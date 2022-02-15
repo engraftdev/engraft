@@ -139,7 +139,7 @@ export function LooperTool({ context, config, reportConfig, reportOutput, report
 }
 registerTool(LooperTool, {
   toolName: 'looper',
-  inputConfig: toolIndex['picker'].defaultConfig,
-  perItemConfig: toolIndex['picker'].defaultConfig
+  inputConfig: toolIndex['code'].defaultConfig,
+  perItemConfig: toolIndex['code'].defaultConfig
 });
 

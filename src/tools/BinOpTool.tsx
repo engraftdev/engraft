@@ -29,7 +29,7 @@ export function BinOpTool({ context, config, reportConfig, reportOutput, reportV
   useEffect(() => {
     reportView.set(() => {
       return (
-        <div>
+        <div className="row-center">
           <FunctionComponent f={input1.view} ifMissing={<span>missing input 1 view</span>}/>
           <span style={{margin: 15, fontSize: "150%"}}>{config.op}</span>
           <FunctionComponent f={input2.view} ifMissing={<span>missing input 2 view</span>}/>
@@ -46,7 +46,7 @@ export function BinOpTool({ context, config, reportConfig, reportOutput, reportV
 }
 registerTool(BinOpTool, {
   toolName: 'bin-op',
-  input1Config: toolIndex['picker'].defaultConfig,
-  input2Config: toolIndex['picker'].defaultConfig,
+  input1Config: toolIndex['code'].defaultConfig,
+  input2Config: toolIndex['code'].defaultConfig,
   op: '+'
 });

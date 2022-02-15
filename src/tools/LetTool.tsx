@@ -27,13 +27,18 @@ export function LetTool({ context, config, reportConfig, reportOutput, reportVie
     reportView.set(() => {
       return (
         <div>
-          <input type="text" value={config.bindingKey} onChange={(ev) => reportConfig.update(setKeys({bindingKey: ev.target.value}))}/>
+          <div className="row-top" style={{marginBottom: 10}}>
+            <b>let</b>
+            <input type="text" value={config.bindingKey} onChange={(ev) => reportConfig.update(setKeys({bindingKey: ev.target.value}))}/>
+          </div>
 
-          <div>
+          <div className="row-top" style={{marginBottom: 10}}>
+            <b>be</b>
             <FunctionComponent f={binding.view} ifMissing={<span>missing binding view</span>} />
           </div>
 
-          <div>
+          <div className="row-top" style={{marginBottom: 10}}>
+            <b>in</b>
             <FunctionComponent f={body.view} ifMissing={<span>missing body view</span>} />
           </div>
         </div>
@@ -50,6 +55,6 @@ export function LetTool({ context, config, reportConfig, reportOutput, reportVie
 registerTool(LetTool, {
   toolName: 'let',
   bindingKey: 'x',
-  bindingConfig: toolIndex['picker'].defaultConfig,
-  bodyConfig: toolIndex['picker'].defaultConfig
+  bindingConfig: toolIndex['code'].defaultConfig,
+  bodyConfig: toolIndex['code'].defaultConfig
 });
