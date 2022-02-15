@@ -6,14 +6,16 @@ import useStrictState from './util/useStrictState';
 
 import './tools/builtInTools';
 
+/*
+TODO: fix remounting text-editor bug
+*/
+
 function App() {
   const [config, setConfig] = useStrictState<any>({
     toolName: 'picker',
   } as PickerConfig)
   const [output, setOutput] = useStrictState<any>(undefined);
   const context = useInitOnce(() => ({array: {toolValue: [1, 2, 3]}}));
-
-  console.log("testtoolspicker render", {config})
 
   return <>
     <div>

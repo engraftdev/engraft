@@ -16,7 +16,6 @@ export function SliderTool({ config, reportConfig, reportOutput, reportView }: T
 
   useEffect(() => {
     reportView.set(() => {
-      console.log("slider view", config);
       return (
         <div className="App">
           <input
