@@ -13,7 +13,12 @@ export function DumbTextTool({ context, config, reportConfig, reportOutput, repo
   }, [config.text, reportOutput]);
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView.set(function View() {
+      useEffect(() => {
+        console.log("DumbTextTool mounted");
+
+        return () => console.log("DumbTextTool unmounted");
+      }, [])
       return (
         <input type="text" value={config.text} onChange={(ev) => reportConfig.update(setKeys({text: ev.target.value}))}/>
       );

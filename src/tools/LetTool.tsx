@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react"
-import FunctionComponent from "../util/FunctionComponent"
+import FunctionComponent from "../util/CallFunction"
 import { setKeys } from "../util/setKeys"
-import { registerTool, ToolConfig, toolIndex, ToolProps, useSubTool } from "../tools-framework/tools"
+import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
+import { useSubTool } from "../tools-framework/useSubTool"
 
 export interface LetConfig extends ToolConfig {
   toolName: 'let';
@@ -29,23 +30,23 @@ export function LetTool({ context, config, reportConfig, reportOutput, reportVie
         <div>
           <div className="row-top" style={{marginBottom: 10}}>
             <b>let</b>
-            <input type="text" value={config.bindingKey} onChange={(ev) => reportConfig.update(setKeys({bindingKey: ev.target.value}))}/>
+            <input type="text" autoFocus={true} value={config.bindingKey} onChange={(ev) => reportConfig.update(setKeys({bindingKey: ev.target.value}))}/>
           </div>
 
           <div className="row-top" style={{marginBottom: 10}}>
             <b>be</b>
-            <FunctionComponent f={binding.view} ifMissing={<span>missing binding view</span>} />
+            {binding.makeView({})}
           </div>
 
           <div className="row-top" style={{marginBottom: 10}}>
             <b>in</b>
-            <FunctionComponent f={body.view} ifMissing={<span>missing body view</span>} />
+            {body.makeView({})}
           </div>
         </div>
       );
     });
     return () => reportView.set(null);
-  }, [config.bindingKey, reportView, reportConfig, binding.view, body.view]);
+  }, [config.bindingKey, reportView, reportConfig, binding.makeView, body.makeView]);
 
   return <>
     {binding.component}

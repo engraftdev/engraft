@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from "react";
-import FunctionComponent from "../util/FunctionComponent";
+import FunctionComponent from "../util/CallFunction";
 import { setKeys, setKeys2 } from "../util/setKeys";
 import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
 import useStrictState, { subSetter } from "../util/useStrictState";
+import CallFunction from "../util/CallFunction";
 
 export interface PickerConfig {
   toolName: 'picker';
@@ -21,7 +22,7 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
         }
 
         contents = <>
-          {pickedView ? <FunctionComponent f={pickedView} /> : <div>No view yet?</div>}
+          {pickedView ? <CallFunction f={() => pickedView({})} /> : <div>No view yet?</div>}
           <button style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }} onClick={onClick}>
           ×
           </button>

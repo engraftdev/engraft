@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import FunctionComponent from "../util/FunctionComponent";
-import { registerTool, ToolConfig, toolIndex, ToolProps, useSubTool } from "../tools-framework/tools";
+import FunctionComponent from "../util/CallFunction";
+import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import { setKeys } from "../util/setKeys";
 
 export interface RequestConfig extends ToolConfig {

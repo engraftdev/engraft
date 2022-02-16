@@ -1,9 +1,11 @@
 import memoize from "fast-memoize";
 import React from "react";
 import { useEffect, useMemo } from "react";
-import FunctionComponent from "../util/FunctionComponent";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, useSubTool } from "../tools-framework/tools";
+import FunctionComponent from "../util/CallFunction";
+import { registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import useStrictState, { fromSetterUnsafe, subSetter } from "../util/useStrictState";
+import CallFunction from "../util/CallFunction";
+import { useSubTool } from "../tools-framework/useSubTool";
 
 
 
@@ -58,7 +60,7 @@ export function LooperTool({ context, config, reportConfig, reportOutput, report
         <div>
           <h2>looper</h2>
           <div className="row-top" style={{marginBottom: 10}}>
-            <b>input</b> <FunctionComponent f={input.view} ifMissing={<span>missing input view</span>}/>
+            <b>input</b> {input.makeView({})}
           </div>
 
           {inputArray &&
@@ -72,7 +74,7 @@ export function LooperTool({ context, config, reportConfig, reportOutput, report
                   </div>
                 )}
                 <div>
-                  <FunctionComponent f={highlightedView} ifMissing={<span>missing highlighted view</span>}/>
+                  {highlightedView && <CallFunction f={() => highlightedView({})} />}
                 </div>
               </div>
             </div>
@@ -81,7 +83,7 @@ export function LooperTool({ context, config, reportConfig, reportOutput, report
       );
     })
     return () => reportView.set(null);
-  }, [config, reportView, reportConfig, input.view, inputArray, highlightedIndex, highlightedView, setHighlightedIndex]);
+  }, [config, reportView, reportConfig, input.makeView, inputArray, highlightedIndex, highlightedView, setHighlightedIndex]);
 
   const PerItemTool = toolIndex[config.perItemConfig.toolName];
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import FunctionComponent from "../util/FunctionComponent";
-import { registerTool, ToolConfig, toolIndex, ToolProps, useSubTool } from "../tools-framework/tools";
+import FunctionComponent from "../util/CallFunction";
+import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
+import { useSubTool } from "../tools-framework/useSubTool";
 
 export interface BinOpConfig extends ToolConfig {
   toolName: 'bin-op';
@@ -30,14 +31,14 @@ export function BinOpTool({ context, config, reportConfig, reportOutput, reportV
     reportView.set(() => {
       return (
         <div className="row-center">
-          <FunctionComponent f={input1.view} ifMissing={<span>missing input 1 view</span>}/>
+          {input1.makeView({autoFocus: true})}
           <span style={{margin: 15, fontSize: "150%"}}>{config.op}</span>
-          <FunctionComponent f={input2.view} ifMissing={<span>missing input 2 view</span>}/>
+          {input2.makeView({autoFocus: false})}
         </div>
       );
     })
     return () => reportView.set(null);
-  }, [config.op, reportView, input1.view, input2.view]);
+  }, [config.op, reportView, input1.makeView, input2.makeView]);
 
   return <>
     {input1.component}

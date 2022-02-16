@@ -4,11 +4,11 @@ import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript, javascriptLanguage } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
-import FunctionComponent from "../util/FunctionComponent";
+import FunctionComponent from "../util/CallFunction";
 import useStrictState, { subSetter } from "../util/useStrictState";
 
-import {keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor} from "@codemirror/view"
-import {Extension, EditorState} from "@codemirror/state"
+import {keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor, DecorationSet, Decoration, EditorView, WidgetType} from "@codemirror/view"
+import {Extension, EditorState, StateField, EditorSelection, TransactionSpec, Text} from "@codemirror/state"
 import {history, historyKeymap} from "@codemirror/history"
 import {foldGutter, foldKeymap} from "@codemirror/fold"
 import {indentOnInput} from "@codemirror/language"
@@ -22,6 +22,8 @@ import {commentKeymap} from "@codemirror/comment"
 import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
+import { RangeSet } from "@codemirror/rangeset";
+import CallFunction from "../util/CallFunction";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -88,6 +90,90 @@ const setup = [
 ]
 
 
+
+class RefWidget extends WidgetType {
+  constructor(readonly id: string) { super() }
+
+  toDOM() {
+    let wrap = document.createElement("span")
+    wrap.innerText = this.id
+    wrap.className = "lc-ref"
+    return wrap
+  }
+
+  destroy() {
+
+  }
+}
+
+const refRE = new RegExp("__ref_(....)", "g")
+
+function refsFromText(text: Text) {
+  const matches = Array.from(text.sliceString(0).matchAll(refRE));
+
+  return RangeSet.of(
+    matches.map((match) => {
+      return Decoration.replace({
+        widget: new RefWidget(match[1])
+      }).range(match.index!, match.index! + match[0].length)
+    })
+  );
+}
+
+const refsField = StateField.define<DecorationSet>({
+  create(state) {
+    return refsFromText(state.doc)
+  },
+  update(old, tr) {
+    return refsFromText(tr.newDoc)
+  },
+  provide: f => EditorView.decorations.from(f)
+})
+
+const jumpOverRefs = EditorState.transactionFilter.of(tr => {
+  // const userEvent = tr.annotation(Transaction.userEvent);
+  const refs = tr.startState.field(refsField)
+
+  // TODO: only single selection will be supported
+
+  if (tr.isUserEvent('select')) {
+    let {head, anchor} = tr.newSelection.main;
+    let change = false;
+    refs.between(head, head, (refFrom, refTo, ref) => {
+      function applyWormhole(src: number, dst: number) {
+        if (head === src) { head = dst; change = true; }
+        if (anchor === src) { anchor = dst; change = true; }
+      }
+      applyWormhole(refTo - 1, refFrom);
+      applyWormhole(refFrom + 1, refTo);
+      if (change) { return false; }
+    })
+    if (change) {
+      return [tr, {selection: tr.newSelection.replaceRange(EditorSelection.range(anchor, head))}];
+    }
+  } else if (tr.isUserEvent('delete.forward') || tr.isUserEvent('delete.backward')) {
+    const forward = tr.isUserEvent('delete.forward')
+
+    const head = tr.startState.selection.main.head;
+    let result: TransactionSpec | readonly TransactionSpec[] = tr;
+    refs.between(head, head, (refFrom, refTo, ref) => {
+      if (head === (forward ? refFrom : refTo)) {
+        result = [{changes: {from: refFrom, to: refTo}}];
+        return false;
+      }
+    });
+    return result;
+  }
+
+  return tr;
+})
+
+const refsTheme = EditorView.baseTheme({
+  ".lc-ref": { background: 'lightblue', borderRadius: '10px', padding: '0px 5px' }
+})
+
+
+
 export function CodeTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<CodeConfig>) {
   // useEffect(() => {
   //   reportOutput.set({toolValue: config.text});
@@ -126,7 +212,9 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
               // extensions={[language]}
               // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
               basicSetup={false}
-              extensions={[...setup, javascript(), javascriptLanguage.data.of({ autocomplete: completions })]}
+              extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), javascriptLanguage.data.of({ autocomplete: completions })]}
+              indentWithTab={false}
+              autoFocus={true}
               value={config.text}
               onChange={(value) => {
                 reportConfig.update(setKeys2<CodeConfig>({text: value}))
@@ -136,7 +224,7 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
         );
       } else {
         return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
-          {pickedView ? <FunctionComponent f={pickedView} /> : <div>No view yet?</div>}
+          {pickedView ? <CallFunction f={() => pickedView({})} /> : <div>No view yet?</div>}
           <button
             style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
             onClick={() => {
