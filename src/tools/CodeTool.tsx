@@ -46,19 +46,10 @@ function tryEval(code: string): unknown {
   }
 }
 
-function tryEvalHack(code: string, context: any): unknown {
-  try {
-    return eval(`
-      (() => {
-        ${Object.entries(context).map(([key, value]) => `const ${key} = ${JSON.stringify((value as any).toolValue)};`).join("\n")}
-        return (${code});
-      })();
-    `);
-  } catch {
-    return undefined;
-  }
+function compile(exprCode: string): (context: object) => unknown {
+  // eslint-disable-next-line no-new-func
+  return new Function('__context__', `with (__context__) { return (${exprCode}); }`) as any
 }
-
 
 const setup = [
   // lineNumbers(),
@@ -106,7 +97,13 @@ class RefWidget extends WidgetType {
   }
 }
 
-const refRE = new RegExp("__ref_(....)", "g")
+function refCode(s: string) {
+  return `_α_${s}_ω_`
+}
+
+const refRE = new RegExp(refCode("([_a-zA-Z0-9]*)"), "g")
+
+// _α_my_token_ω_
 
 function refsFromText(text: Text) {
   const matches = Array.from(text.sliceString(0).matchAll(refRE));
@@ -131,7 +128,6 @@ const refsField = StateField.define<DecorationSet>({
 })
 
 const jumpOverRefs = EditorState.transactionFilter.of(tr => {
-  // const userEvent = tr.annotation(Transaction.userEvent);
   const refs = tr.startState.field(refsField)
 
   // TODO: only single selection will be supported
@@ -169,7 +165,7 @@ const jumpOverRefs = EditorState.transactionFilter.of(tr => {
 })
 
 const refsTheme = EditorView.baseTheme({
-  ".lc-ref": { background: 'lightblue', borderRadius: '10px', padding: '0px 5px' }
+  ".lc-ref": { background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }
 })
 
 
@@ -181,30 +177,51 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
 
   const [pickedView, setPickedView] = useStrictState<ToolView | null>(null);
 
-  useEffect(() => {
+  const compiled = useMemo(() => {
     if (config.type === 'text') {
-      reportOutput.set({toolValue: tryEvalHack(config.text, context)})
+      try {
+        return compile(config.text)
+      } catch {
+        // todo
+      }
     }
-  }, [config, reportOutput, context])
+  }, [config])
 
-  const completions: CompletionSource = useCallback((context: CompletionContext) => {
-    let word = context.matchBefore(/^.*/)!
+  useEffect(() => {
+    if (compiled) {
+      const wrapped = Object.fromEntries(Object.entries(context).map(([k, v]) => [refCode(k), v.toolValue]));
+      try {
+        reportOutput.set({toolValue: compiled(wrapped)})
+      } catch {
+        // TODO
+      }
+    }
+  }, [context, compiled, reportOutput])
+
+  const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
+    let word = completionContext.matchBefore(/^.*/)!
     if (word.from === word.to && !context.explicit) {
       return null
     }
     return {
       from: word.from,
-      options: Object.entries(toolIndex).map(([toolName, tool]) => ({
-        label: '/' + toolName,
-        apply: () => {
-          reportConfig.update(setKeys2<CodeConfig>({type: 'tool', pickedConfig: tool.defaultConfig}))
-        }
-      }))
+      options: [
+        ...Object.entries(toolIndex).map(([toolName, tool]) => ({
+          label: '/' + toolName,
+          apply: () => {
+            reportConfig.update(setKeys2<CodeConfig>({type: 'tool', pickedConfig: tool.defaultConfig}))
+          }
+        })),
+        ...Object.keys(context).map((contextKey) => ({
+          label: '@' + contextKey,
+          apply: refCode(contextKey),
+        })),
+      ]
     }
   }, [])  // TODO: react to new completions or w/e
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView.set(({autoFocus}) => {
       if (config.type === 'text') {
         return (
           <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
@@ -212,9 +229,10 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
               // extensions={[language]}
               // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
               basicSetup={false}
-              extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), javascriptLanguage.data.of({ autocomplete: completions })]}
+              extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
+              // javascriptLanguage.data.of({ autocomplete: completions })
               indentWithTab={false}
-              autoFocus={true}
+              autoFocus={autoFocus}
               value={config.text}
               onChange={(value) => {
                 reportConfig.update(setKeys2<CodeConfig>({text: value}))
