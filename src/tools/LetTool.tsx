@@ -1,8 +1,7 @@
 import { useEffect, useMemo } from "react"
-import FunctionComponent from "../util/CallFunction"
-import { setKeys } from "../util/setKeys"
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
 import { useSubTool } from "../tools-framework/useSubTool"
+import { updateKeys } from "../util/state"
 
 export interface LetConfig extends ToolConfig {
   toolName: 'let';
@@ -11,46 +10,46 @@ export interface LetConfig extends ToolConfig {
   bodyConfig: ToolConfig;
 }
 
-export function LetTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
-  const binding = useSubTool({context, config, reportConfig, subKey: 'bindingConfig'})
+export function LetTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
+  const [bindingComponent, bindingMakeView, bindingOutput] = useSubTool({context, config, updateConfig, subKey: 'bindingConfig'})
 
   const contextForBody = useMemo(() => {
-    return binding.value ? {...context, [config.bindingKey]: binding.value} : context
-  }, [binding.value, config.bindingKey, context])
+    return bindingOutput ? {...context, [config.bindingKey]: bindingOutput} : context
+  }, [bindingOutput, config.bindingKey, context])
 
-  const body = useSubTool({context: contextForBody, config, reportConfig, subKey: 'bodyConfig'})
-
-  useEffect(() => {
-    reportOutput.set(body.value);
-  }, [body.value, reportOutput])
+  const [bodyComponent, bodyMakeView, bodyOutput] = useSubTool({context: contextForBody, config, updateConfig, subKey: 'bodyConfig'})
 
   useEffect(() => {
-    reportView.set(() => {
+    reportOutput(bodyOutput);
+  }, [bodyOutput, reportOutput])
+
+  useEffect(() => {
+    reportView(() => {
       return (
         <div>
           <div className="row-top" style={{marginBottom: 10}}>
             <b>let</b>
-            <input type="text" autoFocus={true} value={config.bindingKey} onChange={(ev) => reportConfig.update(setKeys({bindingKey: ev.target.value}))}/>
+            <input type="text" autoFocus={true} value={config.bindingKey} onChange={(ev) => updateKeys(updateConfig, {bindingKey: ev.target.value})}/>
           </div>
 
           <div className="row-top" style={{marginBottom: 10}}>
             <b>be</b>
-            {binding.makeView({})}
+            {bindingMakeView({})}
           </div>
 
           <div className="row-top" style={{marginBottom: 10}}>
             <b>in</b>
-            {body.makeView({})}
+            {bodyMakeView({})}
           </div>
         </div>
       );
     });
-    return () => reportView.set(null);
-  }, [config.bindingKey, reportView, reportConfig, binding.makeView, body.makeView]);
+    return () => reportView(null);
+  }, [config.bindingKey, reportView, updateConfig, bindingMakeView, bodyMakeView]);
 
   return <>
-    {binding.component}
-    {body.component}
+    {bindingComponent}
+    {bodyComponent}
   </>
 }
 registerTool(LetTool, {

@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { setKeys, setKeys2 } from "../util/setKeys";
-import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
+import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import CodeMirror from "@uiw/react-codemirror"
-import { javascript, javascriptLanguage } from "@codemirror/lang-javascript";
+import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
-import FunctionComponent from "../util/CallFunction";
-import useStrictState, { subSetter } from "../util/useStrictState";
 
-import {keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor, DecorationSet, Decoration, EditorView, WidgetType} from "@codemirror/view"
-import {Extension, EditorState, StateField, EditorSelection, TransactionSpec, Text} from "@codemirror/state"
+import {keymap, highlightSpecialChars, drawSelection, dropCursor, DecorationSet, Decoration, EditorView, WidgetType} from "@codemirror/view"
+import {EditorState, StateField, EditorSelection, TransactionSpec, Text} from "@codemirror/state"
 import {history, historyKeymap} from "@codemirror/history"
-import {foldGutter, foldKeymap} from "@codemirror/fold"
+import {foldKeymap} from "@codemirror/fold"
 import {indentOnInput} from "@codemirror/language"
-import {lineNumbers, highlightActiveLineGutter} from "@codemirror/gutter"
 import {defaultKeymap} from "@codemirror/commands"
 import {bracketMatching} from "@codemirror/matchbrackets"
 import {closeBrackets, closeBracketsKeymap} from "@codemirror/closebrackets"
@@ -23,32 +19,23 @@ import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
 import { RangeSet } from "@codemirror/rangeset";
-import CallFunction from "../util/CallFunction";
+import { useSubTool } from "../tools-framework/useSubTool";
+import { updateKeys, Updater, useAt } from "../util/state";
+import compile from "../util/compile";
 
 export type CodeConfig = {
   toolName: 'code';
-} & (
-  {
-    type: 'text',
-    text: string
-  } |
-  { type: 'tool',
-    pickedConfig: ToolConfig
-  }
-)
-
-
-function tryEval(code: string): unknown {
-  try {
-    return eval('(' + code + ')');
-  } catch {
-    return undefined;
-  }
+  mode: CodeConfigTextMode | CodeConfigToolMode;
 }
 
-function compile(exprCode: string): (context: object) => unknown {
-  // eslint-disable-next-line no-new-func
-  return new Function('__context__', `with (__context__) { return (${exprCode}); }`) as any
+export interface CodeConfigTextMode {
+  modeName: 'text',
+  text: string
+}
+
+export interface CodeConfigToolMode {
+  modeName: 'tool',
+  config: ToolConfig
 }
 
 const setup = [
@@ -170,28 +157,42 @@ const refsTheme = EditorView.baseTheme({
 
 
 
-export function CodeTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<CodeConfig>) {
-  // useEffect(() => {
-  //   reportOutput.set({toolValue: config.text});
-  // }, [config.text, reportOutput]);
+export function CodeTool(props: ToolProps<CodeConfig>) {
+  const {config, updateConfig} = props;
 
-  const [pickedView, setPickedView] = useStrictState<ToolView | null>(null);
+  let [modeConfig, updateModeConfig] = useAt(config, updateConfig, 'mode');
 
+  if (modeConfig.modeName === 'text') {
+    return <CodeToolTextMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigTextMode>} />;
+  } else {
+    return <CodeToolToolMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigToolMode>} />;
+  }
+}
+registerTool(CodeTool, {
+  toolName: 'code',
+  mode: {
+    modeName: 'text',
+    text: ''
+  }
+});
+
+
+export function CodeToolTextMode({ context, config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
+                                 { modeConfig: CodeConfigTextMode, updateModeConfig: Updater<CodeConfigTextMode> }) {
   const compiled = useMemo(() => {
-    if (config.type === 'text') {
-      try {
-        return compile(config.text)
-      } catch {
-        // todo
-      }
+    try {
+      const result = compile(modeConfig.text)
+      return result;
+    } catch {
+      // todo
     }
-  }, [config])
+  }, [modeConfig.text])
 
   useEffect(() => {
     if (compiled) {
       const wrapped = Object.fromEntries(Object.entries(context).map(([k, v]) => [refCode(k), v.toolValue]));
       try {
-        reportOutput.set({toolValue: compiled(wrapped)})
+        reportOutput({toolValue: compiled(wrapped)})
       } catch {
         // TODO
       }
@@ -209,7 +210,7 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
         ...Object.entries(toolIndex).map(([toolName, tool]) => ({
           label: '/' + toolName,
           apply: () => {
-            reportConfig.update(setKeys2<CodeConfig>({type: 'tool', pickedConfig: tool.defaultConfig}))
+            updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig}})
           }
         })),
         ...Object.keys(context).map((contextKey) => ({
@@ -218,64 +219,58 @@ export function CodeTool({ context, config, reportConfig, reportOutput, reportVi
         })),
       ]
     }
-  }, [])  // TODO: react to new completions or w/e
+  }, [context, updateConfig])  // TODO: react to new completions or w/e
 
   useEffect(() => {
-    reportView.set(({autoFocus}) => {
-      if (config.type === 'text') {
-        return (
-          <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
-            <CodeMirror
-              // extensions={[language]}
-              // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
-              basicSetup={false}
-              extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
-              // javascriptLanguage.data.of({ autocomplete: completions })
-              indentWithTab={false}
-              autoFocus={autoFocus}
-              value={config.text}
-              onChange={(value) => {
-                reportConfig.update(setKeys2<CodeConfig>({text: value}))
-              }}
-            />
-          </div>
-        );
-      } else {
-        return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
-          {pickedView ? <CallFunction f={() => pickedView({})} /> : <div>No view yet?</div>}
-          <button
-            style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
-            onClick={() => {
-              reportConfig.update(setKeys2<CodeConfig>({type: 'text', text: ''}))
-            }}>
-            ×
-          </button>
-        </div>
-      }
+    reportView(({autoFocus}) => {
+      return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+        <CodeMirror
+          // extensions={[language]}
+          // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
+          basicSetup={false}
+          extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
+          // javascriptLanguage.data.of({ autocomplete: completions })
+          indentWithTab={false}
+          autoFocus={autoFocus}
+          value={modeConfig.text}
+          onChange={(value) => {
+            updateKeys(updateModeConfig, {text: value});
+          }}
+        />
+      </div>;
     })
-  }, [config, pickedView, reportConfig, reportView])
-
-
-  const forwardConfig = useMemo(() => subSetter<CodeConfig, any>(reportConfig, 'pickedConfig'), [reportConfig]);  // TODO: types
-
-  if (config.type === 'tool') {
-    const PickedTool = toolIndex[config.pickedConfig.toolName] as Tool<any> | undefined;
-
-    if (PickedTool) {
-      return <PickedTool
-        context={context}
-        config={config.pickedConfig}
-        reportConfig={forwardConfig}
-        reportOutput={reportOutput}
-        reportView={setPickedView}
-      />;
-    }
-  }
-
+  }, [completions, config, modeConfig.text, reportView, updateModeConfig])
   return null;
 }
-registerTool(CodeTool, {
-  toolName: 'code',
-  type: 'text',
-  text: ''
-});
+
+export function CodeToolToolMode({ context, config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
+                                 { modeConfig: CodeConfigToolMode, updateModeConfig: Updater<CodeConfigToolMode> }) {
+
+  const [component, makeView, output] = useSubTool({
+    context,
+    config: modeConfig,
+    updateConfig: updateModeConfig,
+    subKey: 'config',
+  })
+
+  useEffect(() => {
+    reportOutput(output);
+  }, [reportOutput, output])
+
+  useEffect(() => {
+    reportView(({autoFocus}) => {
+      return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
+        {makeView({autoFocus})}
+        <button
+          style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
+          onClick={() => {
+            updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
+          }}>
+          ×
+        </button>
+      </div>
+    })
+  }, [reportView, makeView, updateConfig])
+
+  return component;
+}

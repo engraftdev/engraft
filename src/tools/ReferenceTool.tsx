@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { setKeys } from "../util/setKeys";
 import { registerTool, ToolProps } from "../tools-framework/tools";
 
 
@@ -7,22 +6,22 @@ export interface ReferenceConfig {
   toolName: 'reference';
   referenceKey: string | undefined;
 }
-export function ReferenceTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<ReferenceConfig>) {
+export function ReferenceTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<ReferenceConfig>) {
   useEffect(() => {
     console.log("referencetool output");
     if (config.referenceKey) {
-      reportOutput.set(context[config.referenceKey]);
+      reportOutput(context[config.referenceKey]);
     } else {
-      reportOutput.set({toolValue: undefined});
+      reportOutput({toolValue: undefined});
     }
   }, [config.referenceKey, context, reportOutput]);  // TODO: avoid re-reports when other things change?
   // useWhatChanged([config.referenceKey, context, reportOutput], 'config.referenceKey, context, reportOutput')
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView(() => {
       const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const referenceKey = e.target.value;
-        reportConfig.update(setKeys({ referenceKey: referenceKey || undefined }));
+        updateConfig((o) => ({ ...o, referenceKey: referenceKey || undefined }))
       }
 
       return (
@@ -49,7 +48,7 @@ export function ReferenceTool({ context, config, reportConfig, reportOutput, rep
         </div>
       );
     })
-  }, [reportView, reportConfig, context, config.referenceKey])
+  }, [reportView, updateConfig, context, config.referenceKey])
 
   return null;
 }

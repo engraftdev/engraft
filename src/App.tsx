@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
-import { toolIndex, ToolValue, ToolWithView } from './tools-framework/tools';
-import { PickerConfig } from './tools/PickerTool';
-import useInitOnce from './util/useInitOnce';
-import useStrictState from './util/useStrictState';
+import { useEffect, useMemo } from 'react';
+import { ToolConfig, ToolValue } from './tools-framework/tools';
+import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
 import { CodeConfig } from './tools/CodeTool';
+import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 
 /*
 TODO: fix remounting text-editor bug
@@ -16,42 +15,39 @@ const localStorageKey = 'live-compose-v1';
 
 const defaultConfig: CodeConfig = {
   toolName: 'code',
-  type: 'text',
-  text: ''
+  mode: {
+    modeName: 'text',
+    text: ''
+  }
 };
 
 function App() {
-  const [config, setConfig] = useStrictState<any>(defaultConfig)
-  const [output, setOutput] = useStrictState<ToolValue | null>(null);
-  const context = useInitOnce(() => ({array: {toolValue: [1, 2, 3]}}));
+  const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
+  const context = useMemo(() => ({array: {toolValue: [1, 2, 3]}}), []);
 
   useEffect(() => {
     const configJson = window.localStorage.getItem(localStorageKey)
     if (configJson) {
-        setConfig.set(JSON.parse(configJson));
+        updateConfig(() => JSON.parse(configJson));
     }
-  }, [])
+  }, [updateConfig])
 
   useEffect(() => {
     window.localStorage.setItem(localStorageKey, JSON.stringify(config));
   }, [config])
 
+  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+
   return <>
     <div>
-      <ToolWithView
-          Tool={toolIndex[config.toolName]}
-          context={context}
-          config={config}
-          reportConfig={setConfig}
-          reportOutput={setOutput}
-      />
+      <ToolWithView config={config} context={context} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
     </div>
     <br/>
     <br/>
     <pre>{JSON.stringify(output?.toolValue, null, 2)}</pre>
     <br/>
     <br/>
-    <button onClick={() => setConfig.set(defaultConfig)}>reset</button>
+    <button onClick={() => updateConfig(() => defaultConfig)}>reset</button>
   </>
 }
 

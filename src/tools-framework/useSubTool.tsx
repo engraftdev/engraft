@@ -1,28 +1,32 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import CallFunction from "../util/CallFunction";
-import useStrictState, { Setter, subSetter } from "../util/useStrictState";
+import { Updater, useAt, useStateSetOnly } from "../util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps } from "./tools";
 
-export interface UseSubToolProps<C extends ToolConfig, K extends keyof C> {
+export interface UseToolProps<C extends ToolConfig> {
   context: any,
   config: C,
-  reportConfig: Setter<C>,
-  subKey: K
+  updateConfig: Updater<C>
 }
 
-export function useSubTool<C extends ToolConfig, K extends keyof C>({context, config, reportConfig, subKey}: UseSubToolProps<C, K>) {
-  const [value, setValue] = useStrictState<ToolValue | null>(null)
-  const [view, setView] = useStrictState<ToolView | null>(null)
-  const forwardConfig = useMemo(() => subSetter(reportConfig, subKey), [reportConfig, subKey]);
+export type UseToolReturn = [
+  component: JSX.Element,
+  makeView: (props: ToolViewProps) => JSX.Element | null,
+  output: ToolValue | null,
+]
 
-  const toolName = (config[subKey] as any as ToolConfig).toolName;
+export function useTool<C extends ToolConfig>({context, config, updateConfig}: UseToolProps<C>): UseToolReturn {
+  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
+  const [view, setView] = useStateSetOnly<ToolView | null>(null)
+
+  const toolName = config.toolName;
   const Tool = toolIndex[toolName]
 
   const component = <Tool
     context={context}
-    config={config[subKey]}
-    reportConfig={forwardConfig}
-    reportOutput={setValue}
+    config={config}
+    updateConfig={updateConfig}
+    reportOutput={setOutput}
     reportView={setView}
   />
 
@@ -39,7 +43,27 @@ export function useSubTool<C extends ToolConfig, K extends keyof C>({context, co
     return <CallFunction key={toolName} f={() => view(props)}/>
   }, [view, toolName]);
 
-  return {
-    value, makeView, component
-  }
+  return [component, makeView, output];
+}
+
+
+// for the common case where a tool's config is a key in a super-tool's config
+
+export interface UseSubToolProps<C, K extends keyof C> {
+  context: any,
+  config: C,
+  updateConfig: Updater<C>,
+  subKey: K
+}
+
+// TODO: doesn't check that the sub-config is actually a toolconfig! dang typing
+
+export function useSubTool<C, K extends keyof C>({context, config, updateConfig, subKey}: UseSubToolProps<C, K>) {
+  const [subConfig, updateSubConfig] = useAt(config, updateConfig, subKey);
+
+  return useTool<any>({
+    context,
+    config: subConfig,
+    updateConfig: updateSubConfig,
+  })
 }

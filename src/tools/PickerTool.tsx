@@ -1,24 +1,22 @@
-import { useEffect, useMemo } from "react";
-import FunctionComponent from "../util/CallFunction";
-import { setKeys, setKeys2 } from "../util/setKeys";
+import { useEffect } from "react";
 import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
-import useStrictState, { subSetter } from "../util/useStrictState";
 import CallFunction from "../util/CallFunction";
+import { updateKeys, useAt, useStateSetOnly } from "../util/state";
 
 export interface PickerConfig {
   toolName: 'picker';
   pickedConfig: ToolConfig | undefined;
 }
 export function PickerTool(props: ToolProps<PickerConfig>) {
-  const { context, config, reportConfig, reportOutput, reportView } = props;
-  const [pickedView, setPickedView] = useStrictState<ToolView | null>(null);
+  const { context, config, updateConfig, reportOutput, reportView } = props;
+  const [pickedView, setPickedView] = useStateSetOnly<ToolView | null>(null);
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView(() => {
       let contents;
       if (config.pickedConfig) {
         const onClick = () => {
-          reportConfig.update(setKeys2<PickerConfig>({ pickedConfig: undefined }));
+          updateKeys(updateConfig, { pickedConfig: undefined });
         }
 
         contents = <>
@@ -31,7 +29,7 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
         const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
           console.log("onchange");
           const toolName = e.target.value;
-          reportConfig.update(setKeys({ pickedConfig: toolIndex[toolName].defaultConfig }));
+          updateKeys(updateConfig, { pickedConfig: toolIndex[toolName].defaultConfig });
         }
 
         contents = <select style={{ alignSelf: "flex-end", position: "absolute", border: 'none', left: 8, top: -10 }} onChange={onChange}>
@@ -51,10 +49,10 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
       </div>
     })
 
-    return () => reportView.set(null);
-  }, [config.pickedConfig, pickedView, reportConfig, reportView])
+    return () => reportView(null);
+  }, [config.pickedConfig, pickedView, reportView, updateConfig])
 
-  const forwardConfig = useMemo(() => subSetter<PickerConfig, 'pickedConfig'>(reportConfig, 'pickedConfig'), [reportConfig]);
+  const [pickedConfig, updatePickedConfig] = useAt(config, updateConfig, 'pickedConfig');
 
   if (config.pickedConfig) {
     const PickedTool = toolIndex[config.pickedConfig.toolName] as Tool<any> | undefined;
@@ -62,8 +60,8 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
     if (PickedTool) {
       return <PickedTool
         context={context}
-        config={config.pickedConfig}
-        reportConfig={forwardConfig}
+        config={pickedConfig}
+        updateConfig={updatePickedConfig}
         reportOutput={reportOutput}
         reportView={setPickedView}
       />;

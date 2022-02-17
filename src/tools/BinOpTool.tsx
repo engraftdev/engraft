@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import FunctionComponent from "../util/CallFunction";
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import { useSubTool } from "../tools-framework/useSubTool";
 
@@ -10,39 +9,39 @@ export interface BinOpConfig extends ToolConfig {
   op: '+' | '*';
 }
 
-export function BinOpTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<BinOpConfig>) {
-  const input1 = useSubTool({context, config, reportConfig, subKey: 'input1Config'})
-  const input2 = useSubTool({context, config, reportConfig, subKey: 'input2Config'})
+export function BinOpTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<BinOpConfig>) {
+  const [input1Component, input1MakeView, input1Output] = useSubTool({context, config, updateConfig, subKey: 'input1Config'})
+  const [input2Component, input2MakeView, input2Output] = useSubTool({context, config, updateConfig, subKey: 'input2Config'})
 
   useEffect(() => {
-    if (input1.value && input2.value) {
+    if (input1Output && input2Output) {
       switch (config.op) {
         case '+':
-          reportOutput.set({toolValue: (input1.value.toolValue as number) + (input2.value.toolValue as number)});
+          reportOutput({toolValue: (input1Output.toolValue as number) + (input2Output.toolValue as number)});
           return;
         case '*':
-          reportOutput.set({toolValue: (input1.value.toolValue as number) * (input2.value.toolValue as number)});
+          reportOutput({toolValue: (input1Output.toolValue as number) * (input2Output.toolValue as number)});
           return;
       }
     }
-  }, [config.op, input1.value, input2.value, reportOutput])
+  }, [config.op, input1Output, input2Output, reportOutput])
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView(() => {
       return (
         <div className="row-center">
-          {input1.makeView({autoFocus: true})}
+          {input1MakeView({autoFocus: true})}
           <span style={{margin: 15, fontSize: "150%"}}>{config.op}</span>
-          {input2.makeView({autoFocus: false})}
+          {input2MakeView({autoFocus: false})}
         </div>
       );
     })
-    return () => reportView.set(null);
-  }, [config.op, reportView, input1.makeView, input2.makeView]);
+    return () => reportView(null);
+  }, [config.op, reportView, input1MakeView, input2MakeView]);
 
   return <>
-    {input1.component}
-    {input2.component}
+    {input1Component}
+    {input2Component}
   </>
 }
 registerTool(BinOpTool, {

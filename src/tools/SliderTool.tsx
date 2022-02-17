@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { setKeys } from "../util/setKeys";
 import { registerTool, ToolProps } from "../tools-framework/tools";
+import { updateKeys } from "../util/state";
 
 export interface SliderConfig {
   toolName: 'slider';
@@ -9,27 +9,26 @@ export interface SliderConfig {
   max: number;
   step: number;
 }
-export function SliderTool({ config, reportConfig, reportOutput, reportView }: ToolProps<SliderConfig>) {
+export function SliderTool({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) {
   useEffect(() => {
-    reportOutput.set({toolValue: config.value});
+    reportOutput({toolValue: config.value});
   }, [config.value, reportOutput]);
 
   useEffect(() => {
-    reportView.set(() => {
+    reportView(() => {
       return (
         <div className="App">
           <input
             type="range"
             value={config.value}
-            onChange={(e) => reportConfig.update(setKeys({ value: +e.target.value }))}
+            onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
             min={config.min} max={config.max} step={config.step}/>
           {' '}{config.value}
         </div>
       );
     })
-    return () => reportView.set(null);
-  }, [config, reportView, reportConfig])
-  // useWhatChanged([config, reportView, reportConfig], 'config, reportView, reportConfig')
+    return () => reportView(null);
+  }, [config, reportView, updateConfig])
 
   return null;
 }

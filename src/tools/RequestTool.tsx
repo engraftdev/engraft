@@ -1,69 +1,51 @@
-import { useCallback, useEffect, useState } from "react";
-import FunctionComponent from "../util/CallFunction";
-import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
-import { setKeys } from "../util/setKeys";
+import { useCallback, useEffect } from "react";
+import { registerTool, ToolConfig, ToolProps } from "../tools-framework/tools";
+import { useSubTool } from "../tools-framework/useSubTool";
+import compile from "../util/compile";
+import { updateKeys } from "../util/state";
+import { CodeConfig } from "./CodeTool";
 
 export interface RequestConfig extends ToolConfig {
   toolName: 'request';
   url: string;  // TODO: subtool! default text-editor
-  paramsCode: string;
+  paramsConfig: ToolConfig;
 }
 
-function tryEval(code: string) {
-  try {
-    return eval('(' + code + ')');
-  } catch {
-    return undefined;
-  }
-}
-
-
-export function RequestTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
-  const [response, setResponse] = useState<any>()
+export function RequestTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
+  const [paramsComponent, paramsMakeView, paramsOutput] = useSubTool({context, config, updateConfig, subKey: 'paramsConfig'});
 
   const sendRequest = useCallback(async () => {
     const url = new URL(config.url);
-    let params = tryEval(config.paramsCode) || {}
+    let params = paramsOutput?.toolValue as object || {}
     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, (v as any).toString()))
     const resp = await fetch(url.toString());
 		const data: unknown = await resp.json();
-    reportOutput.set({toolValue: data});
-  }, [config.paramsCode, config.url, reportOutput]);
+    reportOutput({toolValue: data});
+  }, [config.url, paramsOutput?.toolValue, reportOutput]);
 
   useEffect(() => {
-    reportView.set(() => {
-
-      /* eslint-disable react-hooks/rules-of-hooks */
-      useEffect(() => {
-        console.log('RequestTool view mounts');
-
-        return () => {
-            console.log('RequestTool view unmounts')
-        }
-      }, []);
-      /* eslint-enable react-hooks/rules-of-hooks */
+    reportView(() => {
       return (
         <div>
           <h2>request</h2>
           <div className="row-top" style={{marginBottom: 10}}>
-            <b>url</b> <input value={config.url} onChange={(ev) => reportConfig.update(setKeys({url: ev.target.value}))} />
+            <b>url</b> <input value={config.url} onChange={(ev) => updateKeys(updateConfig, {url: ev.target.value})} />
           </div>
           <div className="row-top" style={{marginBottom: 10}}>
-            <b>params</b> <textarea value={config.paramsCode} onChange={(ev) => reportConfig.update(setKeys({paramsCode: ev.target.value}))} />
+            <b>params</b> {paramsMakeView({})}
           </div>
           <button onClick={sendRequest}>send</button>
         </div>
       );
     })
-    return () => reportView.set(null);
-  }, [sendRequest, reportView, config.url, config.paramsCode, reportConfig]);
+    return () => reportView(null);
+  }, [config.url, paramsMakeView, reportView, sendRequest, updateConfig]);
 
-  return null;
+  return <>
+    {paramsComponent}
+  </>;
 }
-registerTool(RequestTool, {
-  toolName: 'request',
-  url: 'https://en.wikipedia.org/w/api.php',
-  paramsCode: `{
+const paramsDefault = `{
   origin: '*',
   format: 'json',
   action: 'query',
@@ -73,4 +55,14 @@ registerTool(RequestTool, {
   rvprop: 'content',
   grnlimit: 1
 }`
+registerTool(RequestTool, {
+  toolName: 'request',
+  url: 'https://en.wikipedia.org/w/api.php',
+  paramsConfig: {
+    toolName: 'code',
+    mode: {
+      modeName: 'text',
+      text: paramsDefault
+    }
+  } as CodeConfig,
 });

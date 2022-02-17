@@ -1,29 +1,29 @@
 import { useEffect } from "react";
-import { setKeys } from "../util/setKeys";
 import { registerTool, ToolProps } from "../tools-framework/tools";
+import { updateKeys } from "../util/state";
 
 
 export interface DumbTextConfig {
   toolName: 'dumb-text';
   text: string;
 }
-export function DumbTextTool({ context, config, reportConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
+export function DumbTextTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
   useEffect(() => {
-    reportOutput.set({toolValue: config.text});
+    reportOutput({toolValue: config.text});
   }, [config.text, reportOutput]);
 
   useEffect(() => {
-    reportView.set(function View() {
+    reportView(function View() {
       useEffect(() => {
         console.log("DumbTextTool mounted");
 
         return () => console.log("DumbTextTool unmounted");
       }, [])
       return (
-        <input type="text" value={config.text} onChange={(ev) => reportConfig.update(setKeys({text: ev.target.value}))}/>
+        <input type="text" value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
       );
     })
-  }, [config.text, reportConfig, reportView])
+  }, [config.text, reportView, updateConfig])
 
   return null;
 }
