@@ -1,6 +1,6 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { EnvContext, registerTool, ToolProps } from "../tools-framework/tools";
-import { useView } from "../tools-framework/useSubTool";
+import { useOutput, useView } from "../tools-framework/useSubTool";
 
 
 export interface ReferenceConfig {
@@ -10,15 +10,14 @@ export interface ReferenceConfig {
 export function ReferenceTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ReferenceConfig>) {
   const env = useContext(EnvContext);
 
-  useEffect(() => {
-    console.log("referencetool output");
-    if (config.referenceKey) {
-      reportOutput(env[config.referenceKey]);
+  const output = useMemo(() => {
+    if (config.referenceKey && config.referenceKey in env) {
+      return env[config.referenceKey];
     } else {
-      reportOutput({toolValue: undefined});
+      return {toolValue: undefined};
     }
-  }, [config.referenceKey, env, reportOutput]);  // TODO: avoid re-reports when other things change?
-  // useWhatChanged([config.referenceKey, context, reportOutput], 'config.referenceKey, context, reportOutput')
+  }, [config.referenceKey, env]);
+  useOutput(reportOutput, output);
 
   const render = useCallback(() => {
     const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -44,12 +43,12 @@ export function ReferenceTool({ config, updateConfig, reportOutput, reportView }
         </div>
         { config.referenceKey &&
           <span style={{opacity: 0.5}}>
-            {' '}= {JSON.stringify(env[config.referenceKey].toolValue)}
+            {' '}= {JSON.stringify(output.toolValue)}
           </span>
         }
       </div>
     );
-  }, [config.referenceKey, env, updateConfig]);
+  }, [config.referenceKey, env, output.toolValue, updateConfig]);
   useView(reportView, render, config);
 
   return null;
