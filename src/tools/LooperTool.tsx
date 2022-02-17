@@ -121,9 +121,8 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
     {inputComponent}
     {inputArray &&
       inputArray.map((item, i) =>
-        <AddToEnvContext value={perItemBinding!(i)}>
+        <AddToEnvContext key={i} value={perItemBinding!(i)}>
           <PerItemTool
-            key={i}
             config={perItemConfig}
             updateConfig={updatePerItemConfig}
             reportOutput={reportPerItemOutput(i)}
