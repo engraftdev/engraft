@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { registerTool, ToolConfig, ToolProps } from "../tools-framework/tools";
 import { useSubTool } from "../tools-framework/useSubTool";
-import compile from "../util/compile";
 import { updateKeys } from "../util/state";
 import { CodeConfig } from "./CodeTool";
 
