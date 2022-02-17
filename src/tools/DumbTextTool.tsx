@@ -7,7 +7,7 @@ export interface DumbTextConfig {
   toolName: 'dumb-text';
   text: string;
 }
-export function DumbTextTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
+export function DumbTextTool({ config, updateConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
   useEffect(() => {
     reportOutput({toolValue: config.text});
   }, [config.text, reportOutput]);

@@ -4,7 +4,6 @@ import { Updater, useAt, useStateSetOnly } from "../util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps } from "./tools";
 
 export interface UseToolProps<C extends ToolConfig> {
-  context: any,
   config: C,
   updateConfig: Updater<C>
 }
@@ -15,7 +14,7 @@ export type UseToolReturn = [
   output: ToolValue | null,
 ]
 
-export function useTool<C extends ToolConfig>({context, config, updateConfig}: UseToolProps<C>): UseToolReturn {
+export function useTool<C extends ToolConfig>({config, updateConfig}: UseToolProps<C>): UseToolReturn {
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
   const [view, setView] = useStateSetOnly<ToolView | null>(null)
 
@@ -23,7 +22,6 @@ export function useTool<C extends ToolConfig>({context, config, updateConfig}: U
   const Tool = toolIndex[toolName]
 
   const component = <Tool
-    context={context}
     config={config}
     updateConfig={updateConfig}
     reportOutput={setOutput}
@@ -50,7 +48,6 @@ export function useTool<C extends ToolConfig>({context, config, updateConfig}: U
 // for the common case where a tool's config is a key in a super-tool's config
 
 export interface UseSubToolProps<C, K extends keyof C> {
-  context: any,
   config: C,
   updateConfig: Updater<C>,
   subKey: K
@@ -58,11 +55,10 @@ export interface UseSubToolProps<C, K extends keyof C> {
 
 // TODO: doesn't check that the sub-config is actually a toolconfig! dang typing
 
-export function useSubTool<C, K extends keyof C>({context, config, updateConfig, subKey}: UseSubToolProps<C, K>) {
+export function useSubTool<C, K extends keyof C>({config, updateConfig, subKey}: UseSubToolProps<C, K>) {
   const [subConfig, updateSubConfig] = useAt(config, updateConfig, subKey);
 
   return useTool<any>({
-    context,
     config: subConfig,
     updateConfig: updateSubConfig,
   })

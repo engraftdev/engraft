@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
+import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
 import { useSubTool } from "../tools-framework/useSubTool"
 import { updateKeys } from "../util/state"
 
@@ -10,14 +10,14 @@ export interface LetConfig extends ToolConfig {
   bodyConfig: ToolConfig;
 }
 
-export function LetTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
-  const [bindingComponent, bindingMakeView, bindingOutput] = useSubTool({context, config, updateConfig, subKey: 'bindingConfig'})
+export function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
+  const [bindingComponent, bindingMakeView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'})
 
-  const contextForBody = useMemo(() => {
-    return bindingOutput ? {...context, [config.bindingKey]: bindingOutput} : context
-  }, [bindingOutput, config.bindingKey, context])
+  const newBindingForBody = useMemo(() => {
+    return bindingOutput ? {[config.bindingKey]: bindingOutput} : {}
+  }, [bindingOutput, config.bindingKey])
 
-  const [bodyComponent, bodyMakeView, bodyOutput] = useSubTool({context: contextForBody, config, updateConfig, subKey: 'bodyConfig'})
+  const [bodyComponent, bodyMakeView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'})
 
   useEffect(() => {
     reportOutput(bodyOutput);
@@ -49,7 +49,9 @@ export function LetTool({ context, config, updateConfig, reportOutput, reportVie
 
   return <>
     {bindingComponent}
-    {bodyComponent}
+    <AddToEnvContext value={newBindingForBody}>
+      {bodyComponent}
+    </AddToEnvContext>
   </>
 }
 registerTool(LetTool, {

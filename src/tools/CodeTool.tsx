@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
+import { useCallback, useContext, useEffect, useMemo } from "react";
+import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
@@ -177,7 +177,7 @@ registerTool(CodeTool, {
 });
 
 
-export function CodeToolTextMode({ context, config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
+export function CodeToolTextMode({ config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
                                  { modeConfig: CodeConfigTextMode, updateModeConfig: Updater<CodeConfigTextMode> }) {
   const compiled = useMemo(() => {
     try {
@@ -188,20 +188,22 @@ export function CodeToolTextMode({ context, config, updateConfig, reportOutput, 
     }
   }, [modeConfig.text])
 
+  const env = useContext(EnvContext)
+
   useEffect(() => {
     if (compiled) {
-      const wrapped = Object.fromEntries(Object.entries(context).map(([k, v]) => [refCode(k), v.toolValue]));
+      const wrapped = Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.toolValue]));
       try {
         reportOutput({toolValue: compiled(wrapped)})
       } catch {
         // TODO
       }
     }
-  }, [context, compiled, reportOutput])
+  }, [env, compiled, reportOutput])
 
   const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/^.*/)!
-    if (word.from === word.to && !context.explicit) {
+    if (word.from === word.to && !env.explicit) {
       return null
     }
     return {
@@ -213,13 +215,13 @@ export function CodeToolTextMode({ context, config, updateConfig, reportOutput, 
             updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig}})
           }
         })),
-        ...Object.keys(context).map((contextKey) => ({
+        ...Object.keys(env).map((contextKey) => ({
           label: '@' + contextKey,
           apply: refCode(contextKey),
         })),
       ]
     }
-  }, [context, updateConfig])  // TODO: react to new completions or w/e
+  }, [env, updateConfig])  // TODO: react to new completions or w/e
 
   useEffect(() => {
     reportView(({autoFocus}) => {
@@ -243,11 +245,10 @@ export function CodeToolTextMode({ context, config, updateConfig, reportOutput, 
   return null;
 }
 
-export function CodeToolToolMode({ context, config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
+export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
                                  { modeConfig: CodeConfigToolMode, updateModeConfig: Updater<CodeConfigToolMode> }) {
 
   const [component, makeView, output] = useSubTool({
-    context,
     config: modeConfig,
     updateConfig: updateModeConfig,
     subKey: 'config',

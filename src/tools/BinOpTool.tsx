@@ -9,9 +9,9 @@ export interface BinOpConfig extends ToolConfig {
   op: '+' | '*';
 }
 
-export function BinOpTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<BinOpConfig>) {
-  const [input1Component, input1MakeView, input1Output] = useSubTool({context, config, updateConfig, subKey: 'input1Config'})
-  const [input2Component, input2MakeView, input2Output] = useSubTool({context, config, updateConfig, subKey: 'input2Config'})
+export function BinOpTool({ config, updateConfig, reportOutput, reportView }: ToolProps<BinOpConfig>) {
+  const [input1Component, input1MakeView, input1Output] = useSubTool({config, updateConfig, subKey: 'input1Config'})
+  const [input2Component, input2MakeView, input2Output] = useSubTool({config, updateConfig, subKey: 'input2Config'})
 
   useEffect(() => {
     if (input1Output && input2Output) {

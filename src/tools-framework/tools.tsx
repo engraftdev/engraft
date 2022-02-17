@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { createContext, ReactElement, ReactNode, useContext, useMemo } from "react";
 import { Setter, Updater } from "../util/state";
 
 export type ToolValue = {
@@ -16,7 +16,6 @@ export interface ToolViewProps {
 export type ToolView = (props: ToolViewProps) => ReactElement<any, any> | null;
 
 export interface ToolProps<C extends ToolConfig> {
-  context: { [key: string]: ToolValue };
   config: C;
   updateConfig: Updater<C>;
   reportOutput: Setter<ToolValue | null>;
@@ -35,4 +34,21 @@ export function registerTool<C extends ToolConfig>(
   defaultConfig: C
 ) {
   toolIndex[defaultConfig.toolName] = Object.assign(func, { defaultConfig });
+}
+
+export const EnvContext = createContext<{[key: string]: ToolValue}>({});
+EnvContext.displayName = 'EnvContext';
+
+export interface AddToEnvContextProps {
+  value: {[key: string]: ToolValue},
+  children?: ReactNode | undefined,
+}
+
+export function AddToEnvContext({value, children}: AddToEnvContextProps) {
+  const oldEnv = useContext(EnvContext);
+  const newEnv = useMemo(() => ({...oldEnv, ...value}), [oldEnv, value])
+
+  return <EnvContext.Provider value={newEnv}>
+    {children}
+  </EnvContext.Provider>
 }

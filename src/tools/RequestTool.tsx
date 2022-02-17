@@ -10,8 +10,8 @@ export interface RequestConfig extends ToolConfig {
   paramsConfig: ToolConfig;
 }
 
-export function RequestTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
-  const [paramsComponent, paramsMakeView, paramsOutput] = useSubTool({context, config, updateConfig, subKey: 'paramsConfig'});
+export function RequestTool({ config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
+  const [paramsComponent, paramsMakeView, paramsOutput] = useSubTool({config, updateConfig, subKey: 'paramsConfig'});
 
   const sendRequest = useCallback(async () => {
     const url = new URL(config.url);

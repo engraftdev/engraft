@@ -8,7 +8,7 @@ export interface PickerConfig {
   pickedConfig: ToolConfig | undefined;
 }
 export function PickerTool(props: ToolProps<PickerConfig>) {
-  const { context, config, updateConfig, reportOutput, reportView } = props;
+  const { config, updateConfig, reportOutput, reportView } = props;
   const [pickedView, setPickedView] = useStateSetOnly<ToolView | null>(null);
 
   useEffect(() => {
@@ -59,7 +59,6 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
 
     if (PickedTool) {
       return <PickedTool
-        context={context}
         config={pickedConfig}
         updateConfig={updatePickedConfig}
         reportOutput={reportOutput}

@@ -1,20 +1,22 @@
-import { useEffect } from "react";
-import { registerTool, ToolProps } from "../tools-framework/tools";
+import { useContext, useEffect } from "react";
+import { EnvContext, registerTool, ToolProps } from "../tools-framework/tools";
 
 
 export interface ReferenceConfig {
   toolName: 'reference';
   referenceKey: string | undefined;
 }
-export function ReferenceTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<ReferenceConfig>) {
+export function ReferenceTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ReferenceConfig>) {
+  const env = useContext(EnvContext);
+
   useEffect(() => {
     console.log("referencetool output");
     if (config.referenceKey) {
-      reportOutput(context[config.referenceKey]);
+      reportOutput(env[config.referenceKey]);
     } else {
       reportOutput({toolValue: undefined});
     }
-  }, [config.referenceKey, context, reportOutput]);  // TODO: avoid re-reports when other things change?
+  }, [config.referenceKey, env, reportOutput]);  // TODO: avoid re-reports when other things change?
   // useWhatChanged([config.referenceKey, context, reportOutput], 'config.referenceKey, context, reportOutput')
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function ReferenceTool({ context, config, updateConfig, reportOutput, rep
                   pick a reference
                 </option>
               }
-              {Object.keys(context).map((contextKey) =>
+              {Object.keys(env).map((contextKey) =>
                 <option key={contextKey}>
                   {contextKey}
                 </option>
@@ -42,13 +44,13 @@ export function ReferenceTool({ context, config, updateConfig, reportOutput, rep
           </div>
           { config.referenceKey &&
             <span style={{opacity: 0.5}}>
-              {' '}= {JSON.stringify(context[config.referenceKey].toolValue)}
+              {' '}= {JSON.stringify(env[config.referenceKey].toolValue)}
             </span>
           }
         </div>
       );
     })
-  }, [reportView, updateConfig, context, config.referenceKey])
+  }, [reportView, updateConfig, env, config.referenceKey])
 
   return null;
 }

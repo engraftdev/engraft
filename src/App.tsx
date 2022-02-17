@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { ToolConfig, ToolValue } from './tools-framework/tools';
+import { EnvContext, ToolConfig, ToolValue } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
@@ -40,7 +40,9 @@ function App() {
 
   return <>
     <div>
-      <ToolWithView config={config} context={context} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+      <EnvContext.Provider value={context}>
+        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+      </EnvContext.Provider>
     </div>
     <br/>
     <br/>

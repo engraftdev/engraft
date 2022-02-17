@@ -1,7 +1,7 @@
 import memoize from "fast-memoize";
 import React from "react";
 import { useEffect, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
+import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import CallFunction from "../util/CallFunction";
 import { useSubTool } from "../tools-framework/useSubTool";
 import { useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
@@ -15,8 +15,8 @@ export interface LooperConfig extends ToolConfig {
 }
 
 
-export function LooperTool({ context, config, updateConfig, reportOutput, reportView }: ToolProps<LooperConfig>) {
-  const [inputComponent, inputMakeView, inputOutput] = useSubTool({context, config, updateConfig, subKey: 'inputConfig'})
+export function LooperTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LooperConfig>) {
+  const [inputComponent, inputMakeView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
   const [highlightedView, setHighlightedView] = useStateSetOnly<ToolView | null>(null)
@@ -112,26 +112,27 @@ export function LooperTool({ context, config, updateConfig, reportOutput, report
     [updateOutputArray]
   );
 
-  const perItemContext = React.useMemo(
+  const perItemBinding = React.useMemo(
     () => inputArray &&
       memoize(
-        (i: number) => ({...context, item: {toolValue: inputArray[i]}})
+        (i: number) => ({item: {toolValue: inputArray[i]}})
       ),
-    [context, inputArray]
+    [inputArray]
   );
 
   return <>
     {inputComponent}
     {inputArray &&
       inputArray.map((item, i) =>
-        <PerItemTool
-          key={i}
-          context={perItemContext!(i)}
-          config={perItemConfig}
-          updateConfig={updatePerItemConfig}
-          reportOutput={reportPerItemOutput(i)}
-          reportView={reportPerItemView(i)}
-        />
+        <AddToEnvContext value={perItemBinding!(i)}>
+          <PerItemTool
+            key={i}
+            config={perItemConfig}
+            updateConfig={updatePerItemConfig}
+            reportOutput={reportPerItemOutput(i)}
+            reportView={reportPerItemView(i)}
+          />
+        </AddToEnvContext>
       )
     }
   </>
