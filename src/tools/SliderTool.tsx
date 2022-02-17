@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import { registerTool, ToolProps } from "../tools-framework/tools";
+import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 
 export interface SliderConfig {
@@ -10,25 +11,22 @@ export interface SliderConfig {
   step: number;
 }
 export function SliderTool({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) {
-  useEffect(() => {
-    reportOutput({toolValue: config.value});
-  }, [config.value, reportOutput]);
+  const output = useMemo(() => ({toolValue: config.value}), [config.value]);
+  useOutput(reportOutput, output);
 
-  useEffect(() => {
-    reportView(() => {
-      return (
-        <div className="App">
-          <input
-            type="range"
-            value={config.value}
-            onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
-            min={config.min} max={config.max} step={config.step}/>
-          {' '}{config.value}
-        </div>
-      );
-    })
-    return () => reportView(null);
-  }, [config, reportView, updateConfig])
+  const render = useCallback(() => {
+    return (
+      <div className="App">
+        <input
+          type="range"
+          value={config.value}
+          onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
+          min={config.min} max={config.max} step={config.step}/>
+        {' '}{config.value}
+      </div>
+    );
+  }, [config.max, config.min, config.step, config.value, updateConfig]);
+  useView(reportView, render, config);
 
   return null;
 }

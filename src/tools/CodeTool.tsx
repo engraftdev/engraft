@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript";
@@ -19,7 +19,7 @@ import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
 import { RangeSet } from "@codemirror/rangeset";
-import { useSubTool } from "../tools-framework/useSubTool";
+import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
 
@@ -190,16 +190,17 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
 
   const env = useContext(EnvContext)
 
-  useEffect(() => {
+  const output = useMemo(() => {
     if (compiled) {
       const wrapped = Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.toolValue]));
       try {
-        reportOutput({toolValue: compiled(wrapped)})
+        return {toolValue: compiled(wrapped)};
       } catch {
-        // TODO
       }
     }
-  }, [env, compiled, reportOutput])
+    return null;
+  }, [compiled, env])
+  useOutput(reportOutput, output);
 
   const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/^.*/)!
@@ -223,55 +224,52 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
     }
   }, [env, updateConfig])  // TODO: react to new completions or w/e
 
-  useEffect(() => {
-    reportView(({autoFocus}) => {
-      return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
-        <CodeMirror
-          // extensions={[language]}
-          // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
-          basicSetup={false}
-          extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
-          // javascriptLanguage.data.of({ autocomplete: completions })
-          indentWithTab={false}
-          autoFocus={autoFocus}
-          value={modeConfig.text}
-          onChange={(value) => {
-            updateKeys(updateModeConfig, {text: value});
-          }}
-        />
-      </div>;
-    })
-  }, [completions, config, modeConfig.text, reportView, updateModeConfig])
+  const render = useCallback(({autoFocus}) => {
+    return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+      <CodeMirror
+        // extensions={[language]}
+        // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
+        basicSetup={false}
+        extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
+        // javascriptLanguage.data.of({ autocomplete: completions })
+        indentWithTab={false}
+        autoFocus={autoFocus}
+        value={modeConfig.text}
+        onChange={(value) => {
+          updateKeys(updateModeConfig, {text: value});
+        }}
+      />
+    </div>;
+  }, [completions, modeConfig.text, updateModeConfig])
+  useView(reportView, render, config);
+
   return null;
 }
 
 export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
                                  { modeConfig: CodeConfigToolMode, updateModeConfig: Updater<CodeConfigToolMode> }) {
 
-  const [component, makeView, output] = useSubTool({
+  const [component, view, output] = useSubTool({
     config: modeConfig,
     updateConfig: updateModeConfig,
     subKey: 'config',
   })
 
-  useEffect(() => {
-    reportOutput(output);
-  }, [reportOutput, output])
+  useOutput(reportOutput, output);
 
-  useEffect(() => {
-    reportView(({autoFocus}) => {
-      return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
-        {makeView({autoFocus})}
-        <button
-          style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
-          onClick={() => {
-            updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
-          }}>
-          ×
-        </button>
-      </div>
-    })
-  }, [reportView, makeView, updateConfig])
+  const render = useCallback(({autoFocus}) => {
+    return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
+      <ShowView view={view} autoFocus={autoFocus} />
+      <button
+        style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
+        onClick={() => {
+          updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
+        }}>
+        ×
+      </button>
+    </div>
+  }, [updateConfig, view]);
+  useView(reportView, render, config);
 
   return component;
 }

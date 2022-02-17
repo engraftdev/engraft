@@ -1,6 +1,6 @@
 import { useStateSetOnly } from "../util/state";
 import { toolIndex, ToolProps, ToolView, ToolViewProps } from "./tools";
-import CallFunction from '../util/CallFunction';
+import { ShowView } from "./useSubTool";
 
 type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & ToolViewProps;
 
@@ -11,7 +11,7 @@ export function ToolWithView({ config, updateConfig, reportOutput, ...rest }: To
 
   return <>
     <Tool config={config} updateConfig={updateConfig} reportOutput={reportOutput} reportView={setView} />
-    {view && <CallFunction f={() => view(rest)}/>}
+    <ShowView view={view} {...rest} />
   </>
 }
 

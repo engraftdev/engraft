@@ -1,7 +1,41 @@
-import { useCallback, useEffect } from "react";
+import memoize from "fast-memoize";
+import { useEffect, useMemo } from "react";
 import CallFunction from "../util/CallFunction";
-import { Updater, useAt, useStateSetOnly } from "../util/state";
-import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps } from "./tools";
+import { Setter, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
+import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps, ToolViewRender } from "./tools";
+
+// TODO: Tool<any> rather than Tool<ToolConfig>; we trust you'll attach a defaultConfig at some point?
+export function useView(reportView: Setter<ToolView | null>, render: ToolViewRender, config: ToolConfig) {
+  useEffect(() => {
+    reportView({render, toolRep: config.toolName});
+    return () => reportView(null);
+  }, [reportView, render, config.toolName])
+}
+
+export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolValue | null) {
+  useEffect(() => {
+    reportOutput(output);
+    return () => reportOutput(null);
+  }, [reportOutput, output])
+}
+
+
+
+
+
+
+export interface ShowViewProps extends ToolViewProps {
+  view: ToolView | null;
+}
+
+export function ShowView({view, ...rest}: ShowViewProps) {
+  if (!view) {
+    return null;
+  }
+
+  return <CallFunction key={view.toolRep} f={() => view.render(rest)}/>
+}
+
 
 export interface UseToolProps<C extends ToolConfig> {
   config: C,
@@ -10,7 +44,7 @@ export interface UseToolProps<C extends ToolConfig> {
 
 export type UseToolReturn = [
   component: JSX.Element,
-  makeView: (props: ToolViewProps) => JSX.Element | null,
+  view: ToolView | null,
   output: ToolValue | null,
 ]
 
@@ -28,20 +62,7 @@ export function useTool<C extends ToolConfig>({config, updateConfig}: UseToolPro
     reportView={setView}
   />
 
-  const makeView = useCallback(function F(props: ToolViewProps) {
-    useEffect(() => {
-      console.log(`mounting view for ${toolName}`);
-      return () => console.log(`unmounting view for ${toolName}`);
-    }, [])
-
-    if (!view) {
-      return null;
-    }
-
-    return <CallFunction key={toolName} f={() => view(props)}/>
-  }, [view, toolName]);
-
-  return [component, makeView, output];
+  return [component, view, output];
 }
 
 
@@ -62,4 +83,53 @@ export function useSubTool<C, K extends keyof C>({config, updateConfig, subKey}:
     config: subConfig,
     updateConfig: updateSubConfig,
   })
+}
+
+
+type PerTool<T> = {[key: string]: T}
+
+export type UseToolsReturn = [
+  components: PerTool<JSX.Element>,
+  makeViews: PerTool<(props: ToolViewProps) => JSX.Element | null>,
+  outputs: PerTool<ToolValue | null>,
+]
+
+function cleanUpOldProperties<T, U>(oldA: PerTool<T>, newB: PerTool<U>) {
+  let newA = oldA;
+  Object.keys(oldA).forEach((key) => {
+    if (!(key in newB)) {
+      if (newA === oldA) {
+        newA = {...oldA}
+      }
+      delete newA[key];
+    }
+  })
+  return newA;
+}
+
+export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolProps<C>}) {
+  const [outputs, updateOutputs] = useStateUpdateOnly<PerTool<ToolValue | null>>({})
+  const [views, updateViews] = useStateUpdateOnly<PerTool<ToolView | null>>({})
+
+  useEffect(() => {
+    updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, tools));
+    updateViews((oldViews) => cleanUpOldProperties(oldViews, tools));
+  }, [tools, updateOutputs, updateViews])
+
+  const reportOutput = useMemo(() => memoize((key: string) => (output: ToolValue | null) => updateKeys(updateOutputs, {[key]: output})), [updateOutputs])
+  const reportView = useMemo(() => memoize((key: string) => (view: ToolView | null) => updateKeys(updateViews, {[key]: view})), [updateViews])
+
+  const components = Object.fromEntries(Object.entries(tools).map(([key, {config, updateConfig}]) => {
+    const toolName = config.toolName;
+    const Tool = toolIndex[toolName]
+
+    return [key, <Tool
+      config={config}
+      updateConfig={updateConfig}
+      reportOutput={reportOutput(key)}
+      reportView={reportView(key)}
+    />]
+  }))
+
+  return [components, views, outputs];
 }

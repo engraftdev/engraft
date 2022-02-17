@@ -1,9 +1,8 @@
 import memoize from "fast-memoize";
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
-import CallFunction from "../util/CallFunction";
-import { useSubTool } from "../tools-framework/useSubTool";
+import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, ToolViewRender } from "../tools-framework/tools";
+import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 
 
@@ -16,7 +15,7 @@ export interface LooperConfig extends ToolConfig {
 
 
 export function LooperTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LooperConfig>) {
-  const [inputComponent, inputMakeView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
   const [highlightedView, setHighlightedView] = useStateSetOnly<ToolView | null>(null)
@@ -51,36 +50,34 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
     reportOutput({toolValue: inputArray ? outputArray : undefined});
   }, [inputArray, outputArray, reportOutput])
 
-  useEffect(() => {
-    reportView(({autoFocus}) => {
-      return (
-        <div>
-          <h2>looper</h2>
-          <div className="row-top" style={{marginBottom: 10}}>
-            <b>input</b> {inputMakeView({autoFocus})}
-          </div>
+  const render: ToolViewRender = useCallback(({autoFocus}) => {
+    return (
+      <div>
+        <h2>looper</h2>
+        <div className="row-top" style={{marginBottom: 10}}>
+          <b>input</b> <ShowView view={inputView} autoFocus={autoFocus} />
+        </div>
 
-          {inputArray &&
-            <div className="row-top">
-              <b>for each</b>
-              <div style={{display: 'inline-block'}}>
-                {inputArray.map((elem, i) =>
-                  <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3, cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
-                        onClick={() => setHighlightedIndex(i)}>
-                    {JSON.stringify(elem)}
-                  </div>
-                )}
-                <div>
-                  {highlightedView && <CallFunction f={() => highlightedView({})} />}
+        {inputArray &&
+          <div className="row-top">
+            <b>for each</b>
+            <div style={{display: 'inline-block'}}>
+              {inputArray.map((elem, i) =>
+                <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3, cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
+                      onClick={() => setHighlightedIndex(i)}>
+                  {JSON.stringify(elem)}
                 </div>
+              )}
+              <div>
+                <ShowView view={highlightedView}/>
               </div>
             </div>
-          }
-        </div>
-      );
-    })
-    return () => reportView(null);
-  }, [highlightedIndex, highlightedView, inputArray, reportView, setHighlightedIndex, inputMakeView]);
+          </div>
+        }
+      </div>
+    );
+  }, [highlightedIndex, highlightedView, inputArray, inputView, setHighlightedIndex]);
+  useView(reportView, render, config);
 
   const PerItemTool = toolIndex[config.perItemConfig.toolName];
 

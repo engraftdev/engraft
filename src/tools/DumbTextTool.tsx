@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { registerTool, ToolProps } from "../tools-framework/tools";
+import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 
 
@@ -8,22 +9,20 @@ export interface DumbTextConfig {
   text: string;
 }
 export function DumbTextTool({ config, updateConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
-  useEffect(() => {
-    reportOutput({toolValue: config.text});
-  }, [config.text, reportOutput]);
+  const output = useMemo(() => ({toolValue: config.text}), [config.text]);
+  useOutput(reportOutput, output);
 
-  useEffect(() => {
-    reportView(function View() {
-      useEffect(() => {
-        console.log("DumbTextTool mounted");
+  const render = useCallback(function R() {
+    useEffect(() => {
+      console.log("DumbTextTool mounted");
 
-        return () => console.log("DumbTextTool unmounted");
-      }, [])
-      return (
-        <input type="text" value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
-      );
-    })
-  }, [config.text, reportView, updateConfig])
+      return () => console.log("DumbTextTool unmounted");
+    }, [])
+    return (
+      <input type="text" value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
+    );
+  }, [config.text, updateConfig]);
+  useView(reportView, render, config);
 
   return null;
 }

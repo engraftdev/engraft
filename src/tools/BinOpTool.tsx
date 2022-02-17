@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
-import { useSubTool } from "../tools-framework/useSubTool";
+import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 
 export interface BinOpConfig extends ToolConfig {
   toolName: 'bin-op';
@@ -10,34 +10,32 @@ export interface BinOpConfig extends ToolConfig {
 }
 
 export function BinOpTool({ config, updateConfig, reportOutput, reportView }: ToolProps<BinOpConfig>) {
-  const [input1Component, input1MakeView, input1Output] = useSubTool({config, updateConfig, subKey: 'input1Config'})
-  const [input2Component, input2MakeView, input2Output] = useSubTool({config, updateConfig, subKey: 'input2Config'})
+  const [input1Component, input1View, input1Output] = useSubTool({config, updateConfig, subKey: 'input1Config'})
+  const [input2Component, input2View, input2Output] = useSubTool({config, updateConfig, subKey: 'input2Config'})
 
-  useEffect(() => {
+  const output = useMemo(() => {
     if (input1Output && input2Output) {
       switch (config.op) {
         case '+':
-          reportOutput({toolValue: (input1Output.toolValue as number) + (input2Output.toolValue as number)});
-          return;
+          return {toolValue: (input1Output.toolValue as number) + (input2Output.toolValue as number)};
         case '*':
-          reportOutput({toolValue: (input1Output.toolValue as number) * (input2Output.toolValue as number)});
-          return;
+          return {toolValue: (input1Output.toolValue as number) * (input2Output.toolValue as number)};
       }
     }
-  }, [config.op, input1Output, input2Output, reportOutput])
+    return null;
+  }, [config.op, input1Output, input2Output])
+  useOutput(reportOutput, output)
 
-  useEffect(() => {
-    reportView(() => {
-      return (
-        <div className="row-center">
-          {input1MakeView({autoFocus: true})}
-          <span style={{margin: 15, fontSize: "150%"}}>{config.op}</span>
-          {input2MakeView({autoFocus: false})}
-        </div>
-      );
-    })
-    return () => reportView(null);
-  }, [config.op, reportView, input1MakeView, input2MakeView]);
+  const render = useCallback(({autoFocus}) => {
+    return (
+      <div className="row-center">
+        <ShowView view={input1View} autoFocus={autoFocus}/>
+        <span style={{margin: 15, fontSize: "150%"}}>{config.op}</span>
+        <ShowView view={input2View}/>
+      </div>
+    );
+  }, [config.op, input1View, input2View]);
+  useView(reportView, render, config);
 
   return <>
     {input1Component}
