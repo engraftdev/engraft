@@ -3,6 +3,8 @@ import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolVa
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
+import { ObjectInspector } from "react-inspector";
+
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
   cells: Cell[];
@@ -50,20 +52,24 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
+  // const newBindings = useMemo(() => {
+  //   let newBindings: {[label: string]: ToolValue} = {};
+  //   cells.forEach((cell) => {
+  //     if (cell.label.length === 0) {
+  //       return;
+  //     }
+  //     const output = outputs[cell.id];
+  //     if (!output) {
+  //       return;
+  //     }
+  //     newBindings[cell.label] = output;
+  //   });
+  //   return newBindings;
+  // }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
+
   const newBindings = useMemo(() => {
-    let newBindings: {[label: string]: ToolValue} = {};
-    cells.forEach((cell) => {
-      if (cell.label.length === 0) {
-        return;
-      }
-      const output = outputs[cell.id];
-      if (!output) {
-        return;
-      }
-      newBindings[cell.label] = output;
-    });
-    return newBindings;
-  }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
+    return {};
+  }, []);
 
   return <AddToEnvContext value={newBindings}>{cells.map((cell) =>
     <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
@@ -119,12 +125,12 @@ interface CellViewProps {
 }
 
 function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
-  const toolOutputJson = useMemo(() => {
+  const outputDisplay = useMemo(() => {
     if (!toolOutput) {
       return '[no output]';
     }
     try {
-      return JSON.stringify(toolOutput.toolValue);
+      return <ObjectInspector data={toolOutput.toolValue} />;
     } catch {
       return '[cannot serialize]';
     }
@@ -132,9 +138,10 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
 
   return <div style={{display: 'flex', alignItems: 'flex-start'}}>
     <input type='text' value={cell.label} onChange={(e) => updateKeys(updateCell, {label: e.target.value})}
-      style={{textAlign: 'right', border: 'none', width: 100, marginRight: 20}}/>
+      style={{textAlign: 'right', border: 'none', width: 100}}/>
+    <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-      <pre style={{margin: 0}}>{toolOutputJson}</pre>
+      {outputDisplay}
       <ShowView view={toolView}/>
     </div>
   </div>
