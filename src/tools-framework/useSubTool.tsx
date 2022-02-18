@@ -76,7 +76,7 @@ export interface UseSubToolProps<C, K extends keyof C> {
 
 // TODO: doesn't check that the sub-config is actually a toolconfig! dang typing
 
-export function useSubTool<C, K extends keyof C>({config, updateConfig, subKey}: UseSubToolProps<C, K>) {
+export function useSubTool<C, K extends string & keyof C>({config, updateConfig, subKey}: UseSubToolProps<C, K>) {
   const [subConfig, updateSubConfig] = useAt(config, updateConfig, subKey);
 
   return useTool<any>({

@@ -31,17 +31,36 @@ export function updateKeys<T>(update: Updater<T>, newKeys: Partial<T>) {
   update((oldT) => ({...oldT, ...newKeys}));
 }
 
-export function at<T, K extends keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
+export function at<T, K extends string & keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
   return (f: (oldTK: T[K]) => T[K]) => {
     update((oldT) => ({...oldT, [key]: f(oldT[key])}));
   };
 }
 
-export function useUpdateAt<T, K extends keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
+export function useUpdateAt<T, K extends string & keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
   return useMemo(() => at(update, key), [update, key]);
 }
 
-export function useAt<T, K extends keyof T>(t: T, updateT: Updater<T>, key: K): [T[K], Updater<T[K]>] {
+export function useAt<T, K extends string & keyof T>(t: T, updateT: Updater<T>, key: K): [T[K], Updater<T[K]>] {
   const updateTK = useUpdateAt(updateT, key);
   return [t[key], updateTK];
+}
+
+export function atIndex<T>(update: Updater<T[]>, index: number): Updater<T> {
+  return (f: (oldT: T) => T) => {
+    update((oldTs) => {
+      const newTs = oldTs.slice();
+      newTs[index] = f(newTs[index]);
+      return newTs;
+    });
+  };
+}
+
+export function useUpdateAtIndex<T>(update: Updater<T[]>, index: number): Updater<T> {
+  return useMemo(() => atIndex(update, index), [update, index]);
+}
+
+export function useAtIndex<T>(ts: T[], updateTs: Updater<T[]>, index: number): [T, Updater<T>] {
+  const updateT = useUpdateAtIndex(updateTs, index);
+  return [ts[index], updateT];
 }

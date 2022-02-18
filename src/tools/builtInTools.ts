@@ -3,6 +3,7 @@ import './PickerTool';
 
 // the rest
 import './CodeTool';
+import './NotebookTool';
 import './BinOpTool';
 import './LetTool';
 import './LooperTool';
