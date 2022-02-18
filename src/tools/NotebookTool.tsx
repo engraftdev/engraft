@@ -52,24 +52,24 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
-  // const newBindings = useMemo(() => {
-  //   let newBindings: {[label: string]: ToolValue} = {};
-  //   cells.forEach((cell) => {
-  //     if (cell.label.length === 0) {
-  //       return;
-  //     }
-  //     const output = outputs[cell.id];
-  //     if (!output) {
-  //       return;
-  //     }
-  //     newBindings[cell.label] = output;
-  //   });
-  //   return newBindings;
-  // }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
-
   const newBindings = useMemo(() => {
-    return {};
-  }, []);
+    let newBindings: {[label: string]: ToolValue} = {};
+    cells.forEach((cell) => {
+      if (cell.label.length === 0) {
+        return;
+      }
+      const output = outputs[cell.id];
+      if (!output) {
+        return;
+      }
+      newBindings[cell.label] = output;
+    });
+    return newBindings;
+  }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
+
+  // const newBindings = useMemo(() => {
+  //   return {};
+  // }, []);
 
   return <AddToEnvContext value={newBindings}>{cells.map((cell) =>
     <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>

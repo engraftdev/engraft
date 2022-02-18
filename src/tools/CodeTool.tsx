@@ -1,6 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
 import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
-import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
@@ -22,6 +21,7 @@ import { RangeSet } from "@codemirror/rangeset";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
+import CodeMirror from "../util/CodeMirror";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -156,7 +156,6 @@ const refsTheme = EditorView.baseTheme({
 })
 
 
-
 export function CodeTool(props: ToolProps<CodeConfig>) {
   const {config, updateConfig} = props;
 
@@ -226,15 +225,18 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
     }
   }, [env, updateConfig])  // TODO: react to new completions or w/e
 
+  const extensions = useMemo(() =>
+    [...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})],
+    [completions]
+  )
+
   const render = useCallback(({autoFocus}) => {
     return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
       <CodeMirror
         // extensions={[language]}
         // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
-        basicSetup={false}
-        extensions={[...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})]}
+        extensions={extensions}
         // javascriptLanguage.data.of({ autocomplete: completions })
-        indentWithTab={false}
         autoFocus={autoFocus}
         value={modeConfig.text}
         onChange={(value) => {
@@ -242,7 +244,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         }}
       />
     </div>;
-  }, [completions, modeConfig.text, updateModeConfig])
+  }, [extensions, modeConfig.text, updateModeConfig])
   useView(reportView, render, config);
 
   return null;
