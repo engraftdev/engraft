@@ -4449,6 +4449,11 @@ fresh@0.5.2:
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
   integrity sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=
 
+friendly-words@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/friendly-words/-/friendly-words-1.2.0.tgz#db6d9842f510d94d0bd220b7609a3188a52f80a8"
+  integrity sha512-KO9vxmqnaaHJy5O83V9vJV3e3gmoeHVJoqndqbiGcFQgYVdj1gvCy8NlGkqATAxY7PyTenFdyJ6GoYxxFu52TQ==
+
 fs-extra@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-10.0.0.tgz#9ff61b655dde53fb34a82df84bb214ce802e17c1"
