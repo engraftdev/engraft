@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
+import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
@@ -18,23 +18,24 @@ interface Cell {
 
 
 export function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
-  console.log("notebook config", config);
   const [cells, updateCells] = useAt(config, updateConfig, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
   const reportCellView = useCallback((id: string, view: ToolView | null) => {
+    console.log("reportCellView", id);
     updateKeys(updateViews, {[id]: view})
   }, [updateViews])
   const reportCellOutput = useCallback((id: string, output: ToolValue | null) => {
+    console.log("reportCellOutput", id);
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
 
   const render = useCallback(() => {
     return <div>
       {cells.map((cell, i) => <CellView key={cell.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.id]} toolView={views[cell.id]} />)}
-      <button onClick={() => updateCells((cells) => [...cells, {id: Math.random().toString(), label: '', config: toolIndex['code'].defaultConfig}])}>+</button>
+      <button onClick={() => updateCells((cells) => [...cells, {id: Math.random().toFixed(4), label: '', config: toolIndex['code'].defaultConfig}])}>+</button>
     </div>;
   }, [cells, outputs, updateCells, views])
   useView(reportView, render, config);
@@ -49,9 +50,24 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
-  return <>{cells.map((cell) =>
+  const newBindings = useMemo(() => {
+    let newBindings: {[label: string]: ToolValue} = {};
+    cells.forEach((cell) => {
+      if (cell.label.length === 0) {
+        return;
+      }
+      const output = outputs[cell.id];
+      if (!output) {
+        return;
+      }
+      newBindings[cell.label] = output;
+    });
+    return newBindings;
+  }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
+
+  return <AddToEnvContext value={newBindings}>{cells.map((cell) =>
     <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
-  )}</>
+  )}</AddToEnvContext>
 }
 registerTool(NotebookTool, {
   toolName: 'notebook',
@@ -102,9 +118,24 @@ interface CellViewProps {
   toolView: ToolView | null,
 }
 
-function CellView({cell, updateCell, toolView}: CellViewProps) {
-  return <div>
-    <input type='text' value={cell.label} onChange={(e) => updateKeys(updateCell, {label: e.target.value})}/>
-    <ShowView view={toolView}/>
+function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
+  const toolOutputJson = useMemo(() => {
+    if (!toolOutput) {
+      return '[no output]';
+    }
+    try {
+      return JSON.stringify(toolOutput.toolValue);
+    } catch {
+      return '[cannot serialize]';
+    }
+  }, [toolOutput])
+
+  return <div style={{display: 'flex', alignItems: 'flex-start'}}>
+    <input type='text' value={cell.label} onChange={(e) => updateKeys(updateCell, {label: e.target.value})}
+      style={{textAlign: 'right', border: 'none', width: 100, marginRight: 20}}/>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+      <pre style={{margin: 0}}>{toolOutputJson}</pre>
+      <ShowView view={toolView}/>
+    </div>
   </div>
 }
