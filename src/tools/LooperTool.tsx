@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { AddToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
+import { AddToContext } from "../util/context";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
 

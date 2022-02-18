@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { AddObjToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
+import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
 import { ObjectInspector } from "react-inspector";
+import { AddObjToContext } from "../util/context";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';

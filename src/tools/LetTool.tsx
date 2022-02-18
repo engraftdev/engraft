@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react"
-import { AddToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
+import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
+import { AddToContext } from "../util/context"
 import { updateKeys } from "../util/state"
 
 export interface LetConfig extends ToolConfig {
