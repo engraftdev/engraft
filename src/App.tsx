@@ -4,6 +4,7 @@ import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
 import { CodeConfig } from './tools/CodeTool';
+import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 
 /*
@@ -23,7 +24,10 @@ const defaultConfig: CodeConfig = {
 
 function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
-  const context = useMemo(() => ({array: {toolValue: [1, 2, 3]}}), []);
+  const context = useMemo(() => ({
+    array: {toolValue: [1, 2, 3]},
+    range: {toolValue: range}
+  }), []);
 
   useEffect(() => {
     const configJson = window.localStorage.getItem(localStorageKey)

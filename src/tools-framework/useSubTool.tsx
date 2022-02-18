@@ -90,7 +90,7 @@ type PerTool<T> = {[key: string]: T}
 
 export type UseToolsReturn = [
   components: PerTool<JSX.Element>,
-  makeViews: PerTool<(props: ToolViewProps) => JSX.Element | null>,
+  views: PerTool<ToolView | null>,
   outputs: PerTool<ToolValue | null>,
 ]
 
@@ -107,7 +107,7 @@ function cleanUpOldProperties<T, U>(oldA: PerTool<T>, newB: PerTool<U>) {
   return newA;
 }
 
-export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolProps<C>}) {
+export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolProps<C>}): UseToolsReturn {
   const [outputs, updateOutputs] = useStateUpdateOnly<PerTool<ToolValue | null>>({})
   const [views, updateViews] = useStateUpdateOnly<PerTool<ToolView | null>>({})
 

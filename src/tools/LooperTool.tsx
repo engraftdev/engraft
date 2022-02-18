@@ -1,9 +1,10 @@
 import memoize from "fast-memoize";
 import React, { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, ToolViewRender } from "../tools-framework/tools";
-import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
+import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
+import range from "../util/range";
+import { useAt, useStateSetOnly } from "../util/state";
 
 
 
@@ -13,14 +14,10 @@ export interface LooperConfig extends ToolConfig {
   perItemConfig: ToolConfig;
 }
 
-
 export function LooperTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LooperConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
-  const [highlightedView, setHighlightedView] = useStateSetOnly<ToolView | null>(null)
-
-  const [outputArray, updateOutputArray] = useStateUpdateOnly<unknown[]>([]);
 
   const inputArray = useMemo(() => {
     if (!inputOutput) { return; }
@@ -34,21 +31,22 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 
   const inputLength = inputArray?.length || 0;
 
-  useEffect(() => {
-    if (inputLength < outputArray.length) {
-      updateOutputArray((outputArray) => outputArray.slice(0, inputLength));
-    }
-  }, [inputLength, outputArray.length, updateOutputArray])
+  const [perItemConfig, updatePerItemConfig] = useAt(config, updateConfig, 'perItemConfig');
+
+  const [perItemComponents, perItemViews, perItemOutputs] = useTools(Object.fromEntries((inputArray || []).map((elem, i) => {
+    return [i, {config: perItemConfig, updateConfig: updatePerItemConfig}]
+  })))
 
   useEffect(() => {
     if (inputArray && highlightedIndex > inputArray.length - 1) {
-      setHighlightedIndex(inputArray.length - 1);
+      setHighlightedIndex(Math.max(inputArray.length - 1, 0));
     }
   }, [highlightedIndex, inputArray, setHighlightedIndex])
 
-  useEffect(() => {
-    reportOutput({toolValue: inputArray ? outputArray : undefined});
-  }, [inputArray, outputArray, reportOutput])
+  const output = useMemo(() => {
+    return {toolValue: range(inputLength).map((i) => perItemOutputs[i]?.toolValue)};
+  }, [inputLength, perItemOutputs])
+  useOutput(reportOutput, output);
 
   const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
@@ -69,45 +67,15 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
                 </div>
               )}
               <div>
-                <ShowView view={highlightedView}/>
+                <ShowView view={perItemViews[highlightedIndex]}/>
               </div>
             </div>
           </div>
         }
       </div>
     );
-  }, [highlightedIndex, highlightedView, inputArray, inputView, setHighlightedIndex]);
+  }, [highlightedIndex, inputArray, inputView, perItemViews, setHighlightedIndex]);
   useView(reportView, render, config);
-
-  const PerItemTool = toolIndex[config.perItemConfig.toolName];
-
-  const [perItemConfig, updatePerItemConfig] = useAt(config, updateConfig, 'perItemConfig');
-
-  const reportPerItemView = React.useMemo(
-    () =>
-      memoize(
-        (i: number) => (view: ToolView | null) => {
-          if (i === highlightedIndex) {
-            setHighlightedView(view);
-          }
-        }
-      ),
-    [highlightedIndex, setHighlightedView]
-  );
-
-  const reportPerItemOutput = React.useMemo(
-    () =>
-      memoize(
-        (i: number) => (value: ToolValue | null) => {
-          updateOutputArray((outputArray) => {
-            let newOutputArray = outputArray.slice();
-            newOutputArray[i] = value?.toolValue;
-            return newOutputArray;
-          });
-        }
-      ),
-    [updateOutputArray]
-  );
 
   const perItemBinding = React.useMemo(
     () => inputArray &&
@@ -119,18 +87,11 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 
   return <>
     {inputComponent}
-    {inputArray &&
-      inputArray.map((item, i) =>
-        <AddToEnvContext key={i} value={perItemBinding!(i)}>
-          <PerItemTool
-            config={perItemConfig}
-            updateConfig={updatePerItemConfig}
-            reportOutput={reportPerItemOutput(i)}
-            reportView={reportPerItemView(i)}
-          />
-        </AddToEnvContext>
-      )
-    }
+    {Object.entries(perItemComponents).map(([i, component]) =>
+      <AddToEnvContext key={i} value={perItemBinding!(+i)}>
+        {component}
+      </AddToEnvContext>
+    )}
   </>
 }
 registerTool(LooperTool, {
