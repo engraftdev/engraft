@@ -202,8 +202,10 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   }, [compiled, env])
   useOutput(reportOutput, output);
 
+  // TODO: separate autocomplete for / & @
+
   const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
-    let word = completionContext.matchBefore(/^.*/)!
+    let word = completionContext.matchBefore(/\/?@?\w*/)!
     if (word.from === word.to && !env.explicit) {
       return null
     }
