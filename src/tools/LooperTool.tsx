@@ -1,7 +1,6 @@
-import memoize from "fast-memoize";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { AddToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
@@ -20,10 +19,10 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
 
   const inputArray = useMemo(() => {
-    if (!inputOutput) { return; }
+    if (!inputOutput) { return null; }
 
     if (inputOutput.toolValue instanceof Array) {
-      return inputOutput.toolValue;
+      return inputOutput.toolValue.map((v) => ({toolValue: v}));
     } else {
       return null;
     }
@@ -63,7 +62,7 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
               {inputArray.map((elem, i) =>
                 <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3, cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
                       onClick={() => setHighlightedIndex(i)}>
-                  {JSON.stringify(elem)}
+                  {JSON.stringify(elem.toolValue)}
                 </div>
               )}
               <div>
@@ -77,20 +76,12 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
   }, [highlightedIndex, inputArray, inputView, perItemViews, setHighlightedIndex]);
   useView(reportView, render, config);
 
-  const perItemBinding = React.useMemo(
-    () => inputArray &&
-      memoize(
-        (i: number) => ({item: {toolValue: inputArray[i]}})
-      ),
-    [inputArray]
-  );
-
   return <>
     {inputComponent}
-    {Object.entries(perItemComponents).map(([i, component]) =>
-      <AddToEnvContext key={i} value={perItemBinding!(+i)}>
-        {component}
-      </AddToEnvContext>
+    {inputArray?.map((inputArrayElem, i) =>
+      <AddToContext key={i} context={EnvContext} k='item' v={inputArrayElem}>
+        {perItemComponents[i]}
+      </AddToContext>
     )}
   </>
 }

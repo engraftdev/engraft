@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
+import { AddObjToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
@@ -71,9 +71,11 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   //   return {};
   // }, []);
 
-  return <AddToEnvContext value={newBindings}>{cells.map((cell) =>
-    <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
-  )}</AddToEnvContext>
+  return <AddObjToContext context={EnvContext} obj={newBindings}>
+    {cells.map((cell) =>
+      <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
+    )}
+  </AddObjToContext>
 }
 registerTool(NotebookTool, {
   toolName: 'notebook',

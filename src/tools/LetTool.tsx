@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo } from "react"
-import { AddToEnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
+import { useCallback, useEffect } from "react"
+import { AddToContext, EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
 import { updateKeys } from "../util/state"
 
@@ -12,10 +12,6 @@ export interface LetConfig extends ToolConfig {
 
 export function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
   const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'})
-
-  const newBindingForBody = useMemo(() => {
-    return bindingOutput ? {[config.bindingKey]: bindingOutput} : {}
-  }, [bindingOutput, config.bindingKey])
 
   const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'})
 
@@ -47,9 +43,12 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
 
   return <>
     {bindingComponent}
-    <AddToEnvContext value={newBindingForBody}>
-      {bodyComponent}
-    </AddToEnvContext>
+    {bindingOutput ?
+      <AddToContext context={EnvContext} k={config.bindingKey} v={bindingOutput}>
+        {bodyComponent}
+      </AddToContext> :
+      bodyComponent
+    }
   </>
 }
 registerTool(LetTool, {

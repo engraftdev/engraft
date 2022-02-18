@@ -1,4 +1,4 @@
-import { createContext, ReactElement, ReactNode, useContext, useMemo } from "react";
+import { Context, createContext, ReactElement, ReactNode, useContext, useMemo } from "react";
 import { Setter, Updater } from "../util/state";
 
 export type ToolValue = {
@@ -41,19 +41,43 @@ export function registerTool<C extends ToolConfig>(
   toolIndex[defaultConfig.toolName] = Object.assign(func, { defaultConfig });
 }
 
-export const EnvContext = createContext<{[key: string]: ToolValue}>({});
+export const EnvContext = createContext<{[k: string]: ToolValue}>({});
 EnvContext.displayName = 'EnvContext';
 
-export interface AddToEnvContextProps {
-  value: {[key: string]: ToolValue},
+
+
+
+export interface AddToContextProps<V> {
+  context: Context<{[k: string]: V}>,
+  k: string,
+  v: V,
   children?: ReactNode | undefined,
 }
 
-export function AddToEnvContext({value, children}: AddToEnvContextProps) {
-  const oldEnv = useContext(EnvContext);
-  const newEnv = useMemo(() => ({...oldEnv, ...value}), [oldEnv, value])
+export function AddToContext<V>({context, k, v, children}: AddToContextProps<V>) {
+  const oldValue = useContext(context);
+  const newValue = useMemo(() => {
+    return {...oldValue, [k]: v};
+  }, [oldValue, k, v])
 
-  return <EnvContext.Provider value={newEnv}>
+  return <context.Provider value={newValue}>
     {children}
-  </EnvContext.Provider>
+  </context.Provider>
+}
+
+export interface AddObjToContextProps<V> {
+  context: Context<{[k: string]: V}>,
+  obj: {[k: string]: V},
+  children?: ReactNode | undefined,
+}
+
+export function AddObjToContext<V>({context, obj, children}: AddObjToContextProps<V>) {
+  const oldValue = useContext(context);
+  const newValue = useMemo(() => {
+    return {...oldValue, ...obj};
+  }, [oldValue, obj])
+
+  return <context.Provider value={newValue}>
+    {children}
+  </context.Provider>
 }
