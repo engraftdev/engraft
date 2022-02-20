@@ -25,6 +25,7 @@ import CodeMirror from "../util/CodeMirror";
 import PortalSet, { usePortalSet } from "../util/PortalSet";
 import PortalWidget from "../util/PortalWidget";
 import ReactDOM from "react-dom";
+import { VarUse } from "../view/Vars";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -258,12 +259,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         }}
       />
       {refs.map(([elem, {id}]) => {
-        return ReactDOM.createPortal(
-          <span style={{ background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }}>
-            {env[id].config.label}
-          </span>,
-          elem
-        )
+        return ReactDOM.createPortal(<VarUse varInfo={env[id]} />, elem)
       })}
     </div>;
   }, [env, extensions, modeConfig.text, refs, updateModeConfig])

@@ -7359,6 +7359,11 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
+rect-connect@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/rect-connect/-/rect-connect-1.0.0.tgz#70b232dc90fd880f9cc206cfb7e50942cbbcf68a"
+  integrity sha1-cLIy3JD9iA+cwgbPt+UJQsu89oo=
+
 recursive-readdir@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/recursive-readdir/-/recursive-readdir-2.2.2.tgz#9946fb3274e1628de6e36b2f6714953b4845094f"

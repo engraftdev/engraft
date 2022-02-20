@@ -7,6 +7,7 @@ import { ObjectInspector } from "react-inspector";
 import { AddObjToContext } from "../util/context";
 import useDebounce, { arrEqWith, objEqWith, refEq } from "../util/useDebounce";
 import ControlledTextInput from "../util/ControlledTextInput";
+import { VarDefinition } from "../view/Vars";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -162,11 +163,12 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
     }
   }, [toolOutput])
 
+  const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
+
   return <div style={{display: 'flex', alignItems: 'flex-start', paddingBottom: 50}}>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
-      <ControlledTextInput value={cell.var.label} onChange={(e) => updateKeys(at(updateCell, 'var'), {label: e.target.value})}
-        style={{textAlign: 'right', border: '1px solid rgba(0,0,0,0.1)', width: 100}}/>
-      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{cell.var.id}</pre>
+      <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
+      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
     </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>

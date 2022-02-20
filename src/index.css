@@ -29,3 +29,8 @@ h2 {
   align-items: flex-start;
   gap: 10px;
 }
+
+#overlay {
+  width: 1px;
+  height: 1px;
+}
