@@ -154,10 +154,10 @@ interface CellViewProps {
 function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
   const outputDisplay = useMemo(() => {
     if (!toolOutput) {
-      return '[no output]';
+      return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
     }
     try {
-      return <ObjectInspector data={toolOutput.toolValue} />;
+      return <ObjectInspector data={toolOutput.toolValue} expandLevel={0}/>;
     } catch {
       return '[cannot serialize]';
     }

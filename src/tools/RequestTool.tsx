@@ -26,7 +26,6 @@ export function RequestTool({ config, updateConfig, reportOutput, reportView }: 
   const render = useCallback(() => {
     return (
       <div>
-        <h2>request</h2>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>url</b> <ControlledTextInput value={config.url} onChange={(ev) => updateKeys(updateConfig, {url: ev.target.value})} />
         </div>

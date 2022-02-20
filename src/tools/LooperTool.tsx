@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
+import { ObjectInspector } from "react-inspector";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
@@ -51,19 +52,19 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
   const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
       <div>
-        <h2>looper</h2>
         <div className="row-top" style={{marginBottom: 10}}>
-          <b>input</b> <ShowView view={inputView} autoFocus={autoFocus} />
+          input <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
 
         {inputArray &&
           <div className="row-top">
-            <b>for each</b>
             <div style={{display: 'inline-block'}}>
               {inputArray.map((elem, i) =>
                 <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3, cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
                       onClick={() => setHighlightedIndex(i)}>
-                  {JSON.stringify(elem.toolValue)}
+                  <div style={{pointerEvents: 'none'}}>
+                  <ObjectInspector data={elem.toolValue}/>
+                  </div>
                 </div>
               )}
               <div>

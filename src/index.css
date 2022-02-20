@@ -38,3 +38,7 @@ h2 {
 [contenteditable]:focus {
   outline: 0px solid transparent;
 }
+
+li[role=treeitem] {
+  background-color: inherit !important;
+}

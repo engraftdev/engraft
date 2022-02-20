@@ -280,15 +280,36 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   useOutput(reportOutput, output);
 
   const render = useCallback(({autoFocus}) => {
-    return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
-      <ShowView view={view} autoFocus={autoFocus} />
-      <button
+    // return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
+    //   <ShowView view={view} autoFocus={autoFocus} />
+    //   <button
+    //     style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
+    //     onClick={() => {
+    //       updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
+    //     }}>
+    //     ×
+    //   </button>
+    // </div>
+    return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'flex', flexDirection: 'column' }}>
+      <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
+        <div style={{marginLeft: 2}}>{modeConfig.config.toolName}</div>
+        <div style={{flexGrow: 1}}></div>
+        <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
+          onClick={() => {
+            updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
+          }}
+        >×</div>
+      </div>
+      <div style={{ minWidth: 100, padding: '10px', position: "relative"}}>
+        <ShowView view={view} autoFocus={autoFocus} />
+      </div>
+      {/* <button
         style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
         onClick={() => {
           updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
         }}>
         ×
-      </button>
+      </button> */}
     </div>
   }, [updateConfig, view]);
   useView(reportView, render, config);
