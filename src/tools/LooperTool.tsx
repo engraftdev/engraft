@@ -89,7 +89,7 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 registerTool<LooperConfig>(LooperTool, () => ({
   toolName: 'looper',
   inputConfig: toolIndex['code'].defaultConfig(),
-  itemVar: newVarConfig(),
+  itemVar: newVarConfig('item'),
   perItemConfig: toolIndex['code'].defaultConfig()
 }));
 

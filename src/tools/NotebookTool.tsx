@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
 import { ObjectInspector } from "react-inspector";
 import { AddObjToContext } from "../util/context";
+import useDebounce, { arrEqWith, objEqWith, refEq } from "../util/useDebounce";
+import ControlledTextInput from "../util/ControlledTextInput";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -14,7 +16,7 @@ export interface NotebookConfig extends ToolConfig {
 interface Cell {
   var: VarConfig;  // empty label if unlabelled, natch
   config: ToolConfig;
-  upstreamIds: string[];
+  upstreamIds: {[id: string]: true};
   // pinning?
   // output?
 }
@@ -39,7 +41,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
     return <div>
       {cells.map((cell, i) => <CellView key={cell.var.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]} />)}
       <button onClick={() =>
-        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig(), upstreamIds: []}])}>
+        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig(), upstreamIds: {}}])}>
           +
       </button>
     </div>;
@@ -108,17 +110,32 @@ function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: 
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
 
 
-  const newVarInfos = useMemo(() => {
-    let newVarInfos: {[label: string]: VarInfo} = {};
-    cell.upstreamIds.forEach((upstreamId) => {
-      newVarInfos[upstreamId] = {config: cell.var, value: outputs[upstreamId] || undefined};
+  const newVarInfos = useDebounce(useMemo(() => {
+    let result: {[label: string]: VarInfo} = {};
+    cells.forEach((otherCell) => {
+      if (cell.upstreamIds[otherCell.var.id]) {
+        result[otherCell.var.id] = {config: otherCell.var, value: outputs[otherCell.var.id] || undefined};  // OH NO will this infinity?
+      }
     });
-    return newVarInfos;
-  }, [cell.upstreamIds, cell.var, outputs])
+    return result;
+  }, [cell.upstreamIds, cells, outputs]), objEqWith(objEqWith(refEq)))
+
+  // TODO: exclude things that are already present? or does this happen elsewhere
+  const newPossibleVarInfos = useDebounce(useMemo(() => {
+    let result: {[label: string]: PossibleVarInfo} = {};
+    cells.forEach((otherCell) => {
+      if (otherCell !== cell && otherCell.var.label.length > 0) {
+        result[otherCell.var.id] = {config: otherCell.var, request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCell.var.id]: true})};
+      }
+    });
+    return result;
+  }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
 
 
   return <AddObjToContext context={EnvContext} obj={newVarInfos}>
-    {component}
+    <AddObjToContext context={PossibleEnvContext} obj={newPossibleVarInfos}>
+      {component}
+    </AddObjToContext>
   </AddObjToContext>;
 }
 
@@ -145,13 +162,17 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
     }
   }, [toolOutput])
 
-  return <div style={{display: 'flex', alignItems: 'flex-start'}}>
-    <input type='text' value={cell.var.label} onChange={(e) => updateKeys(at(updateCell, 'var'), {label: e.target.value})}
-      style={{textAlign: 'right', border: 'none', width: 100}}/>
+  return <div style={{display: 'flex', alignItems: 'flex-start', paddingBottom: 50}}>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+      <ControlledTextInput value={cell.var.label} onChange={(e) => updateKeys(at(updateCell, 'var'), {label: e.target.value})}
+        style={{textAlign: 'right', border: '1px solid rgba(0,0,0,0.1)', width: 100}}/>
+      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{cell.var.id}</pre>
+    </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-      {outputDisplay}
+      <div style={{marginBottom: 10}}>{outputDisplay}</div>
       <ShowView view={toolView}/>
+      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
     </div>
   </div>
 }

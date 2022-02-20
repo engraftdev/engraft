@@ -1,5 +1,5 @@
 import { useCallback, useContext, useMemo, useRef } from "react";
-import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
@@ -12,7 +12,7 @@ import {defaultKeymap} from "@codemirror/commands"
 import {bracketMatching} from "@codemirror/matchbrackets"
 import {closeBrackets, closeBracketsKeymap} from "@codemirror/closebrackets"
 import {searchKeymap, highlightSelectionMatches} from "@codemirror/search"
-import {autocompletion, completionKeymap} from "@codemirror/autocomplete"
+import {autocompletion, completionKeymap, pickedCompletion, Completion} from "@codemirror/autocomplete"
 import {commentKeymap} from "@codemirror/comment"
 import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
@@ -22,7 +22,6 @@ import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/use
 import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
-import useForceUpdate from "../util/useForceUpdate";
 import PortalSet, { usePortalSet } from "../util/PortalSet";
 import PortalWidget from "../util/PortalWidget";
 import ReactDOM from "react-dom";
@@ -184,6 +183,9 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   const env = useContext(EnvContext)
   const envRef = useRef<VarInfos>();
   envRef.current = env;
+  const possibleEnv = useContext(PossibleEnvContext)
+  const possibleEnvRef = useRef<PossibleVarInfos>();
+  possibleEnvRef.current = possibleEnv;
   // TODO: is the above an appropriate pattern to make a value available from a fixed (user-initiated) callback?
 
   const output = useMemo(() => {
@@ -217,6 +219,19 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         ...Object.values(envRef.current!).map((varInfo) => ({
           label: '@' + varInfo.config.label,
           apply: refCode(varInfo.config.id),
+        })),
+        ...Object.values(possibleEnvRef.current!).map((possibleVarInfo) => ({
+          label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
+          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+            let apply = refCode(possibleVarInfo.config.id);
+            possibleVarInfo.request();
+            view.dispatch({
+              changes: {from, to, insert: apply},
+              selection: {anchor: from + apply.length},
+              userEvent: "input.complete",
+              annotations: pickedCompletion.of(completion)
+            });
+          }
         })),
       ]
     }

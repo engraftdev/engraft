@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { registerTool, ToolProps } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
+import ControlledTextInput from "../util/ControlledTextInput";
 import { updateKeys } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
 
@@ -20,7 +21,7 @@ export function DumbTextTool({ config, updateConfig, reportOutput, reportView }:
       return () => console.log("DumbTextTool unmounted");
     }, [])
     return (
-      <input type="text" value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
+      <ControlledTextInput value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
     );
   }, [config.text, updateConfig]);
   useView(reportView, render, config);

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { registerTool, ToolConfig, ToolProps } from "../tools-framework/tools";
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
+import ControlledTextInput from "../util/ControlledTextInput";
 import { updateKeys } from "../util/state";
 import { CodeConfig } from "./CodeTool";
 
@@ -27,7 +28,7 @@ export function RequestTool({ config, updateConfig, reportOutput, reportView }: 
       <div>
         <h2>request</h2>
         <div className="row-top" style={{marginBottom: 10}}>
-          <b>url</b> <input value={config.url} onChange={(ev) => updateKeys(updateConfig, {url: ev.target.value})} />
+          <b>url</b> <ControlledTextInput value={config.url} onChange={(ev) => updateKeys(updateConfig, {url: ev.target.value})} />
         </div>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>params</b> <ShowView view={paramsView}/>

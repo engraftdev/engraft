@@ -70,7 +70,7 @@ export interface PossibleVarInfo {
   request: () => void;
 }
 
-export type PossibleVarInfos = {[varId: string]: VarInfo};
+export type PossibleVarInfos = {[varId: string]: PossibleVarInfo};
 
 export const PossibleEnvContext = createContext<PossibleVarInfos>({});
 PossibleEnvContext.displayName = 'PossibleEnvContext';
