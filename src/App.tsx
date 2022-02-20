@@ -29,8 +29,9 @@ function varInfoObject(varInfos: VarInfo[]) {
 function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
   const context = useMemo(() => varInfoObject([
-    {config: newVarConfig('array'), value: {toolValue: [1, 2, 3]}},
-    {config: newVarConfig('range'), value: {toolValue: range}},
+    // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
+    {config: {id: 'IDarray000000', label: 'array'}, value: {toolValue: [1, 2, 3]}},
+    {config: {id: 'IDrange000000', label: 'range'}, value: {toolValue: range}},
   ]), []);
 
   useEffect(() => {

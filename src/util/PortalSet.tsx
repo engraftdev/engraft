@@ -1,29 +1,33 @@
-import { ReactNode } from "react";
-import ReactDOM from "react-dom";
+import { useMemo, useState } from "react";
 
 // a generic tool for maintaining sets of React portals coming out of an imperative system
 // (like CodeMirror!)
 
 export default class PortalSet<T> {
-  portals: Map<HTMLSpanElement, T> = new Map();
+  private portalMap: Map<HTMLSpanElement, T> = new Map();
 
-  constructor(readonly onChange?: () => void) {}
+  constructor(readonly setPortals: (portals: [HTMLSpanElement, T][]) => void) {}
+
+  private portals(): [HTMLSpanElement, T][] {
+    return Array.from(this.portalMap.entries());
+  }
 
   register(elem: HTMLSpanElement, data: T) {
-    this.portals.set(elem, data);
-    this.onChange && this.onChange();
+    this.portalMap.set(elem, data);
+    this.setPortals(this.portals())
   }
 
   unregister(elem: HTMLSpanElement) {
-    this.portals.delete(elem);
-    this.onChange && this.onChange();
-  }
-
-  render(f: (data: T) => ReactNode): ReactNode[] {
-    let nodes: ReactNode[] = [];
-    this.portals.forEach((data, elem) =>
-      nodes.push(ReactDOM.createPortal(f(data), elem ))
-    )
-    return nodes;
+    this.portalMap.delete(elem);
+    this.setPortals(this.portals())
   }
 }
+
+export function usePortalSet<T>() {
+  const [portals, setPortals] = useState<[HTMLSpanElement, T][]>([])
+  const portalSet = useMemo(() => new PortalSet<T>(setPortals), []);
+
+  return [portalSet, portals] as const;
+}
+
+// TODO: line between class & hook are extremely blurry

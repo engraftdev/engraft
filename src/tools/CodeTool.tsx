@@ -23,8 +23,9 @@ import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
 import useForceUpdate from "../util/useForceUpdate";
-import PortalSet from "../util/PortalSet";
+import PortalSet, { usePortalSet } from "../util/PortalSet";
 import PortalWidget from "../util/PortalWidget";
+import ReactDOM from "react-dom";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -221,15 +222,11 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
     }
   }, [updateConfig])  // TODO: react to new completions or w/e
 
-  const refsSet = useRef<PortalSet<{id: string}>>();
-  const forceUpdate = useForceUpdate();
-  if (!refsSet.current) {
-    refsSet.current = new PortalSet(forceUpdate);
-  }
+  const [refSet, refs] = usePortalSet<{id: string}>();
 
   const extensions = useMemo(() =>
-    [...setup, refsExtension(refsSet.current!), javascript(), autocompletion({override: [completions]})],
-    [completions]
+    [...setup, refsExtension(refSet), javascript(), autocompletion({override: [completions]})],
+    [completions, refSet]  // TODO: these are constant
   )
 
   const render = useCallback(({autoFocus}) => {
@@ -245,13 +242,16 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
           updateKeys(updateModeConfig, {text: value});
         }}
       />
-      {refsSet.current?.render(({id}) =>
-        <span style={{ background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }}>
-          {env[id].config.label}
-        </span>
-      )}
+      {refs.map(([elem, {id}]) => {
+        return ReactDOM.createPortal(
+          <span style={{ background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }}>
+            {env[id].config.label}
+          </span>,
+          elem
+        )
+      })}
     </div>;
-  }, [env, extensions, modeConfig.text, updateModeConfig])
+  }, [env, extensions, modeConfig.text, refs, updateModeConfig])
   useView(reportView, render, config);
 
   return null;
