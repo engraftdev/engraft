@@ -63,6 +63,19 @@ export type VarInfos = {[varId: string]: VarInfo};
 export const EnvContext = createContext<VarInfos>({});
 EnvContext.displayName = 'EnvContext';
 
+// TODO: figure out some names
+
+export interface PossibleVarInfo {
+  config: VarConfig;
+  request: () => void;
+}
+
+export type PossibleVarInfos = {[varId: string]: VarInfo};
+
+export const PossibleEnvContext = createContext<PossibleVarInfos>({});
+PossibleEnvContext.displayName = 'PossibleEnvContext';
+
+
 
 
 export interface VarConfig {

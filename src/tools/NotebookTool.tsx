@@ -14,6 +14,7 @@ export interface NotebookConfig extends ToolConfig {
 interface Cell {
   var: VarConfig;  // empty label if unlabelled, natch
   config: ToolConfig;
+  upstreamIds: string[];
   // pinning?
   // output?
 }
@@ -38,7 +39,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
     return <div>
       {cells.map((cell, i) => <CellView key={cell.var.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]} />)}
       <button onClick={() =>
-        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig()}])}>
+        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig(), upstreamIds: []}])}>
           +
       </button>
     </div>;
@@ -55,30 +56,19 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
-  const newVarInfos = useMemo(() => {
-    let newVarInfos: {[label: string]: VarInfo} = {};
-    cells.forEach((cell) => {
-      if (cell.var.label.length === 0) {
-        return;
-      }
-      const output = outputs[cell.var.id];
-      if (!output) {
-        return;
-      }
-      newVarInfos[cell.var.id] = {config: cell.var, value: output};
-    });
-    return newVarInfos;
-  }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
-
   // const newBindings = useMemo(() => {
   //   return {};
   // }, []);
 
-  return <AddObjToContext context={EnvContext} obj={newVarInfos}>
-    {cells.map((cell) =>
-      <CellModel key={cell.var.id} id={cell.var.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
-    )}
-  </AddObjToContext>
+  return <>{cells.map((cell) =>
+    <CellModel
+      key={cell.var.id}
+      id={cell.var.id}
+      cells={cells}
+      updateCells={updateCells}
+      outputs={outputs}
+      reportView={reportCellView} reportOutput={reportCellOutput}/>
+  )}</>;
 }
 registerTool(NotebookTool, {
   toolName: 'notebook',
@@ -94,11 +84,13 @@ interface CellModelProps {
   cells: Cell[];
   updateCells: Updater<Cell[]>;
 
+  outputs: {[id: string]: ToolValue | null};
+
   reportView: (id: string, view: ToolView | null) => void;
   reportOutput: (id: string, value: ToolValue | null) => void;
 }
 
-function CellModel({id, cells, updateCells, reportView, reportOutput}: CellModelProps) {
+function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) {
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var.id === id);
     if (i === -1) {
@@ -115,7 +107,19 @@ function CellModel({id, cells, updateCells, reportView, reportOutput}: CellModel
   useEffect(() => reportView(id, view), [id, reportView, view]);
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
 
-  return component;
+
+  const newVarInfos = useMemo(() => {
+    let newVarInfos: {[label: string]: VarInfo} = {};
+    cell.upstreamIds.forEach((upstreamId) => {
+      newVarInfos[upstreamId] = {config: cell.var, value: outputs[upstreamId] || undefined};
+    });
+    return newVarInfos;
+  }, [cell.upstreamIds, cell.var, outputs])
+
+
+  return <AddObjToContext context={EnvContext} obj={newVarInfos}>
+    {component}
+  </AddObjToContext>;
 }
 
 
