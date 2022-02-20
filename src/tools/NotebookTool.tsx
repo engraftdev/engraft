@@ -166,7 +166,7 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <div style={{display: 'flex', alignItems: 'flex-start', paddingBottom: 50}}>
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 150, width: 150}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
     </div>

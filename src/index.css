@@ -34,3 +34,7 @@ h2 {
   width: 1px;
   height: 1px;
 }
+
+[contenteditable]:focus {
+  outline: 0px solid transparent;
+}

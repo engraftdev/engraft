@@ -2,7 +2,8 @@ import { useCallback, useEffect } from "react"
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
 import ControlledTextInput from "../util/ControlledTextInput";
-import { at, updateKeys, Updater } from "../util/state"
+import { at, updateKeys, Updater, useAt } from "../util/state"
+import { VarDefinition } from "../view/Vars";
 
 export interface LetConfig extends ToolConfig {
   toolName: 'let';
@@ -19,16 +20,14 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
     reportOutput(bodyOutput);
   }, [bodyOutput, reportOutput])
 
-  const render = useCallback(() => {
+  const [bindingVar, updateBindingVar] = useAt(config, updateConfig, 'bindingVar');
+
+  const render = useCallback(({autoFocus}) => {
     return (
       <div>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>let</b>
-          {config.bindingVar && <ControlledTextInput
-            autoFocus={true}
-            value={config.bindingVar.label}
-            onChange={(ev) => updateKeys(at(updateConfig, 'bindingVar') as Updater<VarConfig>, {label: ev.target.value})}/>
-          }
+          {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
         </div>
 
         <div className="row-top" style={{marginBottom: 10}}>
@@ -42,7 +41,7 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
         </div>
       </div>
     );
-  }, [bindingView, bodyView, config.bindingVar, updateConfig]);
+  }, [bindingVar, bindingView, bodyView, updateBindingVar]);
   useView(reportView, render, config);
 
   return <>

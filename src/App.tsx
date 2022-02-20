@@ -4,6 +4,7 @@ import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
 import { CodeConfig } from './tools/CodeTool';
+import { ControlledSpan } from './util/ControlledTextInput';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 
