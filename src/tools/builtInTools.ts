@@ -5,6 +5,7 @@ import './PickerTool';
 import './CodeTool';
 import './NotebookTool';
 import './BinOpTool';
+import './ImportTool';
 import './LetTool';
 import './LooperTool';
 import './ReferenceTool';
