@@ -1,10 +1,10 @@
-import { useCallback, useContext, useMemo } from "react";
-import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
+import { ReactNode, useCallback, useContext, useMemo, useRef } from "react";
+import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
 import {keymap, highlightSpecialChars, drawSelection, dropCursor, DecorationSet, Decoration, EditorView, WidgetType} from "@codemirror/view"
-import {EditorState, StateField, EditorSelection, TransactionSpec, Text} from "@codemirror/state"
+import {EditorState, StateField, EditorSelection, TransactionSpec, Text, Extension} from "@codemirror/state"
 import {history, historyKeymap} from "@codemirror/history"
 import {foldKeymap} from "@codemirror/fold"
 import {indentOnInput} from "@codemirror/language"
@@ -22,6 +22,8 @@ import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/use
 import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
+import ReactDOM from "react-dom";
+import useForceUpdate from "../util/useForceUpdate";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -69,91 +71,128 @@ const setup = [
 
 
 
-class RefWidget extends WidgetType {
-  constructor(readonly id: string) { super() }
+// function refCode(s: string) {
+//   return `_α_${s}_ω_`
+// }
+// const refRE = new RegExp(refCode("([_a-zA-Z0-9]*)"), "g")
+
+function refCode(s: string) {
+  return s;
+}
+const refRE = new RegExp(refCode("(ID[a-z]*[0-9]{6})"), "g")
+
+
+class PortalSet<T> {
+  portals: Map<HTMLSpanElement, T> = new Map();
+
+  constructor(readonly onChange?: () => void) {}
+
+  register(elem: HTMLSpanElement, data: T) {
+    console.log("registering", data)
+    this.portals.set(elem, data);
+    this.onChange && this.onChange();
+  }
+
+  unregister(elem: HTMLSpanElement) {
+    console.log("unregistering", this.portals.get(elem))
+    this.portals.delete(elem);
+    this.onChange && this.onChange();
+  }
+
+  render(f: (data: T) => ReactNode): ReactNode[] {
+    let nodes: ReactNode[] = [];
+    this.portals.forEach((data, elem) =>
+      nodes.push(ReactDOM.createPortal(f(data), elem ))
+    )
+    return nodes;
+  }
+}
+
+class PortalWidget<T> extends WidgetType {
+  elem?: HTMLSpanElement;
+
+  constructor(readonly portalSet: PortalSet<T>, readonly data: T) {
+    super()
+  }
+
+  eq() {
+    return true;
+  }
 
   toDOM() {
-    let wrap = document.createElement("span")
-    wrap.innerText = this.id
-    wrap.className = "lc-ref"
-    return wrap
+    console.log("toDOM");
+    this.elem = document.createElement("span")
+    this.portalSet.register(this.elem, this.data);
+    return this.elem;
   }
 
   destroy() {
-
+    this.elem && this.portalSet.unregister(this.elem);
   }
 }
 
-function refCode(s: string) {
-  return `_α_${s}_ω_`
-}
-
-const refRE = new RegExp(refCode("([_a-zA-Z0-9]*)"), "g")
-
-// _α_my_token_ω_
-
-function refsFromText(text: Text) {
+function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   const matches = Array.from(text.sliceString(0).matchAll(refRE));
 
   return RangeSet.of(
     matches.map((match) => {
       return Decoration.replace({
-        widget: new RefWidget(match[1])
+        widget: new PortalWidget(portalSet, {id: match[1]})
       }).range(match.index!, match.index! + match[0].length)
     })
   );
 }
 
-const refsField = StateField.define<DecorationSet>({
-  create(state) {
-    return refsFromText(state.doc)
-  },
-  update(old, tr) {
-    return refsFromText(tr.newDoc)
-  },
-  provide: f => EditorView.decorations.from(f)
-})
+function refsExtension(portalSet: PortalSet<{id: string}>): Extension {
+  const refsField = StateField.define<DecorationSet>({
+    create(state) {
+      return refsFromText(state.doc, portalSet)
+    },
+    update(old, tr) {
+      return refsFromText(tr.newDoc, portalSet)
+    },
+    provide: f => EditorView.decorations.from(f)
+  });
 
-const jumpOverRefs = EditorState.transactionFilter.of(tr => {
-  const refs = tr.startState.field(refsField)
+  const jumpOverRefs = EditorState.transactionFilter.of(tr => {
+    const refs = tr.startState.field(refsField)
 
-  // TODO: only single selection will be supported
+    // TODO: only single selection will be supported
 
-  if (tr.isUserEvent('select')) {
-    let {head, anchor} = tr.newSelection.main;
-    let change = false;
-    refs.between(head, head, (refFrom, refTo, ref) => {
-      function applyWormhole(src: number, dst: number) {
-        if (head === src) { head = dst; change = true; }
-        if (anchor === src) { anchor = dst; change = true; }
+    if (tr.isUserEvent('select')) {
+      let {head, anchor} = tr.newSelection.main;
+      let change = false;
+      refs.between(head, head, (refFrom, refTo, ref) => {
+        function applyWormhole(src: number, dst: number) {
+          if (head === src) { head = dst; change = true; }
+          if (anchor === src) { anchor = dst; change = true; }
+        }
+        applyWormhole(refTo - 1, refFrom);
+        applyWormhole(refFrom + 1, refTo);
+        if (change) { return false; }
+      })
+      if (change) {
+        return [tr, {selection: tr.newSelection.replaceRange(EditorSelection.range(anchor, head))}];
       }
-      applyWormhole(refTo - 1, refFrom);
-      applyWormhole(refFrom + 1, refTo);
-      if (change) { return false; }
-    })
-    if (change) {
-      return [tr, {selection: tr.newSelection.replaceRange(EditorSelection.range(anchor, head))}];
+    } else if (tr.isUserEvent('delete.forward') || tr.isUserEvent('delete.backward')) {
+      const forward = tr.isUserEvent('delete.forward')
+
+      const head = tr.startState.selection.main.head;
+      let result: TransactionSpec | readonly TransactionSpec[] = tr;
+      refs.between(head, head, (refFrom, refTo, ref) => {
+        if (head === (forward ? refFrom : refTo)) {
+          result = [{changes: {from: refFrom, to: refTo}}];
+          return false;
+        }
+      });
+      return result;
     }
-  } else if (tr.isUserEvent('delete.forward') || tr.isUserEvent('delete.backward')) {
-    const forward = tr.isUserEvent('delete.forward')
 
-    const head = tr.startState.selection.main.head;
-    let result: TransactionSpec | readonly TransactionSpec[] = tr;
-    refs.between(head, head, (refFrom, refTo, ref) => {
-      if (head === (forward ? refFrom : refTo)) {
-        result = [{changes: {from: refFrom, to: refTo}}];
-        return false;
-      }
-    });
-    return result;
-  }
+    return tr;
+  })
 
-  return tr;
-})
-
-const refsTheme = EditorView.baseTheme({
-  ".lc-ref": { background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }
-})
+  return [refsField, jumpOverRefs]
+}
 
 
 export function CodeTool(props: ToolProps<CodeConfig>) {
@@ -188,10 +227,13 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   }, [modeConfig.text])
 
   const env = useContext(EnvContext)
+  const envRef = useRef<VarInfos>();
+  envRef.current = env;
+  // TODO: is the above an appropriate pattern to make a value available from a fixed (user-initiated) callback?
 
   const output = useMemo(() => {
     if (compiled) {
-      const wrapped = Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.toolValue]));
+      const wrapped = Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue]));
       try {
         return {toolValue: compiled(wrapped)};
       } catch {
@@ -205,7 +247,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
 
   const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/\/?@?\w*/)!
-    if (word.from === word.to && !env.explicit) {
+    if (word.from === word.to && !completionContext.explicit) {
       return null
     }
     return {
@@ -214,19 +256,25 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         ...Object.entries(toolIndex).map(([toolName, tool]) => ({
           label: '/' + toolName,
           apply: () => {
-            updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig}})
+            updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
           }
         })),
-        ...Object.keys(env).map((contextKey) => ({
-          label: '@' + contextKey,
-          apply: refCode(contextKey),
+        ...Object.values(envRef.current!).map((varInfo) => ({
+          label: '@' + varInfo.config.label,
+          apply: refCode(varInfo.config.id),
         })),
       ]
     }
-  }, [env, updateConfig])  // TODO: react to new completions or w/e
+  }, [updateConfig])  // TODO: react to new completions or w/e
+
+  const refsSet = useRef<PortalSet<{id: string}>>();
+  const forceUpdate = useForceUpdate();
+  if (!refsSet.current) {
+    refsSet.current = new PortalSet(forceUpdate);
+  }
 
   const extensions = useMemo(() =>
-    [...setup, refsField, refsTheme, jumpOverRefs, javascript(), autocompletion({override: [completions]})],
+    [...setup, refsExtension(refsSet.current!), javascript(), autocompletion({override: [completions]})],
     [completions]
   )
 
@@ -235,7 +283,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
       <CodeMirror
         // extensions={[language]}
         // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
-        extensions={extensions}
+        initialExtensions={extensions}
         // javascriptLanguage.data.of({ autocomplete: completions })
         autoFocus={autoFocus}
         value={modeConfig.text}
@@ -243,8 +291,13 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
           updateKeys(updateModeConfig, {text: value});
         }}
       />
+      {refsSet.current?.render(({id}) =>
+        <span style={{ background: 'lightblue', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif' }}>
+          {env[id].config.label}
+        </span>
+      )}
     </div>;
-  }, [extensions, modeConfig.text, updateModeConfig])
+  }, [env, extensions, modeConfig.text, updateModeConfig])
   useView(reportView, render, config);
 
   return null;

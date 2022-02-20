@@ -1,5 +1,8 @@
-import { createContext, ReactElement } from "react";
+import { createContext, ReactElement, ReactNode, useMemo } from "react";
+import { AddToContext } from "../util/context";
+import id from "../util/id";
 import { Setter, Updater } from "../util/state";
+import { useMemoObject } from "../util/useMemoObject";
 
 export type ToolValue = {
   toolValue: unknown
@@ -29,17 +32,59 @@ export interface ToolProps<C extends ToolConfig> {
 
 export interface Tool<C extends ToolConfig> {
   (props: ToolProps<C>): ReactElement<any, any> | null;
-  defaultConfig: C;
+  defaultConfig: () => C;
 }
 
 export let toolIndex: { [toolName: string]: Tool<any> } = {};
 
 export function registerTool<C extends ToolConfig>(
   func: (props: ToolProps<C>) => ReactElement<any, any> | null,
-  defaultConfig: C
+  defaultConfig: C | (() => C)
 ) {
-  toolIndex[defaultConfig.toolName] = Object.assign(func, { defaultConfig });
+  let defaultConfigFunc: () => C;
+  if (typeof defaultConfig === 'object') {
+    defaultConfigFunc = () => (defaultConfig as C);
+  } else {
+    defaultConfigFunc = defaultConfig;
+  }
+  // HACK for now, making a tool config when you register it lol
+  toolIndex[defaultConfigFunc().toolName] = Object.assign(func, { defaultConfig: defaultConfigFunc });
 }
 
-export const EnvContext = createContext<{[k: string]: ToolValue}>({});
+
+
+export interface VarInfo {
+  config: VarConfig;
+  value?: ToolValue;
+}
+
+export type VarInfos = {[varId: string]: VarInfo};
+
+export const EnvContext = createContext<VarInfos>({});
 EnvContext.displayName = 'EnvContext';
+
+
+
+export interface VarConfig {
+  id: string;
+  label: string;
+}
+
+export function newVarConfig(label = 'new var') {
+  return {id: id(), label};
+}
+
+
+export interface ProvideVarProps {
+  config: VarConfig;
+  value?: ToolValue;
+  children?: ReactNode | undefined,
+}
+
+export function ProvideVar({config, value, children}: ProvideVarProps) {
+  const info = useMemoObject({config, value});
+
+  return <AddToContext context={EnvContext} k={config.id} v={info}>
+    {children}
+  </AddToContext>
+}

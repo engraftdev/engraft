@@ -1,20 +1,19 @@
 import { useCallback, useEffect } from "react"
-import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools"
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
-import { AddToContext } from "../util/context"
-import { updateKeys } from "../util/state"
+import ControlledTextInput from "../util/ControlledTextInput";
+import { at, updateKeys, Updater } from "../util/state"
 
 export interface LetConfig extends ToolConfig {
   toolName: 'let';
-  bindingKey: string;
+  bindingVar: VarConfig;
   bindingConfig: ToolConfig;
   bodyConfig: ToolConfig;
 }
 
 export function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
-  const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'})
-
-  const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'})
+  const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'});
+  const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'});
 
   useEffect(() => {
     reportOutput(bodyOutput);
@@ -25,7 +24,11 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
       <div>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>let</b>
-          <input type="text" autoFocus={true} value={config.bindingKey} onChange={(ev) => updateKeys(updateConfig, {bindingKey: ev.target.value})}/>
+          {config.bindingVar && <ControlledTextInput
+            autoFocus={true}
+            value={config.bindingVar.label}
+            onChange={(ev) => updateKeys(at(updateConfig, 'bindingVar') as Updater<VarConfig>, {label: ev.target.value})}/>
+          }
         </div>
 
         <div className="row-top" style={{marginBottom: 10}}>
@@ -39,22 +42,22 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
         </div>
       </div>
     );
-  }, [bindingView, bodyView, config.bindingKey, updateConfig]);
+  }, [bindingView, bodyView, config.bindingVar, updateConfig]);
   useView(reportView, render, config);
 
   return <>
     {bindingComponent}
-    {bindingOutput ?
-      <AddToContext context={EnvContext} k={config.bindingKey} v={bindingOutput}>
+    {config.bindingVar ?
+      <ProvideVar config={config.bindingVar} value={bindingOutput || undefined}>
         {bodyComponent}
-      </AddToContext> :
+      </ProvideVar> :
       bodyComponent
     }
   </>
 }
-registerTool(LetTool, {
+registerTool<LetConfig>(LetTool, () => ({
   toolName: 'let',
-  bindingKey: 'x',
-  bindingConfig: toolIndex['code'].defaultConfig,
-  bodyConfig: toolIndex['code'].defaultConfig
-});
+  bindingVar: newVarConfig(),
+  bindingConfig: toolIndex['code'].defaultConfig(),
+  bodyConfig: toolIndex['code'].defaultConfig(),
+}));

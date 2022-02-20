@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
-import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
+import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
 import { ObjectInspector } from "react-inspector";
 import { AddObjToContext } from "../util/context";
@@ -12,8 +12,7 @@ export interface NotebookConfig extends ToolConfig {
 }
 
 interface Cell {
-  id: string;
-  label: string;  // empty if unlabelled, natch
+  var: VarConfig;  // empty label if unlabelled, natch
   config: ToolConfig;
   // pinning?
   // output?
@@ -37,8 +36,11 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
 
   const render = useCallback(() => {
     return <div>
-      {cells.map((cell, i) => <CellView key={cell.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.id]} toolView={views[cell.id]} />)}
-      <button onClick={() => updateCells((cells) => [...cells, {id: Math.random().toFixed(4), label: '', config: toolIndex['code'].defaultConfig}])}>+</button>
+      {cells.map((cell, i) => <CellView key={cell.var.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]} />)}
+      <button onClick={() =>
+        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig()}])}>
+          +
+      </button>
     </div>;
   }, [cells, outputs, updateCells, views])
   useView(reportView, render, config);
@@ -49,32 +51,32 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
       return null;
     }
 
-    return outputs[lastCell.id];
+    return outputs[lastCell.var.id];
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
-  const newBindings = useMemo(() => {
-    let newBindings: {[label: string]: ToolValue} = {};
+  const newVarInfos = useMemo(() => {
+    let newVarInfos: {[label: string]: VarInfo} = {};
     cells.forEach((cell) => {
-      if (cell.label.length === 0) {
+      if (cell.var.label.length === 0) {
         return;
       }
-      const output = outputs[cell.id];
+      const output = outputs[cell.var.id];
       if (!output) {
         return;
       }
-      newBindings[cell.label] = output;
+      newVarInfos[cell.var.id] = {config: cell.var, value: output};
     });
-    return newBindings;
+    return newVarInfos;
   }, [cells, JSON.stringify(outputs)])  // TODO: hack until we have legit dependency tracking lol
 
   // const newBindings = useMemo(() => {
   //   return {};
   // }, []);
 
-  return <AddObjToContext context={EnvContext} obj={newBindings}>
+  return <AddObjToContext context={EnvContext} obj={newVarInfos}>
     {cells.map((cell) =>
-      <CellModel key={cell.id} id={cell.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
+      <CellModel key={cell.var.id} id={cell.var.id} cells={cells} updateCells={updateCells} reportView={reportCellView} reportOutput={reportCellOutput}/>
     )}
   </AddObjToContext>
 }
@@ -98,7 +100,7 @@ interface CellModelProps {
 
 function CellModel({id, cells, updateCells, reportView, reportOutput}: CellModelProps) {
   const i = useMemo(() => {
-    const i = cells.findIndex((cell) => cell.id === id);
+    const i = cells.findIndex((cell) => cell.var.id === id);
     if (i === -1) {
       throw new Error("internal error: cell not found");
     }
@@ -140,9 +142,9 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
   }, [toolOutput])
 
   return <div style={{display: 'flex', alignItems: 'flex-start'}}>
-    <input type='text' value={cell.label} onChange={(e) => updateKeys(updateCell, {label: e.target.value})}
+    <input type='text' value={cell.var.label} onChange={(e) => updateKeys(at(updateCell, 'var'), {label: e.target.value})}
       style={{textAlign: 'right', border: 'none', width: 100}}/>
-    <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
+    <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
       {outputDisplay}
       <ShowView view={toolView}/>

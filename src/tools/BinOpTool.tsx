@@ -42,9 +42,9 @@ export function BinOpTool({ config, updateConfig, reportOutput, reportView }: To
     {input2Component}
   </>
 }
-registerTool(BinOpTool, {
+registerTool<BinOpConfig>(BinOpTool, () => ({
   toolName: 'bin-op',
-  input1Config: toolIndex['code'].defaultConfig,
-  input2Config: toolIndex['code'].defaultConfig,
+  input1Config: toolIndex['code'].defaultConfig(),
+  input2Config: toolIndex['code'].defaultConfig(),
   op: '+'
-});
+}));

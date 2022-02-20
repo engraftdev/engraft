@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { EnvContext, ToolConfig, ToolValue } from './tools-framework/tools';
+import { EnvContext, newVarConfig, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
@@ -22,12 +22,16 @@ const defaultConfig: CodeConfig = {
   }
 };
 
+function varInfoObject(varInfos: VarInfo[]) {
+  return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));
+}
+
 function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
-  const context = useMemo(() => ({
-    array: {toolValue: [1, 2, 3]},
-    range: {toolValue: range}
-  }), []);
+  const context = useMemo(() => varInfoObject([
+    {config: newVarConfig('array'), value: {toolValue: [1, 2, 3]}},
+    {config: newVarConfig('range'), value: {toolValue: range}},
+  ]), []);
 
   useEffect(() => {
     const configJson = window.localStorage.getItem(localStorageKey)

@@ -28,7 +28,7 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
       const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         console.log("onchange");
         const toolName = e.target.value;
-        updateKeys(updateConfig, { pickedConfig: toolIndex[toolName].defaultConfig });
+        updateKeys(updateConfig, { pickedConfig: toolIndex[toolName].defaultConfig() });
       }
 
       contents = <select style={{ alignSelf: "flex-end", position: "absolute", border: 'none', left: 8, top: -10 }} onChange={onChange}>

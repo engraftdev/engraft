@@ -1,8 +1,7 @@
 import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
-import { AddToContext } from "../util/context";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
 
@@ -11,6 +10,7 @@ import { useAt, useStateSetOnly } from "../util/state";
 export interface LooperConfig extends ToolConfig {
   toolName: 'looper';
   inputConfig: ToolConfig;
+  itemVar: VarConfig;
   perItemConfig: ToolConfig;
 }
 
@@ -80,15 +80,16 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
   return <>
     {inputComponent}
     {inputArray?.map((inputArrayElem, i) =>
-      <AddToContext key={i} context={EnvContext} k='item' v={inputArrayElem}>
+      <ProvideVar key={i} config={config.itemVar} value={inputArrayElem}>
         {perItemComponents[i]}
-      </AddToContext>
+      </ProvideVar>
     )}
   </>
 }
-registerTool(LooperTool, {
+registerTool<LooperConfig>(LooperTool, () => ({
   toolName: 'looper',
-  inputConfig: toolIndex['code'].defaultConfig,
-  perItemConfig: toolIndex['code'].defaultConfig
-});
+  inputConfig: toolIndex['code'].defaultConfig(),
+  itemVar: newVarConfig(),
+  perItemConfig: toolIndex['code'].defaultConfig()
+}));
 

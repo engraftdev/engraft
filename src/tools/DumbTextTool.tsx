@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { registerTool, ToolProps } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
+import { useMemoObject } from "../util/useMemoObject";
 
 
 export interface DumbTextConfig {
@@ -9,7 +10,7 @@ export interface DumbTextConfig {
   text: string;
 }
 export function DumbTextTool({ config, updateConfig, reportOutput, reportView }: ToolProps<DumbTextConfig>) {
-  const output = useMemo(() => ({toolValue: config.text}), [config.text]);
+  const output = useMemoObject({toolValue: config.text});
   useOutput(reportOutput, output);
 
   const render = useCallback(function R() {

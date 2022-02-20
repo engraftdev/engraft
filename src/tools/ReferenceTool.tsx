@@ -12,7 +12,7 @@ export function ReferenceTool({ config, updateConfig, reportOutput, reportView }
 
   const output = useMemo(() => {
     if (config.referenceKey && config.referenceKey in env) {
-      return env[config.referenceKey];
+      return env[config.referenceKey].value || null;
     } else {
       return {toolValue: undefined};
     }
@@ -34,21 +34,21 @@ export function ReferenceTool({ config, updateConfig, reportOutput, reportView }
                 pick a reference
               </option>
             }
-            {Object.keys(env).map((contextKey) =>
-              <option key={contextKey}>
-                {contextKey}
+            {Object.values(env).map((varInfo) =>
+              <option key={varInfo.config.id} value={varInfo.config.id}>
+                {varInfo.config.label}
               </option>
             )}
           </select>
         </div>
         { config.referenceKey &&
           <span style={{opacity: 0.5}}>
-            {' '}= {JSON.stringify(output.toolValue)}
+            {' '}= {JSON.stringify(output?.toolValue)}
           </span>
         }
       </div>
     );
-  }, [config.referenceKey, env, output.toolValue, updateConfig]);
+  }, [config.referenceKey, env, output?.toolValue, updateConfig]);
   useView(reportView, render, config);
 
   return null;

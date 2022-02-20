@@ -3,7 +3,7 @@ import { EditorView, ViewUpdate } from '@codemirror/view';
 import { useEffect, useRef, useState } from "react"
 
 export interface MyCodeMirrorProps {
-  extensions: Extension[];
+  initialExtensions: Extension[];
 
   value: string;
   onChange: (value: string) => void;
@@ -11,14 +11,14 @@ export interface MyCodeMirrorProps {
   autoFocus: boolean;
 }
 
-export default function CodeMirror({extensions, value, onChange, autoFocus}: MyCodeMirrorProps) {
+export default function CodeMirror({initialExtensions, value, onChange, autoFocus}: MyCodeMirrorProps) {
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();
 
   useEffect(() => {
     if (div && !stateRef.current) {
-      let allExtensions = extensions.slice();
+      let allExtensions = initialExtensions.slice();
       allExtensions.push(EditorView.updateListener.of((vu: ViewUpdate) => {
         if (vu.docChanged) {
           const doc = vu.state.doc;
