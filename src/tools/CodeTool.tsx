@@ -1,9 +1,9 @@
-import { ReactNode, useCallback, useContext, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
-import {keymap, highlightSpecialChars, drawSelection, dropCursor, DecorationSet, Decoration, EditorView, WidgetType} from "@codemirror/view"
+import {keymap, highlightSpecialChars, drawSelection, dropCursor, DecorationSet, Decoration, EditorView} from "@codemirror/view"
 import {EditorState, StateField, EditorSelection, TransactionSpec, Text, Extension} from "@codemirror/state"
 import {history, historyKeymap} from "@codemirror/history"
 import {foldKeymap} from "@codemirror/fold"
@@ -22,8 +22,9 @@ import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/use
 import { updateKeys, Updater, useAt } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
-import ReactDOM from "react-dom";
 import useForceUpdate from "../util/useForceUpdate";
+import PortalSet from "../util/PortalSet";
+import PortalWidget from "../util/PortalWidget";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -82,54 +83,7 @@ function refCode(s: string) {
 const refRE = new RegExp(refCode("(ID[a-z]*[0-9]{6})"), "g")
 
 
-class PortalSet<T> {
-  portals: Map<HTMLSpanElement, T> = new Map();
 
-  constructor(readonly onChange?: () => void) {}
-
-  register(elem: HTMLSpanElement, data: T) {
-    console.log("registering", data)
-    this.portals.set(elem, data);
-    this.onChange && this.onChange();
-  }
-
-  unregister(elem: HTMLSpanElement) {
-    console.log("unregistering", this.portals.get(elem))
-    this.portals.delete(elem);
-    this.onChange && this.onChange();
-  }
-
-  render(f: (data: T) => ReactNode): ReactNode[] {
-    let nodes: ReactNode[] = [];
-    this.portals.forEach((data, elem) =>
-      nodes.push(ReactDOM.createPortal(f(data), elem ))
-    )
-    return nodes;
-  }
-}
-
-class PortalWidget<T> extends WidgetType {
-  elem?: HTMLSpanElement;
-
-  constructor(readonly portalSet: PortalSet<T>, readonly data: T) {
-    super()
-  }
-
-  eq() {
-    return true;
-  }
-
-  toDOM() {
-    console.log("toDOM");
-    this.elem = document.createElement("span")
-    this.portalSet.register(this.elem, this.data);
-    return this.elem;
-  }
-
-  destroy() {
-    this.elem && this.portalSet.unregister(this.elem);
-  }
-}
 
 function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   const matches = Array.from(text.sliceString(0).matchAll(refRE));

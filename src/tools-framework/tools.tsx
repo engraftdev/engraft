@@ -1,4 +1,4 @@
-import { createContext, ReactElement, ReactNode, useMemo } from "react";
+import { createContext, ReactElement, ReactNode } from "react";
 import { AddToContext } from "../util/context";
 import id from "../util/id";
 import { Setter, Updater } from "../util/state";
