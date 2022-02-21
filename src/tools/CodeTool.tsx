@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
@@ -204,7 +204,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
-        return ReactDOM.createPortal(<VarUse varInfo={env[id]} />, elem)
+        return ReactDOM.createPortal(<VarUse varInfo={env[id] as VarInfo | undefined} />, elem)
       })}
     </ToolFrame>;
   }, [config, env, modeConfig.text, updateConfig, updateModeConfig])

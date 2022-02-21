@@ -26,7 +26,7 @@ export function VarDefinition({varConfig, updateVarConfig, autoFocus}: VarDefini
 
 
 interface VarUseProps {
-  varInfo: VarInfo,
+  varInfo: VarInfo | undefined,
 }
 
 export function VarUse({varInfo}: VarUseProps) {
@@ -42,6 +42,7 @@ export function VarUse({varInfo}: VarUseProps) {
       ref={spanRef}
       style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', fontSize: '13px', cursor: 'pointer'}}
       onDoubleClick={() => {
+        if (!varInfo) { return; }
         const def = document.querySelector(`.def-${varInfo.config.id}`);
         if (!def) { return; }
         def.scrollIntoView();
@@ -73,10 +74,18 @@ export function VarUse({varInfo}: VarUseProps) {
         </svg>,
         document.getElementById('overlay')!
       )}
-      {varInfo.config.label}
-      {varInfo.config.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
+      {varInfo?.config.label}
+      {varInfo?.config.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
     </span>
     {/* {inspected && <span>{JSON.stringify(varInfo.value?.toolValue)}</span>} */}
-    {inspected && <ObjectInspector data={varInfo.value?.toolValue} />}
+    {(() => {
+      if (!inspected) { return; }
+      if (!varInfo) { return; }
+      if (varInfo.value) {
+        return <ObjectInspector data={varInfo.value.toolValue} />;
+      } else {
+        return <span style={{fontStyle: 'italic'}}>missing</span>;
+      }
+    })()}
   </div>
 }
