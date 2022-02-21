@@ -156,7 +156,7 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
       return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
     }
     try {
-      return <Value value={toolOutput.toolValue}/>;
+      return <Value value={toolOutput.toolValue} style={{maxHeight: 200}}/>;
     } catch {
       return '[cannot serialize]';
     }
@@ -171,7 +171,7 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
     </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflowX: "hidden"}}>
-      <div style={{marginBottom: 10, maxHeight: 200, overflow: 'scroll', maxWidth: '100%'}}>
+      <div style={{marginBottom: 10, maxWidth: '100%'}}>
         {outputDisplay}
       </div>
       <div style={{maxWidth: '100%'}}>
