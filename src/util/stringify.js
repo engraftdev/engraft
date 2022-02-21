@@ -1,5 +1,3 @@
-"use strict";
-
 import isValidIdentifier from 'is-valid-identifier';
 
 // Note: This regex matches even invalid JSON strings, but since we’re

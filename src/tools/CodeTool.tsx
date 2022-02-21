@@ -25,7 +25,6 @@ import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
 import WindowPortal from "../util/WindowPortal";
-import { ObjectInspector } from "react-inspector";
 import refsExtension, { refCode } from "../util/refsExtension";
 import Value from "../view/Value";
 
@@ -177,10 +176,6 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   const render = useCallback(function R({autoFocus}) {
     const [refSet, refs] = usePortalSet<{id: string}>();
 
-    const applyToolCompletion = useCallback((tool: Tool<any>) => {
-      updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
-    }, [])
-
     const extensions = useMemo(() => {
       function applyToolCompletion(tool: Tool<any>) {
         updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}});
@@ -206,7 +201,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
         return ReactDOM.createPortal(<VarUse varInfo={env[id] as VarInfo | undefined} />, elem)
       })}
     </ToolFrame>;
-  }, [config, env, modeConfig.text, updateConfig, updateModeConfig])
+  }, [config, env, modeConfig.text, possibleEnv, updateConfig, updateModeConfig])
   useView(reportView, render, config);
 
   return null;
@@ -232,7 +227,7 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
         <ShowView view={view} autoFocus={autoFocus} />
       </div>
     </ToolFrame>
-  }, [env, modeConfig.config, updateConfig, view]);
+  }, [env, modeConfig.config, possibleEnv, updateConfig, view]);
   useView(reportView, render, config);
 
   return component;

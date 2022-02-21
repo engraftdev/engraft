@@ -3,13 +3,10 @@ import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, register
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
-import { ObjectInspector } from "react-inspector";
 import { AddObjToContext } from "../util/context";
-import useDebounce, { arrEqWith, objEqWith, refEq } from "../util/useDebounce";
-import ControlledTextInput from "../util/ControlledTextInput";
+import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
 import { VarDefinition } from "../view/Vars";
 import Value from "../view/Value";
-import ScrollShadow from "react-scroll-shadow";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';

@@ -1,8 +1,7 @@
 import { useCallback, useEffect } from "react"
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
-import ControlledTextInput from "../util/ControlledTextInput";
-import { at, updateKeys, Updater, useAt } from "../util/state"
+import { useAt } from "../util/state"
 import { VarDefinition } from "../view/Vars";
 
 export interface LetConfig extends ToolConfig {

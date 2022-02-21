@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { ObjectInspector } from "react-inspector";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
@@ -86,7 +85,7 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
         }
       </div>
     );
-  }, [highlightedIndex, inputArray, inputView, perItemViews, setHighlightedIndex]);
+  }, [highlightedIndex, inputArray, inputView, itemVarConfig, perItemViews, setHighlightedIndex, updateItemVarConfig]);
   useView(reportView, render, config);
 
   return <>
