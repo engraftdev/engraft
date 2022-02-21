@@ -1,6 +1,6 @@
 import { useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, ToolProps, VarInfo, VarInfos } from "../tools-framework/tools";
-import { javascript } from "@codemirror/lang-javascript";
+import { markdown } from "@codemirror/lang-markdown";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
 import {keymap, highlightSpecialChars, drawSelection, dropCursor, EditorView} from "@codemirror/view"
@@ -128,7 +128,7 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
 
     const extensions = useMemo(() => {
       const completions = [refCompletions(envRef.current, possibleEnvRef.current)];
-      return [...setup, refsExtension(refSet), javascript(), autocompletion({override: completions})];
+      return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions})];
     }, [refSet])
 
     const onChange = useCallback((value) => {

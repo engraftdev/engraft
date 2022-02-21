@@ -23,7 +23,8 @@ export function SliderTool({ config, updateConfig, reportOutput, reportView }: T
           value={config.value}
           onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
           min={config.min} max={config.max} step={config.step}/>
-        {' '}{config.value}
+        {' '}
+        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{config.value}</div>
       </div>
     );
   }, [config.max, config.min, config.step, config.value, updateConfig]);

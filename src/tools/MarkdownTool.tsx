@@ -3,6 +3,7 @@ import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framewo
 
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
+import { CodeConfig } from "./CodeTool";
 
 export interface MarkdownConfig {
   toolName: 'markdown';
@@ -45,5 +46,11 @@ export function MarkdownTool({config, updateConfig, reportView, reportOutput}: T
 }
 registerTool<MarkdownConfig>(MarkdownTool, () => ({
   toolName: 'markdown',
-  sourceConfig: toolIndex['code'].defaultConfig()
+  sourceConfig: {
+    toolName: 'code',
+    mode: {
+      modeName: 'tool',
+      config: toolIndex['text'].defaultConfig()
+    }
+  } as CodeConfig
 }));

@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useContext, useMemo, useRef } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, VarInfo, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
@@ -17,7 +17,7 @@ import {commentKeymap} from "@codemirror/comment"
 import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
+import { ShowView, useOutput, useSubTool, useTool, useView } from "../tools-framework/useSubTool";
 import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
@@ -27,6 +27,8 @@ import { VarUse } from "../view/Vars";
 import WindowPortal from "../util/WindowPortal";
 import refsExtension, { refCode } from "../util/refsExtension";
 import Value from "../view/Value";
+import id from "../util/id";
+import CallFunction from "../util/CallFunction";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -74,7 +76,7 @@ const setup = [
 ]
 
 
-function toolCompletions(apply: (tool: Tool<any>) => void): CompletionSource {
+function toolCompletions(insertTool: (tool: Tool<any>) => string, replaceWithTool: (tool: Tool<any>) => void): CompletionSource {
   return (completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/\/?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
@@ -85,7 +87,21 @@ function toolCompletions(apply: (tool: Tool<any>) => void): CompletionSource {
       options: [
         ...Object.entries(toolIndex).map(([toolName, tool]) => ({
           label: '/' + toolName,
-          apply: () => apply(tool),
+          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+            console.log({from, to, len: view.state.doc.length})
+            if (from === 0 && to === view.state.doc.length) {
+              replaceWithTool(tool);
+            } else {
+              const id = insertTool(tool);
+              const completionText = refCode(id);
+              view.dispatch({
+                changes: {from, to, insert: completionText},
+                selection: {anchor: from + completionText.length},
+                userEvent: "input.complete",
+                annotations: pickedCompletion.of(completion)
+              });
+            }
+          }
         })),
       ]
     }
@@ -163,26 +179,42 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
   possibleEnvRef.current = possibleEnv;
   // TODO: is the above an appropriate pattern to make a value available from a fixed (user-initiated) callback?
 
+
+  const [subTools, updateSubTools] = useAt(modeConfig, updateModeConfig, 'subTools');
+  const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+
+
   const output = useMemo(() => {
     if (compiled) {
-      const wrapped = Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue]));
+      const wrapped = {
+        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
+        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue]))
+      };
       try {
         return {toolValue: compiled(wrapped)};
       } catch {
       }
     }
     return null;
-  }, [compiled, env])
+  }, [compiled, env, outputs])
   useOutput(reportOutput, output);
 
   const render = useCallback(function R({autoFocus}) {
     const [refSet, refs] = usePortalSet<{id: string}>();
 
     const extensions = useMemo(() => {
-      function applyToolCompletion(tool: Tool<any>) {
+      function insertTool(tool: Tool<ToolConfig>) {
+        const newId = id();
+        const newConfig = tool.defaultConfig();
+        updateKeys(updateSubTools, {[newId]: newConfig});
+        // TODO: we never remove these! lol
+        return newId;
+      };
+      function replaceWithTool(tool: Tool<ToolConfig>) {
         updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}});
       };
-      const completions = [toolCompletions(applyToolCompletion), refCompletions(envRef.current, possibleEnvRef.current)];
+      const completions = [toolCompletions(insertTool, replaceWithTool), refCompletions(envRef.current, possibleEnvRef.current)];
       return [...setup, refsExtension(refSet), javascript(), autocompletion({override: completions})];
     }, [refSet])
 
@@ -200,14 +232,46 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
-        return ReactDOM.createPortal(<VarUse varInfo={env[id] as VarInfo | undefined} />, elem)
+        return ReactDOM.createPortal(
+          subTools[id] ?
+            // TODO: this style-resetting is tedious; is there a better way?
+            <div style={{all: 'initial', display: 'inline-block'}}>
+              <div className="root">
+              <ToolFrame config={subTools[id]} env={env} possibleEnv={possibleEnv}>
+                <ShowView view={views[id]} />
+              </ToolFrame>
+              </div>
+            </div> :
+            <VarUse varInfo={env[id] as VarInfo | undefined} />,
+          elem
+        )
       })}
     </ToolFrame>;
-  }, [config, env, modeConfig.code, possibleEnv, updateConfig, updateModeConfig])
+  }, [config, env, modeConfig.code, possibleEnv, subTools, updateModeConfig, updateSubTools, views])
   useView(reportView, render, config);
 
-  return null;
+  return <>
+    {Object.entries(subTools).map(([id, subToolConfig]) =>
+      <CallFunction key={id} f={function R() {
+        const [subTool, updateSubTool] = useAt(subTools, updateSubTools, id);
+
+        // TODO: CallFunction seems dangerous, in that hook deps might not be maintained correctly?
+        // this sure is simple tho!
+        const reportOutput = useCallback((output) => updateKeys(updateOutputs, {[id]: output}), []);
+        const reportView = useCallback((view) => updateKeys(updateViews, {[id]: view}), []);
+
+        const Tool = toolIndex[subTool.toolName]
+        return <Tool
+          config={subTool}
+          updateConfig={updateSubTool}
+          reportOutput={reportOutput}
+          reportView={reportView}
+        />
+      }} />
+    )}
+  </>;
 }
+
 
 export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
                                  { modeConfig: CodeConfigToolMode, updateModeConfig: Updater<CodeConfigToolMode> }) {
@@ -246,7 +310,7 @@ interface ToolFrameProps {
 function ToolFrame({children, config, onClose, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
-  return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'flex', flexDirection: 'column' }}>
+  return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column' }}>
     <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
       <div style={{marginLeft: 2}}>{config.toolName}</div>
       <div style={{flexGrow: 1}}></div>
