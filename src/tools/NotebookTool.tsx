@@ -30,11 +30,11 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
   const reportCellView = useCallback((id: string, view: ToolView | null) => {
-    console.log("reportCellView", id);
+    // console.log("reportCellView", id);
     updateKeys(updateViews, {[id]: view})
   }, [updateViews])
   const reportCellOutput = useCallback((id: string, output: ToolValue | null) => {
-    console.log("reportCellOutput", id);
+    // console.log("reportCellOutput", id);
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
 

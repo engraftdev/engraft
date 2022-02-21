@@ -94,7 +94,8 @@ function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   return RangeSet.of(
     matches.map((match) => {
       return Decoration.replace({
-        widget: new PortalWidget(portalSet, {id: match[1]})
+        widget: new PortalWidget(portalSet, {id: match[1]}),
+        inclusive: false,
       }).range(match.index!, match.index! + match[0].length)
     })
   );
