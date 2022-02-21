@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useRef } from "react";
+import { ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
@@ -19,13 +19,15 @@ import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
 import { RangeSet } from "@codemirror/rangeset";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { updateKeys, Updater, useAt } from "../util/state";
+import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
 import PortalSet, { usePortalSet } from "../util/PortalSet";
 import PortalWidget from "../util/PortalWidget";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
+import WindowPortal from "../util/WindowPortal";
+import { ObjectInspector } from "react-inspector";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -246,12 +248,10 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   )
 
   const render = useCallback(({autoFocus}) => {
-    return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+    // return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+    return <ToolFrame config={config} env={env}>
       <CodeMirror
-        // extensions={[language]}
-        // extensions={[language, language.language.data.of({ autocomplete: myCompletions }), checkboxPlugin]}
         initialExtensions={extensions}
-        // javascriptLanguage.data.of({ autocomplete: completions })
         autoFocus={autoFocus}
         value={modeConfig.text}
         onChange={(value) => {
@@ -261,8 +261,8 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(<VarUse varInfo={env[id]} />, elem)
       })}
-    </div>;
-  }, [env, extensions, modeConfig.text, refs, updateModeConfig])
+    </ToolFrame>;
+  }, [config, env, extensions, modeConfig.text, refs, updateModeConfig])
   useView(reportView, render, config);
 
   return null;
@@ -279,40 +279,49 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
 
   useOutput(reportOutput, output);
 
-  const render = useCallback(({autoFocus}) => {
-    // return <div style={{ display: 'inline-block', minWidth: 100, border: '1px solid #0083', padding: '10px', position: "relative", paddingTop: '15px', marginTop: '15px' }}>
-    //   <ShowView view={view} autoFocus={autoFocus} />
-    //   <button
-    //     style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
-    //     onClick={() => {
-    //       updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
-    //     }}>
-    //     ×
-    //   </button>
-    // </div>
-    return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'flex', flexDirection: 'column' }}>
-      <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
-        <div style={{marginLeft: 2}}>{modeConfig.config.toolName}</div>
-        <div style={{flexGrow: 1}}></div>
-        <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={() => {
-            updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
-          }}
-        >×</div>
-      </div>
+  const env = useContext(EnvContext);
+
+  const render = useCallback(function R({autoFocus}) {
+    return <ToolFrame config={modeConfig.config} env={env} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});}}>
       <div style={{ minWidth: 100, padding: '10px', position: "relative"}}>
         <ShowView view={view} autoFocus={autoFocus} />
       </div>
-      {/* <button
-        style={{ alignSelf: "flex-end", position: "absolute", left: 8, top: -10, border: '1px solid rgba(0,0,0,0.2)' }}
-        onClick={() => {
-          updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});
-        }}>
-        ×
-      </button> */}
-    </div>
-  }, [updateConfig, view]);
+    </ToolFrame>
+  }, [env, modeConfig.config, updateConfig, view]);
   useView(reportView, render, config);
 
   return component;
+}
+
+interface ToolFrameProps {
+  children: ReactNode;
+  config: ToolConfig;
+  onClose?: () => void;
+  env: VarInfos;
+}
+
+function ToolFrame({children, config, onClose, env}: ToolFrameProps) {
+  const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
+
+  return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'flex', flexDirection: 'column' }}>
+    <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
+      <div style={{marginLeft: 2}}>{config.toolName}</div>
+      <div style={{flexGrow: 1}}></div>
+      <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
+        onClick={() => {updateShowInspector((i) => !i)}}
+      >i</div>
+      {onClose &&
+        <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
+          onClick={onClose}
+        >×</div>
+      }
+    </div>
+    {children}
+    {showInspector && <WindowPortal>
+      <h3>Tool config</h3>
+      <ObjectInspector data={config} expandLevel={100}/>
+      <h3>Env</h3>
+      <ObjectInspector data={env} expandLevel={100}/>
+    </WindowPortal>}
+  </div>;
 }

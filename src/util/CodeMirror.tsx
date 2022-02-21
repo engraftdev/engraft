@@ -1,6 +1,7 @@
 import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { useEffect, useRef, useState } from "react"
+import useLogLifecycle from './useLogLifecycle';
 
 export interface MyCodeMirrorProps {
   initialExtensions: Extension[];
@@ -15,6 +16,8 @@ export default function CodeMirror({initialExtensions, value, onChange, autoFocu
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();
+
+  useLogLifecycle('CodeMirror');
 
   useEffect(() => {
     if (div && !stateRef.current) {
