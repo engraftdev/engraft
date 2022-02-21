@@ -203,66 +203,69 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   }, [compiled, env])
   useOutput(reportOutput, output);
 
-  // TODO: separate autocomplete for / & @
+  const render = useCallback(function R({autoFocus}) {
+    // TODO: separate autocomplete for / & @
 
-  const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
-    let word = completionContext.matchBefore(/\/?@?\w*/)!
-    if (word.from === word.to && !completionContext.explicit) {
-      return null
-    }
-    return {
-      from: word.from,
-      options: [
-        ...Object.entries(toolIndex).map(([toolName, tool]) => ({
-          label: '/' + toolName,
-          apply: () => {
-            updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
-          }
-        })),
-        ...Object.values(envRef.current!).map((varInfo) => ({
-          label: '@' + varInfo.config.label,
-          apply: refCode(varInfo.config.id),
-        })),
-        ...Object.values(possibleEnvRef.current!).map((possibleVarInfo) => ({
-          label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
-          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            let apply = refCode(possibleVarInfo.config.id);
-            possibleVarInfo.request();
-            view.dispatch({
-              changes: {from, to, insert: apply},
-              selection: {anchor: from + apply.length},
-              userEvent: "input.complete",
-              annotations: pickedCompletion.of(completion)
-            });
-          }
-        })),
-      ]
-    }
-  }, [updateConfig])  // TODO: react to new completions or w/e
+    const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
+      let word = completionContext.matchBefore(/\/?@?\w*/)!
+      if (word.from === word.to && !completionContext.explicit) {
+        return null
+      }
+      return {
+        from: word.from,
+        options: [
+          ...Object.entries(toolIndex).map(([toolName, tool]) => ({
+            label: '/' + toolName,
+            apply: () => {
+              updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
+            }
+          })),
+          ...Object.values(envRef.current!).map((varInfo) => ({
+            label: '@' + varInfo.config.label,
+            apply: refCode(varInfo.config.id),
+          })),
+          ...Object.values(possibleEnvRef.current!).map((possibleVarInfo) => ({
+            label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
+            apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+              let apply = refCode(possibleVarInfo.config.id);
+              possibleVarInfo.request();
+              view.dispatch({
+                changes: {from, to, insert: apply},
+                selection: {anchor: from + apply.length},
+                userEvent: "input.complete",
+                annotations: pickedCompletion.of(completion)
+              });
+            }
+          })),
+        ]
+      }
+    }, [])  // TODO: react to new completions or w/e
 
-  const [refSet, refs] = usePortalSet<{id: string}>();
+    const [refSet, refs] = usePortalSet<{id: string}>();
 
-  const extensions = useMemo(() =>
-    [...setup, refsExtension(refSet), javascript(), autocompletion({override: [completions]})],
-    [completions, refSet]  // TODO: these are constant
-  )
+    const extensions = useMemo(() =>
+      [...setup, refsExtension(refSet), javascript(), autocompletion({override: [completions]})],
+      [completions, refSet]  // TODO: these are constant
+    )
 
-  const render = useCallback(({autoFocus}) => {
+    const onChange = useCallback((value) => {
+      updateKeys(updateModeConfig, {text: value});
+    }, []);
+
     // return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+
     return <ToolFrame config={config} env={env}>
       <CodeMirror
-        initialExtensions={extensions}
+        extensions={extensions}
         autoFocus={autoFocus}
-        value={modeConfig.text}
-        onChange={(value) => {
-          updateKeys(updateModeConfig, {text: value});
-        }}
+        text={modeConfig.text}
+        onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(<VarUse varInfo={env[id]} />, elem)
       })}
     </ToolFrame>;
-  }, [config, env, extensions, modeConfig.text, refs, updateModeConfig])
+  }, [config, env, modeConfig.text, updateConfig, updateModeConfig])
   useView(reportView, render, config);
 
   return null;

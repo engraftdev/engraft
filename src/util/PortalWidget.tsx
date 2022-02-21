@@ -10,8 +10,8 @@ export default class PortalWidget<T> extends WidgetType {
     super()
   }
 
-  eq() {
-    return true;
+  eq(otherWidget: PortalWidget<T>) {
+    return this.portalSet === otherWidget.portalSet;
   }
 
   toDOM() {
