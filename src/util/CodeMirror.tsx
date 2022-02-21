@@ -1,7 +1,6 @@
 import { EditorState, Extension, StateEffect } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { useEffect, useMemo, useRef, useState } from "react"
-import useLogLifecycle from './useLogLifecycle';
 
 export interface MyCodeMirrorProps {
   extensions: Extension[];
@@ -52,16 +51,22 @@ export default function CodeMirror({extensions, text, onChange, autoFocus}: MyCo
     }
   });
 
-  useEffect(() => {
-    const view = viewRef.current;
-    if (!viewRef.current) { return; }
-    const currentText = view ? view.state.doc.toString() : '';
-    if (view && text !== currentText) {
-      view.dispatch({
-        changes: { from: 0, to: currentText.length, insert: text || '' },
-      });
-    }
-  }, [text]);
+  // TODO:
+  // ok this REALLY SUCKS but apparently if you nest code inside of three layers of notebooks...
+  // and type fast...
+  // you get feedback loops from this.
+  // clearly this should be fixed. for now: we comment it out.
+
+  // useEffect(() => {
+  //   const view = viewRef.current;
+  //   if (!viewRef.current) { return; }
+  //   const currentText = view ? view.state.doc.toString() : '';
+  //   if (view && text !== currentText) {
+  //     view.dispatch({
+  //       changes: { from: 0, to: currentText.length, insert: text || '' },
+  //     });
+  //   }
+  // }, [text]);
 
   return <div ref={setDiv} className="cm-theme cm-theme-light"/>
 }
