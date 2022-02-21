@@ -48,6 +48,8 @@ function App() {
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
 
+  const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
+
   return <>
     <div>
       <EnvContext.Provider value={context}>
@@ -59,6 +61,28 @@ function App() {
     <pre>{JSON.stringify(output?.toolValue, null, 2)}</pre>
     <br/>
     <br/>
+    <div className="bottom-stuff">
+      <button className="button-add" onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(config));
+          setCopyPasteMessage('Copied successfully');
+        } catch (e) {
+          setCopyPasteMessage('Copy unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));
+        }
+      }}>Copy to clipboard</button>
+      {' '}
+      <button className="button-add" onClick={async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          updateConfig(() => JSON.parse(text));
+          setCopyPasteMessage('Pasted successfully');
+        } catch (e) {
+          setCopyPasteMessage('Paste unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));
+        }
+      }}>Paste from clipboard</button>
+      {' '}
+      {copyPasteMessage}
+    </div>
     <button onClick={() => updateConfig(() => defaultConfig)}>reset</button>
   </>
 }

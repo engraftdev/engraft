@@ -1,10 +1,10 @@
-import { ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
-import {keymap, highlightSpecialChars, drawSelection, dropCursor, DecorationSet, Decoration, EditorView} from "@codemirror/view"
-import {EditorState, StateField, EditorSelection, TransactionSpec, Text, Extension} from "@codemirror/state"
+import {keymap, highlightSpecialChars, drawSelection, dropCursor, EditorView} from "@codemirror/view"
+import {EditorState} from "@codemirror/state"
 import {history, historyKeymap} from "@codemirror/history"
 import {foldKeymap} from "@codemirror/fold"
 import {indentOnInput} from "@codemirror/language"
@@ -17,13 +17,11 @@ import {commentKeymap} from "@codemirror/comment"
 import {rectangularSelection} from "@codemirror/rectangular-selection"
 import {defaultHighlightStyle} from "@codemirror/highlight"
 import {lintKeymap} from "@codemirror/lint"
-import { RangeSet } from "@codemirror/rangeset";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
-import PortalSet, { usePortalSet } from "../util/PortalSet";
-import PortalWidget from "../util/PortalWidget";
+import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
 import WindowPortal from "../util/WindowPortal";
@@ -196,7 +194,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
 
     // return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
 
-    return <ToolFrame config={config} env={env}>
+    return <ToolFrame config={config} env={env} possibleEnv={possibleEnv}>
       <CodeMirror
         extensions={extensions}
         autoFocus={autoFocus}
@@ -225,9 +223,10 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   useOutput(reportOutput, output);
 
   const env = useContext(EnvContext);
+  const possibleEnv = useContext(PossibleEnvContext);
 
   const render = useCallback(function R({autoFocus}) {
-    return <ToolFrame config={modeConfig.config} env={env} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});}}>
+    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});}}>
       <div style={{ minWidth: 100, padding: '10px', position: "relative"}}>
         <ShowView view={view} autoFocus={autoFocus} />
       </div>
@@ -243,9 +242,10 @@ interface ToolFrameProps {
   config: ToolConfig;
   onClose?: () => void;
   env: VarInfos;
+  possibleEnv: PossibleVarInfos;
 }
 
-function ToolFrame({children, config, onClose, env}: ToolFrameProps) {
+function ToolFrame({children, config, onClose, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'flex', flexDirection: 'column' }}>
@@ -267,6 +267,8 @@ function ToolFrame({children, config, onClose, env}: ToolFrameProps) {
       <ObjectInspector data={config} expandLevel={100}/>
       <h3>Env</h3>
       <ObjectInspector data={env} expandLevel={100}/>
+      <h3>Possible env</h3>
+      <ObjectInspector data={possibleEnv} expandLevel={100}/>
     </WindowPortal>}
   </div>;
 }

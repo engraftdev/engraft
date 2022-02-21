@@ -15,11 +15,6 @@ export function DumbTextTool({ config, updateConfig, reportOutput, reportView }:
   useOutput(reportOutput, output);
 
   const render = useCallback(function R() {
-    useEffect(() => {
-      console.log("DumbTextTool mounted");
-
-      return () => console.log("DumbTextTool unmounted");
-    }, [])
     return (
       <ControlledTextInput value={config.text} onChange={(ev) => updateKeys(updateConfig, {text: ev.target.value})}/>
     );

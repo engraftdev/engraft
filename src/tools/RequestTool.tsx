@@ -48,7 +48,8 @@ const paramsDefault = `{
   action: 'query',
   generator: 'random',
   grnnamespace: 0,
-  // prop: 'revisions|images',
+  prop: 'pageimages|extracts',
+  exintro: true,
   rvprop: 'content',
   grnlimit: 1
 }`

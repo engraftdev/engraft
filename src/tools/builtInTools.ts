@@ -10,5 +10,7 @@ import './LetTool';
 import './LooperTool';
 import './ReferenceTool';
 import './RequestTool';
+import './TableTool';
+import './MarkdownTool';
 import './SliderTool';
 import './DumbTextTool';
