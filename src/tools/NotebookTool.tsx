@@ -8,6 +8,8 @@ import { AddObjToContext } from "../util/context";
 import useDebounce, { arrEqWith, objEqWith, refEq } from "../util/useDebounce";
 import ControlledTextInput from "../util/ControlledTextInput";
 import { VarDefinition } from "../view/Vars";
+import Value from "../view/Value";
+import ScrollShadow from "react-scroll-shadow";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -157,7 +159,7 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
       return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
     }
     try {
-      return <ObjectInspector data={toolOutput.toolValue} expandLevel={0}/>;
+      return <Value value={toolOutput.toolValue}/>;
     } catch {
       return '[cannot serialize]';
     }
@@ -171,9 +173,13 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
     </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-      <div style={{marginBottom: 10}}>{outputDisplay}</div>
-      <ShowView view={toolView}/>
+    <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflowX: "hidden"}}>
+      <div style={{marginBottom: 10, maxHeight: 200, overflow: 'scroll', maxWidth: '100%'}}>
+        {outputDisplay}
+      </div>
+      <div style={{maxWidth: '100%'}}>
+        <ShowView view={toolView}/>
+      </div>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
     </div>
   </div>

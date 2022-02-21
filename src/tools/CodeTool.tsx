@@ -27,6 +27,7 @@ import { VarUse } from "../view/Vars";
 import WindowPortal from "../util/WindowPortal";
 import { ObjectInspector } from "react-inspector";
 import refsExtension, { refCode } from "../util/refsExtension";
+import Value from "../view/Value";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -264,11 +265,11 @@ function ToolFrame({children, config, onClose, env, possibleEnv}: ToolFrameProps
     {children}
     {showInspector && <WindowPortal>
       <h3>Tool config</h3>
-      <ObjectInspector data={config} expandLevel={100}/>
+      <Value value={config}/>
       <h3>Env</h3>
-      <ObjectInspector data={env} expandLevel={100}/>
+      <Value value={env}/>
       <h3>Possible env</h3>
-      <ObjectInspector data={possibleEnv} expandLevel={100}/>
+      <Value value={possibleEnv}/>
     </WindowPortal>}
   </div>;
 }

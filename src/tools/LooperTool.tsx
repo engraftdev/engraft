@@ -5,6 +5,8 @@ import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProp
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
+import Value from "../view/Value";
+import { VarDefinition } from "../view/Vars";
 
 
 
@@ -49,6 +51,8 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
   }, [inputLength, perItemOutputs])
   useOutput(reportOutput, output);
 
+  const [itemVarConfig, updateItemVarConfig] = useAt(config, updateConfig, 'itemVar');
+
   const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
       <div>
@@ -57,21 +61,28 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
         </div>
 
         {inputArray &&
-          <div className="row-top">
-            <div style={{display: 'inline-block'}}>
+          <>
+            <div>
               {inputArray.map((elem, i) =>
-                <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3, cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
+                <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3,
+                                    cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
                       onClick={() => setHighlightedIndex(i)}>
                   <div style={{pointerEvents: 'none'}}>
-                  <ObjectInspector data={elem.toolValue}/>
+                    {/* <Value value={elem.toolValue}/> */}
+                    {i}
                   </div>
                 </div>
               )}
-              <div>
-                <ShowView view={perItemViews[highlightedIndex]}/>
-              </div>
             </div>
-          </div>
+            <div className="row-top" style={{marginTop: 10, marginBottom: 10}}>
+              <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
+              {' = '}
+              <Value value={inputArray[highlightedIndex].toolValue} />
+            </div>
+            <div>
+              <ShowView view={perItemViews[highlightedIndex]}/>
+            </div>
+          </>
         }
       </div>
     );
