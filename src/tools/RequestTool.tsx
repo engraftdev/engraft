@@ -59,8 +59,8 @@ registerTool(RequestTool, {
   paramsConfig: {
     toolName: 'code',
     mode: {
-      modeName: 'text',
-      text: paramsDefault
+      modeName: 'code',
+      code: paramsDefault
     }
   } as CodeConfig,
 });

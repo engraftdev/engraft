@@ -18,8 +18,8 @@ const localStorageKey = 'live-compose-v1';
 const defaultConfig: CodeConfig = {
   toolName: 'code',
   mode: {
-    modeName: 'text',
-    text: ''
+    modeName: 'code',
+    code: ''
   }
 };
 

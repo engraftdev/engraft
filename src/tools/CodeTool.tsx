@@ -30,12 +30,12 @@ import Value from "../view/Value";
 
 export type CodeConfig = {
   toolName: 'code';
-  mode: CodeConfigTextMode | CodeConfigToolMode;
+  mode: CodeConfigCodeMode | CodeConfigToolMode;
 }
 
-export interface CodeConfigTextMode {
-  modeName: 'text',
-  text: string
+export interface CodeConfigCodeMode {
+  modeName: 'code',
+  code: string
 }
 
 export interface CodeConfigToolMode {
@@ -127,8 +127,8 @@ export function CodeTool(props: ToolProps<CodeConfig>) {
 
   let [modeConfig, updateModeConfig] = useAt(config, updateConfig, 'mode');
 
-  if (modeConfig.modeName === 'text') {
-    return <CodeToolTextMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigTextMode>} />;
+  if (modeConfig.modeName === 'code') {
+    return <CodeToolCodeMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigCodeMode>} />;
   } else {
     return <CodeToolToolMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigToolMode>} />;
   }
@@ -136,22 +136,22 @@ export function CodeTool(props: ToolProps<CodeConfig>) {
 registerTool(CodeTool, {
   toolName: 'code',
   mode: {
-    modeName: 'text',
-    text: ''
+    modeName: 'code',
+    code: ''
   }
 });
 
 
-export function CodeToolTextMode({ config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
-                                 { modeConfig: CodeConfigTextMode, updateModeConfig: Updater<CodeConfigTextMode> }) {
+export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
+                                 { modeConfig: CodeConfigCodeMode, updateModeConfig: Updater<CodeConfigCodeMode> }) {
   const compiled = useMemo(() => {
     try {
-      const result = compile(modeConfig.text)
+      const result = compile(modeConfig.code)
       return result;
     } catch {
       // todo
     }
-  }, [modeConfig.text])
+  }, [modeConfig.code])
 
   const env = useContext(EnvContext)
   const envRef = useRef<VarInfos>();
@@ -185,7 +185,7 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
     }, [refSet])
 
     const onChange = useCallback((value) => {
-      updateKeys(updateModeConfig, {text: value});
+      updateKeys(updateModeConfig, {code: value});
     }, []);
 
     // return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
@@ -194,14 +194,14 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
       <CodeMirror
         extensions={extensions}
         autoFocus={autoFocus}
-        text={modeConfig.text}
+        text={modeConfig.code}
         onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(<VarUse varInfo={env[id] as VarInfo | undefined} />, elem)
       })}
     </ToolFrame>;
-  }, [config, env, modeConfig.text, possibleEnv, updateConfig, updateModeConfig])
+  }, [config, env, modeConfig.code, possibleEnv, updateConfig, updateModeConfig])
   useView(reportView, render, config);
 
   return null;
@@ -222,7 +222,7 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   const possibleEnv = useContext(PossibleEnvContext);
 
   const render = useCallback(function R({autoFocus}) {
-    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'text', text: ''}});}}>
+    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: ''}});}}>
       <div style={{ minWidth: 100, padding: '10px', position: "relative"}}>
         <ShowView view={view} autoFocus={autoFocus} />
       </div>
