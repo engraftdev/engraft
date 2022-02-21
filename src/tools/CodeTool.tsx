@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, toolIndex, ToolProps, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
 
@@ -75,6 +75,55 @@ const setup = [
 ]
 
 
+function toolCompletions(apply: (tool: Tool<any>) => void): CompletionSource {
+  return (completionContext: CompletionContext) => {
+    let word = completionContext.matchBefore(/\/?\w*/)!
+    if (word.from === word.to && !completionContext.explicit) {
+      return null
+    }
+    return {
+      from: word.from,
+      options: [
+        ...Object.entries(toolIndex).map(([toolName, tool]) => ({
+          label: '/' + toolName,
+          apply: () => apply(tool),
+        })),
+      ]
+    }
+  }
+}
+
+function refCompletions(env?: VarInfos, possibleEnv?: PossibleVarInfos): CompletionSource {
+  return (completionContext: CompletionContext) => {
+    let word = completionContext.matchBefore(/@?\w*/)!
+    if (word.from === word.to && !completionContext.explicit) {
+      return null
+    }
+    return {
+      from: word.from,
+      options: [
+        ...Object.values(env || {}).map((varInfo) => ({
+          label: '@' + varInfo.config.label,
+          apply: refCode(varInfo.config.id),
+        })),
+        ...Object.values(possibleEnv || {}).map((possibleVarInfo) => ({
+          label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
+          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+            let apply = refCode(possibleVarInfo.config.id);
+            possibleVarInfo.request();
+            view.dispatch({
+              changes: {from, to, insert: apply},
+              selection: {anchor: from + apply.length},
+              userEvent: "input.complete",
+              annotations: pickedCompletion.of(completion)
+            });
+          }
+        })),
+      ]
+    }
+  };
+}
+
 export function CodeTool(props: ToolProps<CodeConfig>) {
   const {config, updateConfig} = props;
 
@@ -127,49 +176,19 @@ export function CodeToolTextMode({ config, updateConfig, reportOutput, reportVie
   useOutput(reportOutput, output);
 
   const render = useCallback(function R({autoFocus}) {
-    // TODO: separate autocomplete for / & @
-
-    const completions: CompletionSource = useCallback((completionContext: CompletionContext) => {
-      let word = completionContext.matchBefore(/\/?@?\w*/)!
-      if (word.from === word.to && !completionContext.explicit) {
-        return null
-      }
-      return {
-        from: word.from,
-        options: [
-          ...Object.entries(toolIndex).map(([toolName, tool]) => ({
-            label: '/' + toolName,
-            apply: () => {
-              updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
-            }
-          })),
-          ...Object.values(envRef.current!).map((varInfo) => ({
-            label: '@' + varInfo.config.label,
-            apply: refCode(varInfo.config.id),
-          })),
-          ...Object.values(possibleEnvRef.current!).map((possibleVarInfo) => ({
-            label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
-            apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-              let apply = refCode(possibleVarInfo.config.id);
-              possibleVarInfo.request();
-              view.dispatch({
-                changes: {from, to, insert: apply},
-                selection: {anchor: from + apply.length},
-                userEvent: "input.complete",
-                annotations: pickedCompletion.of(completion)
-              });
-            }
-          })),
-        ]
-      }
-    }, [])  // TODO: react to new completions or w/e
-
     const [refSet, refs] = usePortalSet<{id: string}>();
 
-    const extensions = useMemo(() =>
-      [...setup, refsExtension(refSet), javascript(), autocompletion({override: [completions]})],
-      [completions, refSet]  // TODO: these are constant
-    )
+    const applyToolCompletion = useCallback((tool: Tool<any>) => {
+      updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}})
+    }, [])
+
+    const extensions = useMemo(() => {
+      function applyToolCompletion(tool: Tool<any>) {
+        updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}});
+      };
+      const completions = [toolCompletions(applyToolCompletion), refCompletions(envRef.current, possibleEnvRef.current)];
+      return [...setup, refsExtension(refSet), javascript(), autocompletion({override: completions})];
+    }, [refSet])
 
     const onChange = useCallback((value) => {
       updateKeys(updateModeConfig, {text: value});
