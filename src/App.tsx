@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { EnvContext, newVarConfig, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
+import { EnvContext, newVarConfig, ToolConfig, toolIndex, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
@@ -15,13 +15,7 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultConfig: CodeConfig = {
-  toolName: 'code',
-  mode: {
-    modeName: 'code',
-    code: ''
-  }
-};
+const defaultConfig: CodeConfig = toolIndex['code'].defaultConfig();
 
 function varInfoObject(varInfos: VarInfo[]) {
   return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));

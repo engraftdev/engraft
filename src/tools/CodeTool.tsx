@@ -35,7 +35,8 @@ export type CodeConfig = {
 
 export interface CodeConfigCodeMode {
   modeName: 'code',
-  code: string
+  code: string,
+  subTools: {[id: string]: ToolConfig}
 }
 
 export interface CodeConfigToolMode {
@@ -137,7 +138,8 @@ registerTool(CodeTool, {
   toolName: 'code',
   mode: {
     modeName: 'code',
-    code: ''
+    code: '',
+    subTools: {},
   }
 });
 
@@ -222,7 +224,7 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   const possibleEnv = useContext(PossibleEnvContext);
 
   const render = useCallback(function R({autoFocus}) {
-    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: ''}});}}>
+    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: '', subTools: {}}});}}>
       <div style={{ minWidth: 100, padding: '10px', position: "relative"}}>
         <ShowView view={view} autoFocus={autoFocus} />
       </div>
