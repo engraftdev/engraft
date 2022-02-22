@@ -7,3 +7,9 @@ declare module 'rect-connect' {
   interface Size {width: number, height: number}
   export default function rectConnect(sourceCenter: Point, sourceSize: Size, targetCenter: Point, targetSize: Size): {source: Point, target: Point}
 }
+
+declare module '@babel/preset-react' {
+  import { PluginItem } from '@babel/core';
+  const babelPresetReact: PluginItem
+  export = babelPresetReact;
+}

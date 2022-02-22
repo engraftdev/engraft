@@ -15,6 +15,8 @@ import Value from "../view/Value";
 import id from "../util/id";
 import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../util/codeMirrorStuff";
 import ShadowDOM from "../util/ShadowDOM";
+import { transform } from '@babel/standalone';
+import React from "react";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -72,10 +74,13 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
                                  { modeConfig: CodeConfigCodeMode, updateModeConfig: Updater<CodeConfigCodeMode> }) {
   const compiled = useMemo(() => {
     try {
-      const result = compile(modeConfig.code)
+      let translated = transform(modeConfig.code, { presets: ["react"] }).code!;
+      translated = translated.replace(/;$/, "");
+      console.log(translated);
+      const result = compile(translated);
       return result;
-    } catch {
-      // todo
+    } catch (e) {
+      console.warn(e);
     }
   }, [modeConfig.code])
 
@@ -95,12 +100,13 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
 
   const output = useMemo(() => {
     if (compiled) {
-      const wrapped = {
+      const scope = {
         ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
-        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue]))
+        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue])),
+        React
       };
       try {
-        return {toolValue: compiled(wrapped)};
+        return {toolValue: compiled(scope)};
       } catch {
       }
     }
@@ -126,7 +132,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         toolCompletions(insertTool, replaceWithTool),
         refCompletions(() => envRef.current, () => possibleEnvRef.current)
       ];
-      return [...setup, refsExtension(refSet), javascript(), autocompletion({override: completions})];
+      return [...setup, refsExtension(refSet), javascript({jsx: true}), autocompletion({override: completions})];
     }, [refSet])
 
     const onChange = useCallback((value) => {

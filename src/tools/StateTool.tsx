@@ -1,10 +1,9 @@
 import { useCallback, useEffect } from "react"
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, VarConfig } from "../tools-framework/tools"
+import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framework/tools"
 import { ToolWithView } from "../tools-framework/ToolWithView";
-import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
+import { useView } from "../tools-framework/useSubTool"
 import { useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state"
 import Value from "../view/Value";
-import { VarDefinition } from "../view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface StateConfig extends ToolConfig {
@@ -21,6 +20,8 @@ export interface StateConfig extends ToolConfig {
 export function StateTool({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) {
   const [stateValue, updateStateValue] = useAt(config, updateConfig, 'stateValue')
   const setStateValue = useSetter(updateStateValue);
+
+  // TODO: make sure state is serializable befoer you set it
 
   useEffect(() => {
     reportOutput({toolValue: {get: stateValue, set: setStateValue}});

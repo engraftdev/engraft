@@ -1,7 +1,7 @@
 // import stringify from "json-stringify-pretty-compact";
 import './highlight-style.css'
 import stringify from "../util/stringify";
-import { HTMLProps, useMemo } from "react";
+import React, { HTMLProps, isValidElement, useMemo } from "react";
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
@@ -15,7 +15,14 @@ interface Props extends HTMLProps<HTMLDivElement> {
 export default function Value({value, style, ...props}: Props) {
   const contents = useMemo(() => {
     if (!value) { return; }
-    const stringified = stringify(value);
+    if (isValidElement(value)) {
+      return value;
+    }
+
+    let stringified: string | undefined;
+    try {
+      stringified = stringify(value);
+    } catch {}
     if (stringified) {
       const html = hljs.highlight(stringified, {language: 'javascript'}).value;
       return <pre dangerouslySetInnerHTML={{__html: html}} />;
