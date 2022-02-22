@@ -2,6 +2,8 @@ import { useRef } from "react";
 
 type Eq<T> = (x1: T, x2: T) => boolean;
 
+// TODO: rename this; it's overloaded
+
 export default function useDebounce<T extends object>(t: T, eq: Eq<T>): T {
   const lastT = useRef<T>();
 
@@ -36,7 +38,7 @@ export function objEqWith(eq: Eq<any>): Eq<object> {
   }
 }
 
-export function arrEqWith<T>(eq: Eq<T>): Eq<T[]> {
+export function arrEqWith<T, U extends (readonly T[]) | T[]>(eq: Eq<T>): Eq<U> {
   return (a1: any, a2: any) => {
     if (a1.length !== a2.length) {
       return false;
