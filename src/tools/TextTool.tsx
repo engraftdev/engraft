@@ -14,6 +14,7 @@ import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMir
 import id from "../util/id";
 import { codeConfigSetTo } from "./CodeTool";
 import ShadowDOM from "../util/ShadowDOM";
+import rootStyles from "../view/rootStyles";
 
 export interface TextConfig {
   toolName: 'text';
@@ -91,10 +92,10 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
           subTools[id] ?
             // TODO: this style-resetting is tedious; is there a better way?
             <ShadowDOM style={{all: 'initial', display: 'inline-block'}}>
-              <div className="root">
-                <ShowView view={views[id]} />
+              <div style={rootStyles}>
+                <ShowView view={views[id]} autoFocus={true}/>
               </div>
-            </ShadowDOM>:
+            </ShadowDOM> :
             <VarUse varInfo={env[id] as VarInfo | undefined} />,
           elem
         )

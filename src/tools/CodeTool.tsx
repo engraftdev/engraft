@@ -17,6 +17,7 @@ import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../u
 import ShadowDOM from "../util/ShadowDOM";
 import { transform } from '@babel/standalone';
 import React from "react";
+import rootStyles from "../view/rootStyles";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -152,11 +153,9 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         return ReactDOM.createPortal(
           subTools[id] ?
             // TODO: this style-resetting is tedious; is there a better way?
-            <ShadowDOM>
-              <div style={{all: 'initial', display: 'inline-block'}}>
-                <div className="root">
-                  <ShowView view={views[id]} autoFocus={true}/>
-                </div>
+            <ShadowDOM style={{all: 'initial', display: 'inline-block'}}>
+              <div style={rootStyles}>
+                <ShowView view={views[id]} autoFocus={true}/>
               </div>
             </ShadowDOM> :
             <VarUse varInfo={env[id] as VarInfo | undefined} />,
