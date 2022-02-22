@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
+import { registerTool, ToolConfig, toolIndex, ToolProps } from "../../tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "../../tools-framework/useSubTool";
 
 export interface BinOpConfig extends ToolConfig {
   toolName: 'bin-op';

@@ -17,7 +17,7 @@ export function SliderTool({ config, updateConfig, reportOutput, reportView }: T
 
   const render = useCallback(() => {
     return (
-      <div className="App">
+      <div style={{padding: 10}}>
         <input
           type="range"
           value={config.value}

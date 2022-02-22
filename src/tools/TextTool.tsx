@@ -1,94 +1,24 @@
 import { useCallback, useContext, useMemo, useRef } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, ToolProps, VarInfo, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { markdown } from "@codemirror/lang-markdown";
-import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
-
-import {keymap, highlightSpecialChars, drawSelection, dropCursor, EditorView} from "@codemirror/view"
-import {EditorState} from "@codemirror/state"
-import {history, historyKeymap} from "@codemirror/history"
-import {foldKeymap} from "@codemirror/fold"
-import {indentOnInput} from "@codemirror/language"
-import {defaultKeymap} from "@codemirror/commands"
-import {bracketMatching} from "@codemirror/matchbrackets"
-import {closeBrackets, closeBracketsKeymap} from "@codemirror/closebrackets"
-import {searchKeymap, highlightSelectionMatches} from "@codemirror/search"
-import {autocompletion, completionKeymap, pickedCompletion, Completion} from "@codemirror/autocomplete"
-import {commentKeymap} from "@codemirror/comment"
-import {rectangularSelection} from "@codemirror/rectangular-selection"
-import {defaultHighlightStyle} from "@codemirror/highlight"
-import {lintKeymap} from "@codemirror/lint"
-import { useOutput, useView } from "../tools-framework/useSubTool";
-import { useAt } from "../util/state";
+import { autocompletion } from "@codemirror/autocomplete"
+import { ShowView, useOutput, useView } from "../tools-framework/useSubTool";
+import { updateKeys, useAt, useStateUpdateOnly } from "../util/state";
 import CodeMirror from "../util/CodeMirror";
 import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
 import refsExtension, { refCode } from "../util/refsExtension";
 import { useMemoObject } from "../util/useMemoObject";
+import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
+import id from "../util/id";
+import { codeConfigSetTo } from "./CodeTool";
+import ShadowDOM from "../util/ShadowDOM";
 
 export interface TextConfig {
   toolName: 'text';
   text: string;
-}
-
-const setup = [
-  // lineNumbers(),
-  // highlightActiveLineGutter(),
-  highlightSpecialChars(),
-  history(),
-  // foldGutter(),
-  drawSelection(),
-  dropCursor(),
-  EditorState.allowMultipleSelections.of(true),
-  indentOnInput(),
-  defaultHighlightStyle.fallback,
-  bracketMatching(),
-  closeBrackets(),
-  autocompletion(),
-  rectangularSelection(),
-  // highlightActiveLine(),
-  highlightSelectionMatches(),
-  keymap.of([
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...searchKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...commentKeymap,
-    ...completionKeymap,
-    ...lintKeymap
-  ])
-]
-
-function refCompletions(env?: VarInfos, possibleEnv?: PossibleVarInfos): CompletionSource {
-  return (completionContext: CompletionContext) => {
-    let word = completionContext.matchBefore(/@?\w*/)!
-    if (word.from === word.to && !completionContext.explicit) {
-      return null
-    }
-    return {
-      from: word.from,
-      options: [
-        ...Object.values(env || {}).map((varInfo) => ({
-          label: '@' + varInfo.config.label,
-          apply: refCode(varInfo.config.id),
-        })),
-        ...Object.values(possibleEnv || {}).map((possibleVarInfo) => ({
-          label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
-          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            let apply = refCode(possibleVarInfo.config.id);
-            possibleVarInfo.request();
-            view.dispatch({
-              changes: {from, to, insert: apply},
-              selection: {anchor: from + apply.length},
-              userEvent: "input.complete",
-              annotations: pickedCompletion.of(completion)
-            });
-          }
-        })),
-      ]
-    }
-  };
+  subTools: {[id: string]: ToolConfig};
 }
 
 export function TextTool({ config, updateConfig, reportOutput, reportView}: ToolProps<TextConfig>) {
@@ -101,25 +31,27 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
   const possibleEnvRef = useRef<PossibleVarInfos>();
   possibleEnvRef.current = possibleEnv;
 
+  const [subTools, updateSubTools] = useAt(config, updateConfig, 'subTools');
+  const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+
   const replacedText = useMemo(() => {
     let result = text;
-    Object.entries(env).forEach(([k, v]) => {
-      let replacementText: string | undefined = undefined;
-      result = result.replaceAll(refCode(k), () => {
-        if (replacementText !== undefined) { return replacementText; }
-        replacementText = '';
-        if (v.value) {
-          const toolValue = v.value.toolValue;
-          if (typeof toolValue === 'object' && toolValue) {
-            replacementText = toolValue.toString();
-          }
-          replacementText = "" + toolValue;
+    const applyReplacement = ([k, v]: readonly [string, ToolValue | null]) => {
+      let replacementText = '';
+      if (v) {
+        const toolValue = v.toolValue;
+        if (typeof toolValue === 'object' && toolValue) {
+          replacementText = toolValue.toString();
         }
-        return replacementText;
-      })
-    })
+        replacementText = "" + toolValue;
+      }
+      result = result.replaceAll(refCode(k), replacementText);
+    }
+    Object.entries(env).map(([k, v]) => [k, v.value || null] as const).forEach(applyReplacement);
+    Object.entries(outputs).forEach(applyReplacement);
     return result;
-  }, [env, text])
+  }, [env, outputs, text])
   const output = useMemoObject({toolValue: replacedText});
   useOutput(reportOutput, output);
 
@@ -127,7 +59,17 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
     const [refSet, refs] = usePortalSet<{id: string}>();
 
     const extensions = useMemo(() => {
-      const completions = [refCompletions(envRef.current, possibleEnvRef.current)];
+      function insertTool(tool: Tool<ToolConfig>) {
+        const newId = id();
+        const newConfig = codeConfigSetTo(tool.defaultConfig());
+        updateKeys(updateSubTools, {[newId]: newConfig});
+        // TODO: we never remove these! lol
+        return newId;
+      };
+      const completions = [
+        toolCompletions(insertTool),
+        refCompletions(() => envRef.current, () => possibleEnvRef.current)
+      ];
       return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions})];
     }, [refSet])
 
@@ -145,15 +87,31 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
         onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
-        return ReactDOM.createPortal(<VarUse varInfo={env[id] as VarInfo | undefined} />, elem)
+        return ReactDOM.createPortal(
+          subTools[id] ?
+            // TODO: this style-resetting is tedious; is there a better way?
+            <ShadowDOM style={{all: 'initial', display: 'inline-block'}}>
+              <div className="root">
+                <ShowView view={views[id]} />
+              </div>
+            </ShadowDOM>:
+            <VarUse varInfo={env[id] as VarInfo | undefined} />,
+          elem
+        )
       })}
     </>;
-  }, [env, text, updateText])
+  }, [env, subTools, text, updateSubTools, updateText, views])
   useView(reportView, render, config);
 
-  return null;
+  return <>
+    {Object.entries(subTools).map(([id, subToolConfig]) =>
+      <SubTool key={id} id={id} subToolConfigs={subTools}
+              updateSubToolConfigs={updateSubTools} updateOutputs={updateOutputs} updateViews={updateViews} />
+    )}
+  </>;
 }
 registerTool(TextTool, {
   toolName: 'text',
   text: '',
+  subTools: {},
 });

@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react';
-import { EnvContext, newVarConfig, ToolConfig, toolIndex, ToolValue, VarInfo } from './tools-framework/tools';
+import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
 import './tools/builtInTools';
-import { CodeConfig } from './tools/CodeTool';
-import { ControlledSpan } from './util/ControlledTextInput';
+import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
+import Value from './view/Value';
 
 /*
 TODO: fix remounting text-editor bug
@@ -15,7 +15,7 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultConfig: CodeConfig = toolIndex['code'].defaultConfig();
+const defaultConfig: CodeConfig = codeConfigSetTo('');
 
 function varInfoObject(varInfos: VarInfo[]) {
   return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));
@@ -52,7 +52,7 @@ function App() {
     </div>
     <br/>
     <br/>
-    <pre>{JSON.stringify(output?.toolValue, null, 2)}</pre>
+    <Value value={output?.toolValue} />
     <br/>
     <br/>
     <div className="bottom-stuff">

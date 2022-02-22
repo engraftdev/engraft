@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, toolIndex, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
@@ -7,6 +7,7 @@ import { AddObjToContext } from "../util/context";
 import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
 import { VarDefinition } from "../view/Vars";
 import Value from "../view/Value";
+import { codeConfigSetTo } from "./CodeTool";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -38,10 +39,20 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [updateOutputs])
 
   const render = useCallback(() => {
-    return <div>
-      {cells.map((cell, i) => <CellView key={cell.var.id} cell={cell} updateCell={atIndex(updateCells, i)} toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]} />)}
+    return <div style={{padding: 10}}>
+      {cells.map((cell, i) =>
+        <CellView key={cell.var.id} cell={cell}
+          // TODO: memoize these?
+          updateCell={atIndex(updateCells, i)}
+          removeCell={() => {
+            const newCells = [...cells];
+            newCells.splice(i, 1);
+            updateCells(() => newCells);
+          }}
+          toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
+      />)}
       <button onClick={() =>
-        updateCells((cells) => [...cells, {var: newVarConfig(''), config: toolIndex['code'].defaultConfig(), upstreamIds: {}}])}>
+        updateCells((cells) => [...cells, {var: newVarConfig(''), config: codeConfigSetTo(''), upstreamIds: {}}])}>
           +
       </button>
     </div>;
@@ -148,9 +159,11 @@ interface CellViewProps {
 
   toolOutput: ToolValue | null,
   toolView: ToolView | null,
+
+  removeCell: () => void;
 }
 
-function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
+function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
   const outputDisplay = useMemo(() => {
     if (!toolOutput) {
       return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
@@ -168,6 +181,7 @@ function CellView({cell, updateCell, toolView, toolOutput}: CellViewProps) {
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 150, width: 150}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
+      <button style={{borderRadius: 30}} onClick={removeCell}>✖️</button>
     </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflowX: "hidden"}}>

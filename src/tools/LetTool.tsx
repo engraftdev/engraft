@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from "react"
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, VarConfig } from "../tools-framework/tools"
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
 import { useAt } from "../util/state"
 import { VarDefinition } from "../view/Vars";
+import { codeConfigSetTo } from "./CodeTool";
 
 export interface LetConfig extends ToolConfig {
   toolName: 'let';
@@ -23,7 +24,7 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
 
   const render = useCallback(({autoFocus}) => {
     return (
-      <div>
+      <div style={{padding: 10}}>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>let</b>
           {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
@@ -56,6 +57,6 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
 registerTool<LetConfig>(LetTool, () => ({
   toolName: 'let',
   bindingVar: newVarConfig(),
-  bindingConfig: toolIndex['code'].defaultConfig(),
-  bodyConfig: toolIndex['code'].defaultConfig(),
+  bindingConfig: codeConfigSetTo(''),
+  bodyConfig: codeConfigSetTo(''),
 }));

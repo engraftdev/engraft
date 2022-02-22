@@ -13,7 +13,7 @@ export function TableTool({ config, updateConfig, reportOutput, reportView }: To
   useOutput(reportOutput, inputOutput);
 
   const render = useCallback(function R({autoFocus}) {
-    return <div>
+    return <div style={{padding: 10}}>
       <ShowView view={inputView} autoFocus={autoFocus}/>
       <TableInspector data={inputOutput?.toolValue}/>
     </div>;

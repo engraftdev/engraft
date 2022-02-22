@@ -1,0 +1,173 @@
+{
+  "toolName": "code",
+  "mode": {
+    "modeName": "tool",
+    "config": {
+      "toolName": "notebook",
+      "cells": [
+        {
+          "var": {
+            "id": "IDhole279857",
+            "label": "response"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "request",
+                "urlConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "tool",
+                    "config": {
+                      "toolName": "text",
+                      "text": "https://en.wikipedia.org/w/api.php",
+                      "subTools": {}
+                    }
+                  }
+                },
+                "paramsConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "code",
+                    "code": "{\n  origin: '*',\n  format: 'json',\n  action: 'query',\n  generator: 'random',\n  grnnamespace: 0,\n  prop: 'pageimages|extracts',\n  exintro: true,\n  rvprop: 'content',\n  grnlimit: 5\n}",
+                    "subTools": {}
+                  }
+                }
+              }
+            }
+          },
+          "upstreamIds": {}
+        },
+        {
+          "var": {
+            "id": "IDslicer681048",
+            "label": "pages"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "table",
+                "inputConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "code",
+                    "code": "Object.values(IDhole279857.query.pages)",
+                    "subTools": {}
+                  }
+                }
+              }
+            }
+          },
+          "upstreamIds": {
+            "IDhole279857": true
+          }
+        },
+        {
+          "var": {
+            "id": "IDgrape419949",
+            "label": "markdown pieces"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "looper",
+                "inputConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "code",
+                    "code": "IDslicer681048",
+                    "subTools": {}
+                  }
+                },
+                "itemVar": {
+                  "id": "IDjet873332",
+                  "label": "item"
+                },
+                "perItemConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "tool",
+                    "config": {
+                      "toolName": "markdown",
+                      "sourceConfig": {
+                        "toolName": "code",
+                        "mode": {
+                          "modeName": "tool",
+                          "config": {
+                            "toolName": "text",
+                            "text": "# IDpainter564219\n\n![](IDcondor751779)\n\nIDtalos285013",
+                            "subTools": {
+                              "IDpainter564219": {
+                                "toolName": "code",
+                                "mode": {
+                                  "modeName": "code",
+                                  "code": "IDjet873332.title",
+                                  "subTools": {}
+                                }
+                              },
+                              "IDcondor751779": {
+                                "toolName": "code",
+                                "mode": {
+                                  "modeName": "code",
+                                  "code": "IDjet873332.thumbnail.source",
+                                  "subTools": {}
+                                }
+                              },
+                              "IDtalos285013": {
+                                "toolName": "code",
+                                "mode": {
+                                  "modeName": "code",
+                                  "code": "IDjet873332.extract",
+                                  "subTools": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "upstreamIds": {
+            "IDslicer681048": true
+          }
+        },
+        {
+          "var": {
+            "id": "IDstallion401711",
+            "label": ""
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "markdown",
+                "sourceConfig": {
+                  "toolName": "code",
+                  "mode": {
+                    "modeName": "code",
+                    "code": "IDgrape419949.join('\\n\\n')",
+                    "subTools": {}
+                  }
+                }
+              }
+            }
+          },
+          "upstreamIds": {
+            "IDgrape419949": true
+          }
+        }
+      ]
+    }
+  }
+}

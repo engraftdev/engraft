@@ -27,7 +27,7 @@ export function ImportTool({ config, updateConfig, reportOutput, reportView }: T
 
   const render = useCallback(() => {
     return (
-      <div>
+      <div style={{padding: 10}}>
         <div className="row-top" style={{marginBottom: 10}}>
           <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
         </div>

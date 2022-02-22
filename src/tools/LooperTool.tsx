@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
 import Value from "../view/Value";
 import { VarDefinition } from "../view/Vars";
+import { codeConfigSetTo } from "./CodeTool";
 
 
 
@@ -54,7 +55,7 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 
   const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
-      <div>
+      <div style={{padding: 10}}>
         <div className="row-top" style={{marginBottom: 10}}>
           input <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
@@ -99,8 +100,8 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 }
 registerTool<LooperConfig>(LooperTool, () => ({
   toolName: 'looper',
-  inputConfig: toolIndex['code'].defaultConfig(),
+  inputConfig: codeConfigSetTo(''),
   itemVar: newVarConfig('item'),
-  perItemConfig: toolIndex['code'].defaultConfig()
+  perItemConfig: codeConfigSetTo('')
 }));
 

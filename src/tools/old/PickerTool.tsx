@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
-import { ShowView, useView } from "../tools-framework/useSubTool";
-import { updateKeys, useAt, useStateSetOnly } from "../util/state";
+import { registerTool, Tool, ToolConfig, toolIndex, ToolProps, ToolView } from "../../tools-framework/tools";
+import { ShowView, useView } from "../../tools-framework/useSubTool";
+import { updateKeys, useAt, useStateSetOnly } from "../../util/state";
 
 export interface PickerConfig {
   toolName: 'picker';
@@ -26,7 +26,7 @@ export function PickerTool(props: ToolProps<PickerConfig>) {
       </>;
     } else {
       const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log("onchange");
+        // console.log("onchange");
         const toolName = e.target.value;
         updateKeys(updateConfig, { pickedConfig: toolIndex[toolName].defaultConfig() });
       }

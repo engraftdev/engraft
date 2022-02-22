@@ -3,7 +3,7 @@ import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framewo
 
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
-import { CodeConfig } from "./CodeTool";
+import { codeConfigSetTo } from "./CodeTool";
 
 export interface MarkdownConfig {
   toolName: 'markdown';
@@ -28,7 +28,7 @@ export function MarkdownTool({config, updateConfig, reportView, reportOutput}: T
   }, [md, sourceOutput])
 
   const render = useCallback(function R() {
-    return <div style={{display: 'flex', gap: 20, alignItems: 'flex-start'}}>
+    return <div style={{display: 'flex', gap: 20, alignItems: 'flex-start', padding: 10}}>
       <div style={{flexShrink: 0}}>
         <ShowView view={sourceView} />
       </div>
@@ -46,11 +46,5 @@ export function MarkdownTool({config, updateConfig, reportView, reportOutput}: T
 }
 registerTool<MarkdownConfig>(MarkdownTool, () => ({
   toolName: 'markdown',
-  sourceConfig: {
-    toolName: 'code',
-    mode: {
-      modeName: 'tool',
-      config: toolIndex['text'].defaultConfig()
-    }
-  } as CodeConfig
+  sourceConfig: codeConfigSetTo(toolIndex['text'].defaultConfig()),
 }));

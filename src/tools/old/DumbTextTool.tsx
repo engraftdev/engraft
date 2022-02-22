@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from "react";
-import { registerTool, ToolProps } from "../tools-framework/tools";
-import { useOutput, useView } from "../tools-framework/useSubTool";
-import ControlledTextInput from "../util/ControlledTextInput";
-import { updateKeys } from "../util/state";
-import { useMemoObject } from "../util/useMemoObject";
+import { registerTool, ToolProps } from "../../tools-framework/tools";
+import { useOutput, useView } from "../../tools-framework/useSubTool";
+import ControlledTextInput from "../../util/ControlledTextInput";
+import { updateKeys } from "../../util/state";
+import { useMemoObject } from "../../util/useMemoObject";
 
 
 export interface DumbTextConfig {
