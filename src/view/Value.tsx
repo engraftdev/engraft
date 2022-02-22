@@ -32,7 +32,7 @@ export default function Value({value, style, ...props}: Props) {
   }, [value])
 
   //, boxShadow: 'inset 0 0 2px 1px rgba(0,0,0,0.2)'
-  return <ScrollShadow style={{...style, overflow: 'scroll'}} {...props}>
+  return <ScrollShadow style={{...style, overflow: 'auto'}} {...props}>
     {contents}
   </ScrollShadow>
 }
