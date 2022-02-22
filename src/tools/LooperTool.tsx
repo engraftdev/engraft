@@ -27,6 +27,8 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
 
     if (inputOutput.toolValue instanceof Array) {
       return inputOutput.toolValue.map((v) => ({toolValue: v}));
+    } else if (inputOutput.toolValue instanceof Object && inputOutput.toolValue !== null) {
+      return Object.entries(inputOutput.toolValue).map((pair) => ({toolValue: pair}))
     } else {
       return null;
     }

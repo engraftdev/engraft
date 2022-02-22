@@ -9,3 +9,4 @@ import './RequestTool';
 import './TableTool';
 import './MarkdownTool';
 import './SliderTool';
+import './StateTool';

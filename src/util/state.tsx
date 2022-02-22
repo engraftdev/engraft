@@ -46,6 +46,10 @@ export function useAt<T, K extends string & keyof T>(t: T, updateT: Updater<T>, 
   return [t[key], updateTK];
 }
 
+export function useSetter<T>(updateT: Updater<T>): Setter<T> {
+  return useMemo(() => (newT: T) => updateT(() => newT), [updateT]);
+}
+
 export function atIndex<T>(update: Updater<T[]>, index: number): Updater<T> {
   return (f: (oldT: T) => T) => {
     update((oldTs) => {
