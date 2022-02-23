@@ -1,3 +1,9 @@
+// we're not using style-loader
+declare module "*.css" {
+  const content: string;
+  export default content;
+}
+
 declare module 'friendly-words' {
   const objects: string[];
 }
