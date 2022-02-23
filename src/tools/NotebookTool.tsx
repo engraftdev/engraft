@@ -181,17 +181,17 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 150, width: 150}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
-      <button style={{borderRadius: 30}} onClick={removeCell}>✖️</button>
+      <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
+      <button style={{borderRadius: 30, zoom: "60%"}} onClick={removeCell}>✖️</button>
     </div>
     <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflowX: "hidden"}}>
+      <div style={{maxWidth: '100%', marginBottom: 10}}>
+        <ShowView view={toolView}/>
+      </div>
       <div style={{marginBottom: 10, maxWidth: '100%'}}>
         {outputDisplay}
       </div>
-      <div style={{maxWidth: '100%'}}>
-        <ShowView view={toolView}/>
-      </div>
-      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
     </div>
   </div>
 }

@@ -6,6 +6,7 @@ import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
 import { ObjectInspector } from 'react-inspector';
+import * as _ from 'lodash';
 hljs.registerLanguage('javascript', javascript);
 
 interface Props extends HTMLProps<HTMLDivElement> {
@@ -22,6 +23,14 @@ export default function Value({value, style, ...props}: Props) {
     let stringified: string | undefined;
     try {
       stringified = stringify(value);
+      try {
+        if (stringified && !_.isEqual(value, JSON.parse(JSON.stringify(value)))) {
+          stringified = undefined;
+        }
+      } catch {
+        console.log("TROUBLE PARSING", value, stringified);
+        stringified = undefined;
+      }
     } catch {}
     if (stringified) {
       const html = hljs.highlight(stringified, {language: 'javascript'}).value;

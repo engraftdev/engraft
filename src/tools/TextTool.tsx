@@ -15,6 +15,7 @@ import id from "../util/id";
 import { codeConfigSetTo } from "./CodeTool";
 import ShadowDOM from "../util/ShadowDOM";
 import rootStyles from "../view/rootStyles";
+import { EditorView } from "@codemirror/view";
 
 export interface TextConfig {
   toolName: 'text';
@@ -71,7 +72,7 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
         toolCompletions(insertTool),
         refCompletions(() => envRef.current, () => possibleEnvRef.current)
       ];
-      return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions})];
+      return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions}), EditorView.lineWrapping];
     }, [refSet])
 
     const onChange = useCallback((value) => {

@@ -153,12 +153,12 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         return ReactDOM.createPortal(
           subTools[id] ?
             // TODO: this style-resetting is tedious; is there a better way?
-            <ShadowDOM style={{all: 'initial', display: 'inline-block'}}>
+            <ShadowDOM key={id} style={{all: 'initial', display: 'inline-block'}}>
               <div style={rootStyles}>
                 <ShowView view={views[id]} autoFocus={true}/>
               </div>
             </ShadowDOM> :
-            <VarUse varInfo={env[id] as VarInfo | undefined} />,
+            <VarUse key={id} varInfo={env[id] as VarInfo | undefined} />,
           elem
         )
       })}
