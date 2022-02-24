@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
@@ -43,14 +43,14 @@ function App() {
   }, [config])
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
-
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
+  const [hidden, setHidden] = useStateSetOnly(false);
 
   return <>
     <style>
       {appCss}
     </style>
-    <div>
+    <div style={hidden ? {display: 'none'} : {}}>
       <EnvContext.Provider value={context}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
@@ -87,7 +87,11 @@ function App() {
       {copyPasteMessage}
     </div>
     <br/>
-    <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
+    <div>
+      <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
+    </div>
+    <br/>
+    <button onClick={() => setHidden(!hidden)}>{hidden ? 'Show tool' : 'Hide tool'}</button>
   </>
 }
 
