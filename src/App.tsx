@@ -60,6 +60,10 @@ function App() {
     <Value value={output?.toolValue} />
     <br/>
     <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
         try {
@@ -82,7 +86,8 @@ function App() {
       {' '}
       {copyPasteMessage}
     </div>
-    <button onClick={() => updateConfig(() => defaultConfig)}>reset</button>
+    <br/>
+    <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
   </>
 }
 

@@ -100,10 +100,13 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
     )}
   </>
 }
-registerTool<LooperConfig>(LooperTool, () => ({
-  toolName: 'looper',
-  inputConfig: codeConfigSetTo(''),
-  itemVar: newVarConfig('item'),
-  perItemConfig: codeConfigSetTo('')
-}));
+registerTool<LooperConfig>(LooperTool, () => {
+  const itemVar = newVarConfig('item');
+  return {
+    toolName: 'looper',
+    inputConfig: codeConfigSetTo(''),
+    itemVar,
+    perItemConfig: codeConfigSetTo(itemVar.id),
+  };
+});
 

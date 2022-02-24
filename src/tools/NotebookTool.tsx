@@ -95,7 +95,7 @@ function RowDivider({i, updateCells}: {i: number, updateCells: Updater<Cell[]>})
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
-      newCells.splice(i, 0, {var: newVarConfig(''), config: codeConfigSetTo(''), upstreamIds: {}});
+      newCells.splice(i, 0, {var: newVarConfig('cell'), config: codeConfigSetTo(''), upstreamIds: {}});
       return newCells;
     })
   }, [i, updateCells]);
@@ -199,8 +199,8 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
   return <>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
-      <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
-      <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
+      {/* <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
+      <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre> */}
       <div style={{borderRadius: 30, zoom: "60%", cursor: 'pointer'}} onClick={removeCell}>✖️</div>
     </div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
