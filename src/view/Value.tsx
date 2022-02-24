@@ -15,7 +15,6 @@ interface Props extends HTMLProps<HTMLDivElement> {
 
 export default function Value({value, style, ...props}: Props) {
   const contents = useMemo(() => {
-    if (!value) { return; }
     if (isValidElement(value)) {
       return value;
     }

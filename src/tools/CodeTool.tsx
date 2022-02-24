@@ -75,7 +75,8 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
                                  { modeConfig: CodeConfigCodeMode, updateModeConfig: Updater<CodeConfigCodeMode> }) {
   const compiled = useMemo(() => {
     try {
-      let translated = transform(modeConfig.code, { presets: ["react"] }).code!;
+      // TODO: better treatment of non-expression code (multiple lines w/return, etc)
+      let translated = transform("(" + modeConfig.code + ")", { presets: ["react"] }).code!;
       translated = translated.replace(/;$/, "");
       console.log(translated);
       const result = compile(translated);
