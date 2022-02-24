@@ -12,10 +12,9 @@ import { VarUse } from "../view/Vars";
 import refsExtension, { refCode } from "../util/refsExtension";
 import id from "../util/id";
 import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../util/codeMirrorStuff";
-import ShadowDOM from "../util/ShadowDOM";
 import { transform } from '@babel/standalone';
 import React from "react";
-import RootStyles from "../view/RootStyles";
+import IsolateStyles from "../view/IsolateStyles";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -150,13 +149,9 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(
           subTools[id] ?
-            // TODO: this style-resetting is tedious; is there a better way?
-            <ShadowDOM key={id} style={{all: 'initial', display: 'inline-block'}}>
-              <RootStyles/>
-              <div className="root">
-                <ShowView view={views[id]} autoFocus={true}/>
-              </div>
-            </ShadowDOM> :
+            <IsolateStyles style={{display: 'inline-block'}}>
+              <ShowView view={views[id]} autoFocus={true}/>
+            </IsolateStyles> :
             <VarUse key={id} varInfo={env[id] as VarInfo | undefined} />,
           elem
         )

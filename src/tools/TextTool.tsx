@@ -15,7 +15,8 @@ import id from "../util/id";
 import { codeConfigSetTo } from "./CodeTool";
 import ShadowDOM from "../util/ShadowDOM";
 import { EditorView } from "@codemirror/view";
-import RootStyles from "../view/RootStyles";
+import RootStyles from "../view/IsolateStyles";
+import IsolateStyles from "../view/IsolateStyles";
 
 export interface TextConfig {
   toolName: 'text';
@@ -91,13 +92,9 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(
           subTools[id] ?
-            // TODO: this style-resetting is tedious; is there a better way?
-            <ShadowDOM style={{all: 'initial', display: 'inline-block'}}>
-              <RootStyles />
-              <div className="root">
-                <ShowView view={views[id]} autoFocus={true}/>
-              </div>
-            </ShadowDOM> :
+            <IsolateStyles style={{display: 'inline-block'}}>
+              <ShowView view={views[id]} autoFocus={true}/>
+            </IsolateStyles> :
             <VarUse varInfo={env[id] as VarInfo | undefined} />,
           elem
         )
