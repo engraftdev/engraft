@@ -201,7 +201,7 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
       <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
-      <button style={{borderRadius: 30, zoom: "60%"}} onClick={removeCell}>✖️</button>
+      <div style={{borderRadius: 30, zoom: "60%", cursor: 'pointer'}} onClick={removeCell}>✖️</div>
     </div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
       <div style={{maxWidth: '100%', marginBottom: 10, position: 'sticky', top: 10}}>
