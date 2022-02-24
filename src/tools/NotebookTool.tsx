@@ -40,7 +40,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [updateOutputs])
 
   const render = useCallback(() => {
-    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'fit-content(400px) minmax(0, 1fr) minmax(60px, 1fr)', columnGap: 20, rowGap: 20}}>
+    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 20}}>
       {cells.map((cell, i) =>
         <>
           <RowDivider i={i} updateCells={updateCells}/>
@@ -197,7 +197,7 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <>
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 150, width: 150}}>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
       <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
@@ -208,7 +208,7 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
         <ShowView view={toolView}/>
       </div>
     </div>
-    <div style={{marginBottom: 10, maxWidth: '100%'}}>
+    <div style={{marginBottom: 10, maxWidth: '100%', minWidth: 60}}>
       <div style={{position: 'sticky', top: 10}}>
         {outputDisplay}
       </div>
