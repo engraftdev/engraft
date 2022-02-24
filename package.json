@@ -40,9 +40,9 @@
     "use-debounce": "^7.0.1"
   },
   "scripts": {
-    "start": "webpack-dev-server",
-    "build-lib": "webpack --config webpack-lib.config.js",
-    "watch-lib": "webpack --config webpack-lib.config.js --watch"
+    "start": "webpack-dev-server --config-name app",
+    "build-lib": "webpack --config-name lib",
+    "watch-lib": "webpack --config-name lib --watch"
   },
   "babel": {
     "presets": [
