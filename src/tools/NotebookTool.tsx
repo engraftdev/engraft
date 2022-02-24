@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
@@ -42,9 +42,9 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   const render = useCallback(() => {
     return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 20}}>
       {cells.map((cell, i) =>
-        <>
+        <Fragment key={cell.var.id}>
           <RowDivider i={i} updateCells={updateCells}/>
-          <CellView key={cell.var.id} cell={cell}
+          <CellView cell={cell}
             // TODO: memoize these?
             updateCell={atIndex(updateCells, i)}
             removeCell={() => {
@@ -54,7 +54,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
             }}
             toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
           />
-        </>
+        </Fragment>
       )}
       <RowDivider i={cells.length} updateCells={updateCells}/>
     </div>;

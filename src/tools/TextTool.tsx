@@ -13,9 +13,7 @@ import { useMemoObject } from "../util/useMemoObject";
 import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
 import id from "../util/id";
 import { codeConfigSetTo } from "./CodeTool";
-import ShadowDOM from "../util/ShadowDOM";
 import { EditorView } from "@codemirror/view";
-import RootStyles from "../view/IsolateStyles";
 import IsolateStyles from "../view/IsolateStyles";
 
 export interface TextConfig {
