@@ -8,6 +8,7 @@ import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
 import { VarDefinition } from "../view/Vars";
 import Value from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
+import useHover from "../util/useHover";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -39,22 +40,23 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [updateOutputs])
 
   const render = useCallback(() => {
-    return <div style={{padding: 10}}>
+    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'fit-content(400px) minmax(0, 1fr) minmax(60px, 1fr)', columnGap: 20, rowGap: 20}}>
       {cells.map((cell, i) =>
-        <CellView key={cell.var.id} cell={cell}
-          // TODO: memoize these?
-          updateCell={atIndex(updateCells, i)}
-          removeCell={() => {
-            const newCells = [...cells];
-            newCells.splice(i, 1);
-            updateCells(() => newCells);
-          }}
-          toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
-      />)}
-      <button onClick={() =>
-        updateCells((cells) => [...cells, {var: newVarConfig(''), config: codeConfigSetTo(''), upstreamIds: {}}])}>
-          +
-      </button>
+        <>
+          <RowDivider i={i} updateCells={updateCells}/>
+          <CellView key={cell.var.id} cell={cell}
+            // TODO: memoize these?
+            updateCell={atIndex(updateCells, i)}
+            removeCell={() => {
+              const newCells = [...cells];
+              newCells.splice(i, 1);
+              updateCells(() => newCells);
+            }}
+            toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
+          />
+        </>
+      )}
+      <RowDivider i={cells.length} updateCells={updateCells}/>
     </div>;
   }, [cells, outputs, updateCells, views])
   useView(reportView, render, config);
@@ -89,6 +91,23 @@ registerTool(NotebookTool, {
 });
 
 
+function RowDivider({i, updateCells}: {i: number, updateCells: Updater<Cell[]>}) {
+  const onClick = useCallback(() => {
+    updateCells((oldCells) => {
+      let newCells = oldCells.slice();
+      newCells.splice(i, 0, {var: newVarConfig(''), config: codeConfigSetTo(''), upstreamIds: {}});
+      return newCells;
+    })
+  }, [i, updateCells]);
+
+  const [hoverRef, isHovered] = useHover<HTMLDivElement>();
+
+  return <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
+    <div style={{borderTop: `1px ${isHovered ? 'solid' : 'dashed'} rgba(0,0,0,0.2)`, height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
+    </div>
+  </div>;
+}
 
 
 interface CellModelProps {
@@ -169,7 +188,7 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
       return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
     }
     try {
-      return <Value value={toolOutput.toolValue} style={{maxHeight: 200}}/>;
+      return <Value value={toolOutput.toolValue}/>;
     } catch {
       return '[cannot serialize]';
     }
@@ -177,21 +196,22 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
 
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
-  return <div style={{display: 'flex', alignItems: 'flex-start', paddingBottom: 50}}>
+  return <>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 150, width: 150}}>
       <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
       <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
       <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre>
       <button style={{borderRadius: 30, zoom: "60%"}} onClick={removeCell}>✖️</button>
     </div>
-    <div style={{fontSize: 13, marginLeft: 10, marginRight: 10, visibility: cell.var.label.length > 0 ? 'visible' : 'hidden'}}>=</div>
-    <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflowX: "hidden"}}>
-      <div style={{maxWidth: '100%', marginBottom: 10}}>
+    <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
+      <div style={{maxWidth: '100%', marginBottom: 10, position: 'sticky', top: 10}}>
         <ShowView view={toolView}/>
       </div>
-      <div style={{marginBottom: 10, maxWidth: '100%'}}>
+    </div>
+    <div style={{marginBottom: 10, maxWidth: '100%'}}>
+      <div style={{position: 'sticky', top: 10}}>
         {outputDisplay}
       </div>
     </div>
-  </div>
+  </>
 }

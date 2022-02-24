@@ -1,9 +1,8 @@
 import ShadowDOM from "../util/ShadowDOM";
 import { useStateSetOnly } from "../util/state";
+import RootStyles from "../view/RootStyles";
 import { toolIndex, ToolProps, ToolView, ToolViewProps } from "./tools";
 import { ShowView } from "./useSubTool";
-
-import style from '../index.css';
 
 type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & ToolViewProps;
 
@@ -15,10 +14,10 @@ export function ToolWithView({ config, updateConfig, reportOutput, ...rest }: To
   return <>
     <Tool config={config} updateConfig={updateConfig} reportOutput={reportOutput} reportView={setView} />
     <ShadowDOM>
-      <style>
-        {style}
-      </style>
-      <ShowView view={view} {...rest} />
+      <RootStyles/>
+      <div className="root">
+        <ShowView view={view} {...rest} />
+      </div>
     </ShadowDOM>
   </>
 }

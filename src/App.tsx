@@ -8,6 +8,8 @@ import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import Value from './view/Value';
 
+import appCss from './App.css';
+
 /*
 TODO: fix remounting text-editor bug
 */
@@ -45,6 +47,9 @@ function App() {
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
 
   return <>
+    <style>
+      {appCss}
+    </style>
     <div>
       <EnvContext.Provider value={context}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>

@@ -1,7 +1,6 @@
 // import stringify from "json-stringify-pretty-compact";
-import './highlight-style.css'
 import stringify from "../util/stringify";
-import React, { HTMLProps, isValidElement, useMemo } from "react";
+import React, { CSSProperties, HTMLProps, isValidElement, useMemo } from "react";
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
@@ -32,15 +31,19 @@ export default function Value({value, style, ...props}: Props) {
       }
     } catch {}
     if (stringified) {
+      let style : CSSProperties = {};
+      if (typeof value === 'string') {
+        style.whiteSpace = 'pre-wrap';
+      }
       const html = hljs.highlight(stringified, {language: 'javascript'}).value;
-      return <pre dangerouslySetInnerHTML={{__html: html}} />;
+      return <pre dangerouslySetInnerHTML={{__html: html}} style={style} />;
     } else {
       return <ObjectInspector data={value}/>
     }
   }, [value])
 
   //, boxShadow: 'inset 0 0 2px 1px rgba(0,0,0,0.2)'
-  return <ScrollShadow style={{...style, overflow: 'auto'}} {...props}>
+  return <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
     {contents}
   </ScrollShadow>
 }

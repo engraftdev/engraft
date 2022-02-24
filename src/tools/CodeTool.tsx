@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useContext, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
@@ -9,15 +9,13 @@ import CodeMirror from "../util/CodeMirror";
 import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
-import WindowPortal from "../util/WindowPortal";
 import refsExtension, { refCode } from "../util/refsExtension";
-import Value from "../view/Value";
 import id from "../util/id";
 import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../util/codeMirrorStuff";
 import ShadowDOM from "../util/ShadowDOM";
 import { transform } from '@babel/standalone';
 import React from "react";
-import rootStyles from "../view/rootStyles";
+import RootStyles from "../view/RootStyles";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -82,7 +80,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
       const result = compile(translated);
       return result;
     } catch (e) {
-      console.warn(e);
+      // console.warn(e);
     }
   }, [modeConfig.code])
 
@@ -155,7 +153,8 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
           subTools[id] ?
             // TODO: this style-resetting is tedious; is there a better way?
             <ShadowDOM key={id} style={{all: 'initial', display: 'inline-block'}}>
-              <div style={rootStyles}>
+              <RootStyles/>
+              <div className="root">
                 <ShowView view={views[id]} autoFocus={true}/>
               </div>
             </ShadowDOM> :
@@ -170,7 +169,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         {contents}
       </ToolFrame>;
     } else {
-      return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083'}}>
+      return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', maxWidth: '100%'}}>
         {contents}
       </div>;
     }
