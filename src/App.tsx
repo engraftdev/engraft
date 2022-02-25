@@ -57,7 +57,7 @@ function App() {
     </div>
     <br/>
     <br/>
-    <Value value={output?.toolValue} />
+    {/* <Value value={output?.toolValue} /> */}
     <br/>
     <br/>
     <br/>

@@ -9,6 +9,7 @@ import { VarDefinition } from "../view/Vars";
 import Value from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 import useHover from "../util/useHover";
+import _ from "lodash";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -23,6 +24,7 @@ interface Cell {
   // output?
 }
 
+const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
 export function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
   const [cells, updateCells] = useAt(config, updateConfig, 'cells');
@@ -40,10 +42,14 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [updateOutputs])
 
   const render = useCallback(() => {
+    const smallestUnusedLabel = defaultCellLabels.find((label) =>
+      !cells.find((cell) => cell.var.label === label)
+    )!
+
     return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10}}>
       {cells.map((cell, i) =>
         <Fragment key={cell.var.id}>
-          <RowDivider i={i} updateCells={updateCells}/>
+          <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
           <CellView cell={cell}
             // TODO: memoize these?
             updateCell={atIndex(updateCells, i)}
@@ -56,7 +62,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
           />
         </Fragment>
       )}
-      <RowDivider i={cells.length} updateCells={updateCells}/>
+      <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
     </div>;
   }, [cells, outputs, updateCells, views])
   useView(reportView, render, config);
@@ -85,17 +91,28 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
       reportView={reportCellView} reportOutput={reportCellOutput}/>
   )}</>;
 }
-registerTool(NotebookTool, {
+registerTool<NotebookConfig>(NotebookTool, () => ({
   toolName: 'notebook',
-  cells: []
-});
+  cells: [
+    { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(''), upstreamIds: {} }
+  ]
+}));
+
+export function notebookConfigSetTo(config: ToolConfig): NotebookConfig {
+  return {
+    toolName: 'notebook',
+    cells: [
+      { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(config), upstreamIds: {} }
+    ]
+  };
+}
 
 
-function RowDivider({i, updateCells}: {i: number, updateCells: Updater<Cell[]>}) {
+function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) {
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
-      newCells.splice(i, 0, {var: newVarConfig('cell'), config: codeConfigSetTo(''), upstreamIds: {}});
+      newCells.splice(i, 0, {var: newVarConfig(smallestUnusedLabel), config: codeConfigSetTo(''), upstreamIds: {}});
       return newCells;
     })
   }, [i, updateCells]);

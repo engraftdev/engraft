@@ -16,6 +16,7 @@ import { transform } from '@babel/standalone';
 import React from "react";
 import IsolateStyles from "../view/IsolateStyles";
 import seedrandom from 'seedrandom';
+import { notebookConfigSetTo } from "./NotebookTool";
 
 export type CodeConfig = {
   toolName: 'code';
@@ -54,7 +55,7 @@ registerTool(CodeTool, {
 });
 
 export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
-  // TODO: this is a hack, isn't it?
+  // TODO: this is a hack, isn't it? (the config.toolName === 'code' part, I mean)
   if (typeof config !== 'string' && config.toolName === 'code') {
     return config as CodeConfig;
   }
@@ -197,7 +198,11 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   const possibleEnv = useContext(PossibleEnvContext);
 
   const render = useCallback(function R({autoFocus}) {
-    return <ToolFrame config={modeConfig.config} env={env} possibleEnv={possibleEnv} onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: '', subTools: {}}});}}>
+    return <ToolFrame
+      config={modeConfig.config} env={env} possibleEnv={possibleEnv}
+      onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: '', subTools: {}}});}}
+      onNotebook={modeConfig.config.toolName === 'notebook' ? undefined : () => {updateKeys(updateConfig, {mode: {modeName: 'tool', config: notebookConfigSetTo(config)}});}}
+    >
       {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
         <ShowView view={view} autoFocus={autoFocus} />
       {/* </div> */}

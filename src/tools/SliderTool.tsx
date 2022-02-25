@@ -35,7 +35,7 @@ export function SliderTool({ config, updateConfig, reportOutput, reportView }: T
 registerTool(SliderTool, {
   toolName: 'slider',
   value: 0,
-  min: -100,
-  max: 100,
+  min: -10,
+  max: 10,
   step: 1
 });
