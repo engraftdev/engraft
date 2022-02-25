@@ -3,7 +3,7 @@ import './TextTool';
 import './NotebookTool';
 import './ImportTool';
 import './LetTool';
-import './LooperTool';
+import './MapTool';
 import './ReferenceTool';
 import './RequestTool';
 import './TableTool';

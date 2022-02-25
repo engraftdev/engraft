@@ -10,14 +10,14 @@ import { codeConfigSetTo } from "./CodeTool";
 
 
 
-export interface LooperConfig extends ToolConfig {
-  toolName: 'looper';
+export interface MapConfig extends ToolConfig {
+  toolName: 'map';
   inputConfig: ToolConfig;
   itemVar: VarConfig;
   perItemConfig: ToolConfig;
 }
 
-export function LooperTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LooperConfig>) {
+export function MapTool({ config, updateConfig, reportOutput, reportView }: ToolProps<MapConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
@@ -100,10 +100,10 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
     )}
   </>
 }
-registerTool<LooperConfig>(LooperTool, () => {
+registerTool<MapConfig>(MapTool, () => {
   const itemVar = newVarConfig('item');
   return {
-    toolName: 'looper',
+    toolName: 'map',
     inputConfig: codeConfigSetTo(''),
     itemVar,
     perItemConfig: codeConfigSetTo(itemVar.id),

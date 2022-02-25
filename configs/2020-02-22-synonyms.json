@@ -68,7 +68,7 @@
             "mode": {
               "modeName": "tool",
               "config": {
-                "toolName": "looper",
+                "toolName": "map",
                 "inputConfig": {
                   "toolName": "code",
                   "mode": {
