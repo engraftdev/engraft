@@ -6,7 +6,7 @@ import './tools/builtInTools';
 import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
-import Value from './view/Value';
+import Value, { ValueOfTool } from './view/Value';
 
 import appCss from './App.css';
 
@@ -44,20 +44,21 @@ function App() {
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
-  const [hidden, setHidden] = useStateSetOnly(false);
+  const [hideTool, setHideTool] = useStateSetOnly(false);
+  const [hideOutput, setHideOutput] = useStateSetOnly(true);
 
   return <>
     <style>
       {appCss}
     </style>
-    <div style={hidden ? {display: 'none'} : {}}>
+    <div style={hideTool ? {display: 'none'} : {}}>
       <EnvContext.Provider value={context}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <br/>
     <br/>
-    {/* <Value value={output?.toolValue} /> */}
+    {!hideOutput && <ValueOfTool toolValue={output} />}
     <br/>
     <br/>
     <br/>
@@ -91,7 +92,8 @@ function App() {
       <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
     </div>
     <br/>
-    <button onClick={() => setHidden(!hidden)}>{hidden ? 'Show tool' : 'Hide tool'}</button>
+    <button onClick={() => setHideTool(!hideTool)}>{hideTool ? 'Show tool' : 'Hide tool'}</button>
+    <button onClick={() => setHideOutput(!hideOutput)}>{hideOutput ? 'Show output' : 'Hide output'}</button>
   </>
 }
 
