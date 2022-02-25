@@ -10,3 +10,4 @@ import './TableTool';
 import './MarkdownTool';
 import './SliderTool';
 import './StateTool';
+import './WorldTool';

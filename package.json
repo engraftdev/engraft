@@ -20,6 +20,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-inspector": "^4.0.2",
     "@types/react-test-renderer": "^17.0.1",
+    "@types/seedrandom": "^3.0.2",
     "css-loader": "^6.6.0",
     "fast-memoize": "^2.5.2",
     "friendly-words": "^1.2.0",
@@ -33,6 +34,7 @@
     "react-scripts": "5.0.0",
     "react-test-renderer": "^17.0.2",
     "rect-connect": "^1.0.0",
+    "seedrandom": "^3.0.5",
     "speed-measure-webpack-plugin": "^1.5.0",
     "style-loader": "^3.3.1",
     "to-string-loader": "^1.2.0",
@@ -46,9 +48,12 @@
   },
   "babel": {
     "presets": [
-      ["@babel/preset-react", {
-        "runtime": "automatic"
-      }],
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic"
+        }
+      ],
       "@babel/preset-typescript"
     ]
   },

@@ -79,7 +79,7 @@ export function LooperTool({ config, updateConfig, reportOutput, reportView }: T
             <div className="row-top" style={{marginTop: 10, marginBottom: 10}}>
               <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
               {' = '}
-              <Value value={inputArray[highlightedIndex].toolValue} />
+              <Value value={inputArray[highlightedIndex]?.toolValue} />
             </div>
             <div>
               <ShowView view={perItemViews[highlightedIndex]}/>

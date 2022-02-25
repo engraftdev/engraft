@@ -6,21 +6,29 @@ import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
 import { ObjectInspector } from 'react-inspector';
 import * as _ from 'lodash';
+import ErrorBoundary from "../util/ErrorBoundary";
 hljs.registerLanguage('javascript', javascript);
 
 interface Props extends HTMLProps<HTMLDivElement> {
   value: any;
 }
 
+function replacer(key: any, value: any): any {
+  if (typeof value === 'number') {
+    return Number(value.toFixed(3));
+  }
+  return value;
+}
+
 export default function Value({value, style, ...props}: Props) {
   const contents = useMemo(() => {
     if (isValidElement(value)) {
-      return value;
+      return <ErrorBoundary>{value}</ErrorBoundary>;
     }
 
     let stringified: string | undefined;
     try {
-      stringified = stringify(value);
+      stringified = stringify(value, {replacer});
       try {
         if (stringified && !_.isEqual(value, JSON.parse(JSON.stringify(value)))) {
           stringified = undefined;
@@ -29,7 +37,8 @@ export default function Value({value, style, ...props}: Props) {
         console.log("TROUBLE PARSING", value, stringified);
         stringified = undefined;
       }
-    } catch {}
+    } catch (e) {
+    }
     if (stringified) {
       let style : CSSProperties = {};
       if (typeof value === 'string') {

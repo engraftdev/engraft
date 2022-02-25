@@ -15,6 +15,7 @@ import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../u
 import { transform } from '@babel/standalone';
 import React from "react";
 import IsolateStyles from "../view/IsolateStyles";
+import seedrandom from 'seedrandom';
 
 export type CodeConfig = {
   toolName: 'code';
@@ -98,10 +99,12 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
 
   const output = useMemo(() => {
     if (compiled) {
+      const rand = seedrandom('live-compose 2022');
       const scope = {
         ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue])),
-        React
+        React,
+        rand
       };
       try {
         return {toolValue: compiled(scope)};
