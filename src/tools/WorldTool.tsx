@@ -46,7 +46,7 @@ export function WorldTool({ config, updateConfig, reportOutput, reportView }: To
     return (
       <div style={{
         padding: 10, display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
-        background: 'linear-gradient(to bottom right, rgba(93,157,185,0.1), rgba(243,50,139,0.1))'
+        background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
         }}>
         <div style={{textAlign: 'right'}}>step</div>
         <div>
