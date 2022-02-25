@@ -29,6 +29,7 @@
     "lodash": "^4.17.21",
     "markdown-it": "^12.3.2",
     "react": "^17.0.2",
+    "react-colorful": "^5.5.1",
     "react-dom": "^17.0.2",
     "react-inspector": "^5.1.1",
     "react-scripts": "5.0.0",
