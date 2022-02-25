@@ -92,7 +92,7 @@ export function WorldTool({ config, updateConfig, reportOutput, reportView }: To
         {upComponents[i]}
       </ProvideVar>
     )}
-    <ProvideVar config={config.stateVar} value={(highlightedIndex === 0 ? initOutput : upOutputs[highlightedIndex - 1]) || undefined}>
+    <ProvideVar config={config.stateVar} value={(upOutputs[highlightedIndex]) || undefined}>
       {viewComponent}
     </ProvideVar>
   </>
