@@ -1,17 +1,16 @@
 // import stringify from "json-stringify-pretty-compact";
 import stringify from "../util/stringify";
-import React, { CSSProperties, HTMLProps, isValidElement, useMemo } from "react";
+import React, { CSSProperties, HTMLProps, isValidElement, useEffect, useMemo } from "react";
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
 import { ObjectInspector } from 'react-inspector';
 import * as _ from 'lodash';
 import ErrorBoundary from "../util/ErrorBoundary";
+import { ToolValue } from "../tools-framework/tools";
+import { useStateSetOnly } from "../util/state";
 hljs.registerLanguage('javascript', javascript);
 
-interface Props extends HTMLProps<HTMLDivElement> {
-  value: any;
-}
 
 function replacer(key: any, value: any): any {
   if (typeof value === 'number') {
@@ -20,7 +19,11 @@ function replacer(key: any, value: any): any {
   return value;
 }
 
-export default function Value({value, style, ...props}: Props) {
+export interface ValueProps extends HTMLProps<HTMLDivElement> {
+  value: any;
+}
+
+export default function Value({value, style, ...props}: ValueProps) {
   const contents = useMemo(() => {
     if (isValidElement(value)) {
       return <ErrorBoundary>{value}</ErrorBoundary>;
@@ -55,4 +58,29 @@ export default function Value({value, style, ...props}: Props) {
   return <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
     {contents}
   </ScrollShadow>
+}
+
+export interface ToolValueProps extends HTMLProps<HTMLDivElement> {
+  toolValue: ToolValue | null;
+}
+
+// TODO: awful naming huh?
+export function ValueOfTool({toolValue, style, ...props}: ToolValueProps) {
+  const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
+
+  useEffect(() => {
+    if (toolValue) {
+      setLastValue(toolValue);
+    }
+  }, [setLastValue, toolValue])
+
+  return lastValue ?
+    <Value
+      value={lastValue.toolValue}
+      style={{...style, opacity: toolValue === null ? 0.3 : 1}}
+      {...props}
+    /> :
+    <div style={{fontSize: 13, fontStyle: 'italic'}}>
+      no output yet
+    </div>;
 }

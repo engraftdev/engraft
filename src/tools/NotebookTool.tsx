@@ -6,7 +6,7 @@ import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly
 import { AddObjToContext } from "../util/context";
 import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
 import { VarDefinition } from "../view/Vars";
-import Value from "../view/Value";
+import Value, { ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 import useHover from "../util/useHover";
 import _ from "lodash";
@@ -200,17 +200,6 @@ interface CellViewProps {
 }
 
 function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
-  const outputDisplay = useMemo(() => {
-    if (!toolOutput) {
-      return <div style={{fontSize: 13, fontStyle: 'italic'}}>no output</div>;
-    }
-    try {
-      return <Value value={toolOutput.toolValue}/>;
-    } catch {
-      return '[cannot serialize]';
-    }
-  }, [toolOutput])
-
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <>
@@ -229,7 +218,7 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
     </div>
     <div style={{maxWidth: '100%', minWidth: 60}}>
       <div style={{position: 'sticky', top: 10}}>
-        {outputDisplay}
+        <ValueOfTool toolValue={toolOutput}/>
       </div>
     </div>
   </>
