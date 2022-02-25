@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { TableInspector } from "react-inspector";
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
+import { useMemoObject } from "../util/useMemoObject";
 
 
 export interface TableConfig {
@@ -10,7 +11,8 @@ export interface TableConfig {
 }
 export function TableTool({ config, updateConfig, reportOutput, reportView }: ToolProps<TableConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
-  useOutput(reportOutput, inputOutput);
+  const inputOutputWithAlreadyDisplayed = useMemoObject({toolValue: inputOutput?.toolValue, alreadyDisplayed: true});
+  useOutput(reportOutput, inputOutputWithAlreadyDisplayed);
 
   const render = useCallback(function R({autoFocus}) {
     return <div style={{padding: 10}}>

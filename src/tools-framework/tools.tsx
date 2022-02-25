@@ -5,7 +5,8 @@ import { Setter, Updater } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
 
 export type ToolValue = {
-  toolValue: unknown
+  toolValue: unknown;
+  alreadyDisplayed?: boolean;
 };
 
 export interface ToolConfig {

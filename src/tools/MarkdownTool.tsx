@@ -4,6 +4,7 @@ import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framewo
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
 import { codeConfigSetTo } from "./CodeTool";
+import { useMemoObject } from "../util/useMemoObject";
 
 export interface MarkdownConfig {
   toolName: 'markdown';
@@ -15,7 +16,8 @@ export function MarkdownTool({config, updateConfig, reportView, reportOutput}: T
 
   const md = useMemo(() => new MarkdownIt({html: true}), [])
 
-  useOutput(reportOutput, sourceOutput);
+  const sourceOutputWithAlreadyDisplayed = useMemoObject({toolValue: sourceOutput?.toolValue, alreadyDisplayed: true});
+  useOutput(reportOutput, sourceOutputWithAlreadyDisplayed);
 
   const htmlOrError = useMemo(() => {
     if (!sourceOutput) {

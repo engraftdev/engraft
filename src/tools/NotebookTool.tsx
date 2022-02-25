@@ -211,15 +211,17 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
         <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre> */}
       </div>
     </div>
-    <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
+    <div className="notebook-CellView-right" style={{...(toolOutput?.alreadyDisplayed ? {gridColumn: '2 / 4'} : {}), display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
       <div style={{maxWidth: '100%', position: 'sticky', top: 10}}>
         <ShowView view={toolView}/>
       </div>
     </div>
-    <div style={{maxWidth: '100%', minWidth: 60}}>
-      <div style={{position: 'sticky', top: 10}}>
-        <ValueOfTool toolValue={toolOutput}/>
+    { !toolOutput?.alreadyDisplayed &&
+      <div style={{maxWidth: '100%', minWidth: 60}}>
+        <div style={{position: 'sticky', top: 10}}>
+          <ValueOfTool toolValue={toolOutput}/>
+        </div>
       </div>
-    </div>
+    }
   </>
 }
