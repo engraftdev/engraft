@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import _ from "lodash";
+import { useCallback, useState } from "react";
 import { useEffect, useMemo } from "react";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
@@ -55,20 +56,64 @@ export function MapTool({ config, updateConfig, reportOutput, reportView }: Tool
 
   const [itemVarConfig, updateItemVarConfig] = useAt(config, updateConfig, 'itemVar');
 
-  const render: ToolViewRender = useCallback(({autoFocus}) => {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
+    const [mainDiv, setMainDiv] = useState<HTMLDivElement | null>(null)
+    const [indexBoxDiv, setIndexBoxDiv] = useState<HTMLDivElement | null>(null)
+    const [perItemBoxDiv, setPerItemBoxDiv] = useState<HTMLDivElement | null>(null)
+
+    const [perItemBoxDivResizes, setPerItemBoxDivResizes] = useState(0);
+
+    useEffect(() => {
+      if (perItemBoxDiv) {
+        const observer = new ResizeObserver(() => setPerItemBoxDivResizes((n) => n + 1));
+        observer.observe(perItemBoxDiv);
+        return () => observer.disconnect();
+      }
+    }, [perItemBoxDiv])
+
+    const trapezoidPoints = useMemo(() => {
+      if (!mainDiv || !indexBoxDiv || !perItemBoxDiv) {
+        return [];
+      }
+
+      void perItemBoxDivResizes;  // re-run this on resizes
+
+      const mainDivRect = mainDiv.getBoundingClientRect();
+      const indexBoxDivRect = indexBoxDiv.getBoundingClientRect()
+      const perItemBoxDivRect = perItemBoxDiv.getBoundingClientRect()
+
+      return [
+        [indexBoxDivRect.left - mainDivRect.x, indexBoxDivRect.bottom - mainDivRect.y],
+        [indexBoxDivRect.right - mainDivRect.x, indexBoxDivRect.bottom - mainDivRect.y],
+        [perItemBoxDivRect.right - mainDivRect.x, perItemBoxDivRect.top - mainDivRect.y],
+        // [perItemBoxDivRect.right - mainDivRect.x, perItemBoxDivRect.bottom - mainDivRect.y],
+        // [perItemBoxDivRect.left - mainDivRect.x, perItemBoxDivRect.bottom - mainDivRect.y],
+        [perItemBoxDivRect.left - mainDivRect.x, perItemBoxDivRect.top - mainDivRect.y],
+      ];
+    }, [indexBoxDiv, mainDiv, perItemBoxDiv, perItemBoxDivResizes]);
+
     return (
-      <div style={{padding: 10}}>
+      <div ref={setMainDiv} style={{padding: 10, position: 'relative'}}>
         <div className="row-top" style={{marginBottom: 10}}>
           input <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
 
         {inputArray &&
           <>
+            <svg width={1} height={1} style={{position: 'absolute', left: 0, top: 0, overflow: 'visible'}}>
+              <polygon
+                className="ExpansionTrapezoid-trapezoid"
+                points={_.flatten(trapezoidPoints).join(' ')}
+                fill="lightblue"
+                // fill="transparent" stroke="lightblue" strokeWidth={3}
+              />
+            </svg>
             <div>
               {inputArray.map((elem, i) =>
                 <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3,
                                     cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
-                      onClick={() => setHighlightedIndex(i)}>
+                      onClick={() => setHighlightedIndex(i)}
+                      ref={i === highlightedIndex ? setIndexBoxDiv : undefined}>
                   <div style={{pointerEvents: 'none'}}>
                     {/* <Value value={elem.toolValue}/> */}
                     {i}
@@ -76,13 +121,17 @@ export function MapTool({ config, updateConfig, reportOutput, reportView }: Tool
                 </div>
               )}
             </div>
-            <div className="row-top" style={{marginTop: 10, marginBottom: 10}}>
-              <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
-              {' = '}
-              <Value value={inputArray[highlightedIndex]?.toolValue} />
-            </div>
-            <div>
-              <ShowView view={perItemViews[highlightedIndex]}/>
+            <div ref={setPerItemBoxDiv} style={{
+                border: '3px solid lightblue',
+                padding: 10, marginTop: 10}}>
+              <div className="row-top" style={{marginBottom: 10}}>
+                <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
+                {' = '}
+                <Value value={inputArray[highlightedIndex]?.toolValue} />
+              </div>
+              <div>
+                <ShowView view={perItemViews[highlightedIndex]}/>
+              </div>
             </div>
           </>
         }
