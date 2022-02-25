@@ -40,7 +40,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
   }, [updateOutputs])
 
   const render = useCallback(() => {
-    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 20}}>
+    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10}}>
       {cells.map((cell, i) =>
         <Fragment key={cell.var.id}>
           <RowDivider i={i} updateCells={updateCells}/>
@@ -103,7 +103,7 @@ function RowDivider({i, updateCells}: {i: number, updateCells: Updater<Cell[]>})
   const [hoverRef, isHovered] = useHover<HTMLDivElement>();
 
   return <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
-    <div style={{borderTop: `1px ${isHovered ? 'solid' : 'dashed'} rgba(0,0,0,0.2)`, height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+    <div style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
       {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
     </div>
   </div>;
@@ -197,18 +197,20 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <>
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
-      <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
-      {/* <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
-      <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre> */}
-      <div style={{borderRadius: 30, zoom: "60%", cursor: 'pointer'}} onClick={removeCell}>✖️</div>
+    <div style={{}}>
+      <div style={{position: 'sticky', top: 10, display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+        <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
+        <div style={{borderRadius: 30, zoom: "60%", cursor: 'pointer', marginLeft: 10}} onClick={removeCell}>✖️</div>
+        {/* <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
+        <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre> */}
+      </div>
     </div>
     <div className="notebook-CellView-right" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
-      <div style={{maxWidth: '100%', marginBottom: 10, position: 'sticky', top: 10}}>
+      <div style={{maxWidth: '100%', position: 'sticky', top: 10}}>
         <ShowView view={toolView}/>
       </div>
     </div>
-    <div style={{marginBottom: 10, maxWidth: '100%', minWidth: 60}}>
+    <div style={{maxWidth: '100%', minWidth: 60}}>
       <div style={{position: 'sticky', top: 10}}>
         {outputDisplay}
       </div>
