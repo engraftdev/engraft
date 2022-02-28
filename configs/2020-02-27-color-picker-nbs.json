@@ -1,0 +1,242 @@
+{
+  "toolName": "code",
+  "mode": {
+    "modeName": "tool",
+    "config": {
+      "toolName": "notebook",
+      "cells": [
+        {
+          "var": {
+            "id": "IDfemur853097",
+            "label": "R"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var": {
+                      "id": "IDlamb821611",
+                      "label": "cell 1"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "tool",
+                        "config": {
+                          "toolName": "slider",
+                          "value": 7,
+                          "min": -10,
+                          "max": 10,
+                          "step": 1
+                        }
+                      }
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDflame499401",
+                      "label": "cell 2"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "code",
+                        "code": "IDlamb821611*25",
+                        "subTools": {}
+                      }
+                    },
+                    "upstreamIds": {
+                      "IDlamb821611": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "upstreamIds": {
+            "IDcondor527627": true
+          }
+        },
+        {
+          "var": {
+            "id": "IDantlion725869",
+            "label": "G"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var": {
+                      "id": "IDquince271504",
+                      "label": "cell 1"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "tool",
+                        "config": {
+                          "toolName": "slider",
+                          "value": 9,
+                          "min": -10,
+                          "max": 10,
+                          "step": 1
+                        }
+                      }
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDclover042745",
+                      "label": "cell 2"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "code",
+                        "code": "IDquince271504*25",
+                        "subTools": {}
+                      }
+                    },
+                    "upstreamIds": {
+                      "IDquince271504": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "upstreamIds": {}
+        },
+        {
+          "var": {
+            "id": "IDactress425504",
+            "label": "B"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var": {
+                      "id": "IDgeranium519063",
+                      "label": "cell 1"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "tool",
+                        "config": {
+                          "toolName": "slider",
+                          "value": 7,
+                          "min": -10,
+                          "max": 10,
+                          "step": 1
+                        }
+                      }
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDwaterlily933195",
+                      "label": "cell 2"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "mode": {
+                        "modeName": "code",
+                        "code": "IDgeranium519063*25",
+                        "subTools": {}
+                      }
+                    },
+                    "upstreamIds": {
+                      "IDgeranium519063": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "upstreamIds": {}
+        },
+        {
+          "var": {
+            "id": "IDshoulder201958",
+            "label": "color"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "tool",
+              "config": {
+                "toolName": "text",
+                "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
+                "subTools": {
+                  "IDhumor210475": {
+                    "toolName": "code",
+                    "mode": {
+                      "modeName": "code",
+                      "code": "IDfemur853097*25",
+                      "subTools": {}
+                    }
+                  },
+                  "IDsnail738106": {
+                    "toolName": "code",
+                    "mode": {
+                      "modeName": "code",
+                      "code": "IDantlion725869*25",
+                      "subTools": {}
+                    }
+                  },
+                  "IDlimpet808159": {
+                    "toolName": "code",
+                    "mode": {
+                      "modeName": "code",
+                      "code": "IDactress425504*25",
+                      "subTools": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "upstreamIds": {
+            "IDfemur853097": true,
+            "IDantlion725869": true,
+            "IDactress425504": true
+          }
+        },
+        {
+          "var": {
+            "id": "IDcondor527627",
+            "label": "swatch"
+          },
+          "config": {
+            "toolName": "code",
+            "mode": {
+              "modeName": "code",
+              "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",
+              "subTools": {}
+            }
+          },
+          "upstreamIds": {
+            "IDshoulder201958": true
+          }
+        }
+      ]
+    }
+  }
+}
