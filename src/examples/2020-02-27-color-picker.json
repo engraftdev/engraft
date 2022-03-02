@@ -16,7 +16,7 @@
               "modeName": "tool",
               "config": {
                 "toolName": "slider",
-                "value": 7,
+                "value": 213,
                 "min": 0,
                 "max": 255,
                 "step": 1
@@ -36,7 +36,7 @@
               "modeName": "tool",
               "config": {
                 "toolName": "slider",
-                "value": 9,
+                "value": 57,
                 "min": 0,
                 "max": 255,
                 "step": 1
@@ -56,7 +56,7 @@
               "modeName": "tool",
               "config": {
                 "toolName": "slider",
-                "value": 8,
+                "value": 140,
                 "min": 0,
                 "max": 255,
                 "step": 1
@@ -76,33 +76,8 @@
               "modeName": "tool",
               "config": {
                 "toolName": "text",
-                "text": "rgb(IDhumor210475,IDsnail738106,IDlimpet808159)",
-                "subTools": {
-                  "IDhumor210475": {
-                    "toolName": "code",
-                    "mode": {
-                      "modeName": "code",
-                      "code": "IDfemur853097*25",
-                      "subTools": {}
-                    }
-                  },
-                  "IDsnail738106": {
-                    "toolName": "code",
-                    "mode": {
-                      "modeName": "code",
-                      "code": "IDantlion725869*25",
-                      "subTools": {}
-                    }
-                  },
-                  "IDlimpet808159": {
-                    "toolName": "code",
-                    "mode": {
-                      "modeName": "code",
-                      "code": "IDactress425504*25",
-                      "subTools": {}
-                    }
-                  }
-                }
+                "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
+                "subTools": {}
               }
             }
           },
@@ -115,7 +90,7 @@
         {
           "var": {
             "id": "IDcondor527627",
-            "label": "cell 1"
+            "label": "\ncell 1"
           },
           "config": {
             "toolName": "code",

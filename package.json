@@ -21,6 +21,7 @@
     "@types/react-inspector": "^4.0.2",
     "@types/react-test-renderer": "^17.0.1",
     "@types/seedrandom": "^3.0.2",
+    "@types/webpack-env": "^1.16.3",
     "css-loader": "^6.6.0",
     "fast-memoize": "^2.5.2",
     "friendly-words": "^1.2.0",

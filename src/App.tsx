@@ -9,11 +9,11 @@ import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import Value, { ValueOfTool } from './view/Value';
 
 import appCss from './App.css';
+import { examples } from './examples/examples';
 
 /*
 TODO: fix remounting text-editor bug
 */
-
 
 const localStorageKey = 'live-compose-v1';
 
@@ -44,21 +44,21 @@ function App() {
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
-  const [hideTool, setHideTool] = useStateSetOnly(false);
-  const [hideOutput, setHideOutput] = useStateSetOnly(true);
+  const [showTool, setShowTool] = useStateSetOnly(true);
+  const [showOutput, setShowOutput] = useStateSetOnly(false);
 
   return <>
     <style>
       {appCss}
     </style>
-    <div style={hideTool ? {display: 'none'} : {}}>
+    <div style={{...!showTool && {display: 'none'}}}>
       <EnvContext.Provider value={context}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <br/>
     <br/>
-    {!hideOutput && <ValueOfTool toolValue={output} />}
+    {showOutput && <ValueOfTool toolValue={output} />}
     <br/>
     <br/>
     <br/>
@@ -90,10 +90,25 @@ function App() {
     <br/>
     <div>
       <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
+      {' '}
+      <select value='none' onChange={(ev) => {
+          updateConfig(() => examples.find((ex) => ex.name === ev.target.value)!.config);
+        }}>
+        <option value='none' disabled={true}>Load example...</option>
+        {examples.map(({name, config}) =>
+          <option key={name} value={name}>{name}</option>
+        )}
+      </select>
     </div>
     <br/>
-    <button onClick={() => setHideTool(!hideTool)}>{hideTool ? 'Show tool' : 'Hide tool'}</button>
-    <button onClick={() => setHideOutput(!hideOutput)}>{hideOutput ? 'Show output' : 'Hide output'}</button>
+    <div>
+      <input type='checkbox' checked={showTool} onChange={(ev) => setShowTool(ev.target.checked)}/>
+      <label>Show tool</label>
+    </div>
+    <div>
+      <input type='checkbox' checked={showOutput} onChange={(ev) => setShowOutput(ev.target.checked)}/>
+      <label>Show output</label>
+    </div>
   </>
 }
 
