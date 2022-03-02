@@ -45,7 +45,8 @@
   },
   "scripts": {
     "start": "webpack-dev-server --config-name app",
-    "build-lib": "webpack --config-name lib",
+    "build": "NODE_ENV=production webpack --config-name app",
+    "build-lib": "NODE_ENV=production webpack --config-name lib",
     "watch-lib": "webpack --config-name lib --watch"
   },
   "babel": {
