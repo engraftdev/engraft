@@ -17,8 +17,8 @@
               "config": {
                 "toolName": "slider",
                 "value": 7,
-                "min": -10,
-                "max": 10,
+                "min": 0,
+                "max": 255,
                 "step": 1
               }
             }
@@ -37,8 +37,8 @@
               "config": {
                 "toolName": "slider",
                 "value": 9,
-                "min": -10,
-                "max": 10,
+                "min": 0,
+                "max": 255,
                 "step": 1
               }
             }
@@ -57,8 +57,8 @@
               "config": {
                 "toolName": "slider",
                 "value": 8,
-                "min": -10,
-                "max": 10,
+                "min": 0,
+                "max": 255,
                 "step": 1
               }
             }
