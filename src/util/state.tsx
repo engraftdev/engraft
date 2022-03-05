@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 
+
+export type Replace<T, U> = Omit<T, keyof U> & U;
+
 export type Setter<T> = (newT: T) => void;
-export type Updater<T> = (f: (oldT: T) => T) => void;
+export type Updater<T, U extends T = T> = (f: (oldU: U) => T) => void;
 
 // React's useState returns a setter that doesn't work for function types
 //   (it interprets function arguments as updaters, not new function values)
@@ -27,7 +30,7 @@ export function useStateUpdateOnly<T>(init: T): [T, Updater<T>] {
 // utils for working with updaters
 
 // arguably this should just be `(oldT) => ({...oldT, ...newKeys})` part. this feels less abstract tho?
-export function updateKeys<T>(update: Updater<T>, newKeys: Partial<T>) {
+export function updateKeys<T, U extends T>(update: Updater<T, U>, newKeys: Partial<U>) {
   update((oldT) => ({...oldT, ...newKeys}));
 }
 

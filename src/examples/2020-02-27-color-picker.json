@@ -1,110 +1,98 @@
 {
   "toolName": "code",
-  "mode": {
-    "modeName": "tool",
-    "config": {
-      "toolName": "notebook",
-      "cells": [
-        {
-          "var": {
-            "id": "IDfemur853097",
-            "label": "R"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "slider",
-                "value": 213,
-                "min": 0,
-                "max": 255,
-                "step": 1
-              }
-            }
-          },
-          "upstreamIds": {}
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDfemur853097",
+          "label": "R"
         },
-        {
-          "var": {
-            "id": "IDantlion725869",
-            "label": "G"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "slider",
-                "value": 57,
-                "min": 0,
-                "max": 255,
-                "step": 1
-              }
-            }
-          },
-          "upstreamIds": {}
-        },
-        {
-          "var": {
-            "id": "IDactress425504",
-            "label": "B"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "slider",
-                "value": 140,
-                "min": 0,
-                "max": 255,
-                "step": 1
-              }
-            }
-          },
-          "upstreamIds": {}
-        },
-        {
-          "var": {
-            "id": "IDshoulder201958",
-            "label": "color"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "text",
-                "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
-                "subTools": {}
-              }
-            }
-          },
-          "upstreamIds": {
-            "IDfemur853097": true,
-            "IDantlion725869": true,
-            "IDactress425504": true
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "slider",
+            "value": 213,
+            "min": 0,
+            "max": 255,
+            "step": 1
           }
         },
-        {
-          "var": {
-            "id": "IDcondor527627",
-            "label": "\ncell 1"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "code",
-              "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",
-              "subTools": {}
-            }
-          },
-          "upstreamIds": {
-            "IDshoulder201958": true
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDantlion725869",
+          "label": "G"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "slider",
+            "value": 57,
+            "min": 0,
+            "max": 255,
+            "step": 1
           }
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDactress425504",
+          "label": "B"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "slider",
+            "value": 140,
+            "min": 0,
+            "max": 255,
+            "step": 1
+          }
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDshoulder201958",
+          "label": "color"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "text",
+            "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
+            "subTools": {}
+          }
+        },
+        "upstreamIds": {
+          "IDfemur853097": true,
+          "IDantlion725869": true,
+          "IDactress425504": true
         }
-      ]
-    }
+      },
+      {
+        "var": {
+          "id": "IDcondor527627",
+          "label": "\ncell 1"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",
+          "subTools": {}
+        },
+        "upstreamIds": {
+          "IDshoulder201958": true
+        }
+      }
+    ]
   }
 }

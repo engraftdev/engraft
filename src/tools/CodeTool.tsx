@@ -3,7 +3,7 @@ import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, T
 import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
+import { Replace, updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
 import { usePortalSet } from "../util/PortalSet";
@@ -18,40 +18,35 @@ import IsolateStyles from "../view/IsolateStyles";
 import seedrandom from 'seedrandom';
 import { notebookConfigSetTo } from "./NotebookTool";
 
-export type CodeConfig = {
-  toolName: 'code';
-  mode: CodeConfigCodeMode | CodeConfigToolMode;
-}
+export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
 export interface CodeConfigCodeMode {
+  toolName: 'code',
   modeName: 'code',
   code: string,
   subTools: {[id: string]: ToolConfig}
 }
 
 export interface CodeConfigToolMode {
+  toolName: 'code',
   modeName: 'tool',
-  config: ToolConfig
+  subConfig: ToolConfig
 }
 
 export function CodeTool(props: ToolProps<CodeConfig>) {
   const {config, updateConfig} = props;
 
-  let [modeConfig, updateModeConfig] = useAt(config, updateConfig, 'mode');
-
-  if (modeConfig.modeName === 'code') {
-    return <CodeToolCodeMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigCodeMode>} />;
+  if (config.modeName === 'code') {
+    return <CodeToolCodeMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigCodeMode>} />;
   } else {
-    return <CodeToolToolMode {...props} modeConfig={modeConfig} updateModeConfig={updateModeConfig as Updater<CodeConfigToolMode>} />;
+    return <CodeToolToolMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigToolMode>} />;
   }
 }
 registerTool(CodeTool, {
   toolName: 'code',
-  mode: {
-    modeName: 'code',
-    code: '',
-    subTools: {},
-  }
+  modeName: 'code',
+  code: '',
+  subTools: {},
 });
 
 export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
@@ -62,27 +57,31 @@ export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
 
   return {
     toolName: 'code',
-    mode:
-      typeof config === 'string' ?
+    ...(typeof config === 'string' ?
         { modeName: 'code', code: config, subTools: {} }:
-        { modeName: 'tool', config }
+        { modeName: 'tool', subConfig: config }
+    )
   };
 }
 
 
-export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportView, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
-                                 { modeConfig: CodeConfigCodeMode, updateModeConfig: Updater<CodeConfigCodeMode> }) {
+type CodeToolCodeModeProps = Replace<ToolProps<CodeConfig>, {
+  config: CodeConfigCodeMode,
+  updateConfig: Updater<CodeConfig, CodeConfigCodeMode>,
+}>
+
+export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportView}: CodeToolCodeModeProps) {
   const compiled = useMemo(() => {
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
-      let translated = transform("(" + modeConfig.code + ")", { presets: ["react"] }).code!;
+      let translated = transform("(" + config.code + ")", { presets: ["react"] }).code!;
       translated = translated.replace(/;$/, "");
       const result = compile(translated);
       return result;
     } catch (e) {
       // console.warn(e);
     }
-  }, [modeConfig.code])
+  }, [config.code])
 
   const env = useContext(EnvContext)
   const envRef = useRef<VarInfos>();
@@ -93,7 +92,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
   // TODO: is the above an appropriate pattern to make a value available from a fixed (user-initiated) callback?
 
 
-  const [subTools, updateSubTools] = useAt(modeConfig, updateModeConfig, 'subTools');
+  const [subTools, updateSubTools] = useAt(config, updateConfig, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
@@ -128,7 +127,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         return newId;
       };
       function replaceWithTool(tool: Tool<ToolConfig>) {
-        updateKeys(updateConfig, {mode: {modeName: 'tool', config: tool.defaultConfig()}});
+        updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: tool.defaultConfig()}))
       };
       const completions = [
         toolCompletions(insertTool, replaceWithTool),
@@ -138,7 +137,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
     }, [refSet])
 
     const onChange = useCallback((value) => {
-      updateKeys(updateModeConfig, {code: value});
+      updateKeys(updateConfig, {code: value});
     }, []);
 
     // return
@@ -147,7 +146,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
       <CodeMirror
         extensions={extensions}
         autoFocus={autoFocus}
-        text={modeConfig.code}
+        text={config.code}
         onChange={onChange}
       />
       {refs.map(([elem, {id}]) => {
@@ -171,7 +170,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
         {contents}
       </div>;
     }
-  }, [config, env, modeConfig.code, possibleEnv, subTools, updateConfig, updateModeConfig, updateSubTools, views])
+  }, [config, env, possibleEnv, subTools, updateConfig, updateSubTools, views])
   useView(reportView, render, config);
 
   return <>
@@ -183,14 +182,14 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
 }
 
 
-export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig, modeConfig, updateModeConfig}: ToolProps<CodeConfig> &
-                                 { modeConfig: CodeConfigToolMode, updateModeConfig: Updater<CodeConfigToolMode> }) {
+type CodeToolToolModeProps = Replace<ToolProps<CodeConfig>, {
+  config: CodeConfigToolMode,
+  updateConfig: Updater<CodeConfig, CodeConfigToolMode>,
+}>
 
-  const [component, view, output] = useSubTool({
-    config: modeConfig,
-    updateConfig: updateModeConfig,
-    subKey: 'config',
-  })
+export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) {
+
+  const [component, view, output] = useSubTool({ config, updateConfig, subKey: 'subConfig' })
 
   useOutput(reportOutput, output);
 
@@ -199,15 +198,15 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
 
   const render = useCallback(function R({autoFocus}) {
     return <ToolFrame
-      config={modeConfig.config} env={env} possibleEnv={possibleEnv}
-      onClose={() => {updateKeys(updateConfig, {mode: {modeName: 'code', code: '', subTools: {}}});}}
-      onNotebook={modeConfig.config.toolName === 'notebook' ? undefined : () => {updateKeys(updateConfig, {mode: {modeName: 'tool', config: notebookConfigSetTo(config)}});}}
+      config={config.subConfig} env={env} possibleEnv={possibleEnv}
+      onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}
+      onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: notebookConfigSetTo(config)}))}}
     >
       {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
         <ShowView view={view} autoFocus={autoFocus} />
       {/* </div> */}
     </ToolFrame>
-  }, [env, modeConfig.config, possibleEnv, updateConfig, view]);
+  }, [config, env, possibleEnv, updateConfig, view]);
   useView(reportView, render, config);
 
   return component;

@@ -1,160 +1,138 @@
 {
   "toolName": "code",
-  "mode": {
-    "modeName": "tool",
-    "config": {
-      "toolName": "notebook",
-      "cells": [
-        {
-          "var": {
-            "id": "IDcollege900260",
-            "label": "width"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "code",
-              "code": "100",
-              "subTools": {}
-            }
-          },
-          "upstreamIds": {}
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDcollege900260",
+          "label": "width"
         },
-        {
-          "var": {
-            "id": "IDtoy988307",
-            "label": "height"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "code",
-              "code": "200",
-              "subTools": {}
-            }
-          },
-          "upstreamIds": {}
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "100",
+          "subTools": {}
         },
-        {
-          "var": {
-            "id": "IDrutabaga632206",
-            "label": "cell"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDtoy988307",
+          "label": "height"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "200",
+          "subTools": {}
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDrutabaga632206",
+          "label": "cell"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "world",
+            "iterationsCount": 18,
+            "initConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "{\n x: rand() * IDcollege900260,\n y: rand() * IDtoy988307,\n vx: (rand() - 0.5) * 160,\n vy: (rand() - 0.5) * 160,\n}",
+              "subTools": {}
+            },
+            "stateVar": {
+              "id": "IDthroat614100",
+              "label": "state"
+            },
+            "updateConfig": {
+              "toolName": "code",
               "modeName": "tool",
-              "config": {
-                "toolName": "world",
-                "iterationsCount": 18,
-                "initConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "code",
-                    "code": "{\n  x: rand() * IDcollege900260,\n  y: rand() * IDtoy988307,\n  vx: (rand() - 0.5) * 160,\n  vy: (rand() - 0.5) * 160,\n}",
-                    "subTools": {}
-                  }
-                },
-                "stateVar": {
-                  "id": "IDthroat614100",
-                  "label": "state"
-                },
-                "updateConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "tool",
+              "subConfig": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var": {
+                      "id": "IDcurrency575654",
+                      "label": "new pos"
+                    },
                     "config": {
-                      "toolName": "notebook",
-                      "cells": [
-                        {
-                          "var": {
-                            "id": "IDcurrency575654",
-                            "label": "new pos"
-                          },
-                          "config": {
-                            "toolName": "code",
-                            "mode": {
-                              "modeName": "code",
-                              "code": "{\n  ...IDthroat614100,\n  x: IDthroat614100.x + IDthroat614100.vx,\n  y: IDthroat614100.y + IDthroat614100.vy,\n}",
-                              "subTools": {}
-                            }
-                          },
-                          "upstreamIds": {}
-                        },
-                        {
-                          "var": {
-                            "id": "IDoccupation997063",
-                            "label": "x bounce"
-                          },
-                          "config": {
-                            "toolName": "code",
-                            "mode": {
-                              "modeName": "code",
-                              "code": "IDcurrency575654.x < 0 || IDcurrency575654.x > IDcollege900260",
-                              "subTools": {}
-                            }
-                          },
-                          "upstreamIds": {
-                            "IDcurrency575654": true
-                          }
-                        },
-                        {
-                          "var": {
-                            "id": "IDbase350930",
-                            "label": "y bounce"
-                          },
-                          "config": {
-                            "toolName": "code",
-                            "mode": {
-                              "modeName": "code",
-                              "code": "IDcurrency575654.y < 0 || IDcurrency575654.y > IDtoy988307",
-                              "subTools": {}
-                            }
-                          },
-                          "upstreamIds": {
-                            "IDcurrency575654": true
-                          }
-                        },
-                        {
-                          "var": {
-                            "id": "IDquokka636766",
-                            "label": "cell"
-                          },
-                          "config": {
-                            "toolName": "code",
-                            "mode": {
-                              "modeName": "code",
-                              "code": "{\n  ...IDcurrency575654,\n  vx: IDoccupation997063 ? -IDcurrency575654.vx : IDcurrency575654.vx,\n  vy: IDbase350930 ? -IDcurrency575654.vy : IDcurrency575654.vy,\n}",
-                              "subTools": {}
-                            }
-                          },
-                          "upstreamIds": {
-                            "IDcurrency575654": true,
-                            "IDoccupation997063": true,
-                            "IDbase350930": true
-                          }
-                        }
-                      ]
+                      "toolName": "code",
+                      "modeName": "code",
+                      "code": "{\n ...IDthroat614100,\n x: IDthroat614100.x + IDthroat614100.vx,\n y: IDthroat614100.y + IDthroat614100.vy,\n}",
+                      "subTools": {}
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDoccupation997063",
+                      "label": "x bounce"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "code",
+                      "code": "IDcurrency575654.x < 0 || IDcurrency575654.x > IDcollege900260",
+                      "subTools": {}
+                    },
+                    "upstreamIds": {
+                      "IDcurrency575654": true
+                    }
+                  },
+                  {
+                    "var": {
+                      "id": "IDbase350930",
+                      "label": "y bounce"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "code",
+                      "code": "IDcurrency575654.y < 0 || IDcurrency575654.y > IDtoy988307",
+                      "subTools": {}
+                    },
+                    "upstreamIds": {
+                      "IDcurrency575654": true
+                    }
+                  },
+                  {
+                    "var": {
+                      "id": "IDquokka636766",
+                      "label": "cell"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "code",
+                      "code": "{\n ...IDcurrency575654,\n vx: IDoccupation997063 ? -IDcurrency575654.vx : IDcurrency575654.vx,\n vy: IDbase350930 ? -IDcurrency575654.vy : IDcurrency575654.vy,\n}",
+                      "subTools": {}
+                    },
+                    "upstreamIds": {
+                      "IDcurrency575654": true,
+                      "IDoccupation997063": true,
+                      "IDbase350930": true
                     }
                   }
-                },
-                "viewConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "code",
-                    "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n  <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"purple\"/>\n</svg>",
-                    "subTools": {}
-                  }
-                }
+                ]
               }
+            },
+            "viewConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"purple\"/>\n</svg>",
+              "subTools": {}
             }
-          },
-          "upstreamIds": {
-            "IDcollege900260": true,
-            "IDtoy988307": true
           }
+        },
+        "upstreamIds": {
+          "IDcollege900260": true,
+          "IDtoy988307": true
         }
-      ]
-    }
+      }
+    ]
   }
 }

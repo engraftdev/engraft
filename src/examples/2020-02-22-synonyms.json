@@ -1,119 +1,134 @@
 {
   "toolName": "code",
-  "mode": {
-    "modeName": "tool",
-    "config": {
-      "toolName": "notebook",
-      "cells": [
-        {
-          "var": {
-            "id": "IDcopper241184",
-            "label": "word"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "code",
-              "code": "\"fun\"",
-              "subTools": {}
-            }
-          },
-          "upstreamIds": {}
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDcopper241184",
+          "label": "word"
         },
-        {
-          "var": {
-            "id": "IDpyroraptor110749",
-            "label": "response"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "request",
-                "urlConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "tool",
-                    "config": {
-                      "toolName": "text",
-                      "text": "http://words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/IDcopper241184/json",
-                      "subTools": {}
-                    }
-                  }
-                },
-                "paramsConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "code",
-                    "code": "",
-                    "subTools": {}
-                  }
-                },
-                "autoSend": true
-              }
-            }
-          },
-          "upstreamIds": {
-            "IDcopper241184": true
-          }
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDreport359691.get",
+          "subTools": {}
         },
-        {
-          "var": {
-            "id": "IDbracket986524",
-            "label": "per POS"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "tool",
-              "config": {
-                "toolName": "map",
-                "inputConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "code",
-                    "code": "IDpyroraptor110749",
-                    "subTools": {}
-                  }
-                },
-                "itemVar": {
-                  "id": "IDrainbow180100",
-                  "label": "item"
-                },
-                "perItemConfig": {
-                  "toolName": "code",
-                  "mode": {
-                    "modeName": "code",
-                    "code": "IDrainbow180100[1].syn",
-                    "subTools": {}
-                  }
-                }
-              }
-            }
-          },
-          "upstreamIds": {
-            "IDpyroraptor110749": true
-          }
-        },
-        {
-          "var": {
-            "id": "IDlist469273",
-            "label": "all POS"
-          },
-          "config": {
-            "toolName": "code",
-            "mode": {
-              "modeName": "code",
-              "code": "IDbracket986524.flat()",
-              "subTools": {}
-            }
-          },
-          "upstreamIds": {
-            "IDbracket986524": true
-          }
+        "upstreamIds": {
+          "IDreport359691": true
         }
-      ]
-    }
+      },
+      {
+        "var": {
+          "id": "IDpyroraptor110749",
+          "label": "response"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "request",
+            "urlConfig": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "text",
+                "text": "http://words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/IDcopper241184/json",
+                "subTools": {}
+              }
+            },
+            "paramsConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "",
+              "subTools": {}
+            },
+            "autoSend": true
+          }
+        },
+        "upstreamIds": {
+          "IDcopper241184": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDbracket986524",
+          "label": "per POS"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "map",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDpyroraptor110749",
+              "subTools": {}
+            },
+            "itemVar": {
+              "id": "IDrainbow180100",
+              "label": "item"
+            },
+            "perItemConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDrainbow180100[1].syn",
+              "subTools": {}
+            }
+          }
+        },
+        "upstreamIds": {
+          "IDpyroraptor110749": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDlist469273",
+          "label": "all POS"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDbracket986524.flat()",
+          "subTools": {}
+        },
+        "upstreamIds": {
+          "IDbracket986524": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDreport359691",
+          "label": "word state"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "state",
+            "stateValue": "fun"
+          }
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDeye594052",
+          "label": ""
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "<div>\n <h2>Synonyms of {IDreport359691.get}</h2>\n {IDlist469273.map(pos =>\n <div>\n <button onClick={() => IDreport359691.set(pos)}>\n {pos}\n </button>\n </div>)}\n</div>",
+          "subTools": {}
+        },
+        "upstreamIds": {
+          "IDlist469273": true,
+          "IDreport359691": true
+        }
+      }
+    ]
   }
 }
