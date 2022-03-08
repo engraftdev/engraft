@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { useDebounce } from "use-debounce";
 import { registerTool, ToolConfig, ToolProps } from "../tools-framework/tools";
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
@@ -13,7 +13,7 @@ export interface RequestConfig extends ToolConfig {
   autoSend: boolean;
 }
 
-export function RequestTool({ config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
+export const RequestTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) => {
   const [urlComponent, urlView, urlOutput] = useSubTool({config, updateConfig, subKey: 'urlConfig'});
   const [paramsComponent, paramsView, paramsOutput] = useSubTool({config, updateConfig, subKey: 'paramsConfig'});
 
@@ -63,7 +63,7 @@ export function RequestTool({ config, updateConfig, reportOutput, reportView }: 
     {urlComponent}
     {paramsComponent}
   </>;
-}
+});
 const paramsDefault = `{
   origin: '*',
   format: 'json',

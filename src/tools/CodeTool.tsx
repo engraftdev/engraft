@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useRef } from "react";
+import { memo, useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
@@ -33,7 +33,7 @@ export interface CodeConfigToolMode {
   subConfig: ToolConfig
 }
 
-export function CodeTool(props: ToolProps<CodeConfig>) {
+export const CodeTool = memo((props: ToolProps<CodeConfig>) => {
   const {config, updateConfig} = props;
 
   if (config.modeName === 'code') {
@@ -41,7 +41,7 @@ export function CodeTool(props: ToolProps<CodeConfig>) {
   } else {
     return <CodeToolToolMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigToolMode>} />;
   }
-}
+})
 registerTool(CodeTool, {
   toolName: 'code',
   modeName: 'code',
@@ -70,7 +70,7 @@ type CodeToolCodeModeProps = Replace<ToolProps<CodeConfig>, {
   updateConfig: Updater<CodeConfig, CodeConfigCodeMode>,
 }>
 
-export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportView}: CodeToolCodeModeProps) {
+export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, reportView}: CodeToolCodeModeProps) => {
   const compiled = useMemo(() => {
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
@@ -179,7 +179,7 @@ export function CodeToolCodeMode({ config, updateConfig, reportOutput, reportVie
                updateSubToolConfigs={updateSubTools} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;
-}
+});
 
 
 type CodeToolToolModeProps = Replace<ToolProps<CodeConfig>, {
@@ -187,7 +187,7 @@ type CodeToolToolModeProps = Replace<ToolProps<CodeConfig>, {
   updateConfig: Updater<CodeConfig, CodeConfigToolMode>,
 }>
 
-export function CodeToolToolMode({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) {
+export const CodeToolToolMode = memo(({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) => {
 
   const [component, view, output] = useSubTool({ config, updateConfig, subKey: 'subConfig' })
 
@@ -210,4 +210,4 @@ export function CodeToolToolMode({ config, reportOutput, reportView, updateConfi
   useView(reportView, render, config);
 
   return component;
-}
+});

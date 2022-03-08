@@ -1,5 +1,5 @@
 import memoize from "fast-memoize";
-import { useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import CallFunction from "../util/CallFunction";
 import { Setter, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps, ToolViewRender } from "./tools";
@@ -28,13 +28,13 @@ export interface ShowViewProps extends ToolViewProps {
   view: ToolView | null;
 }
 
-export function ShowView({view, ...rest}: ShowViewProps) {
+export const ShowView = memo(({view, ...rest}: ShowViewProps) => {
   if (!view) {
     return null;
   }
 
   return <CallFunction key={view.toolRep} f={() => view.render(rest)}/>
-}
+})
 
 
 export interface UseToolProps<C extends ToolConfig> {

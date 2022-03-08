@@ -1,11 +1,11 @@
-import React, { ChangeEvent, HTMLProps, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, HTMLProps, memo, useEffect, useRef, useState } from 'react';
 
 interface ControlledTextInputProps extends HTMLProps<HTMLInputElement> {
   value: string,
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function ControlledTextInput(props: ControlledTextInputProps) {
+const ControlledTextInput = memo((props: ControlledTextInputProps) => {
   const { value, onChange, ...rest } = props;
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLInputElement>(null);
@@ -23,7 +23,8 @@ export default function ControlledTextInput(props: ControlledTextInputProps) {
   };
 
   return <input ref={ref} type='text' value={value} onChange={handleChange} {...rest} />;
-};
+});
+export default ControlledTextInput;
 
 
 interface ControlledSpanProps extends HTMLProps<HTMLSpanElement> {
@@ -32,7 +33,7 @@ interface ControlledSpanProps extends HTMLProps<HTMLSpanElement> {
 }
 
 
-export function ControlledSpan(props: ControlledSpanProps) {
+export const ControlledSpan = memo((props: ControlledSpanProps) => {
   const { value, onValue, ...rest } = props;
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLSpanElement>(null);
@@ -58,4 +59,4 @@ export function ControlledSpan(props: ControlledSpanProps) {
   };
 
   return <span ref={ref} contentEditable={true} onInput={handleChange} suppressContentEditableWarning={true} {...rest}>{value}</span>;
-};
+});

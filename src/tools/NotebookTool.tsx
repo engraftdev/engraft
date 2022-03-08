@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
 import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
@@ -6,7 +6,7 @@ import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly
 import { AddObjToContext } from "../util/context";
 import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
 import { VarDefinition } from "../view/Vars";
-import Value, { ValueOfTool } from "../view/Value";
+import { ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 import useHover from "../util/useHover";
 import _ from "lodash";
@@ -26,7 +26,7 @@ interface Cell {
 
 const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
-export function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
+export const NotebookTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) => {
   const [cells, updateCells] = useAt(config, updateConfig, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -90,7 +90,7 @@ export function NotebookTool({ config, updateConfig, reportOutput, reportView }:
       outputs={outputs}
       reportView={reportCellView} reportOutput={reportCellOutput}/>
   )}</>;
-}
+})
 registerTool<NotebookConfig>(NotebookTool, () => ({
   toolName: 'notebook',
   cells: [
@@ -108,7 +108,7 @@ export function notebookConfigSetTo(config: ToolConfig): NotebookConfig {
 }
 
 
-function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) {
+const RowDivider = memo(({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) => {
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
@@ -124,7 +124,7 @@ function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCel
       {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
     </div>
   </div>;
-}
+});
 
 
 interface CellModelProps {
@@ -139,7 +139,7 @@ interface CellModelProps {
   reportOutput: (id: string, value: ToolValue | null) => void;
 }
 
-function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) {
+const CellModel = memo(({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) => {
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var.id === id);
     if (i === -1) {
@@ -184,7 +184,7 @@ function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: 
       {component}
     </AddObjToContext>
   </AddObjToContext>;
-}
+});
 
 
 
@@ -199,7 +199,7 @@ interface CellViewProps {
   removeCell: () => void;
 }
 
-function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
+const CellView = memo(({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) => {
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <>
@@ -224,4 +224,4 @@ function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellView
       </div>
     }
   </>
-}
+});

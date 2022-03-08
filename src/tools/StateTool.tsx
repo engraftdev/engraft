@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { memo, useCallback, useEffect } from "react"
 import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framework/tools"
 import { ToolWithView } from "../tools-framework/ToolWithView";
 import { useView } from "../tools-framework/useSubTool"
@@ -17,7 +17,7 @@ export interface StateConfig extends ToolConfig {
 
 // other ideas include: initialize as undefined every time; some kinda configurable init
 
-export function StateTool({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) {
+export const StateTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) => {
   const [stateValue, updateStateValue] = useAt(config, updateConfig, 'stateValue')
   const setStateValue = useSetter(updateStateValue);
 
@@ -45,7 +45,7 @@ export function StateTool({ config, updateConfig, reportOutput, reportView }: To
   useView(reportView, render, config);
 
   return null;
-}
+});
 registerTool<StateConfig>(StateTool, () => ({
   toolName: 'state',
   stateValue: undefined

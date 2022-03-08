@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import ControlledTextInput from "../util/ControlledTextInput";
@@ -9,7 +9,7 @@ export interface ImportConfig extends ToolConfig {
   name: string;
 }
 
-export function ImportTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ImportConfig>) {
+export const ImportTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<ImportConfig>) => {
   const [result, setResult] = useState<ToolValue | null>(null);
 
   const [name, updateName] = useAt(config, updateConfig, 'name');
@@ -38,7 +38,7 @@ export function ImportTool({ config, updateConfig, reportOutput, reportView }: T
   useView(reportView, render, config);
 
   return <></>;
-}
+});
 registerTool(ImportTool, {
   toolName: 'import',
   name: 'lodash',

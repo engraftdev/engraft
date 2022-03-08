@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { useMemo, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { ToolValue, ToolConfig, EnvContext, VarInfo } from "./tools-framework/tools";
@@ -15,7 +15,7 @@ interface EmbedProps {
   initialConfigJson: string | undefined;
 }
 
-export function EmbedComponent({variables, initialConfigJson, reportOutput}: EmbedProps) {
+export const EmbedComponent = memo(({variables, initialConfigJson, reportOutput}: EmbedProps) => {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(codeConfigSetTo(''));
   useEffect(() => {
     if (!initialConfigJson) { return; }
@@ -62,7 +62,7 @@ export function EmbedComponent({variables, initialConfigJson, reportOutput}: Emb
       {copyPasteMessage}
     </div>
   </div>;
-}
+});
 
 export { default as React } from 'react';
 export { default as ReactDOM } from 'react-dom';

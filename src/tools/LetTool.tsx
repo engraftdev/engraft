@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { memo, useCallback, useEffect } from "react"
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
 import { useAt } from "../util/state"
@@ -12,7 +12,7 @@ export interface LetConfig extends ToolConfig {
   bodyConfig: ToolConfig;
 }
 
-export function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
+export const LetTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) => {
   const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'});
   const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'});
 
@@ -53,7 +53,7 @@ export function LetTool({ config, updateConfig, reportOutput, reportView }: Tool
       bodyComponent
     }
   </>
-}
+});
 registerTool<LetConfig>(LetTool, () => ({
   toolName: 'let',
   bindingVar: newVarConfig(),

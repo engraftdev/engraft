@@ -1,11 +1,11 @@
-import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { memo, ReactNode, useEffect, useMemo, useRef } from "react";
 import ReactDOM from "react-dom";
 
 export interface WindowPortalProps {
   children?: ReactNode
 }
 
-export default function WindowPortal({children}: WindowPortalProps) {
+const WindowPortal = memo(({children}: WindowPortalProps) => {
   const containerEl = useMemo(() => document.createElement('div'), []);
   const externalWindow = useRef<Window>();
 
@@ -16,4 +16,5 @@ export default function WindowPortal({children}: WindowPortalProps) {
   }, [containerEl])
 
   return ReactDOM.createPortal(children, containerEl);
-}
+});
+export default WindowPortal

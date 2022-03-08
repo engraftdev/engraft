@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useEffect, useMemo } from "react";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
@@ -18,7 +18,7 @@ export interface MapConfig extends ToolConfig {
   perItemConfig: ToolConfig;
 }
 
-export function MapTool({ config, updateConfig, reportOutput, reportView }: ToolProps<MapConfig>) {
+export const MapTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<MapConfig>) => {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
@@ -148,7 +148,7 @@ export function MapTool({ config, updateConfig, reportOutput, reportView }: Tool
       </ProvideVar>
     )}
   </>
-}
+});
 registerTool<MapConfig>(MapTool, () => {
   const itemVar = newVarConfig('item');
   return {

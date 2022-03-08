@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useStateSetOnly } from "../util/state";
 import IsolateStyles from "../view/IsolateStyles";
 import { toolIndex, ToolProps, ToolView, ToolViewProps } from "./tools";
@@ -5,7 +6,7 @@ import { ShowView } from "./useSubTool";
 
 type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & ToolViewProps;
 
-export function ToolWithView({ config, updateConfig, reportOutput, ...rest }: ToolWithViewProps) {
+export const ToolWithView = memo(({ config, updateConfig, reportOutput, ...rest }: ToolWithViewProps) => {
   const [view, setView] = useStateSetOnly<ToolView | null>(null);
 
   const Tool = toolIndex[config.toolName];
@@ -16,4 +17,4 @@ export function ToolWithView({ config, updateConfig, reportOutput, ...rest }: To
       <ShowView view={view} {...rest} />
     </IsolateStyles>
   </>
-}
+});

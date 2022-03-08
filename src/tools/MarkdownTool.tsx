@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
@@ -11,7 +11,7 @@ export interface MarkdownConfig {
   sourceConfig: ToolConfig;
 }
 
-export function MarkdownTool({config, updateConfig, reportView, reportOutput}: ToolProps<MarkdownConfig>) {
+export const MarkdownTool = memo(({config, updateConfig, reportView, reportOutput}: ToolProps<MarkdownConfig>) => {
   const [sourceComponent, sourceView, sourceOutput] = useSubTool({config, updateConfig, subKey: 'sourceConfig'})
 
   const md = useMemo(() => new MarkdownIt({html: true}), [])
@@ -45,7 +45,7 @@ export function MarkdownTool({config, updateConfig, reportView, reportOutput}: T
   useView(reportView, render, config);
 
   return sourceComponent;
-}
+})
 registerTool<MarkdownConfig>(MarkdownTool, () => ({
   toolName: 'markdown',
   sourceConfig: codeConfigSetTo(toolIndex['text'].defaultConfig()),

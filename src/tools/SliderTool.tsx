@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { registerTool, ToolProps } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
@@ -11,7 +11,7 @@ export interface SliderConfig {
   max: number;
   step: number;
 }
-export function SliderTool({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) {
+export const SliderTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) => {
   const output = useMemoObject({toolValue: config.value});
   useOutput(reportOutput, output);
 
@@ -31,7 +31,7 @@ export function SliderTool({ config, updateConfig, reportOutput, reportView }: T
   useView(reportView, render, config);
 
   return null;
-}
+})
 registerTool(SliderTool, {
   toolName: 'slider',
   value: 0,

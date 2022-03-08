@@ -1,9 +1,8 @@
 import _ from "lodash";
-import { useCallback, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "../util/state";
-import Value from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface WorldConfig {
@@ -15,7 +14,7 @@ export interface WorldConfig {
   viewConfig: ToolConfig;
 }
 
-export function WorldTool({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) {
+export const WorldTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) => {
   const [initComponent, initView, initOutput] = useSubTool({config, updateConfig, subKey: 'initConfig'})
 
   const [iterationsCount, updateIterationsCount] = useAt(config, updateConfig, 'iterationsCount');
@@ -96,8 +95,7 @@ export function WorldTool({ config, updateConfig, reportOutput, reportView }: To
       {viewComponent}
     </ProvideVar>
   </>
-}
-
+});
 registerTool<WorldConfig>(WorldTool, () => {
   const stateVar = newVarConfig('state');
   return {

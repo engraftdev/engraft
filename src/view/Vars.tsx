@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { VarConfig, VarInfo } from "../tools-framework/tools";
 import { ControlledSpan } from "../util/ControlledTextInput";
 import { updateKeys, Updater } from "../util/state";
@@ -14,21 +14,21 @@ interface VarDefinitionProps {
   autoFocus?: boolean,
 }
 
-export function VarDefinition({varConfig, updateVarConfig, autoFocus}: VarDefinitionProps) {
+export const VarDefinition = memo(({varConfig, updateVarConfig, autoFocus}: VarDefinitionProps) => {
   return <span className={`def-${varConfig.id}`}
     style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', border: '1px solid gray', fontSize: '13px', minHeight: '13px'}}>
     <ControlledSpan value={varConfig.label} onValue={(label) => updateKeys(updateVarConfig, {label})}
           style={{border: 'none', background: 'none'}} autoFocus={autoFocus}/>
     {varConfig.label.length === 0 && <span style={{fontStyle: 'italic'}}></span>}
   </span>
-}
+});
 
 
 interface VarUseProps {
   varInfo: VarInfo | undefined,
 }
 
-export function VarUse({varInfo}: VarUseProps) {
+export const VarUse = memo(({varInfo}: VarUseProps) => {
   const spanRef = useRef<HTMLSpanElement>(null);
 
   const [inspected, setInspected] = useState(false);
@@ -59,4 +59,4 @@ export function VarUse({varInfo}: VarUseProps) {
       }
     })()}
   </div>
-}
+});

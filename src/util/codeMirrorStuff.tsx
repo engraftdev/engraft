@@ -17,7 +17,7 @@ import {lintKeymap} from "@codemirror/lint"
 import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "../tools-framework/tools";
 import { refCode } from "./refsExtension";
-import { ReactNode, useCallback } from "react";
+import { memo, ReactNode, useCallback } from "react";
 import Value from "../view/Value";
 import WindowPortal from "./WindowPortal";
 
@@ -124,7 +124,7 @@ export interface SubToolProps {
   updateViews: Updater<{[id: string]: ToolView | null}>,
 }
 
-export function SubTool({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) {
+export const SubTool = memo(({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) => {
   const [config, updateConfig] = useAt(subToolConfigs, updateSubToolConfigs, id);
 
   const reportOutput = useCallback((output) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
@@ -137,7 +137,7 @@ export function SubTool({id, subToolConfigs, updateSubToolConfigs, updateOutputs
     reportOutput={reportOutput}
     reportView={reportView}
   />;
-}
+})
 
 
 export interface ToolFrameProps {
@@ -149,7 +149,7 @@ export interface ToolFrameProps {
   possibleEnv: PossibleVarInfos;
 }
 
-export function ToolFrame({children, config, onClose, onNotebook, env, possibleEnv}: ToolFrameProps) {
+export const ToolFrame = memo(({children, config, onClose, onNotebook, env, possibleEnv}: ToolFrameProps) => {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>
@@ -180,4 +180,4 @@ export function ToolFrame({children, config, onClose, onNotebook, env, possibleE
       <Value value={possibleEnv}/>
     </WindowPortal>}
   </div>;
-}
+});

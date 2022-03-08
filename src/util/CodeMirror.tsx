@@ -1,6 +1,6 @@
 import { EditorState, Extension, StateEffect } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import { useEffect, useMemo, useRef, useState } from "react"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
 
 export interface MyCodeMirrorProps {
   extensions: Extension[];
@@ -11,7 +11,7 @@ export interface MyCodeMirrorProps {
   autoFocus: boolean;
 }
 
-export default function CodeMirror({extensions, text, onChange, autoFocus}: MyCodeMirrorProps) {
+const CodeMirror = memo(({extensions, text, onChange, autoFocus}: MyCodeMirrorProps) => {
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();
@@ -69,4 +69,5 @@ export default function CodeMirror({extensions, text, onChange, autoFocus}: MyCo
   // }, [text]);
 
   return <div ref={setDiv} className="cm-theme cm-theme-light"/>
-}
+})
+export default CodeMirror;

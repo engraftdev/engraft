@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
@@ -23,7 +23,7 @@ function varInfoObject(varInfos: VarInfo[]) {
   return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));
 }
 
-function App() {
+const App = memo(() => {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
@@ -110,6 +110,6 @@ function App() {
       <label>Show output</label>
     </div>
   </>
-}
+});
 
 export default App;

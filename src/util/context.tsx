@@ -1,4 +1,4 @@
-import { Context, ReactNode, useContext, useMemo } from "react";
+import { Context, memo, ReactNode, useContext, useMemo } from "react";
 
 export interface AddToContextProps<V> {
   context: Context<{[k: string]: V}>,
@@ -6,8 +6,7 @@ export interface AddToContextProps<V> {
   v: V,
   children?: ReactNode | undefined,
 }
-
-export function AddToContext<V>({context, k, v, children}: AddToContextProps<V>) {
+const AddToContextNoMemo = <V extends unknown>({context, k, v, children}: AddToContextProps<V>) => {
   const oldValue = useContext(context);
   const newValue = useMemo(() => {
     return {...oldValue, [k]: v};
@@ -17,14 +16,14 @@ export function AddToContext<V>({context, k, v, children}: AddToContextProps<V>)
     {children}
   </context.Provider>
 }
+export const AddToContext = memo(AddToContextNoMemo) as typeof AddToContextNoMemo;
 
 export interface AddObjToContextProps<V> {
   context: Context<{[k: string]: V}>,
   obj: {[k: string]: V},
   children?: ReactNode | undefined,
 }
-
-export function AddObjToContext<V>({context, obj, children}: AddObjToContextProps<V>) {
+const AddObjToContextNoMemo = <V extends unknown>({context, obj, children}: AddObjToContextProps<V>) => {
   const oldValue = useContext(context);
   const newValue = useMemo(() => {
     return {...oldValue, ...obj};
@@ -34,3 +33,4 @@ export function AddObjToContext<V>({context, obj, children}: AddObjToContextProp
     {children}
   </context.Provider>
 }
+export const AddObjToContext = memo(AddObjToContextNoMemo) as typeof AddObjToContextNoMemo;

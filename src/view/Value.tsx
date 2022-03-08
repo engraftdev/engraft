@@ -1,6 +1,6 @@
 // import stringify from "json-stringify-pretty-compact";
 import stringify from "../util/stringify";
-import React, { CSSProperties, HTMLProps, isValidElement, useEffect, useMemo } from "react";
+import React, { CSSProperties, HTMLProps, isValidElement, memo, useEffect, useMemo } from "react";
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import ScrollShadow from './ScrollShadow';
@@ -23,7 +23,7 @@ export interface ValueProps extends HTMLProps<HTMLDivElement> {
   value: any;
 }
 
-export default function Value({value, style, ...props}: ValueProps) {
+const Value = memo(({value, style, ...props}: ValueProps) => {
   const contents = useMemo(() => {
     if (isValidElement(value)) {
       return <ErrorBoundary>{value}</ErrorBoundary>;
@@ -58,14 +58,16 @@ export default function Value({value, style, ...props}: ValueProps) {
   return <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
     {contents}
   </ScrollShadow>
-}
+});
+export default Value;
 
-export interface ToolValueProps extends HTMLProps<HTMLDivElement> {
+
+export type ToolValueProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
   toolValue: ToolValue | null;
 }
 
 // TODO: awful naming huh?
-export function ValueOfTool({toolValue, style, ...props}: ToolValueProps) {
+export const ValueOfTool = memo(({toolValue, style, ...props}: ToolValueProps) => {
   const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
 
   useEffect(() => {
@@ -83,4 +85,4 @@ export function ValueOfTool({toolValue, style, ...props}: ToolValueProps) {
     <div style={{fontSize: 13, fontStyle: 'italic'}}>
       no output yet
     </div>;
-}
+});

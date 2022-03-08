@@ -1,4 +1,4 @@
-import { createContext, ReactElement, ReactNode } from "react";
+import { createContext, memo, ReactElement, ReactNode } from "react";
 import { AddToContext } from "../util/context";
 import id from "../util/id";
 import { Setter, Updater } from "../util/state";
@@ -95,10 +95,10 @@ export interface ProvideVarProps {
   children?: ReactNode | undefined,
 }
 
-export function ProvideVar({config, value, children}: ProvideVarProps) {
+export const ProvideVar = memo(({config, value, children}: ProvideVarProps) => {
   const info = useMemoObject({config, value});
 
   return <AddToContext context={EnvContext} k={config.id} v={info}>
     {children}
   </AddToContext>
-}
+});

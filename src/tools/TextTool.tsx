@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useRef } from "react";
+import { memo, useCallback, useContext, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { markdown } from "@codemirror/lang-markdown";
 import { autocompletion } from "@codemirror/autocomplete"
@@ -22,7 +22,7 @@ export interface TextConfig {
   subTools: {[id: string]: ToolConfig};
 }
 
-export function TextTool({ config, updateConfig, reportOutput, reportView}: ToolProps<TextConfig>) {
+export const TextTool = memo(({ config, updateConfig, reportOutput, reportView}: ToolProps<TextConfig>) => {
   const [text, updateText] = useAt(config, updateConfig, 'text');
 
   const env = useContext(EnvContext)
@@ -107,7 +107,7 @@ export function TextTool({ config, updateConfig, reportOutput, reportView}: Tool
               updateSubToolConfigs={updateSubTools} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;
-}
+})
 registerTool(TextTool, {
   toolName: 'text',
   text: '',

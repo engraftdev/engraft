@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { TableInspector } from "react-inspector";
 import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
@@ -9,7 +9,7 @@ export interface TableConfig {
   toolName: 'table';
   inputConfig: ToolConfig;
 }
-export function TableTool({ config, updateConfig, reportOutput, reportView }: ToolProps<TableConfig>) {
+export const TableTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<TableConfig>) => {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
   const inputOutputWithAlreadyDisplayed = useMemoObject({toolValue: inputOutput?.toolValue, alreadyDisplayed: true});
   useOutput(reportOutput, inputOutputWithAlreadyDisplayed);
@@ -23,7 +23,7 @@ export function TableTool({ config, updateConfig, reportOutput, reportView }: To
   useView(reportView, render, config);
 
   return inputComponent;
-}
+});
 registerTool<TableConfig>(TableTool, () => ({
   toolName: 'table',
   inputConfig: toolIndex['code'].defaultConfig()
