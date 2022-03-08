@@ -115,7 +115,7 @@ function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCel
       newCells.splice(i, 0, {var: newVarConfig(smallestUnusedLabel), config: codeConfigSetTo(''), upstreamIds: {}});
       return newCells;
     })
-  }, [i, updateCells]);
+  }, [i, smallestUnusedLabel, updateCells]);
 
   const [hoverRef, isHovered] = useHover<HTMLDivElement>();
 
