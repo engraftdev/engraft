@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import ErrorBoundary from "../util/ErrorBoundary";
 import { ToolValue } from "../tools-framework/tools";
 import { useStateSetOnly } from "../util/state";
+import DomNode from "../util/DomNode";
 hljs.registerLanguage('javascript', javascript);
 
 
@@ -27,6 +28,9 @@ const Value = memo(({value, style, ...props}: ValueProps) => {
   const contents = useMemo(() => {
     if (isValidElement(value)) {
       return <ErrorBoundary>{value}</ErrorBoundary>;
+    }
+    if (value instanceof HTMLElement) {
+      return <DomNode node={value} />
     }
 
     let stringified: string | undefined;
