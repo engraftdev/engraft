@@ -200,7 +200,22 @@ export const CodeToolToolMode = memo(({ config, reportOutput, reportView, update
     return <ToolFrame
       config={config.subConfig} env={env} possibleEnv={possibleEnv}
       onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}
-      onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: notebookConfigSetTo(config)}))}}
+      onCode={() => {
+        const newId = id();
+        updateConfig(() => ({
+          toolName: 'code',
+          modeName: 'code',
+          code: refCode(newId),
+          subTools: {[newId]: config},
+        }))
+      }}
+      onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {
+        updateConfig(() => ({
+          toolName: 'code',
+          modeName: 'tool',
+          subConfig: notebookConfigSetTo(config),
+        }))
+      }}
     >
       {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
         <ShowView view={view} autoFocus={autoFocus} />
