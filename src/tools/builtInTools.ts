@@ -11,3 +11,4 @@ import './SliderTool';
 import './StateTool';
 import './WorldTool';
 import './ColorTool';
+import './FileTool';
