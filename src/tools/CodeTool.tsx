@@ -17,6 +17,7 @@ import React from "react";
 import IsolateStyles from "../view/IsolateStyles";
 import seedrandom from 'seedrandom';
 import { notebookConfigSetTo } from "./NotebookTool";
+import { createElementFromReact } from "../util/createElementFrom";
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
@@ -104,7 +105,8 @@ export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, repo
         ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue])),
         React,
-        rand
+        rand,
+        createElementFromReact,
       };
       try {
         return {toolValue: compiled(scope)};

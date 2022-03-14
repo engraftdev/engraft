@@ -39,7 +39,11 @@ const App = memo(() => {
   }, [updateConfig])
 
   useEffect(() => {
-    window.localStorage.setItem(localStorageKey, JSON.stringify(config));
+    try {
+      window.localStorage.setItem(localStorageKey, JSON.stringify(config));
+    } catch {
+
+    }
   }, [config])
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
