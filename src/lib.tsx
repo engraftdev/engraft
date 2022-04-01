@@ -1,11 +1,9 @@
 import React, { memo } from "react";
 import { useMemo, useEffect } from "react";
-import ReactDOM from "react-dom";
 import { ToolValue, ToolConfig, EnvContext, VarInfo } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { codeConfigSetTo } from "./tools/CodeTool";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
-import Value from "./view/Value";
 
 import './tools/builtInTools';
 
@@ -43,7 +41,6 @@ export const EmbedComponent = memo(({variables, initialConfigJson, reportOutput}
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
 
   return <div>
-    <Value value={output?.toolValue} style={{minHeight: 100}}/>
     <div>
       <EnvContext.Provider value={env}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>

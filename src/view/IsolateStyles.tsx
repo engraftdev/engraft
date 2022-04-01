@@ -1,11 +1,9 @@
 import rootCss from './root.css';
-import highlightCss from './highlight.css';
-import { HTMLProps, memo, ReactElement } from 'react';
+import { HTMLProps, memo } from 'react';
 
 export const RootStyles = memo(() => {
   return <style>
     {rootCss}
-    {highlightCss}
   </style>
 });
 

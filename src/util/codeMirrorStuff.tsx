@@ -18,7 +18,7 @@ import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
 import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "../tools-framework/tools";
 import { refCode } from "./refsExtension";
 import { memo, ReactNode, useCallback } from "react";
-import Value from "../view/Value";
+import { Value } from "../view/Value";
 import WindowPortal from "./WindowPortal";
 
 export const setup = [

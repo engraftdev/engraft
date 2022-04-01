@@ -6,7 +6,7 @@ import './tools/builtInTools';
 import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
-import Value, { ValueOfTool } from './view/Value';
+import { ValueOfTool } from './view/Value';
 
 import appCss from './App.css';
 import { examples } from './examples/examples';

@@ -1,8 +1,5 @@
 // import stringify from "json-stringify-pretty-compact";
-import stringify from "../util/stringify";
-import React, { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, useEffect, useMemo } from "react";
-import hljs from 'highlight.js/lib/core';
-import javascript from 'highlight.js/lib/languages/javascript';
+import React, { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useMemo, useState } from "react";
 import ScrollShadow from './ScrollShadow';
 import { ObjectInspector } from 'react-inspector';
 import * as _ from 'lodash';
@@ -11,74 +8,22 @@ import { ToolValue } from "../tools-framework/tools";
 import { useStateSetOnly } from "../util/state";
 import { DOM } from "../util/DOM";
 import { saveFile } from "../util/saveFile";
-hljs.registerLanguage('javascript', javascript);
+import { flexCol, flexRow, inlineBlock } from "./styles";
 
 
-function replacer(key: any, value: any): any {
-  if (typeof value === 'number') {
-    return Number(value.toFixed(3));
-  }
-  return value;
-}
 
-export interface ValueProps extends HTMLProps<HTMLDivElement> {
-  value: any;
-}
-
-const Value = memo(({value, style, ...props}: ValueProps) => {
-  const contents: {type?: string, elem: ReactElement} = useMemo(() => {
-    if (isValidElement(value)) {
-      return {
-        type: 'react element',
-        elem: <ErrorBoundary>{value}</ErrorBoundary>,
-      };
-    }
-    if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
-      return {
-        type: 'html element',
-        elem: <DOM>{value}</DOM>,
-      };
-    }
-    if (value instanceof Blob) {
-      return {
-        type: 'blob',
-        elem: <button onClick={() => saveFile(value, 'file')}>download</button>,
-      }
-    }
-
-    let stringified: string | undefined;
-    try {
-      stringified = stringify(value, {replacer});
-      try {
-        if (stringified && !_.isEqual(value, JSON.parse(JSON.stringify(value)))) {
-          stringified = undefined;
-        }
-      } catch {
-        console.log("TROUBLE PARSING", value, stringified);
-        stringified = undefined;
-      }
-    } catch (e) {
-    }
-    if (stringified) {
-      let style : CSSProperties = {};
-      if (typeof value === 'string') {
-        style.whiteSpace = 'pre-wrap';
-      }
-      const html = hljs.highlight(stringified, {language: 'javascript'}).value;
-      return { elem: <pre dangerouslySetInnerHTML={{__html: html}} style={style} /> };
-    } else {
-      return { elem: <ObjectInspector data={value}/> }
-    }
-  }, [value])
-
-  //, boxShadow: 'inset 0 0 2px 1px rgba(0,0,0,0.2)'
+export const ValueFrame = memo(({children, type, style, ...props}: {type?: string} & HTMLProps<HTMLDivElement>) => {
   const withShadow = <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
-    {contents.elem}
+    {children}
   </ScrollShadow>
 
-  if (contents.type) {
-    return <div style={{display: 'inline-flex', flexDirection: 'column', maxWidth: '100%'}}>
-      <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>{contents.type}</div>
+  if (type) {
+    return <div style={{display: 'inline-flex', flexDirection: 'column', maxWidth: '100%', alignItems: 'start'}}>
+      <div style={{height: 15, background: '#e4e4e4', fontSize: 13,
+                   color: '#0008', display: 'flex',
+                   borderTopLeftRadius: 5, borderTopRightRadius: 5, paddingLeft: 3, paddingRight: 3}}>
+        {type}
+      </div>
       <div style={{border: '1px dashed gray'}}>
         {withShadow}
       </div>
@@ -87,7 +32,152 @@ const Value = memo(({value, style, ...props}: ValueProps) => {
     return withShadow;
   }
 });
-export default Value;
+
+
+export interface ValueProps {
+  value: any;
+}
+
+type ValuePresentation = {
+  type: 'inline',
+  inline: ReactElement,
+} | {
+  type: 'indented',
+  open?: ReactNode,
+  indented: ReactNode,
+  close?: ReactNode,
+}
+
+const valueFont: CSSProperties = {
+  fontSize: '11px',
+  fontFamily: 'Menlo, monospace',
+}
+
+function valuePresentation({value}: {value: unknown}): ValuePresentation {
+  const maybeElement = value as {} | null | undefined;
+
+  if (isValidElement(maybeElement)) {
+    return {
+      type: 'indented',
+      indented: <ValueFrame type='react element'>
+        <ErrorBoundary>{maybeElement}</ErrorBoundary>,
+      </ValueFrame>,
+    }
+  }
+
+  if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
+    return {
+      type: 'indented',
+      indented: <ValueFrame type='html element'>
+        <DOM>{value}</DOM>
+      </ValueFrame>,
+    }
+  }
+
+  if (value instanceof Blob) {
+    return {
+      type: 'indented',
+      indented: <ValueFrame type='blob'>
+        <button onClick={() => saveFile(value, 'file')}>download</button>,
+      </ValueFrame>,
+    }
+  }
+
+  if (value instanceof Function) {
+    return {
+      type: 'inline',
+      inline: <ObjectInspector data={value}/>
+    }
+  }
+
+  if (value instanceof Object) {
+    const isArray = value instanceof Array;
+    return {
+      type: 'indented',
+      open: <span style={valueFont}>{isArray ? '[' : '{'}</span>,
+      indented: Object.entries(value).map(([key, value]) => {
+        const presentation = valuePresentation({value});
+
+        if (presentation.type === 'inline') {
+          return <div style={{...flexRow()}}>
+            { !isArray &&
+              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
+            }
+            {presentation.inline}
+          </div>;
+        } else {
+          return <div style={{...flexCol()}}>
+            <div style={{...flexRow()}}>
+              { !isArray &&
+                <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
+              }
+              {presentation.open}
+            </div>
+            <div style={{marginLeft: 10}}>
+              {presentation.indented}
+            </div>
+            {presentation.close}
+          </div>
+        };
+      }),
+      close: <span style={valueFont}>{isArray ? ']' : '}'}</span>,
+    };
+  }
+
+  if (typeof value === 'number') {
+    return {
+      type: 'inline',
+      inline: <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
+        {/* TODO: needs some work */}
+        {Number(value.toFixed(3))}
+      </div>
+    }
+  }
+
+  if (typeof value === 'boolean') {
+    return {
+      type: 'inline',
+      inline: <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
+        {value ? 'true' : 'false'}
+      </div>
+    }
+  }
+
+  if (typeof value === 'string') {
+    return {
+      type: 'inline',
+      inline: <ValueFrame>
+        <div style={{color: 'rgb(196, 26, 22)', ...valueFont}}>
+          '{value}'
+        </div>
+      </ValueFrame>
+    }
+  }
+
+  return {
+    type: 'inline',
+    inline: <ValueFrame>
+      <ObjectInspector data={value}/>
+    </ValueFrame>,
+  };
+}
+
+export const Value = memo(({value}: ValueProps): ReactElement => {
+  const presentation = valuePresentation({value});
+
+  if (presentation.type === 'inline') {
+    return presentation.inline;
+  } else {
+    return <div style={{...flexCol()}}>
+      {presentation.open}
+      <div style={{marginLeft: 10}}>
+        {presentation.indented}
+      </div>
+      {presentation.close}
+    </div>
+  }
+});
+
 
 
 export type ToolValueProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
@@ -105,11 +195,12 @@ export const ValueOfTool = memo(({toolValue, style, ...props}: ToolValueProps) =
   }, [setLastValue, toolValue])
 
   return lastValue ?
-    <Value
-      value={lastValue.toolValue}
-      style={{...style, opacity: toolValue === null ? 0.3 : 1}}
-      {...props}
-    /> :
+    <div style={{
+      ...style,
+      opacity: toolValue === null ? 0.3 : 1,
+    }} {...props}>
+      <Value value={lastValue.toolValue} />
+    </div> :
     <div style={{fontSize: 13, fontStyle: 'italic'}}>
       no output yet
     </div>;

@@ -3,7 +3,7 @@ import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framewo
 import { ToolWithView } from "../tools-framework/ToolWithView";
 import { useView } from "../tools-framework/useSubTool"
 import { useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state"
-import Value from "../view/Value";
+import { Value } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface StateConfig extends ToolConfig {

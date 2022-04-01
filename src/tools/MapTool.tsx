@@ -5,7 +5,7 @@ import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
-import Value from "../view/Value";
+import { Value } from "../view/Value";
 import { VarDefinition } from "../view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
