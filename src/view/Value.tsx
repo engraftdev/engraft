@@ -1,13 +1,11 @@
-// import stringify from "json-stringify-pretty-compact";
-import React, { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useMemo, useState } from "react";
-import ScrollShadow from './ScrollShadow';
+import { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect } from "react";
 import { ObjectInspector } from 'react-inspector';
-import * as _ from 'lodash';
-import ErrorBoundary from "../util/ErrorBoundary";
 import { ToolValue } from "../tools-framework/tools";
-import { useStateSetOnly } from "../util/state";
 import { DOM } from "../util/DOM";
+import ErrorBoundary from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
+import { useStateSetOnly } from "../util/state";
+import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
 
 
@@ -33,151 +31,129 @@ export const ValueFrame = memo(({children, type, style, ...props}: {type?: strin
   }
 });
 
-
-export interface ValueProps {
-  value: any;
-}
-
-type ValuePresentation = {
-  type: 'inline',
-  inline: ReactElement,
-} | {
-  type: 'indented',
-  open?: ReactNode,
-  indented: ReactNode,
-  close?: ReactNode,
-}
-
 const valueFont: CSSProperties = {
-  fontSize: '11px',
+  fontSize: 11,
   fontFamily: 'Menlo, monospace',
 }
 
-function valuePresentation({value}: {value: unknown}): ValuePresentation {
+const spacing: CSSProperties = {
+  marginBottom: 3,
+}
+
+export interface ValueProps {
+  value: unknown;
+  prefix?: ReactNode;
+  path?: string;
+}
+
+export const Indent = memo(({children}: {children: ReactNode}) =>
+  <div style={{marginLeft: 10, ...flexCol(), ...spacing}}>
+    {children}
+  </div>
+);
+
+export const WithPrefix = memo(({children, prefix}: {children: ReactElement, prefix: ReactNode}) => {
+  if (prefix) {
+    return <div style={{...flexRow()}}>
+      {prefix}
+      {children}
+    </div>
+  } else {
+    return children;
+  }
+});
+
+export const Value = memo(({value, prefix, path = '$'}: ValueProps) => {
   const maybeElement = value as {} | null | undefined;
 
   if (isValidElement(maybeElement)) {
-    return {
-      type: 'indented',
-      indented: <ValueFrame type='react element'>
-        <ErrorBoundary>{maybeElement}</ErrorBoundary>,
-      </ValueFrame>,
-    }
+    return <>
+      {prefix}
+      <Indent>
+        <ValueFrame type='react element'>
+          <ErrorBoundary>{maybeElement}</ErrorBoundary>,
+        </ValueFrame>
+      </Indent>
+    </>
   }
 
   if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
-    return {
-      type: 'indented',
-      indented: <ValueFrame type='html element'>
-        <DOM>{value}</DOM>
-      </ValueFrame>,
-    }
+    return <>
+      {prefix}
+      <Indent>
+        <ValueFrame type='html element'>
+          <DOM>{value}</DOM>
+        </ValueFrame>
+      </Indent>
+    </>
   }
 
   if (value instanceof Blob) {
-    return {
-      type: 'indented',
-      indented: <ValueFrame type='blob'>
-        <button onClick={() => saveFile(value, 'file')}>download</button>,
-      </ValueFrame>,
-    }
+    return <>
+      {prefix}
+      <Indent>
+        <ValueFrame type='blob'>
+          <button onClick={() => saveFile(value, 'file')}>download</button>,
+        </ValueFrame>
+      </Indent>
+    </>;
   }
 
-  if (value instanceof Function) {
-    return {
-      type: 'inline',
-      inline: <ObjectInspector data={value}/>
-    }
-  }
-
-  if (value instanceof Object) {
+  if (value instanceof Object && !(value instanceof Function)) {
     const isArray = value instanceof Array;
-    return {
-      type: 'indented',
-      open: <span style={valueFont}>{isArray ? '[' : '{'}</span>,
-      indented: Object.entries(value).map(([key, value]) => {
-        const presentation = valuePresentation({value});
-
-        if (presentation.type === 'inline') {
-          return <div style={{...flexRow()}}>
-            { !isArray &&
+    return <>
+      <WithPrefix prefix={prefix}>
+        <span style={valueFont} title={path}>{isArray ? '[' : '{'}</span>
+      </WithPrefix>
+      <Indent>
+        {Object.entries(value).map(([key, value]) =>
+          <Value
+            value={value}
+            prefix={
+              !isArray &&
               <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
             }
-            {presentation.inline}
-          </div>;
-        } else {
-          return <div style={{...flexCol()}}>
-            <div style={{...flexRow()}}>
-              { !isArray &&
-                <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
-              }
-              {presentation.open}
-            </div>
-            <div style={{marginLeft: 10}}>
-              {presentation.indented}
-            </div>
-            {presentation.close}
-          </div>
-        };
-      }),
-      close: <span style={valueFont}>{isArray ? ']' : '}'}</span>,
-    };
+            path={path + '.' + key}
+          />
+        )}
+      </Indent>
+      <span style={valueFont}>{isArray ? ']' : '}'}</span>
+    </>;
   }
 
   if (typeof value === 'number') {
-    return {
-      type: 'inline',
-      inline: <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
+    return <WithPrefix prefix={prefix}>
+      <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {/* TODO: needs some work */}
         {Number(value.toFixed(3))}
       </div>
-    }
+    </WithPrefix>;
   }
 
   if (typeof value === 'boolean') {
-    return {
-      type: 'inline',
-      inline: <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
+    return <WithPrefix prefix={prefix}>
+      <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {value ? 'true' : 'false'}
       </div>
-    }
+    </WithPrefix>
   }
 
   if (typeof value === 'string') {
-    return {
-      type: 'inline',
-      inline: <ValueFrame>
+    return <WithPrefix prefix={prefix}>
+      <ValueFrame>
         <div style={{color: 'rgb(196, 26, 22)', ...valueFont}}>
           '{value}'
         </div>
       </ValueFrame>
-    }
+    </WithPrefix>
   }
 
-  return {
-    type: 'inline',
-    inline: <ValueFrame>
+  return <WithPrefix prefix={prefix}>
+    <ValueFrame>
       <ObjectInspector data={value}/>
-    </ValueFrame>,
-  };
-}
-
-export const Value = memo(({value}: ValueProps): ReactElement => {
-  const presentation = valuePresentation({value});
-
-  if (presentation.type === 'inline') {
-    return presentation.inline;
-  } else {
-    return <div style={{...flexCol()}}>
-      {presentation.open}
-      <div style={{marginLeft: 10}}>
-        {presentation.indented}
-      </div>
-      {presentation.close}
-    </div>
-  }
-});
-
+    </ValueFrame>
+  </WithPrefix>
+})
 
 
 export type ToolValueProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
