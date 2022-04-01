@@ -1,9 +1,9 @@
-import { memo, useCallback, useContext, useMemo, useRef } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { Replace, updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
+import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import compile from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
 import { usePortalSet } from "../util/PortalSet";
@@ -18,6 +18,7 @@ import IsolateStyles from "../view/IsolateStyles";
 import seedrandom from 'seedrandom';
 import { notebookConfigSetTo } from "./NotebookTool";
 import { createElementFromReact } from "../util/createElementFrom";
+import { DOM } from "../util/DOM";
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
@@ -80,6 +81,7 @@ export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, repo
       const result = compile(translated);
       return result;
     } catch (e) {
+      // console.warn("error with", config.code)
       // console.warn(e);
     }
   }, [config.code])
@@ -97,8 +99,8 @@ export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, repo
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
-
-  const output = useMemo(() => {
+  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+  useEffect(() => {
     if (compiled) {
       const rand = seedrandom('live-compose 2022');
       const scope = {
@@ -107,14 +109,24 @@ export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, repo
         React,
         rand,
         createElementFromReact,
+        DOM,
       };
       try {
-        return {toolValue: compiled(scope)};
-      } catch {
+        const result = compiled(scope);
+        if (result instanceof Promise) {
+          result.then((value) => {
+            setOutput({toolValue: value});
+          })
+        } else {
+          setOutput({toolValue: compiled(scope)});
+        }
+      } catch (e) {
+        // console.warn("error with", config.code)
+        console.warn(e);
+        setOutput(null);
       }
     }
-    return null;
-  }, [compiled, env, outputs])
+  }, [compiled, env, outputs, setOutput])
   useOutput(reportOutput, output);
 
   const render = useCallback(function R({autoFocus}) {

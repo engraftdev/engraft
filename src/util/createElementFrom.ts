@@ -7,9 +7,11 @@ export function createElementFromHTML(htmlString: string) {
   return div.firstChild;
 }
 
-export function createElementFromReact(element: ReactElement<unknown>, callback: (element: ChildNode | null) => void) {
+export function createElementFromReact(element: ReactElement<unknown>): Promise<ChildNode | null> {
   var container = document.createElement('div');
-  ReactDOM.render(element, container, () => {
-    callback(container.firstChild);
-  });
+  return new Promise((resolve) => {
+    ReactDOM.render(element, container, () => {
+      resolve(container.firstChild);
+    });
+  })
 }

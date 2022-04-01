@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import ControlledTextInput from "../util/ControlledTextInput";
@@ -15,13 +15,22 @@ export const ImportTool = memo(({ config, updateConfig, reportOutput, reportView
   const [name, updateName] = useAt(config, updateConfig, 'name');
 
   // TODO: all sorts of caching, error detection, etc
-
   // package search
+  // automatic .default?
 
   const sendRequest = useCallback(async () => {
     const result = await import(/*webpackIgnore: true*/ `https://cdn.skypack.dev/${name}`);
     setResult({toolValue: result});
   }, [name]);
+
+  // special: run when loaded
+  // TODO: think about this
+  useEffect(() => {
+    if (name.length > 0) {
+      sendRequest();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useOutput(reportOutput, result);
 

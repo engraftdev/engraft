@@ -14,7 +14,7 @@ export interface MarkdownConfig {
 export const MarkdownTool = memo(({config, updateConfig, reportView, reportOutput}: ToolProps<MarkdownConfig>) => {
   const [sourceComponent, sourceView, sourceOutput] = useSubTool({config, updateConfig, subKey: 'sourceConfig'})
 
-  const md = useMemo(() => new MarkdownIt({html: true}), [])
+  const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
 
   const sourceOutputWithAlreadyDisplayed = useMemoObject({toolValue: sourceOutput?.toolValue, alreadyDisplayed: true});
   useOutput(reportOutput, sourceOutputWithAlreadyDisplayed);
