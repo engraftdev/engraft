@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { hookToComponent } from "./Use";
 
 export default function useHover(): [(elem: HTMLElement | null) => void, boolean] {
   const [value, setValue] = useState<boolean>(false);
@@ -20,3 +21,5 @@ export default function useHover(): [(elem: HTMLElement | null) => void, boolean
   );
   return [setElem, value];
 }
+
+export const UseHover = hookToComponent(useHover);

@@ -10,6 +10,7 @@ import { ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 import useHover from "../util/useHover";
 import _ from "lodash";
+import { Use } from "../util/Use";
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -117,13 +118,17 @@ const RowDivider = memo(({i, updateCells, smallestUnusedLabel}: {i: number, upda
     })
   }, [i, smallestUnusedLabel, updateCells]);
 
-  const [hoverRef, isHovered] = useHover();
+  // const [hoverRef, isHovered] = useHover();
 
-  return <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
-    <div style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-      {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
-    </div>
-  </div>;
+  return <Use hook={useHover}>
+    {([hoverRef, isHovered]) =>
+      <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
+        <div style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
+        </div>
+      </div>
+    }
+    </Use>;
 });
 
 
