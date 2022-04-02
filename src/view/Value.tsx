@@ -42,12 +42,6 @@ const spacing: CSSProperties = {
   marginBottom: 3,
 }
 
-export interface ValueProps {
-  value: unknown;
-  prefix?: ReactNode;
-  path?: string;
-}
-
 export const Indent = memo(({children}: {children: ReactNode}) =>
   <div style={{marginLeft: 10, ...flexCol(), ...spacing}}>
     {children}
@@ -65,7 +59,17 @@ export const WithPrefix = memo(({children, prefix}: {children: ReactElement, pre
   }
 });
 
-export const Value = memo(({value, prefix, path = '$'}: ValueProps) => {
+function pathString(path: string[]) {
+  return `$.${path.join('.')}`;
+}
+
+export interface ValueProps {
+  value: unknown;
+  prefix?: ReactNode;
+  path?: string[];
+}
+
+export const Value = memo(({value, prefix, path = []}: ValueProps) => {
   const maybeElement = value as {} | null | undefined;
 
   if (isValidElement(maybeElement)) {
@@ -140,7 +144,7 @@ export const Value = memo(({value, prefix, path = '$'}: ValueProps) => {
 })
 
 
-const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}) => {
+const ValueComposite = memo(({value, prefix, path = []}: ValueProps & {value: Object}) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [hoverRef, isHovered] = useHover<HTMLDivElement>();
 
@@ -150,7 +154,7 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
     return <>
       <WithPrefix prefix={prefix}>
         <div ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-          <span style={valueFont} title={path}>{isArray ? '[' : '{'}</span>
+          <span style={valueFont} title={pathString(path)}>{isArray ? '[' : '{'}</span>
           { isHovered &&
             <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
           }
@@ -163,9 +167,9 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
             value={value}
             prefix={
               !isArray &&
-              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
+              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
             }
-            path={path + '.' + key}
+            path={[...path, key]}
           />
         )}
       </Indent>
@@ -177,7 +181,7 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
     if (isArray) {
       abbreviated = <>
         [
-        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={path}>
+        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={pathString(path)}>
           {count(value.length, 'element', 'elements')}
         </span>
         ]
@@ -185,7 +189,7 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
     } else {
       abbreviated = <>
         {'{'}
-        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={path}>
+        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={pathString(path)}>
           {Object.keys(value).join(', ')}
         </span>
         {'}'}
@@ -194,7 +198,7 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
     return <WithPrefix prefix={prefix}>
       <div
           ref={hoverRef}
-          title={path}
+          title={pathString(path)}
           style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
           onClick={() => setIsExpanded(true)}>
         {abbreviated}
