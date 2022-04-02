@@ -152,7 +152,7 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
         <div ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
           <span style={valueFont} title={path}>{isArray ? '[' : '{'}</span>
           { isHovered &&
-            <span style={{...valueFont, marginLeft: 3, cursor: 'pointer'}} onClick={() => setIsExpanded(false)}>⊖</span>
+            <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
           }
         </div>
       </WithPrefix>
@@ -192,11 +192,15 @@ const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}
       </>
     }
     return <WithPrefix prefix={prefix}>
-      <div ref={hoverRef} title={path} style={{...valueFont, ...flexRow(), flexGrow: 1}}>
+      <div
+          ref={hoverRef}
+          title={path}
+          style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
+          onClick={() => setIsExpanded(true)}>
         {abbreviated}
-        { isHovered &&
-          <span style={{...valueFont, marginLeft: 3, cursor: 'pointer'}} onClick={() => setIsExpanded(true)}>⊕</span>
-        }
+        {/* { isHovered &&
+          <span style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(true)}>⊕</span>
+        } */}
       </div>
     </WithPrefix>
   }
