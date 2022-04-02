@@ -127,7 +127,9 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
               <div className="row-top" style={{marginBottom: 10}}>
                 <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
                 {' = '}
-                <Value value={inputArray[highlightedIndex]?.toolValue} />
+                <div style={{minWidth: 0}}>
+                  <Value value={inputArray[highlightedIndex]?.toolValue}/>
+                </div>
               </div>
               <div>
                 <ShowView view={perItemViews[highlightedIndex]}/>
