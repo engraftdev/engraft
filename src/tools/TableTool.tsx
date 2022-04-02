@@ -9,7 +9,7 @@ export interface TableConfig {
   toolName: 'table';
   inputConfig: ToolConfig;
 }
-export const TableTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<TableConfig>) => {
+export const TableTool = memo(function TableTool({ config, updateConfig, reportOutput, reportView }: ToolProps<TableConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
   const inputOutputWithAlreadyDisplayed = useMemoObject({toolValue: inputOutput?.toolValue, alreadyDisplayed: true});
   useOutput(reportOutput, inputOutputWithAlreadyDisplayed);

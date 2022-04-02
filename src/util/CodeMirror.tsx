@@ -11,7 +11,7 @@ export interface MyCodeMirrorProps {
   autoFocus: boolean;
 }
 
-const CodeMirror = memo(({extensions, text, onChange, autoFocus}: MyCodeMirrorProps) => {
+const CodeMirror = memo(function CodeMirror({extensions, text, onChange, autoFocus}: MyCodeMirrorProps) {
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();

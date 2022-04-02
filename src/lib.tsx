@@ -13,7 +13,7 @@ interface EmbedProps {
   initialConfigJson: string | undefined;
 }
 
-export const EmbedComponent = memo(({variables, initialConfigJson, reportOutput}: EmbedProps) => {
+export const EmbedComponent = memo(function EmbedComponent({variables, initialConfigJson, reportOutput}: EmbedProps) {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(codeConfigSetTo(''));
   useEffect(() => {
     if (!initialConfigJson) { return; }

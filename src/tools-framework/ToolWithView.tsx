@@ -6,7 +6,7 @@ import { ShowView } from "./useSubTool";
 
 type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & ToolViewProps;
 
-export const ToolWithView = memo(({ config, updateConfig, reportOutput, ...rest }: ToolWithViewProps) => {
+export const ToolWithView = memo(function ToolWithView({ config, updateConfig, reportOutput, ...rest }: ToolWithViewProps) {
   const [view, setView] = useStateSetOnly<ToolView | null>(null);
 
   const Tool = toolIndex[config.toolName];

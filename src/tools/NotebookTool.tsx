@@ -27,7 +27,7 @@ interface Cell {
 
 const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
-export const NotebookTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) => {
+export const NotebookTool = memo(function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
   const [cells, updateCells] = useAt(config, updateConfig, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -109,7 +109,7 @@ export function notebookConfigSetTo(config: ToolConfig): NotebookConfig {
 }
 
 
-const RowDivider = memo(({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) => {
+const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) {
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
@@ -144,7 +144,7 @@ interface CellModelProps {
   reportOutput: (id: string, value: ToolValue | null) => void;
 }
 
-const CellModel = memo(({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) => {
+const CellModel = memo(function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) {
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var.id === id);
     if (i === -1) {
@@ -204,7 +204,7 @@ interface CellViewProps {
   removeCell: () => void;
 }
 
-const CellView = memo(({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) => {
+const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   return <>

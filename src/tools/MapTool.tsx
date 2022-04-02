@@ -18,7 +18,7 @@ export interface MapConfig extends ToolConfig {
   perItemConfig: ToolConfig;
 }
 
-export const MapTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<MapConfig>) => {
+export const MapTool = memo(function MapTool({ config, updateConfig, reportOutput, reportView }: ToolProps<MapConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);

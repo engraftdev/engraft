@@ -9,7 +9,7 @@ export interface ImportConfig extends ToolConfig {
   name: string;
 }
 
-export const ImportTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<ImportConfig>) => {
+export const ImportTool = memo(function ImportTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ImportConfig>) {
   const [result, setResult] = useState<ToolValue | null>(null);
 
   const [name, updateName] = useAt(config, updateConfig, 'name');

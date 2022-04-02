@@ -28,7 +28,7 @@ export interface ShowViewProps extends ToolViewProps {
   view: ToolView | null;
 }
 
-export const ShowView = memo(({view, ...rest}: ShowViewProps) => {
+export const ShowView = memo(function ShowView({view, ...rest}: ShowViewProps) {
   if (!view) {
     return null;
   }

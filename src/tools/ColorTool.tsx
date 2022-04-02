@@ -10,7 +10,7 @@ export interface ColorConfig {
   g: number;
   b: number;
 }
-export const ColorTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<ColorConfig>) => {
+export const ColorTool = memo(function ColorTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ColorConfig>) {
   const output = useMemoObject({toolValue: `rgb(${config.r}, ${config.g}, ${config.b})`});
   useOutput(reportOutput, output);
 

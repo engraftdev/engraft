@@ -13,7 +13,7 @@ import { flexCol, flexRow, inlineBlock } from "./styles";
 
 
 
-export const ValueFrame = memo(({children, type, style, ...props}: {type?: string} & HTMLProps<HTMLDivElement>) => {
+export const ValueFrame = memo(function ValueFrame({children, type, style, ...props}: {type?: string} & HTMLProps<HTMLDivElement>) {
   const withShadow = <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
     {children}
   </ScrollShadow>
@@ -43,11 +43,11 @@ const spacing: CSSProperties = {
   marginBottom: 3,
 }
 
-export const Indent = memo(({children}: {children: ReactNode}) =>
-  <div style={{marginLeft: 10, ...flexCol(), ...spacing}}>
+export const Indent = memo(function Indent({children}: {children: ReactNode}) {
+  return <div style={{marginLeft: 10, ...flexCol(), ...spacing}}>
     {children}
-  </div>
-);
+  </div>;
+});
 
 export const WithPrefix = memo(function WithPrefix({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
   if (prefix) {
@@ -79,7 +79,7 @@ const highlight: CSSProperties = {
   backgroundColor: "rgba(0,0,0,0.1)",
 }
 
-export const Value = memo(({value, prefix, path = []}: ValueProps) => {
+export const Value = memo(function Value({value, prefix, path = []}: ValueProps) {
   const maybeElement = value as {} | null | undefined;
 
   const metaHeld = useKeyHeld('Meta');
@@ -158,7 +158,7 @@ export const Value = memo(({value, prefix, path = []}: ValueProps) => {
 })
 
 
-const ValueComposite = memo(({value, prefix, path = []}: ValueProps & {value: Object}) => {
+const ValueComposite = memo(function ValueComposite({value, prefix, path = []}: ValueProps & {value: Object}) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [hoverRef, isHovered] = useHover();
 
@@ -233,7 +233,7 @@ export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
 }
 
 // TODO: awful naming huh?
-export const ValueOfTool = memo(({toolValue, style, ...props}: ValueOfToolProps) => {
+export const ValueOfTool = memo(function ValueOfTool({toolValue, style, ...props}: ValueOfToolProps) {
   const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
 
   useEffect(() => {

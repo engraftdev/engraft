@@ -95,7 +95,7 @@ export interface ProvideVarProps {
   children?: ReactNode | undefined,
 }
 
-export const ProvideVar = memo(({config, value, children}: ProvideVarProps) => {
+export const ProvideVar = memo(function ProvideVar({config, value, children}: ProvideVarProps) {
   const info = useMemoObject({config, value});
 
   return <AddToContext context={EnvContext} k={config.id} v={info}>

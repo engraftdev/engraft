@@ -23,7 +23,7 @@ function varInfoObject(varInfos: VarInfo[]) {
   return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));
 }
 
-const App = memo(() => {
+const App = memo(function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these

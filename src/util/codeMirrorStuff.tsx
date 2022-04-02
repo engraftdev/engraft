@@ -124,7 +124,7 @@ export interface SubToolProps {
   updateViews: Updater<{[id: string]: ToolView | null}>,
 }
 
-export const SubTool = memo(({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) => {
+export const SubTool = memo(function SubTool({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) {
   const [config, updateConfig] = useAt(subToolConfigs, updateSubToolConfigs, id);
 
   const reportOutput = useCallback((output) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
@@ -150,7 +150,7 @@ export interface ToolFrameProps {
   possibleEnv: PossibleVarInfos;
 }
 
-export const ToolFrame = memo(({children, config, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) => {
+export const ToolFrame = memo(function ToolFrame({children, config, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>

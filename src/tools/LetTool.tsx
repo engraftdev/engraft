@@ -12,7 +12,7 @@ export interface LetConfig extends ToolConfig {
   bodyConfig: ToolConfig;
 }
 
-export const LetTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) => {
+export const LetTool = memo(function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
   const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'});
   const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'});
 

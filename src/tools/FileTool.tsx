@@ -9,7 +9,7 @@ export interface FileConfig {
   toolName: 'file';
   dataUrl: string | null;
 }
-export const FileTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<FileConfig>) => {
+export const FileTool = memo(function FileTool({ config, updateConfig, reportOutput, reportView }: ToolProps<FileConfig>) {
   const output = useMemoObject({toolValue: config.dataUrl});
   useOutput(reportOutput, output);
 

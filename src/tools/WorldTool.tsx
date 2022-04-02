@@ -14,7 +14,7 @@ export interface WorldConfig {
   viewConfig: ToolConfig;
 }
 
-export const WorldTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) => {
+export const WorldTool = memo(function WorldTool({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) {
   const [initComponent, initView, initOutput] = useSubTool({config, updateConfig, subKey: 'initConfig'})
 
   const [iterationsCount, updateIterationsCount] = useAt(config, updateConfig, 'iterationsCount');

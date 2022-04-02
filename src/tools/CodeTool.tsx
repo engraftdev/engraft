@@ -35,7 +35,7 @@ export interface CodeConfigToolMode {
   subConfig: ToolConfig
 }
 
-export const CodeTool = memo((props: ToolProps<CodeConfig>) => {
+export const CodeTool = memo(function CodeTool(props: ToolProps<CodeConfig>) {
   const {config, updateConfig} = props;
 
   if (config.modeName === 'code') {
@@ -72,7 +72,7 @@ type CodeToolCodeModeProps = Replace<ToolProps<CodeConfig>, {
   updateConfig: Updater<CodeConfig, CodeConfigCodeMode>,
 }>
 
-export const CodeToolCodeMode = memo(({ config, updateConfig, reportOutput, reportView}: CodeToolCodeModeProps) => {
+export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateConfig, reportOutput, reportView}: CodeToolCodeModeProps) {
   const compiled = useMemo(() => {
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
@@ -201,7 +201,7 @@ type CodeToolToolModeProps = Replace<ToolProps<CodeConfig>, {
   updateConfig: Updater<CodeConfig, CodeConfigToolMode>,
 }>
 
-export const CodeToolToolMode = memo(({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) => {
+export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) {
 
   const [component, view, output] = useSubTool({ config, updateConfig, subKey: 'subConfig' })
 

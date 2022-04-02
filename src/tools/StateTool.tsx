@@ -17,7 +17,7 @@ export interface StateConfig extends ToolConfig {
 
 // other ideas include: initialize as undefined every time; some kinda configurable init
 
-export const StateTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) => {
+export const StateTool = memo(function StateTool({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) {
   const [stateValue, updateStateValue] = useAt(config, updateConfig, 'stateValue')
   const setStateValue = useSetter(updateStateValue);
 

@@ -5,7 +5,7 @@ export interface WindowPortalProps {
   children?: ReactNode
 }
 
-const WindowPortal = memo(({children}: WindowPortalProps) => {
+const WindowPortal = memo(function WindowPortal({children}: WindowPortalProps) {
   const containerEl = useMemo(() => document.createElement('div'), []);
   const externalWindow = useRef<Window>();
 

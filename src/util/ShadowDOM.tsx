@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 interface Props extends HTMLProps<HTMLDivElement> {
 }
 
-const ShadowDOM = memo(({children, ...rest}: Props) => {
+const ShadowDOM = memo(function ShadowDOM({children, ...rest}: Props) {
   const [shadowRoot, setShadowRoot] = useState<ShadowRoot | null>(null);
 
   const onDiv = useCallback((div: HTMLDivElement | null) => {

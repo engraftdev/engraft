@@ -22,7 +22,7 @@ export interface TextConfig {
   subTools: {[id: string]: ToolConfig};
 }
 
-export const TextTool = memo(({ config, updateConfig, reportOutput, reportView}: ToolProps<TextConfig>) => {
+export const TextTool = memo(function TextTool({ config, updateConfig, reportOutput, reportView}: ToolProps<TextConfig>) {
   const [text, updateText] = useAt(config, updateConfig, 'text');
 
   const env = useContext(EnvContext)

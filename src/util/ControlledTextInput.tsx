@@ -5,7 +5,7 @@ interface ControlledTextInputProps extends HTMLProps<HTMLInputElement> {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ControlledTextInput = memo((props: ControlledTextInputProps) => {
+const ControlledTextInput = memo(function ControlledTextInput(props: ControlledTextInputProps) {
   const { value, onChange, ...rest } = props;
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLInputElement>(null);
@@ -33,7 +33,7 @@ interface ControlledSpanProps extends HTMLProps<HTMLSpanElement> {
 }
 
 
-export const ControlledSpan = memo((props: ControlledSpanProps) => {
+export const ControlledSpan = memo(function ControlledSpan(props: ControlledSpanProps) {
   const { value, onValue, ...rest } = props;
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLSpanElement>(null);

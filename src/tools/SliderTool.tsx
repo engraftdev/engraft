@@ -11,7 +11,7 @@ export interface SliderConfig {
   max: number;
   step: number;
 }
-export const SliderTool = memo(({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) => {
+export const SliderTool = memo(function SliderTool({ config, updateConfig, reportOutput, reportView }: ToolProps<SliderConfig>) {
   const output = useMemoObject({toolValue: config.value});
   useOutput(reportOutput, output);
 
