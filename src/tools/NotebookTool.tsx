@@ -117,7 +117,7 @@ const RowDivider = memo(({i, updateCells, smallestUnusedLabel}: {i: number, upda
     })
   }, [i, smallestUnusedLabel, updateCells]);
 
-  const [hoverRef, isHovered] = useHover<HTMLDivElement>();
+  const [hoverRef, isHovered] = useHover();
 
   return <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
     <div style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>

@@ -146,7 +146,7 @@ export const Value = memo(({value, prefix, path = []}: ValueProps) => {
 
 const ValueComposite = memo(({value, prefix, path = []}: ValueProps & {value: Object}) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [hoverRef, isHovered] = useHover<HTMLDivElement>();
+  const [hoverRef, isHovered] = useHover();
 
   const isArray = value instanceof Array;
 
