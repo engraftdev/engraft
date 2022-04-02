@@ -1,10 +1,12 @@
-import { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect } from "react";
+import { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
 import { ToolValue } from "../tools-framework/tools";
+import { count } from "../util/count";
 import { DOM } from "../util/DOM";
 import ErrorBoundary from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
 import { useStateSetOnly } from "../util/state";
+import useHover from "../util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
 
@@ -100,25 +102,7 @@ export const Value = memo(({value, prefix, path = '$'}: ValueProps) => {
   }
 
   if (value instanceof Object && !(value instanceof Function)) {
-    const isArray = value instanceof Array;
-    return <>
-      <WithPrefix prefix={prefix}>
-        <span style={valueFont} title={path}>{isArray ? '[' : '{'}</span>
-      </WithPrefix>
-      <Indent>
-        {Object.entries(value).map(([key, value]) =>
-          <Value
-            value={value}
-            prefix={
-              !isArray &&
-              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
-            }
-            path={path + '.' + key}
-          />
-        )}
-      </Indent>
-      <span style={valueFont}>{isArray ? ']' : '}'}</span>
-    </>;
+    return <ValueComposite value={value} prefix={prefix} path={path}/>
   }
 
   if (typeof value === 'number') {
@@ -156,12 +140,78 @@ export const Value = memo(({value, prefix, path = '$'}: ValueProps) => {
 })
 
 
-export type ToolValueProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
+const ValueComposite = memo(({value, prefix, path}: ValueProps & {value: Object}) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [hoverRef, isHovered] = useHover<HTMLDivElement>();
+
+  const isArray = value instanceof Array;
+
+  if (isExpanded) {
+    return <>
+      <WithPrefix prefix={prefix}>
+        <div ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+          <span style={valueFont} title={path}>{isArray ? '[' : '{'}</span>
+          { isHovered &&
+            <span style={{...valueFont, marginLeft: 3, cursor: 'pointer'}} onClick={() => setIsExpanded(false)}>⊖</span>
+          }
+        </div>
+      </WithPrefix>
+      <Indent>
+        {Object.entries(value).map(([key, value]) =>
+          <Value
+            key={key}
+            value={value}
+            prefix={
+              !isArray &&
+              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}}>{key}:</div>
+            }
+            path={path + '.' + key}
+          />
+        )}
+      </Indent>
+      <span style={valueFont}>{isArray ? ']' : '}'}</span>
+    </>;
+  } else {
+    let abbreviated: ReactElement;
+
+    if (isArray) {
+      abbreviated = <>
+        [
+        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={path}>
+          {count(value.length, 'element', 'elements')}
+        </span>
+        ]
+      </>
+    } else {
+      abbreviated = <>
+        {'{'}
+        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={path}>
+          {Object.keys(value).join(', ')}
+        </span>
+        {'}'}
+      </>
+    }
+    return <WithPrefix prefix={prefix}>
+      <div ref={hoverRef} title={path} style={{...valueFont, ...flexRow(), flexGrow: 1}}>
+        {abbreviated}
+        { isHovered &&
+          <span style={{...valueFont, marginLeft: 3, cursor: 'pointer'}} onClick={() => setIsExpanded(true)}>⊕</span>
+        }
+      </div>
+    </WithPrefix>
+  }
+})
+
+
+
+
+
+export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
   toolValue: ToolValue | null;
 }
 
 // TODO: awful naming huh?
-export const ValueOfTool = memo(({toolValue, style, ...props}: ToolValueProps) => {
+export const ValueOfTool = memo(({toolValue, style, ...props}: ValueOfToolProps) => {
   const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
 
   useEffect(() => {
