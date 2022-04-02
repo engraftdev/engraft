@@ -7,6 +7,7 @@ import ErrorBoundary from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
 import { useStateSetOnly } from "../util/state";
 import useHover from "../util/useHover";
+import { useKeyHeld } from "../util/useKeyHeld";
 import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
 
@@ -48,7 +49,7 @@ export const Indent = memo(({children}: {children: ReactNode}) =>
   </div>
 );
 
-export const WithPrefix = memo(({children, prefix}: {children: ReactElement, prefix: ReactNode}) => {
+export const WithPrefix = memo(function WithPrefix({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
   if (prefix) {
     return <div style={{...flexRow()}}>
       {prefix}
@@ -69,8 +70,19 @@ export interface ValueProps {
   path?: string[];
 }
 
+const highlight: CSSProperties = {
+  marginLeft: "-0.125rem",
+  marginRight: "-0.125rem",
+  paddingLeft: "0.125rem",
+  paddingRight: "0.125rem",
+  borderRadius: "0.125rem",
+  backgroundColor: "rgba(0,0,0,0.1)",
+}
+
 export const Value = memo(({value, prefix, path = []}: ValueProps) => {
   const maybeElement = value as {} | null | undefined;
+
+  const metaHeld = useKeyHeld('Meta');
 
   if (isValidElement(maybeElement)) {
     return <>
@@ -128,11 +140,13 @@ export const Value = memo(({value, prefix, path = []}: ValueProps) => {
 
   if (typeof value === 'string') {
     return <WithPrefix prefix={prefix}>
-      <ValueFrame>
-        <div style={{color: 'rgb(196, 26, 22)', ...valueFont}}>
-          '{value}'
-        </div>
-      </ValueFrame>
+      {/* <div style={{...metaHeld && highlight, maxWidth: '100%',}}> */}
+        <ValueFrame style={{...metaHeld && highlight}}>
+          <div style={{color: 'rgb(196, 26, 22)', ...valueFont}}>
+            '{value}'
+          </div>
+        </ValueFrame>
+      {/* </div> */}
     </WithPrefix>
   }
 
