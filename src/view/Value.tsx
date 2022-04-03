@@ -46,10 +46,30 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
   </div>;
 });
 
-export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, children}: {isTopLevelHovered: boolean, children: ReactNode}) {
+export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, path, children}: {isTopLevelHovered: boolean, path: string[], children: ReactNode}) {
   const metaHeld = useKeyHeld('Meta');
 
-  return <div style={{...isTopLevelHovered && metaHeld && highlight}}>
+  const [hoverRef, isHovered] = useHover();
+
+  return <div
+    ref={hoverRef}
+    title={pathString(path)}
+    style={{
+      minWidth: 0,
+      marginLeft: "-0.125rem",
+      marginRight: "-0.125rem",
+      paddingLeft: "0.125rem",
+      paddingRight: "0.125rem",
+      borderRadius: "0.125rem",
+      ...isTopLevelHovered && metaHeld && {
+        backgroundColor: "rgba(0,0,0,0.05)",
+      },
+      ...isHovered && metaHeld && {
+        backgroundColor: "rgba(0,0,0,0.1)",
+        cursor: "pointer",
+      },
+    }}
+  >
     {children}
   </div>
 })
@@ -82,15 +102,6 @@ function pathString(path: string[]) {
   return `$.${path.join('.')}`;
 }
 
-const highlight: CSSProperties = {
-  marginLeft: "-0.125rem",
-  marginRight: "-0.125rem",
-  paddingLeft: "0.125rem",
-  paddingRight: "0.125rem",
-  borderRadius: "0.125rem",
-  backgroundColor: "rgba(0,0,0,0.1)",
-}
-
 export interface ValueProps {
   value: unknown;
 }
@@ -111,33 +122,46 @@ export interface ValueInternalProps {
 }
 
 const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLevelHovered}: ValueInternalProps) {
-  const metaHeld = useKeyHeld('Meta');
+  function wrapIndented(children: ReactNode) {
+    return <WithPrefixIndented prefix={prefix}>
+      <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+        {children}
+      </SubValueHandle>
+    </WithPrefixIndented>;
+  }
+  function wrapInline(children: ReactNode) {
+    return <WithPrefixInline prefix={prefix}>
+      <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+        {children}
+      </SubValueHandle>
+    </WithPrefixInline>;
+  }
 
   // SPECIAL CASES
 
   const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {
-    return <WithPrefixIndented prefix={prefix}>
+    return wrapIndented(
       <ValueFrame type='react element'>
-        <ErrorBoundary>{maybeElement}</ErrorBoundary>,
+        <ErrorBoundary>{maybeElement}</ErrorBoundary>
       </ValueFrame>
-    </WithPrefixIndented>;
+    );
   }
 
   if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
-    return <WithPrefixIndented prefix={prefix}>
+    return wrapIndented(
       <ValueFrame type='html element'>
         <DOM>{value}</DOM>
       </ValueFrame>
-    </WithPrefixIndented>;
+    );
   }
 
   if (value instanceof Blob) {
-    return <WithPrefixIndented prefix={prefix}>
+    return wrapIndented(
       <ValueFrame type='blob'>
-        <button onClick={() => saveFile(value, 'file')}>download</button>,
+        <button onClick={() => saveFile(value, 'file')}>download</button>
       </ValueFrame>
-    </WithPrefixIndented>;
+    );
   }
 
   // OBJECTS & ARRAYS
@@ -149,43 +173,41 @@ const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLev
   // PRIMITIVE VALUES
 
   if (typeof value === 'number') {
-    return <WithPrefixInline prefix={prefix}>
+    return wrapInline(
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {/* TODO: needs some work */}
         {Number(value.toFixed(3))}
       </div>
-    </WithPrefixInline>;
+    );
   }
 
   if (typeof value === 'boolean') {
-    return <WithPrefixInline prefix={prefix}>
+    return wrapInline(
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {value ? 'true' : 'false'}
       </div>
-    </WithPrefixInline>
+    );
   }
 
   if (typeof value === 'string') {
-    return <WithPrefixInline prefix={prefix}>
-      {/* <div style={{...metaHeld && highlight, maxWidth: '100%',}}> */}
-        <ValueFrame style={{...isTopLevelHovered && metaHeld && highlight}}>
-          <div
-              className='Value-is-string'
-              // todo: hacky hanging indent
-              style={{color: 'rgb(196, 26, 22)', ...valueFont, textIndent: -6, paddingLeft: 6}}
-            >
-            '{value}'
-          </div>
-        </ValueFrame>
-      {/* </div> */}
-    </WithPrefixInline>
+    return wrapInline(
+      <ValueFrame>
+        <div
+            className='Value-is-string'
+            // todo: hacky hanging indent
+            style={{color: 'rgb(196, 26, 22)', ...valueFont, textIndent: -6, paddingLeft: 6}}
+          >
+          '{value}'
+        </div>
+      </ValueFrame>
+    );
   }
 
-  return <WithPrefixInline prefix={prefix}>
+  return wrapInline(
     <ValueFrame>
       <ObjectInspector data={value}/>
     </ValueFrame>
-  </WithPrefixInline>
+  )
 })
 
 const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopLevelHovered}: ValueInternalProps & {value: Object}) {
@@ -198,7 +220,9 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
       <WithPrefixInline prefix={prefix}>
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-            <span style={valueFont} title={pathString(path)}>{isArray ? '[' : '{'}</span>
+            <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+              <div style={valueFont}>{isArray ? '[' : '{'}</div>
+            </SubValueHandle>
             { isHovered &&
               <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
             }
@@ -224,7 +248,7 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
           </div>
         )}
       </Indent>
-      <span className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</span>
+      <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
     </>;
   } else {
     let abbreviated: ReactElement;
@@ -232,26 +256,27 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
     if (isArray) {
       abbreviated = <>
         [
-        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={pathString(path)}>
+        <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
           {count(value.length, 'element', 'elements')}
-        </span>
+        </div>
         ]
       </>
     } else {
-      abbreviated = <SubValueHandle isTopLevelHovered={isTopLevelHovered}>
+      abbreviated = <>
         {'{'}
-        <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={pathString(path)}>
+        <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
           {Object.keys(value).join(', ')}
-        </span>
+        </div>
         {'}'}
-      </SubValueHandle>
+      </>
     }
     return <WithPrefixInline prefix={prefix}>
       <div
-          title={pathString(path)}
           style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
           onClick={() => setIsExpanded(true)}>
-        {abbreviated}
+        <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+          {abbreviated}
+        </SubValueHandle>
         {/* { isHovered &&
           <span style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(true)}>⊕</span>
         } */}
