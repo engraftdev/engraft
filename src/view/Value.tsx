@@ -6,7 +6,8 @@ import { DOM } from "../util/DOM";
 import ErrorBoundary from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
 import { useStateSetOnly } from "../util/state";
-import useHover from "../util/useHover";
+import { Use } from "../util/Use";
+import useHover, { UseHover } from "../util/useHover";
 import { useKeyHeld } from "../util/useKeyHeld";
 import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
@@ -14,7 +15,7 @@ import { flexCol, flexRow, inlineBlock } from "./styles";
 
 
 export const ValueFrame = memo(function ValueFrame({children, type, style, ...props}: {type?: string} & HTMLProps<HTMLDivElement>) {
-  const withShadow = <ScrollShadow className="Value" style={{...style, overflow: 'auto'}} {...props}>
+  const withShadow = <ScrollShadow className="ValueFrame-shadow" style={{...style, overflow: 'auto'}} {...props}>
     {children}
   </ScrollShadow>
 
@@ -39,19 +40,23 @@ const valueFont: CSSProperties = {
   fontFamily: 'Menlo, monospace',
 }
 
-const spacing: CSSProperties = {
-  marginBottom: 3,
-}
-
-export const Indent = memo(function Indent({children}: {children: ReactNode}) {
-  return <div style={{marginLeft: 10, ...flexCol(), ...spacing}}>
+export const Indent = memo(function Indent({children, style}: {children: ReactNode, style?: CSSProperties}) {
+  return <div style={{marginLeft: 10, ...flexCol('left'), ...style}}>
     {children}
   </div>;
 });
 
+export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, children}: {isTopLevelHovered: boolean, children: ReactNode}) {
+  const metaHeld = useKeyHeld('Meta');
+
+  return <div style={{...isTopLevelHovered && metaHeld && highlight}}>
+    {children}
+  </div>
+})
+
 export const WithPrefix = memo(function WithPrefix({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
   if (prefix) {
-    return <div style={{...flexRow()}}>
+    return <div className='WithPrefix-row' style={{...flexRow()}}>
       {prefix}
       {children}
     </div>
@@ -68,6 +73,8 @@ export interface ValueProps {
   value: unknown;
   prefix?: ReactNode;
   path?: string[];
+  isTopLevel?: boolean;
+  isTopLevelHovered?: boolean;
 }
 
 const highlight: CSSProperties = {
@@ -79,11 +86,18 @@ const highlight: CSSProperties = {
   backgroundColor: "rgba(0,0,0,0.1)",
 }
 
-export const Value = memo(function Value({value, prefix, path = []}: ValueProps) {
-  const maybeElement = value as {} | null | undefined;
-
+export const Value = memo(function Value({value, prefix, path = [], isTopLevel = true, isTopLevelHovered}: ValueProps) {
   const metaHeld = useKeyHeld('Meta');
 
+  if (isTopLevel) {
+    return <UseHover children={([hoverRef, isHovered]) =>
+      <div ref={hoverRef}>
+        <Value {...{value, prefix, path, isTopLevel: false, isTopLevelHovered: isHovered}} />
+      </div>
+    }/>
+  }
+
+  const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {
     return <>
       {prefix}
@@ -118,7 +132,7 @@ export const Value = memo(function Value({value, prefix, path = []}: ValueProps)
   }
 
   if (value instanceof Object && !(value instanceof Function)) {
-    return <ValueComposite value={value} prefix={prefix} path={path}/>
+    return <ValueComposite value={value} prefix={prefix} path={path} isTopLevelHovered={isTopLevelHovered}/>
   }
 
   if (typeof value === 'number') {
@@ -141,8 +155,12 @@ export const Value = memo(function Value({value, prefix, path = []}: ValueProps)
   if (typeof value === 'string') {
     return <WithPrefix prefix={prefix}>
       {/* <div style={{...metaHeld && highlight, maxWidth: '100%',}}> */}
-        <ValueFrame style={{...metaHeld && highlight}}>
-          <div style={{color: 'rgb(196, 26, 22)', ...valueFont}}>
+        <ValueFrame style={{...isTopLevelHovered && metaHeld && highlight}}>
+          <div
+              className='Value-is-string'
+              // todo: hacky hanging indent
+              style={{color: 'rgb(196, 26, 22)', ...valueFont, textIndent: -6, paddingLeft: 6}}
+            >
             '{value}'
           </div>
         </ValueFrame>
@@ -158,36 +176,45 @@ export const Value = memo(function Value({value, prefix, path = []}: ValueProps)
 })
 
 
-const ValueComposite = memo(function ValueComposite({value, prefix, path = []}: ValueProps & {value: Object}) {
+const ValueComposite = memo(function ValueComposite({value, prefix, path = [], isTopLevelHovered = false}: ValueProps & {value: Object}) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [hoverRef, isHovered] = useHover();
 
   const isArray = value instanceof Array;
 
   if (isExpanded) {
     return <>
       <WithPrefix prefix={prefix}>
-        <div ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-          <span style={valueFont} title={pathString(path)}>{isArray ? '[' : '{'}</span>
-          { isHovered &&
-            <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
-          }
-        </div>
-      </WithPrefix>
-      <Indent>
-        {Object.entries(value).map(([key, value]) =>
-          <Value
-            key={key}
-            value={value}
-            prefix={
-              !isArray &&
-              <div style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
+        <Use hook={useHover} children={([hoverRef, isHovered]) =>
+          <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+            <span style={valueFont} title={pathString(path)}>{isArray ? '[' : '{'}</span>
+            { isHovered &&
+              <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
             }
-            path={[...path, key]}
-          />
+          </div>
+        }/>
+      </WithPrefix>
+      <Indent style={{padding: 1}}>
+        {Object.entries(value).map(([key, value]) =>
+          <div className='ValueComposite-item' style={{
+            marginTop: 1,
+            marginBottom: 1,
+            maxWidth: '100%',
+          }}>
+            <Value
+              key={key}
+              value={value}
+              prefix={
+                !isArray &&
+                <div className='prefix-with-key' style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
+              }
+              path={[...path, key]}
+              isTopLevel={false}
+              isTopLevelHovered={isTopLevelHovered}
+            />
+          </div>
         )}
       </Indent>
-      <span style={valueFont}>{isArray ? ']' : '}'}</span>
+      <span className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</span>
     </>;
   } else {
     let abbreviated: ReactElement;
@@ -201,17 +228,16 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path = []}: 
         ]
       </>
     } else {
-      abbreviated = <>
+      abbreviated = <SubValueHandle isTopLevelHovered={isTopLevelHovered}>
         {'{'}
         <span style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}} title={pathString(path)}>
           {Object.keys(value).join(', ')}
         </span>
         {'}'}
-      </>
+      </SubValueHandle>
     }
     return <WithPrefix prefix={prefix}>
       <div
-          ref={hoverRef}
           title={pathString(path)}
           style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
           onClick={() => setIsExpanded(true)}>
