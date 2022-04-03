@@ -54,9 +54,9 @@ export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, c
   </div>
 })
 
-export const WithPrefix = memo(function WithPrefix({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
+export const WithPrefixInline = memo(function WithPrefixInline({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
   if (prefix) {
-    return <div className='WithPrefix-row' style={{...flexRow()}}>
+    return <div className='WithPrefixInline-row' style={{...flexRow()}}>
       {prefix}
       {children}
     </div>
@@ -65,16 +65,21 @@ export const WithPrefix = memo(function WithPrefix({children, prefix}: {children
   }
 });
 
+export const WithPrefixIndented = memo(function WithPrefixIndented({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
+  if (prefix) {
+    return <>
+      {prefix}
+      <Indent>
+        {children}
+      </Indent>
+    </>
+  } else {
+    return children;
+  }
+});
+
 function pathString(path: string[]) {
   return `$.${path.join('.')}`;
-}
-
-export interface ValueProps {
-  value: unknown;
-  prefix?: ReactNode;
-  path?: string[];
-  isTopLevel?: boolean;
-  isTopLevelHovered?: boolean;
 }
 
 const highlight: CSSProperties = {
@@ -86,74 +91,82 @@ const highlight: CSSProperties = {
   backgroundColor: "rgba(0,0,0,0.1)",
 }
 
-export const Value = memo(function Value({value, prefix, path = [], isTopLevel = true, isTopLevelHovered}: ValueProps) {
+export interface ValueProps {
+  value: unknown;
+}
+
+export const Value = memo(function Value({value}: ValueProps) {
+  return <UseHover children={([hoverRef, isHovered]) =>
+    <div ref={hoverRef}>
+      <ValueInternal {...{value, path: [], isTopLevelHovered: isHovered}} />
+    </div>
+  }/>
+})
+
+export interface ValueInternalProps {
+  value: unknown;
+  prefix?: ReactNode;
+  path: string[];
+  isTopLevelHovered: boolean;
+}
+
+const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLevelHovered}: ValueInternalProps) {
   const metaHeld = useKeyHeld('Meta');
 
-  if (isTopLevel) {
-    return <UseHover children={([hoverRef, isHovered]) =>
-      <div ref={hoverRef}>
-        <Value {...{value, prefix, path, isTopLevel: false, isTopLevelHovered: isHovered}} />
-      </div>
-    }/>
-  }
+  // SPECIAL CASES
 
   const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {
-    return <>
-      {prefix}
-      <Indent>
-        <ValueFrame type='react element'>
-          <ErrorBoundary>{maybeElement}</ErrorBoundary>,
-        </ValueFrame>
-      </Indent>
-    </>
+    return <WithPrefixIndented prefix={prefix}>
+      <ValueFrame type='react element'>
+        <ErrorBoundary>{maybeElement}</ErrorBoundary>,
+      </ValueFrame>
+    </WithPrefixIndented>;
   }
 
   if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
-    return <>
-      {prefix}
-      <Indent>
-        <ValueFrame type='html element'>
-          <DOM>{value}</DOM>
-        </ValueFrame>
-      </Indent>
-    </>
+    return <WithPrefixIndented prefix={prefix}>
+      <ValueFrame type='html element'>
+        <DOM>{value}</DOM>
+      </ValueFrame>
+    </WithPrefixIndented>;
   }
 
   if (value instanceof Blob) {
-    return <>
-      {prefix}
-      <Indent>
-        <ValueFrame type='blob'>
-          <button onClick={() => saveFile(value, 'file')}>download</button>,
-        </ValueFrame>
-      </Indent>
-    </>;
+    return <WithPrefixIndented prefix={prefix}>
+      <ValueFrame type='blob'>
+        <button onClick={() => saveFile(value, 'file')}>download</button>,
+      </ValueFrame>
+    </WithPrefixIndented>;
   }
+
+  // OBJECTS & ARRAYS
 
   if (value instanceof Object && !(value instanceof Function)) {
     return <ValueComposite value={value} prefix={prefix} path={path} isTopLevelHovered={isTopLevelHovered}/>
   }
 
+  // PRIMITIVE VALUES
+
   if (typeof value === 'number') {
-    return <WithPrefix prefix={prefix}>
+    return <WithPrefixInline prefix={prefix}>
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {/* TODO: needs some work */}
         {Number(value.toFixed(3))}
       </div>
-    </WithPrefix>;
+    </WithPrefixInline>;
   }
 
   if (typeof value === 'boolean') {
-    return <WithPrefix prefix={prefix}>
+    return <WithPrefixInline prefix={prefix}>
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {value ? 'true' : 'false'}
       </div>
-    </WithPrefix>
+    </WithPrefixInline>
   }
 
   if (typeof value === 'string') {
-    return <WithPrefix prefix={prefix}>
+    return <WithPrefixInline prefix={prefix}>
       {/* <div style={{...metaHeld && highlight, maxWidth: '100%',}}> */}
         <ValueFrame style={{...isTopLevelHovered && metaHeld && highlight}}>
           <div
@@ -165,25 +178,24 @@ export const Value = memo(function Value({value, prefix, path = [], isTopLevel =
           </div>
         </ValueFrame>
       {/* </div> */}
-    </WithPrefix>
+    </WithPrefixInline>
   }
 
-  return <WithPrefix prefix={prefix}>
+  return <WithPrefixInline prefix={prefix}>
     <ValueFrame>
       <ObjectInspector data={value}/>
     </ValueFrame>
-  </WithPrefix>
+  </WithPrefixInline>
 })
 
-
-const ValueComposite = memo(function ValueComposite({value, prefix, path = [], isTopLevelHovered = false}: ValueProps & {value: Object}) {
+const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopLevelHovered}: ValueInternalProps & {value: Object}) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const isArray = value instanceof Array;
 
   if (isExpanded) {
     return <>
-      <WithPrefix prefix={prefix}>
+      <WithPrefixInline prefix={prefix}>
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
             <span style={valueFont} title={pathString(path)}>{isArray ? '[' : '{'}</span>
@@ -192,23 +204,21 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path = [], i
             }
           </div>
         }/>
-      </WithPrefix>
+      </WithPrefixInline>
       <Indent style={{padding: 1}}>
         {Object.entries(value).map(([key, value]) =>
-          <div className='ValueComposite-item' style={{
+          <div key={key} className='ValueComposite-item' style={{
             marginTop: 1,
             marginBottom: 1,
             maxWidth: '100%',
           }}>
-            <Value
-              key={key}
+            <ValueInternal
               value={value}
               prefix={
                 !isArray &&
                 <div className='prefix-with-key' style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
               }
               path={[...path, key]}
-              isTopLevel={false}
               isTopLevelHovered={isTopLevelHovered}
             />
           </div>
@@ -236,7 +246,7 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path = [], i
         {'}'}
       </SubValueHandle>
     }
-    return <WithPrefix prefix={prefix}>
+    return <WithPrefixInline prefix={prefix}>
       <div
           title={pathString(path)}
           style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
@@ -246,7 +256,7 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path = [], i
           <span style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(true)}>⊕</span>
         } */}
       </div>
-    </WithPrefix>
+    </WithPrefixInline>
   }
 })
 
