@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { hookToComponent } from "./Use";
+import { useElementEventListener } from "./useEventListener";
 
 let mouseClientX: number;
 let mouseClientY: number;
@@ -22,18 +23,8 @@ export default function useHover(): [(elem: HTMLElement | null) => void, boolean
     }
   }, [elem])
 
-  useEffect(() => {
-    if (elem) {
-      const setIsHoveredTrue = () => setIsHovered(true);
-      const setIsHoveredFalse = () => setIsHovered(false);
-      elem.addEventListener("mouseenter", setIsHoveredTrue);
-      elem.addEventListener("mouseleave", setIsHoveredFalse);
-      return () => {
-        elem.removeEventListener("mouseenter", setIsHoveredTrue);
-        elem.removeEventListener("mouseleave", setIsHoveredFalse);
-      };
-    }
-  }, [elem]);
+  useElementEventListener(elem, 'mouseenter', useCallback(() => setIsHovered(true), []));
+  useElementEventListener(elem, 'mouseleave', useCallback(() => setIsHovered(false), []));
 
   return [setElem, isHovered];
 }
