@@ -76,7 +76,7 @@ export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, p
 
 export const WithPrefixInline = memo(function WithPrefixInline({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
   if (prefix) {
-    return <div className='WithPrefixInline-row' style={{...flexRow()}}>
+    return <div className='WithPrefixInline-row' style={{...flexRow(), width: '100%'}}>
       {prefix}
       {children}
     </div>
@@ -224,7 +224,15 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
               <div style={valueFont}>{isArray ? '[' : '{'}</div>
             </SubValueHandle>
             { isHovered &&
-              <div style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(false)}>⊖</div>
+              <div
+                style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  setIsExpanded(false);
+                }}
+              >
+                ⊖
+              </div>
             }
           </div>
         }/>
@@ -234,7 +242,7 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
           <div key={key} className='ValueComposite-item' style={{
             marginTop: 1,
             marginBottom: 1,
-            maxWidth: '100%',
+            width: '100%',
           }}>
             <ValueInternal
               value={value}
@@ -271,16 +279,26 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
       </>
     }
     return <WithPrefixInline prefix={prefix}>
-      <div
-          style={{...valueFont, ...flexRow(), flexGrow: 1, cursor: 'pointer'}}
-          onClick={() => setIsExpanded(true)}>
-        <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
-          {abbreviated}
-        </SubValueHandle>
-        {/* { isHovered &&
-          <span style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}} onClick={() => setIsExpanded(true)}>⊕</span>
-        } */}
-      </div>
+      <Use hook={useHover} children={([hoverRef, isHovered]) =>
+        <div className="ValueComposite-abbreviated-row" ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+          <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+            <div style={{...valueFont, ...flexRow()}}>
+              {abbreviated}
+            </div>
+          </SubValueHandle>
+          { isHovered &&
+              <span
+                style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  setIsExpanded(true);
+                }}
+              >
+                ⊕
+              </span>
+          }
+        </div>
+      }/>
     </WithPrefixInline>
   }
 })
