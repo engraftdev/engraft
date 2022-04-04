@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { hookToComponent } from "./Use";
 import { useElementEventListener } from "./useEventListener";
 

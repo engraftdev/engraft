@@ -6,7 +6,7 @@ export function useWindowEventListener<K extends keyof WindowEventMap>(type: K, 
     return () => {
       window.removeEventListener(type, listener);
     };
-  }, []);
+  }, [listener, type]);
 }
 
 export function useElementEventListener<K extends keyof HTMLElementEventMap>(element: HTMLElement | null, type: K, listener: (ev: HTMLElementEventMap[K]) => void) {
@@ -17,5 +17,5 @@ export function useElementEventListener<K extends keyof HTMLElementEventMap>(ele
         element.removeEventListener(type, listener);
       };
     }
-  }, [element]);
+  }, [element, listener, type]);
 }

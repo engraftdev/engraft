@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useWindowEventListener } from "./useEventListener";
 
 // Known limitation: When you leave a window and come back later, we don't know
@@ -15,7 +15,7 @@ export function useKeyHeld(targetKey: string) {
       if (ev.key === targetKey) {
         setKeyHeld(true);
       }
-    }, [])
+    }, [targetKey])
   );
 
   useWindowEventListener('keyup',
@@ -23,7 +23,7 @@ export function useKeyHeld(targetKey: string) {
       if (ev.key === targetKey) {
         setKeyHeld(false);
       }
-    }, [])
+    }, [targetKey])
   );
 
   useWindowEventListener('blur',
