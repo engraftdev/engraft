@@ -25,7 +25,7 @@ export const ValueFrame = memo(function ValueFrame({children, type, style, ...pr
                    borderTopLeftRadius: 5, borderTopRightRadius: 5, paddingLeft: 3, paddingRight: 3}}>
         {type}
       </div>
-      <div style={{border: '1px dashed gray'}}>
+      <div style={{border: '1px dashed gray', width: '100%'}}>
         {withShadow}
       </div>
     </div>;
@@ -70,7 +70,7 @@ export interface ValueProps {
 }
 
 export const Value = memo(function Value({value, customizations = {SubValueHandle: SubValueHandleDefault}}: ValueProps) {
-  return <ValueInternal {...{value, path: [], customizations}} />
+  return <ValueInternal value={value} path={[]} customizations={customizations} isTopLevel={true} />
 })
 
 export interface ValueInternalProps {
@@ -79,9 +79,10 @@ export interface ValueInternalProps {
   prefix?: ReactNode;
   suffix?: ReactNode;
   customizations: ValueCustomizations;
+  isTopLevel?: boolean;
 }
 
-const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations}: ValueInternalProps) {
+const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations, isTopLevel}: ValueInternalProps) {
   function wrapInline(children: ReactNode) {
     return <div className='ValueInternal-wrapInline-row' style={{...flexRow(), width: '100%'}}>
       {prefix}
@@ -146,7 +147,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
 
   if (typeof value === 'string') {
     return wrapInline(
-      <ValueFrame>
+      <ValueFrame style={{...!isTopLevel && {maxHeight: 50}}}>
         <div
             className='Value-is-string'
             // todo: hacky hanging indent

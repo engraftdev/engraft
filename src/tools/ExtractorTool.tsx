@@ -17,12 +17,10 @@ export interface ExtractorConfig extends ToolConfig {
 }
 
 interface ExtractorContextValue {
-  topLevelHovered: boolean;
   selectedPath: string[] | undefined;
   setSelectedPath: (path: string[]) => void;
 }
 const ExtractorContext = createContext<ExtractorContextValue>({
-  topLevelHovered: false,
   selectedPath: undefined,
   setSelectedPath: () => {},
 });
@@ -33,7 +31,7 @@ interface SubValueHandleProps {
 }
 
 export const SubValueHandle = memo(function SubValueHandle({path, children}: SubValueHandleProps) {
-  const { topLevelHovered, selectedPath, setSelectedPath } = useContext(ExtractorContext);
+  const { selectedPath, setSelectedPath } = useContext(ExtractorContext);
 
   const isSelected = selectedPath && pathString(selectedPath) === pathString(path);
 
@@ -52,15 +50,12 @@ export const SubValueHandle = memo(function SubValueHandle({path, children}: Sub
         paddingLeft: "0.125rem",
         paddingRight: "0.125rem",
         borderRadius: "0.125rem",
-        ...topLevelHovered && {
-          backgroundColor: "rgba(0,0,0,0.05)",
-        },
         ...isHovered && {
-          backgroundColor: "rgba(0,0,0,0.1)",
+          backgroundColor: "rgba(0,0,220,0.1)",
           cursor: "pointer",
         },
         ...isSelected && {
-          border: '1px solid black',
+          backgroundColor: "rgba(0,0,220,0.1)",
         }
       }}
       onClick={onClick}
@@ -104,31 +99,40 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
 
     return (
       <div style={{padding: 10}}>
-        <div className="ExtractorTool-input-row" style={{marginBottom: 10}}>
-          input <ShowView view={inputView} autoFocus={autoFocus} />
-        </div>
-
-        <div style={{...flexRow(), marginBottom: 10}}>
-          { selectedPath ?
-            <>
-              Path selected:
-              <tt>{JSON.stringify(selectedPath)}</tt>
-              {!output && <div>(not found)</div>}
-            </> :
-            "No path selected"
-          }
-        </div>
-
-        <Use hook={useHover} children={([hoverRef, topLevelHovered]) =>
-          <div ref={hoverRef}>
-            <ExtractorContext.Provider value={{topLevelHovered, selectedPath, setSelectedPath}}>
-              <ValueOfTool toolValue={inputOutput} customizations={customizations} />
-            </ExtractorContext.Provider>
+        <div
+          className="ExtractorTool-top"
+          style={{
+            position: 'sticky',
+            top: 0,
+            background: 'white',
+            paddingTop: 10,
+            marginTop: -10,
+            paddingBottom: 10,
+            marginBottom: 10,
+          }}
+        >
+          <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+            <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
           </div>
-        }/>
+
+          <div style={{...flexRow(), gap: 10}}>
+            { selectedPath ?
+              <>
+                <span style={{fontWeight: 'bold'}}>path</span>
+                <div style={{fontFamily: 'monospace'}}>{JSON.stringify(selectedPath)}</div>
+                {!output && <div>(not found)</div>}
+              </> :
+              "No path selected"
+            }
+          </div>
+        </div>
+
+        <ExtractorContext.Provider value={{selectedPath, setSelectedPath}}>
+          <ValueOfTool toolValue={inputOutput} customizations={customizations} />
+        </ExtractorContext.Provider>
       </div>
     );
-  }, [inputOutput, inputView]);
+  }, [inputOutput, inputView, output, selectedPath, updateSelectedPath]);
   useView(reportView, render, config);
 
   return <>
