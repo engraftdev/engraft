@@ -1,4 +1,4 @@
-import { CSSProperties, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
+import { CSSProperties, ElementType, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
 import { ToolValue } from "../tools-framework/tools";
 import { count } from "../util/count";
@@ -7,8 +7,7 @@ import ErrorBoundary from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
 import { useStateSetOnly } from "../util/state";
 import { Use } from "../util/Use";
-import useHover, { UseHover } from "../util/useHover";
-import { useKeyHeld } from "../util/useKeyHeld";
+import useHover from "../util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
 
@@ -46,102 +45,58 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
   </div>;
 });
 
-export const SubValueHandle = memo(function SubValueHandle({isTopLevelHovered, path, children}: {isTopLevelHovered: boolean, path: string[], children: ReactNode}) {
-  const metaHeld = useKeyHeld('Meta');
+export interface SubValueHandleProps {
+  path: string[];
+  children: ReactNode;
+}
 
-  const [hoverRef, isHovered] = useHover();
-
-  return <div
-    ref={hoverRef}
-    title={pathString(path)}
-    style={{
-      minWidth: 0,
-      marginLeft: "-0.125rem",
-      marginRight: "-0.125rem",
-      paddingLeft: "0.125rem",
-      paddingRight: "0.125rem",
-      borderRadius: "0.125rem",
-      ...isTopLevelHovered && metaHeld && {
-        backgroundColor: "rgba(0,0,0,0.05)",
-      },
-      ...isHovered && metaHeld && {
-        backgroundColor: "rgba(0,0,0,0.1)",
-        cursor: "pointer",
-      },
-    }}
-  >
+export const SubValueHandleDefault = memo(function SubValueHandleDefault({path, children}: SubValueHandleProps) {
+  return <div title={pathString(path)} style={{minWidth: 0}}>
     {children}
   </div>
 })
 
-export const WithPrefixInline = memo(function WithPrefixInline({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
-  if (prefix) {
-    return <div className='WithPrefixInline-row' style={{...flexRow(), width: '100%'}}>
-      {prefix}
-      {children}
-    </div>
-  } else {
-    return children;
-  }
-});
-
-export const WithPrefixIndented = memo(function WithPrefixIndented({children, prefix}: {children: ReactElement, prefix: ReactNode}) {
-  if (prefix) {
-    return <>
-      {prefix}
-      <Indent>
-        {children}
-      </Indent>
-    </>
-  } else {
-    return children;
-  }
-});
-
-function pathString(path: string[]) {
+export function pathString(path: string[]) {
   return `$.${path.join('.')}`;
+}
+
+export interface ValueCustomizations {
+  SubValueHandle: ElementType<SubValueHandleProps>;
 }
 
 export interface ValueProps {
   value: unknown;
+  customizations?: ValueCustomizations;
 }
 
-export const Value = memo(function Value({value}: ValueProps) {
-  return <UseHover children={([hoverRef, isHovered]) =>
-    <div ref={hoverRef}>
-      <ValueInternal {...{value, path: [], isTopLevelHovered: isHovered}} />
-    </div>
-  }/>
+export const Value = memo(function Value({value, customizations = {SubValueHandle: SubValueHandleDefault}}: ValueProps) {
+  return <ValueInternal {...{value, path: [], customizations}} />
 })
 
 export interface ValueInternalProps {
   value: unknown;
-  prefix?: ReactNode;
   path: string[];
-  isTopLevelHovered: boolean;
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  customizations: ValueCustomizations;
 }
 
-const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLevelHovered}: ValueInternalProps) {
-  function wrapIndented(children: ReactNode) {
-    return <WithPrefixIndented prefix={prefix}>
-      <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
-        {children}
-      </SubValueHandle>
-    </WithPrefixIndented>;
-  }
+const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations}: ValueInternalProps) {
   function wrapInline(children: ReactNode) {
-    return <WithPrefixInline prefix={prefix}>
-      <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+    return <div className='ValueInternal-wrapInline-row' style={{...flexRow(), width: '100%'}}>
+      {prefix}
+      <customizations.SubValueHandle path={path}>
         {children}
-      </SubValueHandle>
-    </WithPrefixInline>;
+      </customizations.SubValueHandle>
+      {suffix}
+    </div>;
   }
 
   // SPECIAL CASES
 
   const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {
-    return wrapIndented(
+    return wrapInline(
       <ValueFrame type='react element'>
         <ErrorBoundary>{maybeElement}</ErrorBoundary>
       </ValueFrame>
@@ -149,7 +104,7 @@ const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLev
   }
 
   if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
-    return wrapIndented(
+    return wrapInline(
       <ValueFrame type='html element'>
         <DOM>{value}</DOM>
       </ValueFrame>
@@ -157,7 +112,7 @@ const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLev
   }
 
   if (value instanceof Blob) {
-    return wrapIndented(
+    return wrapInline(
       <ValueFrame type='blob'>
         <button onClick={() => saveFile(value, 'file')}>download</button>
       </ValueFrame>
@@ -167,7 +122,7 @@ const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLev
   // OBJECTS & ARRAYS
 
   if (value instanceof Object && !(value instanceof Function)) {
-    return <ValueComposite value={value} prefix={prefix} path={path} isTopLevelHovered={isTopLevelHovered}/>
+    return <ValueComposite value={value} prefix={prefix} path={path} customizations={customizations}/>
   }
 
   // PRIMITIVE VALUES
@@ -210,19 +165,20 @@ const ValueInternal = memo(function ValueInternal({value, prefix, path, isTopLev
   )
 })
 
-const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopLevelHovered}: ValueInternalProps & {value: Object}) {
+const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix, customizations}: ValueInternalProps & {value: Object}) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const isArray = value instanceof Array;
 
   if (isExpanded) {
     return <>
-      <WithPrefixInline prefix={prefix}>
+      <div className='ValueComposite-open-row' style={{...flexRow(), width: '100%'}}>
+        {prefix}
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-            <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
+            <customizations.SubValueHandle path={path}>
               <div style={valueFont}>{isArray ? '[' : '{'}</div>
-            </SubValueHandle>
+            </customizations.SubValueHandle>
             { isHovered &&
               <div
                 style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
@@ -236,7 +192,7 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
             }
           </div>
         }/>
-      </WithPrefixInline>
+      </div>
       <Indent style={{padding: 1}}>
         {Object.entries(value).map(([key, value]) =>
           <div key={key} className='ValueComposite-item' style={{
@@ -250,13 +206,19 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
                 !isArray &&
                 <div className='prefix-with-key' style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
               }
+              suffix={
+                <div style={{fontSize: 0}}>,</div>
+              }
               path={[...path, key]}
-              isTopLevelHovered={isTopLevelHovered}
+              customizations={customizations}
             />
           </div>
         )}
       </Indent>
-      <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
+      <div className='ValueComposite-close-row' style={{...flexRow(), width: '100%'}}>
+        <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
+        {suffix}
+      </div>
     </>;
   } else {
     let abbreviated: ReactElement;
@@ -278,28 +240,28 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
         {'}'}
       </>
     }
-    return <WithPrefixInline prefix={prefix}>
-      <Use hook={useHover} children={([hoverRef, isHovered]) =>
-        <div className="ValueComposite-abbreviated-row" ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-          <SubValueHandle isTopLevelHovered={isTopLevelHovered} path={path}>
-            <div style={{...valueFont, ...flexRow()}}>
-              {abbreviated}
-            </div>
-          </SubValueHandle>
-          { isHovered &&
-              <span
-                style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  setIsExpanded(true);
-                }}
-              >
-                ⊕
-              </span>
-          }
-        </div>
-      }/>
-    </WithPrefixInline>
+    return <Use hook={useHover} children={([hoverRef, isHovered]) =>
+      <div className="ValueComposite-abbreviated-row" ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+        {prefix}
+        <customizations.SubValueHandle path={path}>
+          <div style={{...valueFont, ...flexRow()}}>
+            {abbreviated}
+          </div>
+        </customizations.SubValueHandle>
+        { isHovered &&
+            <span
+              style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
+              onClick={(ev) => {
+                ev.preventDefault();
+                setIsExpanded(true);
+              }}
+            >
+              ⊕
+            </span>
+        }
+        {suffix}
+      </div>
+    }/>
   }
 })
 
@@ -309,10 +271,11 @@ const ValueComposite = memo(function ValueComposite({value, prefix, path, isTopL
 
 export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
   toolValue: ToolValue | null;
+  customizations?: ValueCustomizations;
 }
 
 // TODO: awful naming huh?
-export const ValueOfTool = memo(function ValueOfTool({toolValue, style, ...props}: ValueOfToolProps) {
+export const ValueOfTool = memo(function ValueOfTool({toolValue, customizations, style, ...props}: ValueOfToolProps) {
   const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
 
   useEffect(() => {
@@ -326,7 +289,7 @@ export const ValueOfTool = memo(function ValueOfTool({toolValue, style, ...props
       ...style,
       opacity: toolValue === null ? 0.3 : 1,
     }} {...props}>
-      <Value value={lastValue.toolValue} />
+      <Value value={lastValue.toolValue} customizations={customizations}/>
     </div> :
     <div style={{fontSize: 13, fontStyle: 'italic'}}>
       no output yet
