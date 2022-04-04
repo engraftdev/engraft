@@ -1,24 +1,22 @@
-import { Component } from "react";
+import { memo, ReactNode } from "react";
+import { ErrorBoundary as ErrorBoundaryFromLib, FallbackProps } from 'react-error-boundary';
 
-export default class ErrorBoundary extends Component<any, {error: Error | undefined}> {
-    constructor(props: any) {
-      super(props);
-      this.state = { error: undefined };
-    }
+interface ErrorBoundaryProps {
+  children: ReactNode,
+}
 
-    static getDerivedStateFromError(error: Error) {
-      return { error };
-    }
+export const ErrorBoundary = memo(({children}: ErrorBoundaryProps) => {
+  return <ErrorBoundaryFromLib
+    FallbackComponent={FallbackComponent}
+    resetKeys={[children]}
+  >
+    {children}
+  </ErrorBoundaryFromLib>
+});
 
-    componentDidCatch(error: Error, errorInfo: any) {
-
-    }
-
-    render() {
-        if (this.state.error) {
-          return <div>React error: {this.state.error.message}</div>;
-        }
-
-        return this.props.children;
-    }
-  }
+const FallbackComponent = memo(({error}: FallbackProps) => {
+  return <div role="alert">
+    <div style={{fontStyle: 'italic'}}>🚨 React error:</div>
+    <div style={{fontFamily: 'monospace'}}>{error.message}</div>
+  </div>
+});

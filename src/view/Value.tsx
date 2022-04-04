@@ -3,7 +3,7 @@ import { ObjectInspector } from 'react-inspector';
 import { ToolValue } from "../tools-framework/tools";
 import { count } from "../util/count";
 import { DOM } from "../util/DOM";
-import ErrorBoundary from "../util/ErrorBoundary";
+import { ErrorBoundary } from "../util/ErrorBoundary";
 import { saveFile } from "../util/saveFile";
 import { useStateSetOnly } from "../util/state";
 import { Use } from "../util/Use";
