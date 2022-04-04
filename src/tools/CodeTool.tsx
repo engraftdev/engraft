@@ -125,6 +125,8 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
         console.warn(e);
         setOutput(null);
       }
+    } else {
+      setOutput(null);
     }
   }, [compiled, env, outputs, setOutput])
   useOutput(reportOutput, output);
