@@ -1,7 +1,7 @@
 import { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useAt } from "../util/state";
+import { Setter, Updater, useAt } from "../util/state";
 import { Use } from "../util/Use";
 import useHover from "../util/useHover";
 import { useKeyHeld } from "../util/useKeyHeld";
@@ -327,6 +327,46 @@ const customizations: ValueCustomizations = {
   SubValueHandle
 }
 
+interface PatternProps {
+  pattern: Pattern;
+  onStepToWildcard: (stepIdx: number) => void;
+  onRemove: () => void;
+}
+
+const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: PatternProps) {
+  return <div style={{...flexRow()}}>
+    <div style={{fontFamily: 'monospace',  ...flexRow()}}>
+      $
+      {pattern.map((step, stepIdx) =>
+        <>
+          .
+          { isWildcard(step) ?
+            '★' :
+            <Use hook={useHover} children={([hoverRef, isHovered]) =>
+              <div ref={hoverRef} onClick={(ev) => {
+                ev.stopPropagation();
+                onStepToWildcard(stepIdx);
+              }}>
+                { isHovered ? <s>{step}</s> : step}
+              </div>
+            }/>
+          }
+        </>
+      )}
+    </div>
+    <div style={{flexGrow: 1}}/>
+    <div
+      style={{fontSize: '50%', marginLeft: 7}}
+      onClick={(ev) => {
+        ev.stopPropagation();
+        onRemove();
+      }}
+    >
+      ❌
+    </div>
+  </div>
+})
+
 export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ExtractorConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
@@ -418,49 +458,27 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
                   onClick={() => setActivePatternIndex(patternIdx)}
                 >
                   {pattern ?
-                    <div style={{...flexRow()}}>
-                      <div style={{fontFamily: 'monospace',  ...flexRow()}}>
-                        $
-                        {pattern.map((step, stepIdx) =>
-                          <>
-                            .
-                            { isWildcard(step) ?
-                              '★' :
-                              <Use hook={useHover} children={([hoverRef, isHovered]) =>
-                                <div ref={hoverRef} onClick={(ev) => {
-                                  updatePatterns((oldPatterns) => {
-                                    let newPatterns = [...oldPatterns];
-                                    newPatterns[patternIdx] = [...newPatterns[patternIdx]];
-                                    newPatterns[patternIdx][stepIdx] = {wildcard: true};
-                                    return newPatterns;
-                                  })
-                                  ev.stopPropagation();
-                                }}>
-                                  { isHovered ? <s>{step}</s> : step}
-                                </div>
-                              }/>
-                            }
-                          </>
-                        )}
-                      </div>
-                      <div style={{flexGrow: 1}}/>
-                      <div
-                        style={{fontSize: '50%', marginLeft: 7}}
-                        onClick={(ev) => {
-                          updatePatterns((oldPatterns) => {
-                            let newPatterns = [...oldPatterns];
-                            newPatterns.splice(patternIdx, 1);
-                            return newPatterns;
-                          })
-                          if (activePatternIndex === patternIdx) {
-                            setActivePatternIndex(patterns.length - 1);
-                          }
-                          ev.stopPropagation();
-                        }}
-                      >
-                        ❌
-                      </div>
-                    </div>:
+                    <Pattern
+                      pattern={pattern}
+                      onStepToWildcard={(stepIdx) => {
+                        updatePatterns((oldPatterns) => {
+                          let newPatterns = [...oldPatterns];
+                          newPatterns[patternIdx] = [...newPatterns[patternIdx]];
+                          newPatterns[patternIdx][stepIdx] = {wildcard: true};
+                          return newPatterns;
+                        })
+                      }}
+                      onRemove={() => {
+                        updatePatterns((oldPatterns) => {
+                          let newPatterns = [...oldPatterns];
+                          newPatterns.splice(patternIdx, 1);
+                          return newPatterns;
+                        })
+                        if (activePatternIndex === patternIdx) {
+                          setActivePatternIndex(patterns.length - 1);
+                        }
+                      }}
+                    />:
                     <div style={{fontStyle: 'italic', fontSize: '80%'}}>
                       new pattern
                     </div>
