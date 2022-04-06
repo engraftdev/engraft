@@ -146,64 +146,6 @@ function getCommonHead(paths: Path[]): Path {
   return common;
 }
 
-// function mergePatterns2(patterns: Pattern[], labelSoFar: string | undefined): [(value: unknown) => unknown, string | undefined] {
-//   if (patterns.length === 0) {
-//     return [() => undefined, labelSoFar];
-//   }
-
-//   // strategy:
-//   // * figure out which keys should be present at this level, imagining that each was present with many others
-//   // * if only one is present, we can just use it
-
-//   let children: {[head: string]: Pattern[]} = {}
-
-//   patterns.map((pattern) => {
-//     let head: PatternStep | undefined = pattern[0];
-//     if (head === undefined) {
-//       head = 'ROOT';
-//     } else if (isWildcard(head)) {
-//       head = 'ALL';
-//     }
-//     if (!children[head]) {
-//       children[head] = [];
-//     }
-//     children[head].push(pattern);
-//   })
-
-//   const entries = Object.entries(children);
-
-//   if (entries.length === 1) {
-//     // hooray, we can just go in there!
-//     const [head, patterns] = entries[0];
-//     if (head === 'ROOT') {
-//       // there can only be one pattern
-//       return [(value) => value, labelSoFar];
-//     } else if (head === 'ALL') {
-//       const subPatterns = patterns.map((pattern) => pattern.slice(1));
-//       const subMerger = mergePatterns2(subPatterns, undefined);
-//       return [(value) => Object.values(value as object).map(subMerger[0]), joinWithUnderscore(labelSoFar, subMerger[1])];
-//     } else {
-//       const subPatterns = patterns.map((pattern) => pattern.slice(1));
-//       const subMerger = mergePatterns2(subPatterns, undefined);
-//       return [(value) => subMerger[0]((value as any)[head]), joinWithUnderscore(labelSoFar, head)]
-//     }
-//   }
-
-//   if (patterns.some((pattern) => pattern.length === 0)) {
-//     // we care about the root
-//     if (patterns.length === 1) {
-//       // and only the root
-//       return (value) => value;
-//     } else {
-//       // and other stuff
-
-//     }
-//   }
-//   if (patterns.) {
-
-//   }
-// }
-
 interface PatternWithId {
   id: string;
   pattern: Pattern;
@@ -420,7 +362,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
   // const metaHeld = useKeyHeld('Meta');
 
   const render: ToolViewRender = useCallback(function R({autoFocus}) {
-    const [activePatternIndex, setActivePatternIndex] = useState(0);
+    const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
 
     useEffect(() => {
       if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
@@ -452,13 +394,17 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
 
     // todo: very hacky
     if (minimized) {
-      return <div style={{padding: 10, ...flexRow(), gap: 10}}>
+      return <div style={{padding: 2, ...flexRow('center')}}>
         <ShowView view={inputView} autoFocus={autoFocus} />
-        <div style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
-          {patternsWithIds.map(({pattern}) => ['$', ...pattern].join('.')).join(', ')}
+        <div style={{...flexCol()}}>
+          {patternsWithIds.map(({pattern}) =>
+            <div style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
+              {['', ...pattern.map(step => isWildcard(step) ? '★' : step)].join('.')}
+            </div>
+          )}
         </div>
         <span
-          style={{marginLeft: 3, cursor: 'pointer'}}
+          style={{marginLeft: 8, cursor: 'pointer'}}
           onClick={(ev) => {
             ev.preventDefault();
             updateMinimized(() => false);
