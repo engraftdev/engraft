@@ -92,13 +92,11 @@ function mergePatterns(patterns: Pattern[]): (value: unknown) => unknown {
       subMergers.push({
         key: pathAfterCommonForKey.length === 0 ? 'ALL' : pathAfterCommonForKey.join('_'),
         pathAfterCommon,
-        func: (value) => Object.values(value as any).map(itemFunc),
+        func: (value) => typeof value === 'object' && value !== null ? Object.values(value).map(itemFunc) : [],
       });
     }
 
   })
-
-  console.log({patterns, commonHead, subMergers});
 
   if (subMergers.length === 1) {
     if (subMergers[0].pathAfterCommon.length > 0) {
@@ -106,13 +104,11 @@ function mergePatterns(patterns: Pattern[]): (value: unknown) => unknown {
     }
     return (value) => {
       const valueToCommon = followPattern(value, commonHead);
-      console.log(value, '=>', valueToCommon, 'single');
       return subMergers[0].func(valueToCommon);
     }
   } else {
     return (value) => {
       const valueToCommon = followPattern(value, commonHead);
-      console.log(value, '=>', valueToCommon, 'multi');
       return Object.fromEntries(subMergers.map(({key, pathAfterCommon, func}) => [
         key,
         func(followPattern(valueToCommon, pathAfterCommon))
@@ -347,7 +343,8 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
     }
     try {
       return { toolValue: mergedPatterns(inputOutput.toolValue) };
-    } catch {
+    } catch (e) {
+      console.warn(e);
       return null;
     }
   }, [inputOutput, mergedPatterns])
@@ -403,27 +400,48 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
           <div style={{...flexRow(), gap: 10}}>
             <span style={{fontWeight: 'bold'}}>patterns</span>
             <div style={{...flexCol()}}>
-              {[...patterns, undefined].map((pattern, i) =>
+              {[...patterns, undefined].map((pattern, patternIdx) =>
                 <div
-                  key={i}
+                  key={patternIdx}
                   className='ExtractorTool-pattern'
                   style={{
                     border: '1px solid gray',
-                    ...i > 0 && {
+                    ...patternIdx > 0 && {
                       marginTop: -1,
                     },
                     padding: 3,
-                    ...activePatternIndex === i && {
+                    ...activePatternIndex === patternIdx && {
                       background: 'rgba(0,0,220,0.1)',
                     },
                     cursor: 'pointer',
                   }}
-                  onClick={() => setActivePatternIndex(i)}
+                  onClick={() => setActivePatternIndex(patternIdx)}
                 >
                   {pattern ?
                     <div style={{...flexRow()}}>
-                      <div style={{fontFamily: 'monospace'}}>
-                        {['$', ...pattern.map((step) => isWildcard(step) ? '★' : step)].join('.')}
+                      <div style={{fontFamily: 'monospace',  ...flexRow()}}>
+                        $
+                        {pattern.map((step, stepIdx) =>
+                          <>
+                            .
+                            { isWildcard(step) ?
+                              '★' :
+                              <Use hook={useHover} children={([hoverRef, isHovered]) =>
+                                <div ref={hoverRef} onClick={(ev) => {
+                                  updatePatterns((oldPatterns) => {
+                                    let newPatterns = [...oldPatterns];
+                                    newPatterns[patternIdx] = [...newPatterns[patternIdx]];
+                                    newPatterns[patternIdx][stepIdx] = {wildcard: true};
+                                    return newPatterns;
+                                  })
+                                  ev.stopPropagation();
+                                }}>
+                                  { isHovered ? <s>{step}</s> : step}
+                                </div>
+                              }/>
+                            }
+                          </>
+                        )}
                       </div>
                       <div style={{flexGrow: 1}}/>
                       <div
@@ -431,10 +449,10 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
                         onClick={(ev) => {
                           updatePatterns((oldPatterns) => {
                             let newPatterns = [...oldPatterns];
-                            newPatterns.splice(i, 1);
+                            newPatterns.splice(patternIdx, 1);
                             return newPatterns;
                           })
-                          if (activePatternIndex === i) {
+                          if (activePatternIndex === patternIdx) {
                             setActivePatternIndex(patterns.length - 1);
                           }
                           ev.stopPropagation();
