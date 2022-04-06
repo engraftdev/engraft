@@ -213,6 +213,7 @@ export interface ExtractorConfig extends ToolConfig {
   toolName: 'extractor';
   inputConfig: ToolConfig;
   patternsWithIds: PatternWithId[];
+  minimized: boolean;
 }
 
 interface ExtractorContextValue {
@@ -396,6 +397,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
   const [patternsWithIds, updatePatternsWithIds] = useAt(config, updateConfig, 'patternsWithIds');
+  const [minimized, updateMinimized] = useAt(config, updateConfig, 'minimized');
 
   const mergedPatterns = useMemo(() => {
     return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
@@ -448,6 +450,25 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
     const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
     const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
+    // todo: very hacky
+    if (minimized) {
+      return <div style={{padding: 10, ...flexRow(), gap: 10}}>
+        <ShowView view={inputView} autoFocus={autoFocus} />
+        <div style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
+          {patternsWithIds.map(({pattern}) => ['$', ...pattern].join('.')).join(', ')}
+        </div>
+        <span
+          style={{marginLeft: 3, cursor: 'pointer'}}
+          onClick={(ev) => {
+            ev.preventDefault();
+            updateMinimized(() => false);
+          }}
+        >
+          ⊕
+        </span>
+      </div>;
+    }
+
     return (
       <div ref={hoverRef} style={{padding: 10}}>
         <div
@@ -463,6 +484,15 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
             marginBottom: 10,
           }}
         >
+          <div
+            style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
+            onClick={(ev) => {
+              ev.preventDefault();
+              updateMinimized(() => true);
+            }}
+          >
+            ⊖
+          </div>
           <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
             <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
           </div>
@@ -537,5 +567,6 @@ registerTool<ExtractorConfig>(ExtractorTool, () => {
     toolName: 'extractor',
     inputConfig: codeConfigSetTo(''),
     patternsWithIds: [],
+    minimized: false,
   };
 });

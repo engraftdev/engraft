@@ -72,7 +72,6 @@ const paramsDefault = `{
   grnnamespace: 0,
   prop: 'pageimages|extracts',
   exintro: true,
-  rvprop: 'content',
   grnlimit: 1
 }`
 registerTool<RequestConfig>(RequestTool, () => {
