@@ -1,17 +1,17 @@
+import { InternMap } from "internmap";
 import { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { Setter, Updater, useAt } from "../util/state";
+import id from "../util/id";
+import { mapUpdate } from "../util/mapUpdate";
+import { useAt } from "../util/state";
 import { Use } from "../util/Use";
+import { useWindowEventListener } from "../util/useEventListener";
 import useHover from "../util/useHover";
 import { useKeyHeld } from "../util/useKeyHeld";
 import { flexCol, flexRow } from "../view/styles";
 import { pathString, ValueCustomizations, ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
-import { InternMap } from "internmap";
-import { mapUpdate } from "../util/mapUpdate";
-import { useWindowEventListener } from "../util/useEventListener";
-import id from "../util/id";
 
 const wildcard = {wildcard: true};
 
@@ -282,7 +282,7 @@ interface PatternProps {
   onRemove: () => void;
 }
 
-const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: PatternProps) {
+const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}: PatternProps) {
   const [patternRef, isPatternHovered] = useHover();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -368,7 +368,10 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
       if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
         setActivePatternIndex(patternsWithIds.length);
       }
-    }, [activePatternIndex, patternsWithIds.length])  // TODO: oh no warning
+    // TODO: this is really bad – exhaustive-deps thinks patternsWithIds.length doesn't trigger re-render cuz it's an
+    //       "outer scope value". this is a flaw in my changing-render-func approach.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activePatternIndex, patternsWithIds.length])
 
 
     const setActivePattern = useCallback((pattern: Pattern) => {
@@ -464,7 +467,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
                   onClick={() => setActivePatternIndex(patternIdx)}
                 >
                   {patternWithId ?
-                    <Pattern
+                    <PatternView
                       key={patternWithId.id}
                       pattern={patternWithId.pattern}
                       onStepToWildcard={(stepIdx) => {
@@ -501,7 +504,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
         </ExtractorContext.Provider>
       </div>
     );
-  }, [patternsWithIds, inputView, inputOutput, updatePatternsWithIds]);
+  }, [patternsWithIds, minimized, inputView, inputOutput, updatePatternsWithIds, updateMinimized]);
   useView(reportView, render, config);
 
   return <>

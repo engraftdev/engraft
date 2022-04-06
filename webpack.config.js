@@ -1,5 +1,4 @@
 const { resolve } = require('path');
-const webpack = require("webpack");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
