@@ -205,7 +205,13 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
               value={value}
               prefix={
                 !isArray &&
-                <div className='prefix-with-key' style={{...inlineBlock(), ...valueFont, marginRight: 5}} title={pathString([...path, key])}>{key}:</div>
+                <div
+                  className='prefix-with-key'
+                  style={{...inlineBlock(), ...valueFont, marginRight: 5, whiteSpace: 'nowrap'}}
+                  title={pathString([...path, key])}
+                >
+                  {key}:
+                </div>
               }
               suffix={
                 <div style={{fontSize: 0}}>,</div>
