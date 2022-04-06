@@ -359,7 +359,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
       if (activePatternIndex > patterns.length) {  // can be an element of patterns, or a blank afterwards
         setActivePatternIndex(patterns.length);
       }
-    }, [activePatternIndex])
+    }, [activePatternIndex, patterns.length])  // TODO: oh no warning
 
 
     const setActivePattern = useCallback((pattern) => {
