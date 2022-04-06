@@ -1,15 +1,3 @@
-import './CodeTool';
-import './TextTool';
-import './NotebookTool';
-import './ImportTool';
-import './LetTool';
-import './MapTool';
-import './RequestTool';
-import './TableTool';
-import './MarkdownTool';
-import './SliderTool';
-import './StateTool';
-import './WorldTool';
-import './ColorTool';
-import './FileTool';
-import './ExtractorTool';
+const toolsContext = require.context('.', true, /\.\/(.*)Tool\.tsx$/);
+
+export const tools = toolsContext.keys().map(id => toolsContext(id));
