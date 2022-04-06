@@ -48,7 +48,7 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
 
   return sourceComponent;
 })
-registerTool<MarkdownConfig>(MarkdownTool, () => ({
+registerTool<MarkdownConfig>(MarkdownTool, 'markdown', () => ({
   toolName: 'markdown',
   sourceConfig: codeConfigSetTo(toolIndex['text'].defaultConfig()),
 }));

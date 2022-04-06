@@ -151,7 +151,7 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
     )}
   </>
 });
-registerTool<MapConfig>(MapTool, () => {
+registerTool<MapConfig>(MapTool, 'map', () => {
   const itemVar = newVarConfig('item');
   return {
     toolName: 'map',

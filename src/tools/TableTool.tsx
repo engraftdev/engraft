@@ -24,7 +24,7 @@ export const TableTool = memo(function TableTool({ config, updateConfig, reportO
 
   return inputComponent;
 });
-registerTool<TableConfig>(TableTool, () => ({
+registerTool<TableConfig>(TableTool, 'table', () => ({
   toolName: 'table',
   inputConfig: toolIndex['code'].defaultConfig()
 }));

@@ -40,6 +40,7 @@ export let toolIndex: { [toolName: string]: Tool<any> } = {};
 
 export function registerTool<C extends ToolConfig>(
   func: (props: ToolProps<C>) => ReactElement<any, any> | null,
+  toolName: C['toolName'],
   defaultConfig: C | (() => C)
 ) {
   let defaultConfigFunc: () => C;
@@ -48,8 +49,7 @@ export function registerTool<C extends ToolConfig>(
   } else {
     defaultConfigFunc = defaultConfig;
   }
-  // HACK for now, making a tool config when you register it lol
-  toolIndex[defaultConfigFunc().toolName] = Object.assign(func, { defaultConfig: defaultConfigFunc });
+  toolIndex[toolName] = Object.assign(func, { defaultConfig: defaultConfigFunc });
 }
 
 

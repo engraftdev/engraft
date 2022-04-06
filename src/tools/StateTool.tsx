@@ -46,7 +46,7 @@ export const StateTool = memo(function StateTool({ config, updateConfig, reportO
 
   return null;
 });
-registerTool<StateConfig>(StateTool, () => ({
+registerTool<StateConfig>(StateTool, 'state', () => ({
   toolName: 'state',
   stateValue: undefined
 }));

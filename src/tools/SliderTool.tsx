@@ -32,7 +32,7 @@ export const SliderTool = memo(function SliderTool({ config, updateConfig, repor
 
   return null;
 })
-registerTool(SliderTool, {
+registerTool(SliderTool, 'slider', {
   toolName: 'slider',
   value: 0,
   min: -10,

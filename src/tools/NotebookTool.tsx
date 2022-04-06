@@ -92,7 +92,7 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
       reportView={reportCellView} reportOutput={reportCellOutput}/>
   )}</>;
 })
-registerTool<NotebookConfig>(NotebookTool, () => ({
+registerTool<NotebookConfig>(NotebookTool, 'notebook', () => ({
   toolName: 'notebook',
   cells: [
     { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(''), upstreamIds: {} }

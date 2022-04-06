@@ -511,7 +511,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
     {inputComponent}
   </>
 });
-registerTool<ExtractorConfig>(ExtractorTool, () => {
+registerTool<ExtractorConfig>(ExtractorTool, 'extractor', () => {
   return {
     toolName: 'extractor',
     inputConfig: codeConfigSetTo(''),

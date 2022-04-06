@@ -96,7 +96,7 @@ export const WorldTool = memo(function WorldTool({ config, updateConfig, reportO
     </ProvideVar>
   </>
 });
-registerTool<WorldConfig>(WorldTool, () => {
+registerTool<WorldConfig>(WorldTool, 'world', () => {
   const stateVar = newVarConfig('state');
   return {
     toolName: 'world',

@@ -47,7 +47,7 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
 
   return null;
 })
-registerTool(FileTool, {
+registerTool(FileTool, 'file', {
   toolName: 'file',
   dataUrl: null,
 });

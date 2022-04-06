@@ -74,7 +74,7 @@ const paramsDefault = `{
   exintro: true,
   grnlimit: 1
 }`
-registerTool<RequestConfig>(RequestTool, () => {
+registerTool<RequestConfig>(RequestTool, 'request', () => {
   const textConfig: TextConfig = {
     toolName: 'text',
     text: 'https://en.wikipedia.org/w/api.php',

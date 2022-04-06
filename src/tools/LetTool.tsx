@@ -54,7 +54,7 @@ export const LetTool = memo(function LetTool({ config, updateConfig, reportOutpu
     }
   </>
 });
-registerTool<LetConfig>(LetTool, () => ({
+registerTool<LetConfig>(LetTool, 'let', () => ({
   toolName: 'let',
   bindingVar: newVarConfig(),
   bindingConfig: codeConfigSetTo(''),

@@ -25,7 +25,7 @@ export const ColorTool = memo(function ColorTool({ config, updateConfig, reportO
 
   return null;
 });
-registerTool(ColorTool, {
+registerTool(ColorTool, 'color', {
   toolName: 'color',
   r: 250,
   g: 200,

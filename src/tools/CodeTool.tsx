@@ -44,7 +44,7 @@ export const CodeTool = memo(function CodeTool(props: ToolProps<CodeConfig>) {
     return <CodeToolToolMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigToolMode>} />;
   }
 })
-registerTool(CodeTool, {
+registerTool(CodeTool, 'code', {
   toolName: 'code',
   modeName: 'code',
   code: '',

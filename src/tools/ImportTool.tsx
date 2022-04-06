@@ -48,7 +48,7 @@ export const ImportTool = memo(function ImportTool({ config, updateConfig, repor
 
   return <></>;
 });
-registerTool(ImportTool, {
+registerTool(ImportTool, 'import', {
   toolName: 'import',
   name: 'lodash',
 });

@@ -108,7 +108,7 @@ export const TextTool = memo(function TextTool({ config, updateConfig, reportOut
     )}
   </>;
 })
-registerTool(TextTool, {
+registerTool(TextTool, 'text', {
   toolName: 'text',
   text: '',
   subTools: {},
