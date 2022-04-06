@@ -10,6 +10,8 @@ import { pathString, ValueCustomizations, ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 import { InternMap } from "internmap";
 import { mapUpdate } from "../util/mapUpdate";
+import { useWindowEventListener } from "../util/useEventListener";
+import id from "../util/id";
 
 const wildcard = {wildcard: true};
 
@@ -202,16 +204,20 @@ function getCommonHead(paths: Path[]): Path {
 //   }
 // }
 
+interface PatternWithId {
+  id: string;
+  pattern: Pattern;
+};
 
 export interface ExtractorConfig extends ToolConfig {
   toolName: 'extractor';
   inputConfig: ToolConfig;
-  patterns: Pattern[];
+  patternsWithIds: PatternWithId[];
 }
 
 interface ExtractorContextValue {
   activePattern: Pattern | undefined;
-  setActivePattern: (pattern: Pattern | undefined) => void;
+  setActivePattern: (pattern: Pattern) => void;
   otherPatterns: Pattern[];
   multiSelectMode: boolean;
 }
@@ -334,7 +340,17 @@ interface PatternProps {
 }
 
 const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: PatternProps) {
-  return <div style={{...flexRow()}}>
+  const [patternRef, isPatternHovered] = useHover();
+  const [isEditing, setIsEditing] = useState(false);
+
+  // TODO: ideally this wouldn't be a permanent event listener?
+  useWindowEventListener('click', (ev) => {
+    if (isEditing) {
+      setIsEditing(false);
+    }
+  })
+
+  return <div ref={patternRef} style={{...flexRow()}}>
     <div style={{fontFamily: 'monospace',  ...flexRow()}}>
       $
       {pattern.map((step, stepIdx) =>
@@ -342,12 +358,13 @@ const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: Pat
           .
           { isWildcard(step) ?
             '★' :
-            <Use hook={useHover} children={([hoverRef, isHovered]) =>
-              <div ref={hoverRef} onClick={(ev) => {
+            <Use hook={useHover} children={([stepRef, isStepHovered]) =>
+              <div ref={stepRef} onClick={(ev) => {
+                if (!isEditing) { return; }
                 ev.stopPropagation();
                 onStepToWildcard(stepIdx);
               }}>
-                { isHovered ? <s>{step}</s> : step}
+                { isEditing && isStepHovered ? <s>{step}</s> : step}
               </div>
             }/>
           }
@@ -355,6 +372,14 @@ const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: Pat
       )}
     </div>
     <div style={{flexGrow: 1}}/>
+    <div
+      style={{fontSize: '50%', marginLeft: 30, visibility: isPatternHovered || isEditing ? 'visible' : 'hidden'}}
+      onClick={() => {
+        setIsEditing(!isEditing);
+      }}
+    >
+      ✏️
+    </div>
     <div
       style={{fontSize: '50%', marginLeft: 7}}
       onClick={(ev) => {
@@ -370,11 +395,11 @@ const Pattern = memo(function Pattern({pattern, onStepToWildcard, onRemove}: Pat
 export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ExtractorConfig>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
-  const [patterns, updatePatterns] = useAt(config, updateConfig, 'patterns');
+  const [patternsWithIds, updatePatternsWithIds] = useAt(config, updateConfig, 'patternsWithIds');
 
   const mergedPatterns = useMemo(() => {
-    return patterns.length > 0 && mergePatterns(patterns)
-  }, [patterns])
+    return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
+  }, [patternsWithIds])
 
   const output = useMemo(() => {
     // TODO: fix this; it should integrate results of patterns intelligently
@@ -396,17 +421,22 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
     const [activePatternIndex, setActivePatternIndex] = useState(0);
 
     useEffect(() => {
-      if (activePatternIndex > patterns.length) {  // can be an element of patterns, or a blank afterwards
-        setActivePatternIndex(patterns.length);
+      if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
+        setActivePatternIndex(patternsWithIds.length);
       }
-    }, [activePatternIndex, patterns.length])  // TODO: oh no warning
+    }, [activePatternIndex, patternsWithIds.length])  // TODO: oh no warning
 
 
-    const setActivePattern = useCallback((pattern) => {
-      updatePatterns((oldPatterns) => {
-        let newPatterns = oldPatterns.slice();
-        newPatterns[activePatternIndex] = pattern;
-        return newPatterns;
+    const setActivePattern = useCallback((pattern: Pattern) => {
+      updatePatternsWithIds((oldPatternsWithIds) => {
+        let newPatternsWithIds = oldPatternsWithIds.slice();
+        let activePatternWithId = newPatternsWithIds[activePatternIndex];
+        if (!activePatternWithId) {
+          newPatternsWithIds[activePatternIndex] = {id: id(), pattern};
+        } else {
+          newPatternsWithIds[activePatternIndex] = {id: activePatternWithId.id, pattern};
+        }
+        return newPatternsWithIds;
       })
     }, [activePatternIndex])
 
@@ -415,8 +445,8 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
 
     const multiSelectMode = isTopLevelHovered && isShiftHeld;
 
-    const activePattern: Pattern | undefined = patterns[activePatternIndex];
-    const otherPatterns = patterns.filter((_, i) => i !== activePatternIndex);
+    const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
+    const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
     return (
       <div ref={hoverRef} style={{padding: 10}}>
@@ -440,7 +470,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
           <div style={{...flexRow(), gap: 10}}>
             <span style={{fontWeight: 'bold'}}>patterns</span>
             <div style={{...flexCol()}}>
-              {[...patterns, undefined].map((pattern, patternIdx) =>
+              {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
                 <div
                   key={patternIdx}
                   className='ExtractorTool-pattern'
@@ -457,25 +487,26 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
                   }}
                   onClick={() => setActivePatternIndex(patternIdx)}
                 >
-                  {pattern ?
+                  {patternWithId ?
                     <Pattern
-                      pattern={pattern}
+                      key={patternWithId.id}
+                      pattern={patternWithId.pattern}
                       onStepToWildcard={(stepIdx) => {
-                        updatePatterns((oldPatterns) => {
-                          let newPatterns = [...oldPatterns];
-                          newPatterns[patternIdx] = [...newPatterns[patternIdx]];
-                          newPatterns[patternIdx][stepIdx] = {wildcard: true};
-                          return newPatterns;
+                        updatePatternsWithIds((oldPatternsWithIds) => {
+                          let newPatternsWithIds = [...oldPatternsWithIds];
+                          // TODO agggrh this isn't enve correnct arrrrgh
+                          newPatternsWithIds[patternIdx].pattern[stepIdx] = {wildcard: true};
+                          return newPatternsWithIds;
                         })
                       }}
                       onRemove={() => {
-                        updatePatterns((oldPatterns) => {
-                          let newPatterns = [...oldPatterns];
-                          newPatterns.splice(patternIdx, 1);
-                          return newPatterns;
+                        updatePatternsWithIds((oldPatternsWithIds) => {
+                          let newPatternsWithIds = [...oldPatternsWithIds];
+                          newPatternsWithIds.splice(patternIdx, 1);
+                          return newPatternsWithIds;
                         })
                         if (activePatternIndex === patternIdx) {
-                          setActivePatternIndex(patterns.length - 1);
+                          setActivePatternIndex(patternsWithIds.length - 1);
                         }
                       }}
                     />:
@@ -494,7 +525,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
         </ExtractorContext.Provider>
       </div>
     );
-  }, [patterns, inputView, inputOutput, updatePatterns]);
+  }, [patternsWithIds, inputView, inputOutput, updatePatternsWithIds]);
   useView(reportView, render, config);
 
   return <>
@@ -505,6 +536,6 @@ registerTool<ExtractorConfig>(ExtractorTool, () => {
   return {
     toolName: 'extractor',
     inputConfig: codeConfigSetTo(''),
-    patterns: [],
+    patternsWithIds: [],
   };
 });
