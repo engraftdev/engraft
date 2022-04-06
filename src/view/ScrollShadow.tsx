@@ -8,7 +8,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
 }
 
 
-export default function ScrollShadow({children, shadowColor = 'rgba(0,0,0,0.2)', shadowBlur = 8, shadowSpread = 4, style, ...props}: Props) {
+export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,1)', shadowBlur = 8, shadowSpread = 10, style, ...props}: Props) {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
   const [boxShadow, setBoxShadow] = useState('')
 
@@ -45,7 +45,23 @@ export default function ScrollShadow({children, shadowColor = 'rgba(0,0,0,0.2)',
     }
   }, [div, updateShadows])
 
-  return <div ref={setDiv} style={{...style, boxShadow}} onScroll={onScroll} {...props}>
-    {children}
+  return <div {...props} style={{
+    position: 'relative'
+  }}>
+    <div ref={setDiv} onScroll={onScroll} style={{
+      ...style
+    }}>
+      {children}
+    </div>
+    <div style={{
+      pointerEvents: 'none',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: -2,
+      boxShadow,
+    }}/>
   </div>
 }

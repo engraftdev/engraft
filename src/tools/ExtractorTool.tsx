@@ -125,19 +125,19 @@ export const SubValueHandle = memo(function SubValueHandle({path, children}: Sub
         paddingLeft: "0.125rem",
         paddingRight: "0.125rem",
         borderRadius: "0.125rem",
-        ...isHovered && isClickable && {
-          backgroundColor: "rgba(0,0,220,0.1)",
-        },
         ...isClickable && {
           cursor: "pointer",
         },
         ...isMultiSelectable && {
           // border: "1px solid rgba(0,0,0)",
-          backgroundColor: "rgba(0,0,220,0.05)",
+          backgroundColor: "rgba(0,0,220,0.1)",
         },
         ...isSelected && {
+          backgroundColor: "rgba(0,0,220,0.2)",
+        },
+        ...isHovered && isClickable && {
           backgroundColor: "rgba(0,0,220,0.3)",
-        }
+        },
       }}
       onClick={onClick}
     >
@@ -186,6 +186,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
           className="ExtractorTool-top"
           style={{
             position: 'sticky',
+            zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
             top: 0,
             background: 'white',
             paddingTop: 10,

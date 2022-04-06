@@ -31,7 +31,8 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
 
   const render = useCallback(function R() {
     return <div style={{display: 'flex', gap: 20, alignItems: 'flex-start', padding: 10}}>
-      <div style={{flexShrink: 0}}>
+      {/* <div style={{flexShrink: 0}}> */}
+      <div>
         <ShowView view={sourceView} />
       </div>
       <div>
