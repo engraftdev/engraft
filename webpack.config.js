@@ -40,7 +40,7 @@ function makeConfig(name) {
         infrastructureLogging: {
             level: 'none',
         },
-        // devtool: isDevelopment ? 'cheap-module-source-map' : false,
+        devtool: isDevelopment ? 'eval-cheap-module-source-map' : false,
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".json"],
         },
@@ -54,7 +54,6 @@ function makeConfig(name) {
                     warnings: false,
                 },
             },
-            open: true,
         },
         module: {
             rules: [
