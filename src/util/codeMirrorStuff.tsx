@@ -156,7 +156,7 @@ export const ToolFrame = memo(function ToolFrame({children, config, onClose, onN
   return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>
     <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
       <div style={{marginLeft: 2}}>{config.toolName}</div>
-      <div style={{flexGrow: 1}}></div>
+      <div style={{flexGrow: 1, minWidth: 6}}></div>
       {onCode &&
         <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
           onClick={onCode}
