@@ -33,3 +33,12 @@ export class Task<Progress, Complete> {
     }
   }
 }
+
+export function runToCompletion<Complete>(generator: Generator<unknown, Complete>): Complete {
+  while (true) {
+    const curr = generator.next();
+    if (curr.done) {
+      return curr.value;
+    }
+  }
+}
