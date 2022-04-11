@@ -12,6 +12,7 @@ import { bracketMatching } from "@codemirror/matchbrackets";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codemirror/view";
 import update from "immutability-helper";
+import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
@@ -66,9 +67,10 @@ interface InOutPairViewProps {
   pairIdx: number;
   updateInOutPairs: Updater<InOutPair[]>;
   isExtra: boolean;
+  func: ((value: any) => unknown) | undefined;
 }
 
-export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateInOutPairs, isExtra}: InOutPairViewProps) {
+export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateInOutPairs, isExtra, func}: InOutPairViewProps) {
   const fadeStyle: CSSProperties = isExtra ? { opacity: 0.5 } : {};
 
   const onChangeIn = useCallback((code: string) => {
@@ -83,6 +85,24 @@ export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateI
     }
   }, [isExtra, pair, updateInOutPairs])
 
+  const isCorrect = useMemo(() => {
+    if (func) {
+      try {
+        // eslint-disable-next-line no-eval
+        const inVal = eval(pair.inCode), outVal = eval(pair.outCode);
+        return _.isEqual(outVal, func(inVal));
+      } catch {
+      }
+    }
+    return false;
+  }, [func, pair.inCode, pair.outCode])
+
+  const incorrectStyle: CSSProperties = !isExtra && !isCorrect ? {
+    borderRadius: 3,
+    padding: 3,
+    margin: -3,
+    background: 'rgba(255,0,0,0.1)',
+  } : {};
 
   return <Fragment>
     <CodeMirror
@@ -99,7 +119,7 @@ export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateI
     </div>
     <CodeMirror
       extensions={codeMirrorExtensions}
-      style={{...fadeStyle, minWidth: 0}}
+      style={{...fadeStyle, minWidth: 0, ...incorrectStyle}}
       text={pair.outCode}
       onChange={onChangeOut}
       onFocus={onFocus}
@@ -152,10 +172,16 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
       if (inputOutput) {
         const inCode = JSON.stringify(inputOutput.toolValue);
         if (!inOutPairs.some((pair) => pair.inCode === inCode) && func) {
+          let outCode;
+          try {
+            outCode = JSON.stringify(func(inputOutput.toolValue))
+          } catch {
+            outCode = 'undefined';
+          }
           return {
             id: id(),
             inCode,
-            outCode: JSON.stringify(func(inputOutput.toolValue)),
+            outCode,
           }
         }
       }
@@ -185,6 +211,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
               pairIdx={pairIdx}
               updateInOutPairs={updateInOutPairs}
               isExtra={!inOutPairs.includes(pair)}
+              func={func}
             />
           )}
         </div>
@@ -198,13 +225,12 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
               }
               const task = new Task(synthesizeGen(pairs), {
                 onComplete(complete) {
-                  console.log('oncomplete');
                   if (complete) {
                     updateCode(() => complete);
                   } else {
-                    console.log('failure');
                   }
                   setProgress(undefined);
+                  setSynthesisTask(undefined);
                 },
                 onProgress(state) {
                   setProgress({...state.progress});
@@ -216,6 +242,17 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
           >
             Run
           </button>
+          {synthesisTask &&
+            <button
+              onClick={() => {
+                synthesisTask.cancel();
+                setProgress(undefined);
+                setSynthesisTask(undefined);
+              }}
+            >
+              Cancel
+            </button>
+          }
         </div>
         <div className="SynthesizerTool-output-row" style={{marginTop: 10, ...flexRow(), gap: 10}}>
           <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{code}</div>
@@ -225,7 +262,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
         </div>
       </div>
     );
-  }, [code, extraInOutPair, inOutPairs, inputView, progress, synthesisTask, updateCode, updateInOutPairs]);
+  }, [code, extraInOutPair, func, inOutPairs, inputView, progress, synthesisTask, updateCode, updateInOutPairs]);
   useView(reportView, render, config);
 
   return <>

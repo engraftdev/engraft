@@ -16,7 +16,7 @@ function constantFromCode(code: string): Constant {
   }
 }
 
-const constants = ["undefined", "null", "0", "1", "''", "' '", "'.'"].map(constantFromCode);
+const constants = ["undefined", "null", "0", "1", "''", "' '", "'.'", "','"].map(constantFromCode);
 
 function isString(x: unknown): boolean {
   return typeof x === 'string';
@@ -30,6 +30,10 @@ function isNumber(x: unknown): boolean {
   return typeof x === 'number';
 }
 
+function isBoolean(x: unknown): boolean {
+  return typeof x === 'boolean';
+}
+
 function isArrayOf(itemCond: (item: unknown) => boolean): (x: unknown) => boolean {
   return function (x: unknown): boolean {
     return isArray(x) && (x.length === 0 || itemCond(x));
@@ -37,12 +41,15 @@ function isArrayOf(itemCond: (item: unknown) => boolean): (x: unknown) => boolea
 }
 
 const valueTypes = {
+  any: () => true,
   string: isString,
   array: isArray as (x: unknown) => boolean,
   number: isNumber,
+  boolean: isBoolean,
   arrayOfString: isArrayOf(isString),
   arrayOfArray: isArrayOf(isArray),
   arrayOfNumber: isArrayOf(isNumber),
+  arrayOfBoolean: isArrayOf(isBoolean),
 }
 
 type Precond = keyof typeof valueTypes | ((value: unknown) => boolean);
@@ -51,7 +58,7 @@ interface Operation {
   arity: number,
   func: (...args: unknown[]) => unknown,
   codeFunc: (...args: string[]) => string,
-  preconds: Precond[][]
+  preconds: Precond[][],
 }
 
 function operationFromCodeFunc(
@@ -71,6 +78,11 @@ function operationFromCodeFunc(
     preconds
   }
 }
+
+export function operationStr(op: Operation) {
+  return op.codeFunc(..._.range(op.arity).map((i) => String.fromCharCode(65 + i)));
+}
+
 
 // function hasProp(x: unknown, prop: string): x is {prop: any} {
 //   return typeof x === 'object' && x !== null && prop in x;
@@ -111,6 +123,10 @@ let operations: Operation[] = [
     [['number', 'string'], ['number', 'string']],
   ),
   operationFromCodeFunc(
+    (n1: string) => `(- ${n1})`,
+    [['number']],
+  ),
+  operationFromCodeFunc(
     (n1: string, n2: string) => `(${n1} - ${n2})`,
     [['number'], ['number']],
   ),
@@ -126,6 +142,22 @@ let operations: Operation[] = [
     (s1: string) => `${s1}.toLowerCase()`,
     [['string']],
   ),
+  operationFromCodeFunc(
+    (n1: string, n2: string) => `(${n1} === ${n2})`,
+    [['number', 'string'], ['number', 'string']],
+  ),
+  operationFromCodeFunc(
+    (n1: string, n2: string) => `(${n1} <= ${n2})`,
+    [['number'], ['number']],
+  ),
+  operationFromCodeFunc(
+    (n1: string, n2: string) => `(${n1} < ${n2})`,
+    [['number'], ['number']],
+  ),
+  operationFromCodeFunc(
+    (b1: string, n1: string, n2: string) => `(${b1} ? ${n1} : ${n2})`,
+    [['boolean'], ['any'], ['any']],
+  ),
 ]
 
 function replaceWith<T>(arr: T[], idx: number, val: T): T[] {
@@ -140,12 +172,16 @@ operations = [
     return _.range(arity).map((i) => {
       let newPreconds = preconds.slice();
       newPreconds[i] = preconds[i].map((precond) => {
-        if (precond === 'array') {
+        if (precond === 'any') {
+          return 'array';
+        } if (precond === 'array') {
           return 'arrayOfArray';
         } else if (precond === 'number') {
           return 'arrayOfNumber';
         } else if (precond === 'string') {
           return 'arrayOfString';
+        } else if (precond === 'boolean') {
+          return 'arrayOfBoolean';
         } else if (typeof precond === 'string') {
           const precondFunc = valueTypes[precond];
           return isArrayOf(precondFunc);
@@ -192,6 +228,7 @@ export interface SynthesisState {
     skipsCount: number,
     opInLevelCount: number,
     opInLevelTotal: number,
+    opInLevelStr: string | undefined,
   }
 }
 
@@ -237,7 +274,7 @@ function initializeState (inOutPairs: [any, any][]): SynthesisState {
     valueInfosByStr: {},
     valueInfosByType: _.mapValues(valueTypes, () => []),
     result: undefined,
-    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0}
+    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0, opInLevelStr: undefined}
   }
 
   addValueToState(state, {values: inputs, code: 'input', frontier: true});
@@ -303,11 +340,13 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
   state.progress.opInLevelCount = 0;
   for (const op of operations) {
     state.progress.opInLevelCount++;
+    state.progress.opInLevelStr = operationStr(op);
     const t = valueInfosFromPrecondsGen(oldState, op.preconds);
     for (const args of t) {
       state.progress.testsCount++;
 
       if (state.progress.testsCount % 20000 === 0) {
+        // (window as any).state = state;
         yield state;
       }
 
@@ -339,6 +378,7 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
   }
 }
 
+// note: bringing maxLevels up to 4 probably makes problems on the cloneDeep
 export function* synthesizeGen(task: [any, any][], maxLevels = 3): Generator<SynthesisState, string | undefined> {
   const state = initializeState(task);
   if (state.result) {
