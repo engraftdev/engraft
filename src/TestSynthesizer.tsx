@@ -3,6 +3,7 @@ import { VarInfo } from './tools-framework/tools';
 import './tools/builtInTools';
 import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
 import { synthesizeGen } from './util/synthesizer';
+import { synthesizeGen as synthesizeGen2 } from './util/synthesizer2';
 import { runToCompletion } from './util/Task';
 import { Value } from './view/Value';
 
@@ -47,9 +48,21 @@ const TestSynthesizer = memo(function TestSynthesizer() {
         <Value value={prompt}/>
         <button
           onClick={() => {
-            console.log(runToCompletion(synthesizeGen(prompt)))
+            const startTime = performance.now()
+            const result = runToCompletion(synthesizeGen(prompt), true);
+            const duration = performance.now() - startTime;
+            console.log(Math.round(duration), result);
           }}>
-          Run
+          Run 1
+        </button>
+        <button
+          onClick={() => {
+            const startTime = performance.now()
+            const result = runToCompletion(synthesizeGen2(prompt), true);
+            const duration = performance.now() - startTime;
+            console.log(Math.round(duration), result);
+          }}>
+          Run 2
         </button>
         <hr/>
       </div>
