@@ -34,11 +34,13 @@ export class Task<Progress, Complete> {
   }
 }
 
-export function runToCompletion<Complete>(generator: Generator<unknown, Complete>): Complete {
+export function runToCompletion<Complete>(generator: Generator<unknown, Complete>, logProgress: boolean = false): Complete {
   while (true) {
     const curr = generator.next();
     if (curr.done) {
       return curr.value;
+    } else if (logProgress) {
+      console.log(curr.value);
     }
   }
 }
