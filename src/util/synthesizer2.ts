@@ -192,8 +192,6 @@ export interface SynthesisState {
     skipsCount: number,
     opInLevelCount: number,
     opInLevelTotal: number,
-    tupleInOpCount: number,
-    tupleInOpTotal: number,
   }
 }
 
@@ -232,9 +230,14 @@ function addValueToState (state: SynthesisState, valueInfo: ValueInfo): void {
 function initializeState (inOutPairs: [any, any][]): SynthesisState {
   const inputs = inOutPairs.map(([input, output]) => input)
   const outputs = inOutPairs.map(([input, output]) => output)
-  const state = {
-    valueInfosByStr: {}, valueInfosByType: _.mapValues(valueTypes, () => []), inputs, outputs, outputsKey: objectToKey(outputs), result: undefined,
-    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0, tupleInOpCount: 0, tupleInOpTotal: 0}
+  const state: SynthesisState = {
+    inputs,
+    outputs,
+    outputsKey: objectToKey(outputs),
+    valueInfosByStr: {},
+    valueInfosByType: _.mapValues(valueTypes, () => []),
+    result: undefined,
+    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0}
   }
 
   addValueToState(state, {values: inputs, code: 'input', frontier: true});
@@ -248,20 +251,12 @@ function initializeState (inOutPairs: [any, any][]): SynthesisState {
   return state;
 }
 
-function* tupleGen <T>(arr: T[], n: number): Generator<T[]> {
-  const count = Math.pow(arr.length, n);
-  for (var i = 0 ; i <  count; i++) {
-    const tuple = [];
-    var i2 = i;
-    for (var j = 0; j < n; j++) {
-      tuple[n-j-1] = arr[i2 % arr.length];
-      i2 = Math.floor(i2 / arr.length);
-    }
-    yield tuple;
-  }
-}
 
-function* valueInfosFromPrecondsGen (state: SynthesisState, preconds: Precond[][], tuple?: ValueInfo[]): Generator<ValueInfo[]> {
+function* valueInfosFromPrecondsGen (
+  state: SynthesisState,
+  preconds: Precond[][],
+  tuple: ValueInfo[] = [],
+): Generator<ValueInfo[]> {
   if (!tuple) {
     tuple = [];
   }
@@ -269,7 +264,9 @@ function* valueInfosFromPrecondsGen (state: SynthesisState, preconds: Precond[][
   const depth = tuple.length;
 
   if (depth === preconds.length) {
-    yield tuple;
+    if (tuple.some((valueInfo) => valueInfo.frontier)) {
+      yield tuple;
+    }
     return;
   }
 
@@ -306,12 +303,8 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
   state.progress.opInLevelCount = 0;
   for (const op of operations) {
     state.progress.opInLevelCount++;
-    // const t = tupleGen(sortedValues, op.arity);
     const t = valueInfosFromPrecondsGen(oldState, op.preconds);
-    // state.progress.tupleInOpTotal = Math.pow(sortedValues.length, op.arity);
-    // state.progress.tupleInOpCount = 0;
     for (const args of t) {
-      state.progress.tupleInOpCount++;
       state.progress.testsCount++;
 
       if (state.progress.testsCount % 20000 === 0) {
@@ -324,7 +317,6 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
         for (let i = 0; i < state.outputs.length; i++) {
           opOutputs[i] = op.func(args[0]?.values[i], args[1]?.values[i], args[2]?.values[i])
         }
-
         // // old version
         // const opOutputs = state.outputs.map((_, i) => {
         //   const opInputs = args.map(arg => arg.values[i]);
@@ -333,6 +325,7 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
 
         const opExpr = op.codeFunc(...args.map(arg => arg.code));
 
+        // console.log(opExpr);
         addValueToState(state, {
           values: opOutputs,
           code: opExpr,

@@ -12,12 +12,12 @@ const synthesisPrompts: [any, any][][] = [
   [
     ["George Washington Carver", "GWC"],
     ["Josh Horowitz", "JH"],
-    ["Paula Te", "PT"]
+    ["Paula Te", "PT"],
   ],
   [
     ["George Washington Carver", "George"],
     ["Josh Horowitz", "Josh"],
-    ["Paula Te", "Paula"]
+    ["Paula Te", "Paula"],
   ],
   [
     ["George Washington Carver", 3],
@@ -27,18 +27,21 @@ const synthesisPrompts: [any, any][][] = [
   [
     [[1, 2], 3],
     [[2, 0], 2],
-    [[3, -1], 2]
+    [[3, -1], 2],
   ],
-  // [
-  //   [["George Washington Carver", 1], "Washington"],
-  //   [["Josh Horowitz", 0], "Josh"],
-  //   [["Paula Te", 1], "Te"]
-  // ],
-  // [
-  //   [["George Washington Carver", 2], "Washington"],
-  //   [["Josh Horowitz", 1], "Josh"],
-  //   [["Paula Te", 2], "Te"]
-  // ],
+  [
+    [["George Washington Carver", 1], "Washington"],
+    [["Josh Horowitz", 0], "Josh"],
+    [["Paula Te", 1], "Te"],
+  ],
+  [
+    ["josh", "Josh"],
+    ["heh", "Heh"],
+  ],
+  [
+    ["josh", "J"],
+    ["heh", "H"],
+  ],
 ]
 
 const TestSynthesizer = memo(function TestSynthesizer() {
@@ -49,7 +52,7 @@ const TestSynthesizer = memo(function TestSynthesizer() {
         <button
           onClick={() => {
             const startTime = performance.now()
-            const result = runToCompletion(synthesizeGen(prompt), true);
+            const result = runToCompletion(synthesizeGen(prompt));
             const duration = performance.now() - startTime;
             console.log(Math.round(duration), result);
           }}>
@@ -58,7 +61,7 @@ const TestSynthesizer = memo(function TestSynthesizer() {
         <button
           onClick={() => {
             const startTime = performance.now()
-            const result = runToCompletion(synthesizeGen2(prompt), true);
+            const result = runToCompletion(synthesizeGen2(prompt));
             const duration = performance.now() - startTime;
             console.log(Math.round(duration), result);
           }}>
