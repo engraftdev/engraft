@@ -18,39 +18,58 @@ function constantFromCode(code: string): Constant {
 
 const constants = ["undefined", "null", "0", "1", "''", "' '", "'.'"].map(constantFromCode);
 
+function isString(x: unknown): boolean {
+  return typeof x === 'string';
+}
+
+function isArray(x: unknown): x is Array<unknown> {
+  return x instanceof Array;
+}
+
+function isNumber(x: unknown): boolean {
+  return typeof x === 'number';
+}
+
+function isArrayOf(itemCond: (item: unknown) => boolean): (x: unknown) => boolean {
+  return function (x: unknown): boolean {
+    return isArray(x) && (x.length === 0 || itemCond(x));
+  };
+}
+
+const valueTypes = {
+  string: isString,
+  array: isArray as (x: unknown) => boolean,
+  number: isNumber,
+  arrayOfString: isArrayOf(isString),
+  arrayOfArray: isArrayOf(isArray),
+  arrayOfNumber: isArrayOf(isNumber),
+}
+
+type Precond = keyof typeof valueTypes | ((value: unknown) => boolean);
 
 interface Operation {
   arity: number,
   func: (...args: unknown[]) => unknown,
   codeFunc: (...args: string[]) => string,
-  precond?: (...args: unknown[]) => boolean,
+  preconds: Precond[][]
 }
 
 function operationFromCodeFunc(
   codeFunc: (...args: string[]) => string,
-  precond?: (...args: unknown[]) => boolean
+  preconds: Precond[][]
 ): Operation {
   const arity = codeFunc.length;
+  if (preconds.length !== arity) {
+    throw new Error('mismatching preconds length');
+  }
   const args = [...Array(arity).keys()].map((_, i) => 'a' + i);
   return {
     arity: codeFunc.length,
     // eslint-disable-next-line no-new-func
     func: new Function(...args, 'return ' + codeFunc(...args)) as any,
     codeFunc,
-    precond
+    preconds
   }
-}
-
-function isString(x: unknown): x is string {
-  return typeof x === 'string';
-}
-
-function isArray(x: unknown, itemCond?: (item: unknown) => boolean): x is Array<unknown> {
-  return x instanceof Array && (!itemCond || x.length === 0 || itemCond(x[0]));
-}
-
-function isNumber(x: unknown): x is number {
-  return typeof x === 'number';
 }
 
 // function hasProp(x: unknown, prop: string): x is {prop: any} {
@@ -60,52 +79,52 @@ function isNumber(x: unknown): x is number {
 let operations: Operation[] = [
   operationFromCodeFunc(
     (s1: string, s2: string) => `${s1}.split(${s2})`,
-    (s1: any, s2: any) => isString(s1) && isString(s2),
+    [['string'], ['string']],
   ),
   operationFromCodeFunc(
     (s1: string, s2: string) => `${s1}.join(${s2})`,
-    (s1: any, s2: any) => isArray(s1) && isString(s2),
+    [['array'], ['string']],
   ),
   operationFromCodeFunc(
     (s1: string, n1: string, n2: string) => `${s1}.slice(${n1}, ${n2})`,
-    (s1: any, n1: any, n2: any) => (isArray(s1) || isString(s1)) && isNumber(n1) && isNumber(n2),
+    [['array', 'string'], ['number'], ['number']],
   ),
   operationFromCodeFunc(
     (s1: string, n1: string) => `${s1}.slice(${n1})`,
-    (s1: any, n1: any) => (isArray(s1) || isString(s1)) && isNumber(n1),
+    [['array', 'string'], ['number']],
   ),
   operationFromCodeFunc(
     (s1: string, n1: string) => `${s1}[${n1}]`,
-    (s1: any, n1: any) => (isArray(s1) || isString(s1)) && isNumber(n1),
+    [['array', 'string'], ['number']],
   ),
   operationFromCodeFunc(
     (s1: string) => `${s1}.length`,
-    (s1: any) => isArray(s1) || isString(s1),
+    [['array', 'string']],
   ),
   operationFromCodeFunc(
     (s1: string) => `${s1}.flatten()`,
-    (s1: any) => isArray(s1, (item) => isArray(item)),
+    [['arrayOfArray']],
   ),
   // TODO STRETCH: symmetry
   operationFromCodeFunc(
     (n1: string, n2: string) => `(${n1} + ${n2})`,
-    (n1: any, n2: any) => (isNumber(n1) || isString(n1)) && (isNumber(n2) || isString(n2)),
+    [['number', 'string'], ['number', 'string']],
   ),
   operationFromCodeFunc(
     (n1: string, n2: string) => `(${n1} - ${n2})`,
-    (n1: any, n2: any) => isNumber(n1) && isNumber(n2),
+    [['number'], ['number']],
   ),
   operationFromCodeFunc(
     (s1: string) => `${s1}.slice().reverse()`,
-    (s1: any) => isArray(s1),
+    [['array']],
   ),
   operationFromCodeFunc(
     (s1: string) => `${s1}.toUpperCase()`,
-    (s1: any) => isString(s1),
+    [['string']],
   ),
   operationFromCodeFunc(
     (s1: string) => `${s1}.toLowerCase()`,
-    (s1: any) => isString(s1),
+    [['string']],
   ),
 ]
 
@@ -117,44 +136,53 @@ function replaceWith<T>(arr: T[], idx: number, val: T): T[] {
 
 operations = [
   ...operations,
-  ...operations.flatMap(({arity, func, codeFunc, precond}) => {
-    return _.range(arity).map((i) => ({
-      arity: arity,
-      func: (...args: any[]) => args[i].map((x: any) => func(...replaceWith(args, i, x))),
-      codeFunc: (...args: string[]) => `${args[i]}.map((x) => ${codeFunc(...replaceWith(args, i, 'x'))})`,
-      precond: (...args: any[]) => {
-        const arr = args[i]
-        if (arr instanceof Array) {
-          if (arr.length > 0 && precond) {
-            return precond(...replaceWith(args, i, arr[0]));
-          } else {
-            return true;
-          }
+  ...operations.flatMap(({arity, func, codeFunc, preconds}) => {
+    return _.range(arity).map((i) => {
+      let newPreconds = preconds.slice();
+      newPreconds[i] = preconds[i].map((precond) => {
+        if (precond === 'array') {
+          return 'arrayOfArray';
+        } else if (precond === 'number') {
+          return 'arrayOfNumber';
+        } else if (precond === 'string') {
+          return 'arrayOfString';
+        } else if (typeof precond === 'string') {
+          const precondFunc = valueTypes[precond];
+          return isArrayOf(precondFunc);
+        } else {
+          return isArrayOf(precond);
         }
-        return false;
+      })
+
+      return {
+        arity: arity,
+        func: (...args: any[]) => args[i].map((x: any) => func(...replaceWith(args, i, x))),
+        codeFunc: (...args: string[]) => `${args[i]}.map((x) => ${codeFunc(...replaceWith(args, i, 'x'))})`,
+        preconds: newPreconds
       }
-    }))
+    })
   })
 ]
 
 // console.log(operations.map(({codeFunc}) => codeFunc("A", "B", "C", "D")))
 // process.exit();
 
-interface Value {
+interface ValueInfo {
   values: any[],
   code: string,
   frontier: boolean,
 }
 
-interface ValueMap {
-  [valuesStr: string]: Value
+interface ValueInfosByStr {
+  [valuesStr: string]: ValueInfo
 }
 
 export interface SynthesisState {
   inputs: any[],
   outputs: any[],
   outputsKey: any,
-  valueMap: ValueMap,
+  valueInfosByStr: ValueInfosByStr,
+  valueInfosByType: {[name in keyof typeof valueTypes]: ValueInfo[]}
   result: string | undefined;
   progress: {
     testsCount: number,
@@ -164,8 +192,6 @@ export interface SynthesisState {
     skipsCount: number,
     opInLevelCount: number,
     opInLevelTotal: number,
-    tupleInOpCount: number,
-    tupleInOpTotal: number,
   }
 }
 
@@ -174,22 +200,29 @@ function objectToKey(obj: any) {
   // return hash.MD5(obj);
 }
 
-function addValueToState (state: SynthesisState, value: Value): void {
-  const valueKey = objectToKey(value.values);
+function addValueToState (state: SynthesisState, valueInfo: ValueInfo): void {
+  const valueKey = objectToKey(valueInfo.values);
 
   // check if we've obtained the objective
   if (valueKey === state.outputsKey) {
-    state.result = value.code;
+    state.result = valueInfo.code;
     return;
   }
 
   // check if it's in the map already
-  if (state.valueMap[valueKey]) {
-    if (value.code.length < state.valueMap[valueKey].code.length) {
-      state.valueMap[valueKey].code = value.code;
+  if (state.valueInfosByStr[valueKey]) {
+    if (valueInfo.code.length < state.valueInfosByStr[valueKey].code.length) {
+      state.valueInfosByStr[valueKey].code = valueInfo.code;
     }
   } else {
-    state.valueMap[valueKey] = value;
+    state.valueInfosByStr[valueKey] = valueInfo;
+
+    for (const valueTypeName in valueTypes) {
+      if (valueInfo.values.every(valueTypes[valueTypeName as keyof typeof valueTypes])) {
+        state.valueInfosByType[valueTypeName as keyof typeof valueTypes].push(valueInfo);
+      }
+    }
+
     state.progress.valueCount++;
   }
 }
@@ -197,9 +230,14 @@ function addValueToState (state: SynthesisState, value: Value): void {
 function initializeState (inOutPairs: [any, any][]): SynthesisState {
   const inputs = inOutPairs.map(([input, output]) => input)
   const outputs = inOutPairs.map(([input, output]) => output)
-  const state = {
-    valueMap: {}, inputs, outputs, outputsKey: objectToKey(outputs), result: undefined,
-    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0, tupleInOpCount: 0, tupleInOpTotal: 0}
+  const state: SynthesisState = {
+    inputs,
+    outputs,
+    outputsKey: objectToKey(outputs),
+    valueInfosByStr: {},
+    valueInfosByType: _.mapValues(valueTypes, () => []),
+    result: undefined,
+    progress: {testsCount: 0, levelCount: 0, valueCount: 0, catchCount: 0, skipsCount: 0, opInLevelCount: 0, opInLevelTotal: 0}
   }
 
   addValueToState(state, {values: inputs, code: 'input', frontier: true});
@@ -213,73 +251,51 @@ function initializeState (inOutPairs: [any, any][]): SynthesisState {
   return state;
 }
 
-function* tupleGen <T>(arr: T[], n: number): Generator<T[]> {
-  const count = Math.pow(arr.length, n);
-  for (var i = 0 ; i <  count; i++) {
-    const tuple = [];
-    var i2 = i;
-    for (var j = 0; j < n; j++) {
-      tuple[n-j-1] = arr[i2 % arr.length];
-      i2 = Math.floor(i2 / arr.length);
+
+function* valueInfosFromPrecondsGen (
+  state: SynthesisState,
+  preconds: Precond[][],
+  tuple: ValueInfo[] = [],
+): Generator<ValueInfo[]> {
+  if (!tuple) {
+    tuple = [];
+  }
+
+  const depth = tuple.length;
+
+  if (depth === preconds.length) {
+    if (tuple.some((valueInfo) => valueInfo.frontier)) {
+      yield tuple;
     }
-    yield tuple;
+    return;
+  }
+
+  const curPreconds = preconds[depth];
+
+  for (const precond of curPreconds) {
+    if (typeof precond === 'string') {
+      for (const valueInfo of state.valueInfosByType[precond]) {
+        tuple.push(valueInfo);
+        yield* valueInfosFromPrecondsGen(state, preconds, tuple);
+        tuple.pop();
+      }
+    } else {
+      for (const valueInfo of Object.values(state.valueInfosByStr)) {
+        if (valueInfo.values.every(precond)) {
+          tuple.push(valueInfo);
+          yield* valueInfosFromPrecondsGen(state, preconds, tuple);
+          tuple.pop();
+        }
+      }
+    }
   }
 }
 
-// function nextLevel (state: SynthesisState): void {
-//   const sortedValues = _.sortBy(Object.values(state.valueMap), (value) => value.code.length);
-
-//   for (const value of Object.values(state.valueMap)) {
-//     value.frontier = false;
-//   }
-
-//   for (const op of operations) {
-//     const t = tupleGen(sortedValues, op.arity);
-//     for (const args of t) {
-//       const precond = op.precond;
-//       if (precond && state.outputs.some((_, i) => !precond(...args.map(arg => arg.values[i])))) {
-//         continue;
-//       }
-
-//       try {
-//         const opOutputs = state.outputs.map((_, i) => {
-//           const opInputs = args.map(arg => arg.values[i]);
-//           return op.func(...opInputs);
-//         });
-
-//         const opExpr = op.codeFunc(...args.map(arg => arg.code));
-
-//         addValueToState(state, {
-//           values: opOutputs,
-//           code: opExpr,
-//           frontier: true,
-//         });
-//         if (state.result) { return; }
-//       } catch {
-//         state.progress.catchCount++;
-//       }
-//     }
-//   }
-// }
-
-// export function synthesize(task: [any, any][], maxLevels = 3) {
-//   const state = initializeState(task);
-//   if (state.result) {
-//     return state.result;
-//   }
-
-//   for (let levelIdx = 0; levelIdx < maxLevels; levelIdx++) {
-//     nextLevel(state);
-//     if (state.result) {
-//       return state.result;
-//     }
-//   }
-// }
-
 function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
-  const sortedValues = _.sortBy(Object.values(state.valueMap), (value) => value.code.length);
+  // TODO: might be expensive
+  const oldState = _.cloneDeep(state);
 
-  for (const value of Object.values(state.valueMap)) {
+  for (const value of Object.values(state.valueInfosByStr)) {
     value.frontier = false;
   }
 
@@ -287,31 +303,29 @@ function* nextLevelGen (state: SynthesisState): Generator<SynthesisState> {
   state.progress.opInLevelCount = 0;
   for (const op of operations) {
     state.progress.opInLevelCount++;
-    const t = tupleGen(sortedValues, op.arity);
-    state.progress.tupleInOpTotal = Math.pow(sortedValues.length, op.arity);
-    state.progress.tupleInOpCount = 0;
+    const t = valueInfosFromPrecondsGen(oldState, op.preconds);
     for (const args of t) {
-      state.progress.tupleInOpCount++;
       state.progress.testsCount++;
 
       if (state.progress.testsCount % 20000 === 0) {
         yield state;
       }
 
-      const precond = op.precond;
-      if (precond && state.outputs.some((_, i) => !precond(...args.map(arg => arg.values[i])))) {
-        state.progress.skipsCount++;
-        continue;
-      }
-
       try {
-        const opOutputs = state.outputs.map((_, i) => {
-          const opInputs = args.map(arg => arg.values[i]);
-          return op.func(...opInputs);
-        });
+        // TODO: this is a hack that speeds us up by 1.5x, shrug
+        let opOutputs: unknown[] = [];
+        for (let i = 0; i < state.outputs.length; i++) {
+          opOutputs[i] = op.func(args[0]?.values[i], args[1]?.values[i], args[2]?.values[i])
+        }
+        // // old version
+        // const opOutputs = state.outputs.map((_, i) => {
+        //   const opInputs = args.map(arg => arg.values[i]);
+        //   return op.func(...opInputs);
+        // });
 
         const opExpr = op.codeFunc(...args.map(arg => arg.code));
 
+        // console.log(opExpr);
         addValueToState(state, {
           values: opOutputs,
           code: opExpr,
@@ -339,61 +353,6 @@ export function* synthesizeGen(task: [any, any][], maxLevels = 3): Generator<Syn
     }
   }
 }
-
-
-
-
-
-// const tasks: [any, any][][] = [
-//   [
-//     ["George Washington Carver", "GWC"],
-//     ["Josh Horowitz", "JH"],
-//     ["Paula Te", "PT"]
-//   ],
-//   [
-//     ["George Washington Carver", "George"],
-//     ["Josh Horowitz", "Josh"],
-//     ["Paula Te", "Paula"]
-//   ],
-//   [
-//     ["George Washington Carver", 3],
-//     ["Josh Horowitz", 2],
-//     ["Paula Te", 2]
-//   ],
-//   [
-//     [[1, 2], 3],
-//     [[2, 0], 2],
-//     [[3, -1], 2]
-//   ],
-//   // [
-//   //   [["George Washington Carver", 1], "Washington"],
-//   //   [["Josh Horowitz", 0], "Josh"],
-//   //   [["Paula Te", 1], "Te"]
-//   // ],
-//   // [
-//   //   [["George Washington Carver", 2], "Washington"],
-//   //   [["Josh Horowitz", 1], "Josh"],
-//   //   [["Paula Te", 2], "Te"]
-//   // ],
-// ]
-
-// let totalTime = 0;
-// for (const task of tasks) {
-//   let s = initializeState(task);
-//   for (let i = 0; i < 4; i++) {
-//     const start = process.hrtime()
-//     s = step(s);
-//     const end = process.hrtime(start);
-//     const time = end[0] * 1000 + end[1] / 1000000;
-//     console.info(`step ${i + 1}: ${time.toFixed(3)}`)
-//     totalTime += time;
-//     if (s.result) {
-//       console.log(`found it: ${s.result} (${s.catchCount} catches)`);
-//       break;
-//     }
-//   }
-// }
-// console.info(`total time: ${totalTime.toFixed(3)}`)
 
 // // picking keys from objects
 // // better handling of higher-level ops (map, reduce)
