@@ -1,5 +1,5 @@
 import { InternMap } from "internmap";
-import { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import id from "../util/id";
@@ -297,7 +297,7 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
     <div style={{fontFamily: 'monospace',  ...flexRow()}}>
       $
       {pattern.map((step, stepIdx) =>
-        <>
+        <React.Fragment key={stepIdx}>
           .
           { isWildcard(step) ?
             '★' :
@@ -311,7 +311,7 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
               </div>
             }/>
           }
-        </>
+        </React.Fragment>
       )}
     </div>
     <div style={{flexGrow: 1}}/>
@@ -400,8 +400,8 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
       return <div style={{padding: 2, ...flexRow('center')}}>
         <ShowView view={inputView} autoFocus={autoFocus} />
         <div style={{...flexCol()}}>
-          {patternsWithIds.map(({pattern}) =>
-            <div style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
+          {patternsWithIds.map(({pattern, id}) =>
+            <div key={id} style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
               {['', ...pattern.map(step => isWildcard(step) ? '★' : step)].join('.')}
             </div>
           )}
@@ -451,7 +451,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
             <div style={{...flexCol()}}>
               {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
                 <div
-                  key={patternIdx}
+                  key={patternWithId?.id || 'new'}
                   className='ExtractorTool-pattern'
                   style={{
                     border: '1px solid gray',

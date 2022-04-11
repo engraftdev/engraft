@@ -1,5 +1,5 @@
 import { memo, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarInfo, VarInfos } from "../tools-framework/tools";
 import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
@@ -131,7 +131,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
   }, [compiled, env, outputs, setOutput])
   useOutput(reportOutput, output);
 
-  const render = useCallback(function R({autoFocus}) {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
     const [refSet, refs] = usePortalSet<{id: string}>();
 
     const extensions = useMemo(() => {
