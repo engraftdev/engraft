@@ -5,6 +5,7 @@ import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
 import { useAt, useStateSetOnly } from "../util/state";
+import { flexRow } from "../view/styles";
 import { Value } from "../view/Value";
 import { VarDefinition } from "../view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
@@ -94,8 +95,8 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
 
     return (
       <div ref={setMainDiv} style={{padding: 10, position: 'relative'}}>
-        <div className="row-top" style={{marginBottom: 10}}>
-          input <ShowView view={inputView} autoFocus={autoFocus} />
+        <div className="row-top" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
 
         {inputArray &&
