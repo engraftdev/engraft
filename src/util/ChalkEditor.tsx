@@ -19,7 +19,7 @@ import {javascript} from "@codemirror/lang-javascript"
 import { useEffect, useMemo, useRef, useState, Dispatch } from 'react';
 import { Callbacks, instrumentCode } from './instrumentation';
 import { compileExpression } from './compile';
-
+import inspect from 'object-inspect';
 import { Range, RangeSet } from "@codemirror/rangeset";
 
 
@@ -50,7 +50,7 @@ function escapeHtml(unsafe: string): string {
  }
 
 function valueWidget(text: string, offset: number) {
-  return  Decoration.widget({
+  return Decoration.widget({
     widget: new HTMLWidget(`<span class="chalk-value">${escapeHtml(text)}</span>`),
     side: 1
   }).range(offset)
@@ -187,11 +187,7 @@ function newLogs(): Logs {
 }
 
 function valueToString(value: unknown): string {
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return "" + value;
-  }
+  return inspect(value);
 }
 
 export type ChalkResult = {value: any} | {error: any};
@@ -259,7 +255,7 @@ function ChalkEditor({code, input, setCode, reportResult, showValues = true, sho
       },
       console: {
         log: (...vals: any[]) => {
-          const text = vals.map((v) => JSON.stringify(v)).join(", ");
+          const text = vals.map((v) => inspect(v)).join(", ");
           const lineNum = logsRef.current.lineNumber;
           logsRef.current.decorations.push(logDecoration(text, cmText.line(lineNum!).to));
           console.log(...vals);
