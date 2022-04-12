@@ -24,6 +24,7 @@
     "@types/react-test-renderer": "^17.0.1",
     "@types/seedrandom": "^3.0.2",
     "@types/webpack-env": "^1.16.3",
+    "astring": "^1.8.1",
     "babel-loader": "^8.2.4",
     "css-loader": "^6.6.0",
     "eslint": "^8.12.0",

@@ -17,7 +17,7 @@ import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "r
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import CodeMirror from "../util/CodeMirror";
-import compile from "../util/compile";
+import { compileExpression } from "../util/compile";
 import id from "../util/id";
 import { Updater, useAt } from "../util/state";
 import { SynthesisState, synthesizeGen } from "../util/synthesizer";
@@ -149,7 +149,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
 
   const func = useMemo(() => {
     try {
-      const compiled = compile(config.code);
+      const compiled = compileExpression(config.code);
       return (input: any) => compiled({input});
     } catch {
 

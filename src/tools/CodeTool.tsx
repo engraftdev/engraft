@@ -4,7 +4,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { autocompletion } from "@codemirror/autocomplete"
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
-import compile from "../util/compile";
+import { compileExpression } from "../util/compile";
 import CodeMirror from "../util/CodeMirror";
 import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
@@ -78,7 +78,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
       let translated = transform("(" + config.code + ")", { presets: ["react"] }).code!;
       translated = translated.replace(/;$/, "");
-      const result = compile(translated);
+      const result = compileExpression(translated);
       return result;
     } catch (e) {
       // console.warn("error with", config.code)
