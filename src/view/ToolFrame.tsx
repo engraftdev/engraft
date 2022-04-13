@@ -42,8 +42,13 @@ export const ToolFrame = memo(function ToolFrame({children, config, onClose, onN
       }
     </div>
     {children}
-    {showInspector && <WindowPortal>
-      <h3>Tool config</h3>
+    {showInspector && <WindowPortal
+      title="Tool info"
+      onClose={() => {
+        updateShowInspector(() => false);
+      }}
+    >
+      <h3>Config</h3>
       <Value value={config}/>
       <h3>Env</h3>
       <Value value={env}/>
