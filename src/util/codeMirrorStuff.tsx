@@ -1,25 +1,22 @@
-import { CompletionSource, CompletionContext } from "@codemirror/autocomplete";
-
-import {keymap, highlightSpecialChars, drawSelection, dropCursor, EditorView} from "@codemirror/view"
-import {EditorState} from "@codemirror/state"
-import {history, historyKeymap} from "@codemirror/history"
-import {foldKeymap} from "@codemirror/fold"
-import {indentOnInput} from "@codemirror/language"
-import {defaultKeymap} from "@codemirror/commands"
-import {bracketMatching} from "@codemirror/matchbrackets"
-import {closeBrackets, closeBracketsKeymap} from "@codemirror/closebrackets"
-import {searchKeymap, highlightSelectionMatches} from "@codemirror/search"
-import {autocompletion, completionKeymap, pickedCompletion, Completion} from "@codemirror/autocomplete"
-import {commentKeymap} from "@codemirror/comment"
-import {rectangularSelection} from "@codemirror/rectangular-selection"
-import {defaultHighlightStyle} from "@codemirror/highlight"
-import {lintKeymap} from "@codemirror/lint"
-import { updateKeys, Updater, useAt, useStateUpdateOnly } from "../util/state";
+import { autocompletion, Completion, CompletionContext, completionKeymap, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
+import { defaultKeymap } from "@codemirror/commands";
+import { commentKeymap } from "@codemirror/comment";
+import { foldKeymap } from "@codemirror/fold";
+import { defaultHighlightStyle } from "@codemirror/highlight";
+import { history, historyKeymap } from "@codemirror/history";
+import { indentOnInput } from "@codemirror/language";
+import { lintKeymap } from "@codemirror/lint";
+import { bracketMatching } from "@codemirror/matchbrackets";
+import { rectangularSelection } from "@codemirror/rectangular-selection";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { EditorState } from "@codemirror/state";
+import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
+import { memo, useCallback } from "react";
 import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "../tools-framework/tools";
+import { updateKeys, Updater, useAt } from "../util/state";
 import { refCode } from "./refsExtension";
-import { memo, ReactNode, useCallback } from "react";
-import { Value } from "../view/Value";
-import WindowPortal from "./WindowPortal";
+
 
 export const setup = [
   // lineNumbers(),
@@ -138,52 +135,3 @@ export const SubTool = memo(function SubTool({id, subToolConfigs, updateSubToolC
     reportView={reportView}
   />;
 })
-
-
-export interface ToolFrameProps {
-  children: ReactNode;
-  config: ToolConfig;
-  onClose?: () => void;
-  onCode?: () => void;
-  onNotebook?: () => void;
-  env: VarInfos;
-  possibleEnv: PossibleVarInfos;
-}
-
-export const ToolFrame = memo(function ToolFrame({children, config, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
-  const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
-
-  return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>
-    <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
-      <div style={{marginLeft: 2}}>{config.toolName}</div>
-      <div style={{flexGrow: 1, minWidth: 6}}></div>
-      {onCode &&
-        <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onCode}
-        >co</div>
-      }
-      {onNotebook &&
-        <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onNotebook}
-        >nb</div>
-      }
-      <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-        onClick={() => {updateShowInspector((i) => !i)}}
-      >i</div>
-      {onClose &&
-        <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onClose}
-        >×</div>
-      }
-    </div>
-    {children}
-    {showInspector && <WindowPortal>
-      <h3>Tool config</h3>
-      <Value value={config}/>
-      <h3>Env</h3>
-      <Value value={env}/>
-      <h3>Possible env</h3>
-      <Value value={possibleEnv}/>
-    </WindowPortal>}
-  </div>;
-});

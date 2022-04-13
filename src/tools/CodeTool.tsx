@@ -11,7 +11,7 @@ import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
 import refsExtension, { refCode } from "../util/refsExtension";
 import id from "../util/id";
-import { refCompletions, setup, SubTool, toolCompletions, ToolFrame } from "../util/codeMirrorStuff";
+import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
 import { transform } from '@babel/standalone';
 import React from "react";
 import IsolateStyles from "../view/IsolateStyles";
@@ -19,6 +19,7 @@ import seedrandom from 'seedrandom';
 import { notebookConfigSetTo } from "./NotebookTool";
 import { createElementFromReact } from "../util/createElementFrom";
 import { DOM } from "../util/DOM";
+import { ToolFrame } from "../view/ToolFrame";
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
