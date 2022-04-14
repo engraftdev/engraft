@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { registerTool, ToolProps } from "../tools-framework/tools";
+import { registerTool, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { useMemoObject } from "../util/useMemoObject";
 import { RgbColorPicker } from 'react-colorful';
@@ -14,7 +14,7 @@ export const ColorTool = memo(function ColorTool({ config, updateConfig, reportO
   const output = useMemoObject({toolValue: `rgb(${config.r}, ${config.g}, ${config.b})`});
   useOutput(reportOutput, output);
 
-  const render = useCallback(() => {
+  const render: ToolViewRender = useCallback(() => {
     return (
       <div style={{padding: 10}}>
         <RgbColorPicker color={config} onChange={(color) => updateConfig((old) => ({...old, ...color}))} style={{width: 150, height: 150}}/>

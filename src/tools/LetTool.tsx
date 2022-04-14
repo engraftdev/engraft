@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect } from "react"
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, VarConfig } from "../tools-framework/tools"
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools"
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
 import { useAt } from "../util/state"
 import { VarDefinition } from "../view/Vars";
@@ -22,7 +22,7 @@ export const LetTool = memo(function LetTool({ config, updateConfig, reportOutpu
 
   const [bindingVar, updateBindingVar] = useAt(config, updateConfig, 'bindingVar');
 
-  const render = useCallback(({autoFocus}) => {
+  const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
       <div style={{padding: 10}}>
         <div className="row-top" style={{marginBottom: 10}}>

@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { registerTool, ToolProps } from "../tools-framework/tools";
+import { registerTool, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
@@ -13,7 +13,7 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
   const output = useMemoObject({toolValue: config.dataUrl});
   useOutput(reportOutput, output);
 
-  const render = useCallback(function R() {
+  const render: ToolViewRender = useCallback(function R() {
     const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
       const reader = new FileReader();
       reader.addEventListener("load", function () {
@@ -42,7 +42,7 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
         }
       </Dropzone>
     );
-  }, [config.dataUrl]);
+  }, [config.dataUrl, updateConfig]);
   useView(reportView, render, config);
 
   return null;

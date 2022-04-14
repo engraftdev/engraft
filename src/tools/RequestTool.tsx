@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect } from "react";
 import { useDebounce } from "use-debounce";
-import { registerTool, ToolConfig, ToolProps } from "../tools-framework/tools";
+import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useAt } from "../util/state";
 import { codeConfigSetTo } from "./CodeTool";
@@ -37,7 +37,7 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
     }
   }, [autoSend, sendDebounced])
 
-  const render = useCallback(({autoFocus}) => {
+  const render: ToolViewRender = useCallback(({autoFocus}) => {
     return (
       <div style={{padding: 10}}>
         <div className="row-top" style={{marginBottom: 10}}>

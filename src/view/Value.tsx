@@ -107,7 +107,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   if (value instanceof HTMLElement || value instanceof SVGSVGElement) {
     return wrapInline(
       <ValueFrame type='html element'>
-        <DOM>{value}</DOM>
+        <DOM element={value} />
       </ValueFrame>
     );
   }

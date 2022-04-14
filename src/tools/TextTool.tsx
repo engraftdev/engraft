@@ -1,5 +1,5 @@
 import { memo, useCallback, useContext, useMemo, useRef } from "react";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, VarInfo, VarInfos } from "../tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarInfo, VarInfos } from "../tools-framework/tools";
 import { markdown } from "@codemirror/lang-markdown";
 import { autocompletion } from "@codemirror/autocomplete"
 import { ShowView, useOutput, useView } from "../tools-framework/useSubTool";
@@ -56,7 +56,7 @@ export const TextTool = memo(function TextTool({ config, updateConfig, reportOut
   const output = useMemoObject({toolValue: replacedText});
   useOutput(reportOutput, output);
 
-  const render = useCallback(function R({autoFocus}) {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
     const [refSet, refs] = usePortalSet<{id: string}>();
 
     const extensions = useMemo(() => {
@@ -74,7 +74,7 @@ export const TextTool = memo(function TextTool({ config, updateConfig, reportOut
       return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions}), EditorView.lineWrapping];
     }, [refSet])
 
-    const onChange = useCallback((value) => {
+    const onChange = useCallback((value: string) => {
       updateText(() => value);
     }, []);
 

@@ -124,8 +124,8 @@ export interface SubToolProps {
 export const SubTool = memo(function SubTool({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) {
   const [config, updateConfig] = useAt(subToolConfigs, updateSubToolConfigs, id);
 
-  const reportOutput = useCallback((output) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
-  const reportView = useCallback((view) => updateKeys(updateViews, {[id]: view}), [id, updateViews]);
+  const reportOutput = useCallback((output: ToolValue | null) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
+  const reportView = useCallback((view: ToolView | null) => updateKeys(updateViews, {[id]: view}), [id, updateViews]);
 
   const Tool = toolIndex[config.toolName]
   return <Tool

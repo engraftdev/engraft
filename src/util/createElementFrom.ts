@@ -10,6 +10,7 @@ export function createElementFromHTML(htmlString: string) {
 export function createElementFromReact(element: ReactElement<unknown>): Promise<ChildNode | null> {
   var container = document.createElement('div');
   return new Promise((resolve) => {
+    // TODO: still using legacy (pre v18) React render
     ReactDOM.render(element, container, () => {
       resolve(container.firstChild);
     });

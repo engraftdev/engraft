@@ -153,7 +153,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
       return [...setup, refsExtension(refSet), javascript({jsx: true}), autocompletion({override: completions})];
     }, [refSet])
 
-    const onChange = useCallback((value) => {
+    const onChange = useCallback((value: string) => {
       updateKeys(updateConfig, {code: value});
     }, []);
 
@@ -213,7 +213,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
   const env = useContext(EnvContext);
   const possibleEnv = useContext(PossibleEnvContext);
 
-  const render = useCallback(function R({autoFocus}) {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
     return <ToolFrame
       config={config.subConfig} env={env} possibleEnv={possibleEnv}
       onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}

@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { registerTool, ToolProps } from "../tools-framework/tools";
+import { registerTool, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
@@ -15,7 +15,7 @@ export const SliderTool = memo(function SliderTool({ config, updateConfig, repor
   const output = useMemoObject({toolValue: config.value});
   useOutput(reportOutput, output);
 
-  const render = useCallback(() => {
+  const render: ToolViewRender = useCallback(() => {
     return (
       <div style={{padding: 10}}>
         <input

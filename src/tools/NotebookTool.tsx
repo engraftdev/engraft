@@ -1,5 +1,5 @@
 import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig, VarInfo } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 
@@ -42,7 +42,7 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
 
-  const render = useCallback(() => {
+  const render: ToolViewRender = useCallback(() => {
     const smallestUnusedLabel = defaultCellLabels.find((label) =>
       !cells.find((cell) => cell.var.label === label)
     )!

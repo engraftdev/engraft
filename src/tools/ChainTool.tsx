@@ -1,6 +1,5 @@
-import { useWhatChanged } from "@simbathesailor/use-what-changed";
 import React, { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig, VarInfo } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { AddObjToContext } from "../util/context";
 import id from "../util/id";
@@ -61,7 +60,7 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
         <ColDivider i={links.length} updateLinks={updateLinks}/>
       </div>
     );
-  }, [links, outputs, views]);
+  }, [links, outputs, updateLinks, views]);
   useView(reportView, render, config);
 
   return <>

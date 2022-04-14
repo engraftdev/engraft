@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { TableInspector } from "react-inspector";
-import { registerTool, ToolConfig, toolIndex, ToolProps } from "../tools-framework/tools";
+import { registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useMemoObject } from "../util/useMemoObject";
 
@@ -14,7 +14,7 @@ export const TableTool = memo(function TableTool({ config, updateConfig, reportO
   const inputOutputWithAlreadyDisplayed = useMemoObject({toolValue: inputOutput?.toolValue, alreadyDisplayed: true});
   useOutput(reportOutput, inputOutputWithAlreadyDisplayed);
 
-  const render = useCallback(function R({autoFocus}) {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
     return <div style={{padding: 10}}>
       <ShowView view={inputView} autoFocus={autoFocus}/>
       <TableInspector data={inputOutput?.toolValue}/>

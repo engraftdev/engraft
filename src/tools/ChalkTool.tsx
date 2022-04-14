@@ -1,5 +1,4 @@
-import { report } from "process";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import ChalkEditor from "../util/ChalkEditor";
@@ -32,7 +31,7 @@ export const ChalkTool = memo(function ChalkTool({ config, updateConfig, reportO
   useOutput(reportOutput, output);
 
   const render: ToolViewRender = useCallback(function R ({autoFocus}) {
-    const setCode = useCallback((code) => {
+    const setCode = useCallback((code: string) => {
       return updateCode(() => code);
     }, []);
 

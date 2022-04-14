@@ -1,5 +1,5 @@
 import { InternMap } from "internmap";
-import React, { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState, MouseEvent } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import id from "../util/id";
@@ -226,7 +226,7 @@ export const SubValueHandle = memo(function SubValueHandle({path, children}: Sub
 
   const isMultiSelectable = multiSelectMode && activePattern ? generalization : false;
 
-  const onClick = useCallback((ev) => {
+  const onClick = useCallback((ev: MouseEvent) => {
     ev.preventDefault();
     if (generalization) {
       setActivePattern(generalization);

@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect } from "react"
-import { registerTool, ToolConfig, ToolProps, ToolValue } from "../tools-framework/tools"
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolViewRender } from "../tools-framework/tools"
 import { ToolWithView } from "../tools-framework/ToolWithView";
 import { useView } from "../tools-framework/useSubTool"
 import { useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state"
@@ -27,7 +27,7 @@ export const StateTool = memo(function StateTool({ config, updateConfig, reportO
     reportOutput({toolValue: {get: stateValue, set: setStateValue}});
   }, [reportOutput, setStateValue, stateValue])
 
-  const render = useCallback(function R({autoFocus}) {
+  const render: ToolViewRender = useCallback(function R({autoFocus}) {
     const [config, updateConfig] = useStateUpdateOnly(codeConfigSetTo(''))
     const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
 
