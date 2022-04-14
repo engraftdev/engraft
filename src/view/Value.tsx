@@ -172,6 +172,15 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
   const isArray = value instanceof Array;
 
   if (isExpanded) {
+    let entries = Object.entries(value);
+    // TODO: customization of maxItems
+    const maxItems = 100;
+    let moreItems = 0;
+    if (entries.length > maxItems) {
+      moreItems = entries.length - maxItems;
+      entries = entries.slice(0, maxItems);
+    }
+
     return <>
       <div className='ValueComposite-open-row' style={{...flexRow(), width: '100%'}}>
         {prefix}
@@ -195,7 +204,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
         }/>
       </div>
       <Indent style={{padding: 1}}>
-        {Object.entries(value).map(([key, value]) =>
+        {entries.map(([key, value]) =>
           <div key={key} className='ValueComposite-item' style={{
             marginTop: 1,
             marginBottom: 1,
@@ -221,6 +230,11 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
             />
           </div>
         )}
+        {moreItems > 0 &&
+          <div style={{...valueFont, fontStyle: 'italic', opacity: 0.5}}>
+            and {moreItems} more
+          </div>
+        }
       </Indent>
       <div className='ValueComposite-close-row' style={{...flexRow(), width: '100%'}}>
         <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
