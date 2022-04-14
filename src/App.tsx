@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, Reducer, useEffect, useMemo, useReducer, useState } from 'react';
 import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 
@@ -25,6 +25,8 @@ function varInfoObject(varInfos: VarInfo[]) {
 
 const App = memo(function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
+  const [topLevelKey, incrementTopLevelKey] = useReducer<Reducer<number, undefined>>((i) => i + 1, 0);
+
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
     {config: {id: 'IDarray000000', label: 'array'}, value: {toolValue: [1, 2, 3]}},
@@ -34,15 +36,18 @@ const App = memo(function App() {
   useEffect(() => {
     const configJson = window.localStorage.getItem(localStorageKey)
     if (configJson) {
-        updateConfig(() => JSON.parse(configJson));
+      updateConfig(() => JSON.parse(configJson));
+      incrementTopLevelKey(undefined);
     }
   }, [updateConfig])
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(localStorageKey, JSON.stringify(config));
-    } catch {
-
+      if (config !== defaultConfig) {
+        window.localStorage.setItem(localStorageKey, JSON.stringify(config));
+      }
+    } catch (e) {
+      console.warn("error saving to local storage", e);
     }
   }, [config])
 
@@ -57,7 +62,7 @@ const App = memo(function App() {
     </style>
     <div style={{...!showTool && {display: 'none'}}}>
       <EnvContext.Provider value={context}>
-        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+        <ToolWithView key={topLevelKey} config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <br/>
