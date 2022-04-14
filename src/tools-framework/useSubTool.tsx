@@ -1,5 +1,4 @@
-import memoize from "fast-memoize";
-import { memo, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect } from "react";
 import CallFunction from "../util/CallFunction";
 import { Setter, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps, ToolViewRender } from "./tools";
@@ -116,20 +115,45 @@ export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolPro
     updateViews((oldViews) => cleanUpOldProperties(oldViews, tools));
   }, [tools, updateOutputs, updateViews])
 
-  const reportOutput = useMemo(() => memoize((key: string) => (output: ToolValue | null) => updateKeys(updateOutputs, {[key]: output})), [updateOutputs])
-  const reportView = useMemo(() => memoize((key: string) => (view: ToolView | null) => updateKeys(updateViews, {[key]: view})), [updateViews])
-
-  const components = Object.fromEntries(Object.entries(tools).map(([key, {config, updateConfig}]) => {
-    const toolName = config.toolName;
-    const Tool = toolIndex[toolName]
-
-    return [key, <Tool
+  const components = Object.fromEntries(Object.entries(tools).map(([keyName, {config, updateConfig}]) => {
+    return [keyName, <ToolAt
+      key={keyName}
+      keyName={keyName}
       config={config}
-      updateConfig={updateConfig}
-      reportOutput={reportOutput(key)}
-      reportView={reportView(key)}
+      updateConfig={updateConfig as unknown as Updater<ToolConfig>}
+      updateOutputs={updateOutputs}
+      updateViews={updateViews}
     />]
   }))
 
   return [components, views, outputs];
 }
+
+interface ToolAtConfig {
+  keyName: string,
+  config: ToolConfig,
+  updateConfig: Updater<ToolConfig>
+  updateOutputs: Updater<PerTool<ToolValue | null>>,
+  updateViews: Updater<PerTool<ToolView | null>>,
+}
+
+const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, config, updateConfig}: ToolAtConfig) {
+  const reportOutput = useCallback((output: ToolValue | null) => {
+    return updateKeys(updateOutputs, {[keyName]: output});
+  }, [keyName, updateOutputs])
+  const reportView = useCallback((view: ToolView | null) => {
+    return updateKeys(updateViews, {[keyName]: view});
+  }, [keyName, updateViews])
+
+  // TODO: use useEffect to clean up after ourselves?
+
+  const toolName = config.toolName;
+  const Tool = toolIndex[toolName]
+
+  return <Tool
+    config={config}
+    updateConfig={updateConfig}
+    reportOutput={reportOutput}
+    reportView={reportView}
+  />;
+})
