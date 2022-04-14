@@ -1,15 +1,15 @@
-import { memo, Reducer, useEffect, useMemo, useReducer, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
+import appCss from './App.css';
+import { examples } from './examples/examples';
 import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
-
 import './tools/builtInTools';
 import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ValueOfTool } from './view/Value';
 
-import appCss from './App.css';
-import { examples } from './examples/examples';
+
 
 /*
 TODO: fix remounting text-editor bug
@@ -25,7 +25,7 @@ function varInfoObject(varInfos: VarInfo[]) {
 
 const App = memo(function App() {
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
-  const [topLevelKey, incrementTopLevelKey] = useReducer<Reducer<number, undefined>>((i) => i + 1, 0);
+  const [configIsFromLocalStorage, setIsConfigFromLocalStorage] = useState(false);
 
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
@@ -37,7 +37,7 @@ const App = memo(function App() {
     const configJson = window.localStorage.getItem(localStorageKey)
     if (configJson) {
       updateConfig(() => JSON.parse(configJson));
-      incrementTopLevelKey(undefined);
+      setIsConfigFromLocalStorage(true);
     }
   }, [updateConfig])
 
@@ -62,7 +62,7 @@ const App = memo(function App() {
     </style>
     <div style={{...!showTool && {display: 'none'}}}>
       <EnvContext.Provider value={context}>
-        <ToolWithView key={topLevelKey} config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+        <ToolWithView key={`${configIsFromLocalStorage}`} config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <br/>
