@@ -1,6 +1,7 @@
-import { memo, useCallback, useEffect } from "react";
+import * as Immutable from "immutable";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import CallFunction from "../util/CallFunction";
-import { Setter, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
+import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps, ToolViewRender } from "./tools";
 
 // TODO: Tool<any> rather than Tool<ToolConfig>; we trust you'll attach a defaultConfig at some point?
@@ -86,6 +87,7 @@ export function useSubTool<C, K extends string & keyof C>({config, updateConfig,
 
 
 type PerTool<T> = {[key: string]: T}
+type PerToolInternal<T> = Immutable.Map<string, T>
 
 export type UseToolsReturn = [
   components: PerTool<JSX.Element>,
@@ -93,22 +95,19 @@ export type UseToolsReturn = [
   outputs: PerTool<ToolValue | null>,
 ]
 
-function cleanUpOldProperties<T, U>(oldA: PerTool<T>, newB: PerTool<U>) {
+function cleanUpOldProperties<T, U>(oldA: PerToolInternal<T>, newB: PerTool<U>) {
   let newA = oldA;
-  Object.keys(oldA).forEach((key) => {
+  oldA.forEach((_, key) => {
     if (!(key in newB)) {
-      if (newA === oldA) {
-        newA = {...oldA}
-      }
-      delete newA[key];
+      newA = newA.delete(key);
     }
   })
   return newA;
 }
 
 export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolProps<C>}): UseToolsReturn {
-  const [outputs, updateOutputs] = useStateUpdateOnly<PerTool<ToolValue | null>>({})
-  const [views, updateViews] = useStateUpdateOnly<PerTool<ToolView | null>>({})
+  const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolValue | null>>(Immutable.Map())
+  const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
 
   useEffect(() => {
     updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, tools));
@@ -126,23 +125,26 @@ export function useTools<C extends ToolConfig>(tools: {[key: string]: UseToolPro
     />]
   }))
 
-  return [components, views, outputs];
+  const viewsObj = useMemo(() => views.toObject(), [views])
+  const outputsObj = useMemo(() => outputs.toObject(), [outputs])
+
+  return [components, viewsObj, outputsObj];
 }
 
 interface ToolAtConfig {
   keyName: string,
   config: ToolConfig,
   updateConfig: Updater<ToolConfig>
-  updateOutputs: Updater<PerTool<ToolValue | null>>,
-  updateViews: Updater<PerTool<ToolView | null>>,
+  updateOutputs: Updater<PerToolInternal<ToolValue | null>>,
+  updateViews: Updater<PerToolInternal<ToolView | null>>,
 }
 
 const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, config, updateConfig}: ToolAtConfig) {
   const reportOutput = useCallback((output: ToolValue | null) => {
-    return updateKeys(updateOutputs, {[keyName]: output});
+    return updateOutputs((oldOutputs) => oldOutputs.set(keyName, output));
   }, [keyName, updateOutputs])
   const reportView = useCallback((view: ToolView | null) => {
-    return updateKeys(updateViews, {[keyName]: view});
+    return updateViews((oldViews) => oldViews.set(keyName, view));
   }, [keyName, updateViews])
 
   // TODO: use useEffect to clean up after ourselves?

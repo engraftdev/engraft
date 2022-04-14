@@ -38,6 +38,7 @@
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "friendly-words": "^1.2.0",
     "immutability-helper": "^3.1.1",
+    "immutable": "^4.0.0",
     "internmap": "^2.0.3",
     "is-valid-identifier": "^2.0.2",
     "lodash": "^4.17.21",
