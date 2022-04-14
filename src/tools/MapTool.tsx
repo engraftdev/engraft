@@ -93,13 +93,19 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
       ];
     }, [indexBoxDiv, mainDiv, perItemBoxDiv, perItemBoxDivResizes]);
 
+    const maxItemsDisplayed = 10;
+    let inputArrayTruncated = inputArray;
+    if (inputArrayTruncated && inputArrayTruncated.length > maxItemsDisplayed) {
+      inputArrayTruncated = inputArrayTruncated.slice(0, maxItemsDisplayed);
+    }
+
     return (
       <div ref={setMainDiv} style={{padding: 10, position: 'relative'}}>
         <div className="row-top" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
           <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
 
-        {inputArray &&
+        {inputArrayTruncated &&
           <>
             <svg width={1} height={1} style={{position: 'absolute', left: 0, top: 0, overflow: 'visible'}}>
               <polygon
@@ -110,7 +116,7 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
               />
             </svg>
             <div>
-              {inputArray.map((elem, i) =>
+              {inputArrayTruncated.map((elem, i) =>
                 <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3,
                                     cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
                       onClick={() => setHighlightedIndex(i)}
@@ -129,7 +135,7 @@ export const MapTool = memo(function MapTool({ config, updateConfig, reportOutpu
                 <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
                 {' = '}
                 <div style={{minWidth: 0}}>
-                  <Value value={inputArray[highlightedIndex]?.toolValue}/>
+                  <Value value={inputArrayTruncated[highlightedIndex]?.toolValue}/>
                 </div>
               </div>
               <div>
