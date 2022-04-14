@@ -10,7 +10,7 @@ import { usePortalSet } from "../util/PortalSet";
 import ReactDOM from "react-dom";
 import { VarUse } from "../view/Vars";
 import refsExtension, { refCode } from "../util/refsExtension";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
 import { transform } from '@babel/standalone';
 import React from "react";
@@ -137,11 +137,11 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
 
     const extensions = useMemo(() => {
       function insertTool(tool: Tool<ToolConfig>) {
-        const newId = id();
+        const id = newId();
         const newConfig = codeConfigSetTo(tool.defaultConfig());
-        updateKeys(updateSubTools, {[newId]: newConfig});
+        updateKeys(updateSubTools, {[id]: newConfig});
         // TODO: we never remove these! lol
-        return newId;
+        return id;
       };
       function replaceWithTool(tool: Tool<ToolConfig>) {
         updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: tool.defaultConfig()}))
@@ -218,12 +218,12 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
       config={config.subConfig} env={env} possibleEnv={possibleEnv}
       onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}
       onCode={() => {
-        const newId = id();
+        const id = newId();
         updateConfig(() => ({
           toolName: 'code',
           modeName: 'code',
-          code: refCode(newId),
-          subTools: {[newId]: config},
+          code: refCode(id),
+          subTools: {[id]: config},
         }))
       }}
       onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {

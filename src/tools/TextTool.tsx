@@ -11,7 +11,7 @@ import { VarUse } from "../view/Vars";
 import refsExtension, { refCode } from "../util/refsExtension";
 import { useMemoObject } from "../util/useMemoObject";
 import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { codeConfigSetTo } from "./CodeTool";
 import { EditorView } from "@codemirror/view";
 import IsolateStyles from "../view/IsolateStyles";
@@ -61,11 +61,11 @@ export const TextTool = memo(function TextTool({ config, updateConfig, reportOut
 
     const extensions = useMemo(() => {
       function insertTool(tool: Tool<ToolConfig>) {
-        const newId = id();
+        const id = newId();
         const newConfig = codeConfigSetTo(tool.defaultConfig());
-        updateKeys(updateSubTools, {[newId]: newConfig});
+        updateKeys(updateSubTools, {[id]: newConfig});
         // TODO: we never remove these! lol
-        return newId;
+        return id;
       };
       const completions = [
         toolCompletions(insertTool),

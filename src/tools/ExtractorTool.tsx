@@ -2,7 +2,7 @@ import { InternMap } from "internmap";
 import React, { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState, MouseEvent } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { mapUpdate } from "../util/mapUpdate";
 import { useAt } from "../util/state";
 import { Use } from "../util/Use";
@@ -379,7 +379,7 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
         let newPatternsWithIds = oldPatternsWithIds.slice();
         let activePatternWithId = newPatternsWithIds[activePatternIndex];
         if (!activePatternWithId) {
-          newPatternsWithIds[activePatternIndex] = {id: id(), pattern};
+          newPatternsWithIds[activePatternIndex] = {id: newId(), pattern};
         } else {
           newPatternsWithIds[activePatternIndex] = {id: activePatternWithId.id, pattern};
         }

@@ -3,11 +3,12 @@ import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
 import { RangeSet } from "@codemirror/rangeset";
 import PortalSet from "./PortalSet";
 import PortalWidget from "./PortalWidget";
+import { idRegExp } from "./id";
 
 export function refCode(s: string) {
   return s;
 }
-const refRE = new RegExp(refCode("(ID[a-z]*[0-9]{6})"), "g")
+const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
 
 function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   const matches = Array.from(text.sliceString(0).matchAll(refRE));

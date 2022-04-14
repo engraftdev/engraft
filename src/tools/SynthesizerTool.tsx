@@ -18,7 +18,7 @@ import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-fr
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import CodeMirror from "../util/CodeMirror";
 import { compileExpression } from "../util/compile";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { Updater, useAt } from "../util/state";
 import { SynthesisState, synthesizeGen } from "../util/synthesizer";
 import { Task } from "../util/Task";
@@ -179,7 +179,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
             outCode = 'undefined';
           }
           return {
-            id: id(),
+            id: newId(),
             inCode,
             outCode,
           }
@@ -188,7 +188,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
     } catch {
     }
     return {
-      id: id(),
+      id: newId(),
       inCode: '',
       outCode: '',
     };

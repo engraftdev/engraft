@@ -1,6 +1,6 @@
 import { createContext, memo, ReactElement, ReactNode } from "react";
 import { AddToContext } from "../util/context";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { Setter, Updater } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
 
@@ -85,7 +85,7 @@ export interface VarConfig {
 }
 
 export function newVarConfig(label = 'new var') {
-  return {id: id(), label};
+  return {id: newId(), label};
 }
 
 

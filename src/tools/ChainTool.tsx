@@ -2,7 +2,7 @@ import React, { Fragment, memo, useCallback, useEffect, useMemo } from "react";
 import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { AddObjToContext } from "../util/context";
-import id from "../util/id";
+import { newId } from "../util/id";
 import { Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 import { updateF } from "../util/updateF";
 import { Use } from "../util/Use";
@@ -85,7 +85,7 @@ registerTool<ChainConfig>(ChainTool, 'chain', () => {
     prevVar,
     links: [
       {
-        id: id(),
+        id: newId(),
         config: codeConfigSetTo(''),
       },
     ],
@@ -163,7 +163,7 @@ const ColDivider = memo(function ColDivider({i, updateLinks}: {i: number, update
     // TODO: updateF / $spec nonsense
     updateLinks((oldLinks) => {
       let newLinks = oldLinks.slice();
-      const newLink: Link = {id: id(), config: codeConfigSetTo('')};
+      const newLink: Link = {id: newId(), config: codeConfigSetTo('')};
       newLinks.splice(i, 0, newLink);
       return newLinks;
     });
