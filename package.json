@@ -16,6 +16,7 @@
     "@codemirror/view": "^0.19.42",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@simbathesailor/use-what-changed": "^2.0.0",
+    "@types/babel__core": "^7.1.19",
     "@types/babel__standalone": "^7.1.4",
     "@types/jest": "^27.0.1",
     "@types/lodash": "^4.14.178",

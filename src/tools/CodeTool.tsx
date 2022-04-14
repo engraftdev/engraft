@@ -13,6 +13,7 @@ import refsExtension, { refCode } from "../util/refsExtension";
 import { newId } from "../util/id";
 import { refCompletions, setup, SubTool, toolCompletions } from "../util/codeMirrorStuff";
 import { transform } from '@babel/standalone';
+import { BabelFileResult } from '@babel/core';
 import React from "react";
 import IsolateStyles from "../view/IsolateStyles";
 import seedrandom from 'seedrandom';
@@ -68,6 +69,15 @@ export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
 }
 
 
+let _transformCachedCache: {[code: string]: BabelFileResult} = {};
+function transformCached(code: string) {
+  const fromCache = _transformCachedCache[code]
+  if (fromCache) { return fromCache; }
+  const computed = transform(code, { presets: ["react"] });
+  _transformCachedCache[code] = computed;
+  return computed;
+}
+
 type CodeToolCodeModeProps = Replace<ToolProps<CodeConfig>, {
   config: CodeConfigCodeMode,
   updateConfig: Updater<CodeConfig, CodeConfigCodeMode>,
@@ -77,7 +87,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode({ config, updateC
   const compiled = useMemo(() => {
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
-      let translated = transform("(" + config.code + ")", { presets: ["react"] }).code!;
+      let translated = transformCached("(" + config.code + ")").code!;
       translated = translated.replace(/;$/, "");
       const result = compileExpression(translated);
       return result;
