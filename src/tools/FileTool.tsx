@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { registerTool, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolProps, ToolView } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
@@ -13,37 +13,36 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
   const output = useMemoObject({toolValue: config.dataUrl});
   useOutput(reportOutput, output);
 
-  const render: ToolViewRender = useCallback(function R() {
-    const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      const reader = new FileReader();
-      reader.addEventListener("load", function () {
-        if (typeof reader.result === 'string') {
-          updateKeys(updateConfig, {dataUrl: reader.result});
-        } else {
-          console.error('problem reading file to data url', reader.result, reader.error);
-        }
-      }, false);
-      reader.readAsDataURL(acceptedFiles[0]);  // todo: multiple / 0 files
-    }, []);
+  // TODO: questionable; easier to put this here, but it really belongs in a render component
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", function () {
+      if (typeof reader.result === 'string') {
+        updateKeys(updateConfig, {dataUrl: reader.result});
+      } else {
+        console.error('problem reading file to data url', reader.result, reader.error);
+      }
+    }, false);
+    reader.readAsDataURL(acceptedFiles[0]);  // todo: multiple / 0 files
+  }, [updateConfig]);
 
-    return (
-      <Dropzone onDrop={onDrop}>
-        {({getRootProps, getInputProps}) =>
-          <div {...getRootProps({className: "root", style: {padding: 10}})}>
-            { config.dataUrl ?
-              <>{config.dataUrl.length} characters</> :
-              <>
-                <div>drop here, or click</div>
-                <input {...getInputProps({className: "input"})}/>
-              </>
-            }
-            {/* TODO: input; delete */}
-          </div>
-        }
-      </Dropzone>
-    );
-  }, [config.dataUrl, updateConfig]);
-  useView(reportView, render, config);
+  const view: ToolView = useCallback(() => (
+    <Dropzone onDrop={onDrop}>
+      {({getRootProps, getInputProps}) =>
+        <div {...getRootProps({className: "root", style: {padding: 10}})}>
+          { config.dataUrl ?
+            <>{config.dataUrl.length} characters</> :
+            <>
+              <div>drop here, or click</div>
+              <input {...getInputProps({className: "input"})}/>
+            </>
+          }
+          {/* TODO: input; delete */}
+        </div>
+      }
+    </Dropzone>
+  ), [config.dataUrl, onDrop]);
+  useView(reportView, view);
 
   return null;
 })

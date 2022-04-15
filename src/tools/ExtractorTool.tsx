@@ -1,6 +1,6 @@
 import { InternMap } from "internmap";
-import React, { createContext, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useState, MouseEvent } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { newId } from "../util/id";
 import { mapUpdate } from "../util/mapUpdate";
@@ -335,11 +335,12 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
   </div>
 })
 
-export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ExtractorConfig>) {
+export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<ExtractorConfig>) {
+  const { config, updateConfig, reportOutput, reportView } = props;
+
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
-  const [patternsWithIds, updatePatternsWithIds] = useAt(config, updateConfig, 'patternsWithIds');
-  const [minimized, updateMinimized] = useAt(config, updateConfig, 'minimized');
+  const { patternsWithIds } = config;
 
   const mergedPatterns = useMemo(() => {
     return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
@@ -361,151 +362,10 @@ export const ExtractorTool = memo(function ExtractorTool({ config, updateConfig,
 
   // const metaHeld = useKeyHeld('Meta');
 
-  const render: ToolViewRender = useCallback(function R({autoFocus}) {
-    const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
-
-    useEffect(() => {
-      if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
-        setActivePatternIndex(patternsWithIds.length);
-      }
-    // TODO: this is really bad – exhaustive-deps thinks patternsWithIds.length doesn't trigger re-render cuz it's an
-    //       "outer scope value". this is a flaw in my changing-render-func approach.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activePatternIndex, patternsWithIds.length])
-
-
-    const setActivePattern = useCallback((pattern: Pattern) => {
-      updatePatternsWithIds((oldPatternsWithIds) => {
-        let newPatternsWithIds = oldPatternsWithIds.slice();
-        let activePatternWithId = newPatternsWithIds[activePatternIndex];
-        if (!activePatternWithId) {
-          newPatternsWithIds[activePatternIndex] = {id: newId(), pattern};
-        } else {
-          newPatternsWithIds[activePatternIndex] = {id: activePatternWithId.id, pattern};
-        }
-        return newPatternsWithIds;
-      })
-    }, [activePatternIndex])
-
-    const [hoverRef, isTopLevelHovered] = useHover();
-    const isShiftHeld = useKeyHeld("Shift");
-
-    const multiSelectMode = isTopLevelHovered && isShiftHeld;
-
-    const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
-    const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
-
-    // todo: very hacky
-    if (minimized) {
-      return <div style={{padding: 2, ...flexRow('center')}}>
-        <ShowView view={inputView} autoFocus={autoFocus} />
-        <div style={{...flexCol()}}>
-          {patternsWithIds.map(({pattern, id}) =>
-            <div key={id} style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
-              {['', ...pattern.map(step => isWildcard(step) ? '★' : step)].join('.')}
-            </div>
-          )}
-        </div>
-        <span
-          style={{marginLeft: 8, cursor: 'pointer'}}
-          onClick={(ev) => {
-            ev.preventDefault();
-            updateMinimized(() => false);
-          }}
-        >
-          ⊕
-        </span>
-      </div>;
-    }
-
-    return (
-      <div ref={hoverRef} style={{padding: 10}}>
-        <div
-          className="ExtractorTool-top"
-          style={{
-            position: 'sticky',
-            zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
-            top: 0,
-            background: 'white',
-            paddingTop: 10,
-            marginTop: -10,
-            paddingBottom: 10,
-            marginBottom: 10,
-          }}
-        >
-          <div
-            style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
-            onClick={(ev) => {
-              ev.preventDefault();
-              updateMinimized(() => true);
-            }}
-          >
-            ⊖
-          </div>
-          <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
-            <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
-          </div>
-
-          <div style={{...flexRow(), gap: 10}}>
-            <span style={{fontWeight: 'bold'}}>patterns</span>
-            <div style={{...flexCol()}}>
-              {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
-                <div
-                  key={patternWithId?.id || 'new'}
-                  className='ExtractorTool-pattern'
-                  style={{
-                    border: '1px solid gray',
-                    ...patternIdx > 0 && {
-                      marginTop: -1,
-                    },
-                    padding: 3,
-                    ...activePatternIndex === patternIdx && {
-                      background: 'rgba(0,0,220,0.1)',
-                    },
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setActivePatternIndex(patternIdx)}
-                >
-                  {patternWithId ?
-                    <PatternView
-                      key={patternWithId.id}
-                      pattern={patternWithId.pattern}
-                      onStepToWildcard={(stepIdx) => {
-                        updatePatternsWithIds((oldPatternsWithIds) => {
-                          let newPatternsWithIds = [...oldPatternsWithIds];
-                          // TODO agggrh this isn't enve correnct arrrrgh
-                          newPatternsWithIds[patternIdx].pattern[stepIdx] = {wildcard: true};
-                          return newPatternsWithIds;
-                        })
-                      }}
-                      onRemove={() => {
-                        updatePatternsWithIds((oldPatternsWithIds) => {
-                          let newPatternsWithIds = [...oldPatternsWithIds];
-                          newPatternsWithIds.splice(patternIdx, 1);
-                          return newPatternsWithIds;
-                        })
-                        if (activePatternIndex === patternIdx) {
-                          setActivePatternIndex(patternsWithIds.length - 1);
-                        }
-                      }}
-                    />:
-                    <div style={{fontStyle: 'italic', fontSize: '80%'}}>
-                      new pattern
-                    </div>
-                  }
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ValueOfTool toolValue={inputOutput} customizations={customizations} />
-        </ExtractorContext.Provider>
-      </div>
-    );
-  }, [patternsWithIds, minimized, inputView, inputOutput, updatePatternsWithIds, updateMinimized]);
-  useView(reportView, render, config);
+  const view: ToolView = useCallback((viewProps) => (
+    <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
+  ), [props, inputView, inputOutput]);
+  useView(reportView, view);
 
   return <>
     {inputComponent}
@@ -519,3 +379,159 @@ registerTool<ExtractorConfig>(ExtractorTool, 'extractor', () => {
     minimized: false,
   };
 });
+
+
+interface ExtractorToolViewProps extends ToolProps<ExtractorConfig>, ToolViewProps {
+  inputView: ToolView | null;
+  inputOutput: ToolValue | null;
+}
+
+const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
+  const { config, updateConfig, autoFocus, inputView, inputOutput } = props;
+
+  const [patternsWithIds, updatePatternsWithIds] = useAt(config, updateConfig, 'patternsWithIds');
+  const [minimized, updateMinimized] = useAt(config, updateConfig, 'minimized');
+
+  const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
+
+  useEffect(() => {
+    if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
+      setActivePatternIndex(patternsWithIds.length);
+    }
+  // TODO: this is really bad – exhaustive-deps thinks patternsWithIds.length doesn't trigger re-render cuz it's an
+  //       "outer scope value". this is a flaw in my changing-render-func approach.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePatternIndex, patternsWithIds.length])
+
+
+  const setActivePattern = useCallback((pattern: Pattern) => {
+    updatePatternsWithIds((oldPatternsWithIds) => {
+      let newPatternsWithIds = oldPatternsWithIds.slice();
+      let activePatternWithId = newPatternsWithIds[activePatternIndex];
+      if (!activePatternWithId) {
+        newPatternsWithIds[activePatternIndex] = {id: newId(), pattern};
+      } else {
+        newPatternsWithIds[activePatternIndex] = {id: activePatternWithId.id, pattern};
+      }
+      return newPatternsWithIds;
+    })
+  }, [activePatternIndex, updatePatternsWithIds])
+
+  const [hoverRef, isTopLevelHovered] = useHover();
+  const isShiftHeld = useKeyHeld("Shift");
+
+  const multiSelectMode = isTopLevelHovered && isShiftHeld;
+
+  const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
+  const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
+
+  // todo: very hacky
+  if (minimized) {
+    return <div style={{padding: 2, ...flexRow('center')}}>
+      <ShowView view={inputView} autoFocus={autoFocus} />
+      <div style={{...flexCol()}}>
+        {patternsWithIds.map(({pattern, id}) =>
+          <div key={id} style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
+            {['', ...pattern.map(step => isWildcard(step) ? '★' : step)].join('.')}
+          </div>
+        )}
+      </div>
+      <span
+        style={{marginLeft: 8, cursor: 'pointer'}}
+        onClick={(ev) => {
+          ev.preventDefault();
+          updateMinimized(() => false);
+        }}
+      >
+        ⊕
+      </span>
+    </div>;
+  }
+
+  return (
+    <div ref={hoverRef} style={{padding: 10}}>
+      <div
+        className="ExtractorTool-top"
+        style={{
+          position: 'sticky',
+          zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
+          top: 0,
+          background: 'white',
+          paddingTop: 10,
+          marginTop: -10,
+          paddingBottom: 10,
+          marginBottom: 10,
+        }}
+      >
+        <div
+          style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
+          onClick={(ev) => {
+            ev.preventDefault();
+            updateMinimized(() => true);
+          }}
+        >
+          ⊖
+        </div>
+        <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
+        </div>
+
+        <div style={{...flexRow(), gap: 10}}>
+          <span style={{fontWeight: 'bold'}}>patterns</span>
+          <div style={{...flexCol()}}>
+            {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
+              <div
+                key={patternWithId?.id || 'new'}
+                className='ExtractorTool-pattern'
+                style={{
+                  border: '1px solid gray',
+                  ...patternIdx > 0 && {
+                    marginTop: -1,
+                  },
+                  padding: 3,
+                  ...activePatternIndex === patternIdx && {
+                    background: 'rgba(0,0,220,0.1)',
+                  },
+                  cursor: 'pointer',
+                }}
+                onClick={() => setActivePatternIndex(patternIdx)}
+              >
+                {patternWithId ?
+                  <PatternView
+                    key={patternWithId.id}
+                    pattern={patternWithId.pattern}
+                    onStepToWildcard={(stepIdx) => {
+                      updatePatternsWithIds((oldPatternsWithIds) => {
+                        let newPatternsWithIds = [...oldPatternsWithIds];
+                        // TODO agggrh this isn't enve correnct arrrrgh
+                        newPatternsWithIds[patternIdx].pattern[stepIdx] = {wildcard: true};
+                        return newPatternsWithIds;
+                      })
+                    }}
+                    onRemove={() => {
+                      updatePatternsWithIds((oldPatternsWithIds) => {
+                        let newPatternsWithIds = [...oldPatternsWithIds];
+                        newPatternsWithIds.splice(patternIdx, 1);
+                        return newPatternsWithIds;
+                      })
+                      if (activePatternIndex === patternIdx) {
+                        setActivePatternIndex(patternsWithIds.length - 1);
+                      }
+                    }}
+                  />:
+                  <div style={{fontStyle: 'italic', fontSize: '80%'}}>
+                    new pattern
+                  </div>
+                }
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
+        <ValueOfTool toolValue={inputOutput} customizations={customizations} />
+      </ExtractorContext.Provider>
+    </div>
+  );
+})

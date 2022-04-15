@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect } from "react";
 import { useDebounce } from "use-debounce";
-import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
 import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useAt } from "../util/state";
 import { codeConfigSetTo } from "./CodeTool";
@@ -37,27 +37,25 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
     }
   }, [autoSend, sendDebounced])
 
-  const render: ToolViewRender = useCallback(({autoFocus}) => {
-    return (
-      <div style={{padding: 10}}>
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>url</b> <ShowView view={urlView} autoFocus={autoFocus}/>
-        </div>
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>params</b> <ShowView view={paramsView}/>
-        </div>
-        <div style={{display: 'flex'}}>
-          <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
-          {autoSend ?
-            sendDebouncedControl.isPending() ? 'about to auto-send' : 'auto-send on' :
-            'auto-send off'}
-          <div style={{flexGrow: 1}} />
-          <button onClick={send}>send now</button>
-        </div>
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{padding: 10}}>
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>url</b> <ShowView view={urlView} autoFocus={autoFocus}/>
       </div>
-    );
-  }, [urlView, paramsView, autoSend, sendDebouncedControl, send, updateAutoSend]);
-  useView(reportView, render, config);
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>params</b> <ShowView view={paramsView}/>
+      </div>
+      <div style={{display: 'flex'}}>
+        <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
+        {autoSend ?
+          sendDebouncedControl.isPending() ? 'about to auto-send' : 'auto-send on' :
+          'auto-send off'}
+        <div style={{flexGrow: 1}} />
+        <button onClick={send}>send now</button>
+      </div>
+    </div>
+  ), [urlView, paramsView, autoSend, sendDebouncedControl, send, updateAutoSend]);
+  useView(reportView, view);
 
   return <>
     {urlComponent}

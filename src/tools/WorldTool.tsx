@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "../util/state";
 import { codeConfigSetTo } from "./CodeTool";
@@ -17,7 +17,7 @@ export interface WorldConfig {
 export const WorldTool = memo(function WorldTool({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) {
   const [initComponent, initView, initOutput] = useSubTool({config, updateConfig, subKey: 'initConfig'})
 
-  const [iterationsCount, updateIterationsCount] = useAt(config, updateConfig, 'iterationsCount');
+  const { iterationsCount } = config;
 
   const iterations = useMemo(() => {
     return _.range(config.iterationsCount)
@@ -41,48 +41,46 @@ export const WorldTool = memo(function WorldTool({ config, updateConfig, reportO
     }
   }, [highlightedIndex, iterationsCount, setHighlightedIndex])
 
-  const render: ToolViewRender = useCallback(function R({autoFocus}) {
-    return (
-      <div style={{
-        padding: 10, display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
-        background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
-        }}>
-        <div style={{textAlign: 'right'}}>step</div>
-        <div>
-          <input
-            type="range"
-            value={highlightedIndex}
-            onChange={(ev) => setHighlightedIndex(+ev.target.value)}
-            min={0} max={iterationsCount - 1} step={1}/>
-          {' '}
-          <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
-          {/* /
-          <div>max</div> <input
-            type="range"
-            value={iterationsCount}
-            onChange={(ev) => updateIterationsCount(() => +ev.target.value)}
-            min={0} max={100} step={1}/>
-          {' '}
-          <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{iterationsCount}</div> */}
-        </div>
-        <div style={{textAlign: 'right'}}>init</div>
-        <div>
-          <ShowView view={initView} autoFocus={autoFocus} />
-        </div>
-        <div style={{textAlign: 'right'}}>update</div>
-        <div style={{display: 'flex', flexDirection: 'column'}}>
-          {/* <Value value={(highlightedIndex === 0 ? initOutput : upOutputs[highlightedIndex - 1]) || undefined}
-            style={{maxHeight: 30}}/> */}
-          <ShowView view={upViews[highlightedIndex]} autoFocus={autoFocus} />
-          {/* <Value value={upOutputs[highlightedIndex]?.toolValue || undefined}
-            style={{maxHeight: 100}}/> */}
-        </div>
-        <div style={{textAlign: 'right'}}>view</div>
-        <ShowView view={viewView} autoFocus={autoFocus} />
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{
+      padding: 10, display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
+      background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
+      }}>
+      <div style={{textAlign: 'right'}}>step</div>
+      <div>
+        <input
+          type="range"
+          value={highlightedIndex}
+          onChange={(ev) => setHighlightedIndex(+ev.target.value)}
+          min={0} max={iterationsCount - 1} step={1}/>
+        {' '}
+        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
+        {/* /
+        <div>max</div> <input
+          type="range"
+          value={iterationsCount}
+          onChange={(ev) => updateIterationsCount(() => +ev.target.value)}
+          min={0} max={100} step={1}/>
+        {' '}
+        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{iterationsCount}</div> */}
       </div>
-    );
-  }, [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewView]);
-  useView(reportView, render, config);
+      <div style={{textAlign: 'right'}}>init</div>
+      <div>
+        <ShowView view={initView} autoFocus={autoFocus} />
+      </div>
+      <div style={{textAlign: 'right'}}>update</div>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        {/* <Value value={(highlightedIndex === 0 ? initOutput : upOutputs[highlightedIndex - 1]) || undefined}
+          style={{maxHeight: 30}}/> */}
+        <ShowView view={upViews[highlightedIndex]} autoFocus={autoFocus} />
+        {/* <Value value={upOutputs[highlightedIndex]?.toolValue || undefined}
+          style={{maxHeight: 100}}/> */}
+      </div>
+      <div style={{textAlign: 'right'}}>view</div>
+      <ShowView view={viewView} autoFocus={autoFocus} />
+    </div>
+  ), [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewView]);
+  useView(reportView, view);
 
   return <>
     {initComponent}

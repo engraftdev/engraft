@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import ChalkEditor from "../util/ChalkEditor";
 import { compileExpression } from "../util/compile";
@@ -30,26 +30,24 @@ export const ChalkTool = memo(function ChalkTool({ config, updateConfig, reportO
   }, [code, inputOutput?.toolValue])
   useOutput(reportOutput, output);
 
-  const render: ToolViewRender = useCallback(function R ({autoFocus}) {
-    const setCode = useCallback((code: string) => {
-      return updateCode(() => code);
-    }, []);
+  const setCode = useCallback((code: string) => {
+    return updateCode(() => code);
+  }, [updateCode]);
 
-    return (
-      <div style={{padding: 10}}>
-        <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
-          <span style={{fontWeight: 'bold'}}>input</span>
-          <ShowView view={inputView} autoFocus={autoFocus} />
-        </div>
-        <ChalkEditor
-          code={code}
-          setCode={setCode}
-          input={inputOutput?.toolValue}
-        />
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{padding: 10}}>
+      <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+        <span style={{fontWeight: 'bold'}}>input</span>
+        <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
-    );
-  }, [code, inputOutput?.toolValue, inputView, updateCode]);
-  useView(reportView, render, config);
+      <ChalkEditor
+        code={code}
+        setCode={setCode}
+        input={inputOutput?.toolValue}
+      />
+    </div>
+  ), [code, inputOutput?.toolValue, inputView, setCode]);
+  useView(reportView, view);
 
   return <>
     {inputComponent}

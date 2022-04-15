@@ -1,15 +1,14 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import CallFunction from "../util/CallFunction";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
-import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps, ToolViewRender } from "./tools";
+import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps } from "./tools";
 
 // TODO: Tool<any> rather than Tool<ToolConfig>; we trust you'll attach a defaultConfig at some point?
-export function useView(reportView: Setter<ToolView | null>, render: ToolViewRender, config: ToolConfig) {
+export function useView(reportView: Setter<ToolView | null>, view: ToolView) {
   useEffect(() => {
-    reportView({render, toolRep: config.toolName});
+    reportView(view);
     return () => reportView(null);
-  }, [reportView, render, config.toolName])
+  }, [reportView, view])
 }
 
 export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolValue | null) {
@@ -33,7 +32,7 @@ export const ShowView = memo(function ShowView({view, ...rest}: ShowViewProps) {
     return null;
   }
 
-  return <CallFunction key={view.toolRep} f={() => view.render(rest)}/>
+  return view(rest);
 })
 
 
@@ -86,7 +85,7 @@ export function useSubTool<C, K extends string & keyof C>({config, updateConfig,
 }
 
 
-type PerTool<T> = {[key: string]: T}
+export type PerTool<T> = {[key: string]: T}
 type PerToolInternal<T> = Immutable.Map<string, T>
 
 export type UseToolsReturn = [

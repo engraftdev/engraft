@@ -1,5 +1,5 @@
 import React, { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig } from "../tools-framework/tools";
+import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { AddObjToContext } from "../util/context";
 import { newId } from "../util/id";
@@ -41,27 +41,25 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
   }, [links, outputs])
   useOutput(reportOutput, output);
 
-  const render: ToolViewRender = useCallback(({autoFocus}) => {
-    return (
-      <div style={{padding: 10, display: 'grid', gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column', columnGap: 20, rowGap: 10, overflowX: 'auto'}}>
-        {links.map((link, i) =>
-          <Fragment key={link.id}>
-            <ColDivider i={i} updateLinks={updateLinks}/>
-            <div style={{alignSelf: 'end', maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
-              <ScrollShadow>
-                <ValueOfTool toolValue={outputs[link.id]}/>
-              </ScrollShadow>
-            </div>
-            <div style={{maxWidth: 400}}>
-              <ShowView view={views[link.id]} autoFocus={autoFocus}/>
-            </div>
-          </Fragment>
-        )}
-        <ColDivider i={links.length} updateLinks={updateLinks}/>
-      </div>
-    );
-  }, [links, outputs, updateLinks, views]);
-  useView(reportView, render, config);
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{padding: 10, display: 'grid', gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column', columnGap: 20, rowGap: 10, overflowX: 'auto'}}>
+      {links.map((link, i) =>
+        <Fragment key={link.id}>
+          <ColDivider i={i} updateLinks={updateLinks}/>
+          <div style={{alignSelf: 'end', maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
+            <ScrollShadow>
+              <ValueOfTool toolValue={outputs[link.id]}/>
+            </ScrollShadow>
+          </div>
+          <div style={{maxWidth: 400}}>
+            <ShowView view={views[link.id]} autoFocus={autoFocus}/>
+          </div>
+        </Fragment>
+      )}
+      <ColDivider i={links.length} updateLinks={updateLinks}/>
+    </div>
+  ), [links, outputs, updateLinks, views]);
+  useView(reportView, view);
 
   return <>
     {links.map((link) =>

@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
 
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
@@ -30,8 +30,8 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
     return {html: md.render(sourceOutput.toolValue)}
   }, [md, sourceOutput])
 
-  const render: ToolViewRender = useCallback(function R() {
-    return <div style={{...flexCol(), gap: 20, padding: 10}}>
+  const view: ToolView = useCallback(() => (
+    <div style={{...flexCol(), gap: 20, padding: 10}}>
       {/* <div style={{flexShrink: 0}}> */}
       <div>
         <ShowView view={sourceView} />
@@ -42,9 +42,9 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
           <span style={{color: 'red'}}>{htmlOrError.error}</span>
         }
       </div>
-    </div>;
-  }, [htmlOrError.error, htmlOrError.html, sourceView]);
-  useView(reportView, render, config);
+    </div>
+  ), [htmlOrError.error, htmlOrError.html, sourceView]);
+  useView(reportView, view);
 
   return sourceComponent;
 })

@@ -1,8 +1,8 @@
-import { memo, useCallback, useEffect } from "react"
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolViewRender } from "../tools-framework/tools"
+import { memo, useCallback, useEffect } from "react";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import { ToolWithView } from "../tools-framework/ToolWithView";
-import { useView } from "../tools-framework/useSubTool"
-import { useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state"
+import { useView } from "../tools-framework/useSubTool";
+import { Setter, useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import { Value } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
@@ -27,22 +27,10 @@ export const StateTool = memo(function StateTool({ config, updateConfig, reportO
     reportOutput({toolValue: {get: stateValue, set: setStateValue}});
   }, [reportOutput, setStateValue, stateValue])
 
-  const render: ToolViewRender = useCallback(function R({autoFocus}) {
-    const [config, updateConfig] = useStateUpdateOnly(codeConfigSetTo(''))
-    const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
-
-    return (
-      <div style={{padding: 10}}>
-        <Value value={stateValue}/>
-        <details>
-          <summary>set to...</summary>
-          <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput}/>
-          {output && <button onClick={() => setStateValue(output.toolValue)}>set</button>}
-        </details>
-      </div>
-    );
-  }, [setStateValue, stateValue]);
-  useView(reportView, render, config);
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <StateToolView stateValue={stateValue} setStateValue={setStateValue}/>
+  ), [setStateValue, stateValue]);
+  useView(reportView, view);
 
   return null;
 });
@@ -50,3 +38,20 @@ registerTool<StateConfig>(StateTool, 'state', () => ({
   toolName: 'state',
   stateValue: undefined
 }));
+
+
+const StateToolView = memo(function StateToolView({stateValue, setStateValue}: {stateValue: any, setStateValue: Setter<any>}) {
+  const [config, updateConfig] = useStateUpdateOnly(codeConfigSetTo(''))
+  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
+
+  return (
+    <div style={{padding: 10}}>
+      <Value value={stateValue}/>
+      <details>
+        <summary>set to...</summary>
+        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput}/>
+        {output && <button onClick={() => setStateValue(output.toolValue)}>set</button>}
+      </details>
+    </div>
+  );
+})

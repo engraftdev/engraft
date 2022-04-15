@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import ControlledTextInput from "../util/ControlledTextInput";
 import { useAt } from "../util/state";
@@ -34,17 +34,15 @@ export const ImportTool = memo(function ImportTool({ config, updateConfig, repor
 
   useOutput(reportOutput, result);
 
-  const render: ToolViewRender = useCallback(() => {
-    return (
-      <div style={{padding: 10}}>
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
-        </div>
-        <button onClick={sendRequest}>import</button>
+  const view: ToolView = useCallback(() => (
+    <div style={{padding: 10}}>
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
       </div>
-    );
-  }, [name, sendRequest, updateName]);
-  useView(reportView, render, config);
+      <button onClick={sendRequest}>import</button>
+    </div>
+  ), [name, sendRequest, updateName]);
+  useView(reportView, view);
 
   return <></>;
 });

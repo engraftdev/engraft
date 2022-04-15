@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { registerTool, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolProps, ToolView } from "../tools-framework/tools";
 import { useOutput, useView } from "../tools-framework/useSubTool";
 import { updateKeys } from "../util/state";
 import { useMemoObject } from "../util/useMemoObject";
@@ -15,20 +15,18 @@ export const SliderTool = memo(function SliderTool({ config, updateConfig, repor
   const output = useMemoObject({toolValue: config.value});
   useOutput(reportOutput, output);
 
-  const render: ToolViewRender = useCallback(() => {
-    return (
-      <div style={{padding: 10}}>
-        <input
-          type="range"
-          value={config.value}
-          onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
-          min={config.min} max={config.max} step={config.step}/>
-        {' '}
-        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{config.value}</div>
-      </div>
-    );
-  }, [config.max, config.min, config.step, config.value, updateConfig]);
-  useView(reportView, render, config);
+  const view: ToolView = useCallback(() => (
+    <div style={{padding: 10}}>
+      <input
+        type="range"
+        value={config.value}
+        onChange={(e) => updateKeys(updateConfig, { value: +e.target.value })}
+        min={config.min} max={config.max} step={config.step}/>
+      {' '}
+      <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{config.value}</div>
+    </div>
+  ), [config.max, config.min, config.step, config.value, updateConfig]);
+  useView(reportView, view);
 
   return null;
 })

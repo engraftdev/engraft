@@ -14,7 +14,7 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper";
 import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolViewRender } from "../tools-framework/tools";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import CodeMirror from "../util/CodeMirror";
 import { compileExpression } from "../util/compile";
@@ -194,76 +194,74 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
     };
   }, [func, inOutPairs, inputOutput])
 
-  const render: ToolViewRender = useCallback(function R({autoFocus}) {
-    const inOutPairsIncExtra = [...inOutPairs, extraInOutPair];
+  const inOutPairsIncExtra = useMemo(() => [...inOutPairs, extraInOutPair], [extraInOutPair, inOutPairs]);
 
-    return (
-      <div style={{padding: 10}}>
-        <div className="SynthesizerTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
-          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
-        </div>
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{padding: 10}}>
+      <div className="SynthesizerTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+        <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
+      </div>
 
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, auto)', alignItems: 'center'}}>
-          {inOutPairsIncExtra.map((pair, pairIdx) =>
-            <InOutPairView
-              key={pair.id}
-              pair={pair}
-              pairIdx={pairIdx}
-              updateInOutPairs={updateInOutPairs}
-              isExtra={!inOutPairs.includes(pair)}
-              func={func}
-            />
-          )}
-        </div>
-        <div style={{...flexRow(), marginTop: 10}}>
-          <button
-            onClick={() => {
-              // eslint-disable-next-line no-eval
-              const pairs: [string, string][] = inOutPairs.map((pair) => [eval(pair.inCode), eval(pair.outCode)])
-              if (synthesisTask) {
-                synthesisTask.cancel();
-              }
-              const task = new Task(synthesizeGen(pairs), {
-                onComplete(complete) {
-                  if (complete) {
-                    updateCode(() => complete);
-                  } else {
-                  }
-                  setProgress(undefined);
-                  setSynthesisTask(undefined);
-                },
-                onProgress(state) {
-                  setProgress({...state.progress});
-                },
-              });
-              setSynthesisTask(task);
-              task.start();
-            }}
-          >
-            Run
-          </button>
-          {synthesisTask &&
-            <button
-              onClick={() => {
-                synthesisTask.cancel();
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, auto)', alignItems: 'center'}}>
+        {inOutPairsIncExtra.map((pair, pairIdx) =>
+          <InOutPairView
+            key={pair.id}
+            pair={pair}
+            pairIdx={pairIdx}
+            updateInOutPairs={updateInOutPairs}
+            isExtra={!inOutPairs.includes(pair)}
+            func={func}
+          />
+        )}
+      </div>
+      <div style={{...flexRow(), marginTop: 10}}>
+        <button
+          onClick={() => {
+            // eslint-disable-next-line no-eval
+            const pairs: [string, string][] = inOutPairs.map((pair) => [eval(pair.inCode), eval(pair.outCode)])
+            if (synthesisTask) {
+              synthesisTask.cancel();
+            }
+            const task = new Task(synthesizeGen(pairs), {
+              onComplete(complete) {
+                if (complete) {
+                  updateCode(() => complete);
+                } else {
+                }
                 setProgress(undefined);
                 setSynthesisTask(undefined);
-              }}
-            >
-              Cancel
-            </button>
-          }
-        </div>
-        <div className="SynthesizerTool-output-row" style={{marginTop: 10, ...flexRow(), gap: 10}}>
-          <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{code}</div>
-        </div>
-        <div>
-          {progress && <pre>{JSON.stringify(progress, null, 2)}</pre>}
-        </div>
+              },
+              onProgress(state) {
+                setProgress({...state.progress});
+              },
+            });
+            setSynthesisTask(task);
+            task.start();
+          }}
+        >
+          Run
+        </button>
+        {synthesisTask &&
+          <button
+            onClick={() => {
+              synthesisTask.cancel();
+              setProgress(undefined);
+              setSynthesisTask(undefined);
+            }}
+          >
+            Cancel
+          </button>
+        }
       </div>
-    );
-  }, [code, extraInOutPair, func, inOutPairs, inputView, progress, synthesisTask, updateCode, updateInOutPairs]);
-  useView(reportView, render, config);
+      <div className="SynthesizerTool-output-row" style={{marginTop: 10, ...flexRow(), gap: 10}}>
+        <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{code}</div>
+      </div>
+      <div>
+        {progress && <pre>{JSON.stringify(progress, null, 2)}</pre>}
+      </div>
+    </div>
+  ), [code, func, inOutPairs, inOutPairsIncExtra, inputView, progress, synthesisTask, updateCode, updateInOutPairs]);
+  useView(reportView, view);
 
   return <>
     {inputComponent}

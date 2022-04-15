@@ -17,12 +17,7 @@ export interface ToolViewProps {
   autoFocus?: boolean
 }
 
-export type ToolViewRender = (props: ToolViewProps) => ReactElement<any, any> | null;
-
-export interface ToolView {
-  render: ToolViewRender;
-  toolRep: string;  // some indicator of what tool this is coming from, so that we can re-mount if it changes
-}
+export type ToolView = (props: ToolViewProps) => ReactElement<any, any> | null;
 
 export interface ToolProps<C extends ToolConfig> {
   config: C;

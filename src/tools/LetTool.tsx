@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect } from "react"
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolViewRender, VarConfig } from "../tools-framework/tools"
-import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool"
-import { useAt } from "../util/state"
+import { memo, useCallback, useEffect } from "react";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "../tools-framework/tools";
+import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
+import { useAt } from "../util/state";
 import { VarDefinition } from "../view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
@@ -22,27 +22,25 @@ export const LetTool = memo(function LetTool({ config, updateConfig, reportOutpu
 
   const [bindingVar, updateBindingVar] = useAt(config, updateConfig, 'bindingVar');
 
-  const render: ToolViewRender = useCallback(({autoFocus}) => {
-    return (
-      <div style={{padding: 10}}>
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>let</b>
-          {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
-        </div>
-
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>be</b>
-          <ShowView view={bindingView} />
-        </div>
-
-        <div className="row-top" style={{marginBottom: 10}}>
-          <b>in</b>
-          <ShowView view={bodyView} />
-        </div>
+  const view: ToolView = useCallback(({autoFocus}) => (
+    <div style={{padding: 10}}>
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>let</b>
+        {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
       </div>
-    );
-  }, [bindingVar, bindingView, bodyView, updateBindingVar]);
-  useView(reportView, render, config);
+
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>be</b>
+        <ShowView view={bindingView} />
+      </div>
+
+      <div className="row-top" style={{marginBottom: 10}}>
+        <b>in</b>
+        <ShowView view={bodyView} />
+      </div>
+    </div>
+  ), [bindingVar, bindingView, bodyView, updateBindingVar]);
+  useView(reportView, view);
 
   return <>
     {bindingComponent}

@@ -1,16 +1,16 @@
-import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewRender, VarConfig, VarInfo } from "../tools-framework/tools";
-import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
-import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
-
-import { AddObjToContext } from "../util/context";
-import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
-import { VarDefinition } from "../view/Vars";
-import { ValueOfTool } from "../view/Value";
-import { codeConfigSetTo } from "./CodeTool";
-import useHover from "../util/useHover";
 import _ from "lodash";
+import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
+import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
+import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
+import { AddObjToContext } from "../util/context";
+import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 import { Use } from "../util/Use";
+import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
+import useHover from "../util/useHover";
+import { ValueOfTool } from "../view/Value";
+import { VarDefinition } from "../view/Vars";
+import { codeConfigSetTo } from "./CodeTool";
+
 
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
@@ -42,12 +42,12 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
 
-  const render: ToolViewRender = useCallback(() => {
-    const smallestUnusedLabel = defaultCellLabels.find((label) =>
-      !cells.find((cell) => cell.var.label === label)
-    )!
+  const smallestUnusedLabel = defaultCellLabels.find((label) =>
+    !cells.find((cell) => cell.var.label === label)
+  )!
 
-    return <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10}}>
+  const view: ToolView = useCallback(() => (
+    <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10}}>
       {cells.map((cell, i) =>
         <Fragment key={cell.var.id}>
           <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
@@ -64,9 +64,9 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
         </Fragment>
       )}
       <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
-    </div>;
-  }, [cells, outputs, updateCells, views])
-  useView(reportView, render, config);
+    </div>
+  ), [cells, outputs, smallestUnusedLabel, updateCells, views])
+  useView(reportView, view);
 
   const output = useMemo(() => {
     const lastCell = cells[cells.length - 1] as Cell | null;
