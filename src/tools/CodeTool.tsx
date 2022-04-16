@@ -216,15 +216,9 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     })}
   </>
 
-  if (false) {
-    return <ToolFrame config={config} env={env} possibleEnv={possibleEnv}>
-      {contents}
-    </ToolFrame>;
-  } else {
-    return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', maxWidth: '100%'}}>
-      {contents}
-    </div>;
-  }
+  return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', maxWidth: '100%'}}>
+    {contents}
+  </div>;
 });
 
 
