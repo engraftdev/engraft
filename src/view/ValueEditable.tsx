@@ -1,0 +1,83 @@
+import { createContext, memo, useCallback, useContext, MouseEvent } from "react";
+import { at, atIndex, Updater } from "../util/state";
+import { Use } from "../util/Use";
+import useHover from "../util/useHover";
+import { pathString, SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
+
+const ValueEditableContext = createContext<Updater<any> | undefined>(undefined);
+
+function atPath(updater: Updater<any>, path: (string | number)[]): Updater<any> {
+  if (path.length === 0) {
+    return updater;
+  }
+
+  const [firstStep, ...restPath] = path;
+  if (typeof firstStep === 'string') {
+    return at(atPath(updater, restPath), firstStep);
+  } else {
+    return atIndex(atPath(updater, restPath), firstStep);
+  }
+}
+
+export const SubValueHandle = memo(function SubValueHandle({value, path, children}: SubValueHandleProps) {
+  const updater = useContext(ValueEditableContext);
+
+  const [hoverRef, isHovered, elem] = useHover();
+
+  const onClick = useCallback((ev: MouseEvent) => {
+    console.log("onClick")
+    if (!updater) { return false; }
+    ev.preventDefault();
+    let defaultStr: string | undefined = undefined;
+    try {
+      defaultStr = JSON.stringify(value);
+    } catch { }
+    // TODO: pop up in correct window
+    console.log(elem, elem?.ownerDocument, elem?.ownerDocument.defaultView === window);
+    const win = elem?.ownerDocument.defaultView || window;
+    const newValueStr = win.prompt("New value JSON", defaultStr);
+    if (newValueStr !== null) {
+      try {
+        const newValue = JSON.parse(newValueStr);
+        atPath(updater, path)((old) => { console.log("was", old); return newValue });
+      } catch { }
+    }
+    return false;
+  }, [elem, path, updater, value])
+
+  return <div
+    ref={hoverRef}
+    title={pathString(path)}
+    style={{
+      userSelect: 'none',  // todo
+      minWidth: 0,
+      marginLeft: "-0.125rem",
+      marginRight: "-0.125rem",
+      paddingLeft: "0.125rem",
+      paddingRight: "0.125rem",
+      borderRadius: "0.125rem",
+      ...isHovered && {
+        backgroundColor: "rgba(0,0,220,0.3)",
+      },
+    }}
+    onClick={onClick}
+  >
+    {children}
+  </div>
+})
+
+const editableCustomizations: ValueCustomizations = {
+  SubValueHandle
+}
+
+interface ValueEditableProps extends ValueProps {
+  updater: Updater<any>;
+}
+
+export const ValueEditable = memo(function ValueEditable (props: ValueEditableProps) {
+  const {updater, customizations, ...rest} = props
+
+  return <ValueEditableContext.Provider value={updater}>
+    <Value {...rest} customizations={{...editableCustomizations, ...editableCustomizations}}/>
+  </ValueEditableContext.Provider>
+})

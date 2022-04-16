@@ -46,7 +46,8 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
 });
 
 export interface SubValueHandleProps {
-  path: string[];
+  value: unknown;
+  path: (string | number)[];
   children: ReactNode;
 }
 
@@ -56,7 +57,7 @@ export const SubValueHandleDefault = memo(function SubValueHandleDefault({path, 
   </div>
 })
 
-export function pathString(path: string[]) {
+export function pathString(path: (string | number)[]) {
   return `$.${path.join('.')}`;
 }
 
@@ -75,7 +76,7 @@ export const Value = memo(function Value({value, customizations = {SubValueHandl
 
 export interface ValueInternalProps {
   value: unknown;
-  path: string[];
+  path: (string | number)[];
   prefix?: ReactNode;
   suffix?: ReactNode;
   customizations: ValueCustomizations;
@@ -86,7 +87,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   function wrapInline(children: ReactNode) {
     return <div className='ValueInternal-wrapInline-row' style={{...flexRow(), width: '100%'}}>
       {prefix}
-      <customizations.SubValueHandle path={path}>
+      <customizations.SubValueHandle value={value} path={path}>
         {children}
       </customizations.SubValueHandle>
       {suffix}
@@ -172,7 +173,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
   const isArray = value instanceof Array;
 
   if (isExpanded) {
-    let entries = Object.entries(value);
+    let entries = isArray ? Array.from(value.entries()) : Object.entries(value);
     // TODO: customization of maxItems
     const maxItems = 100;
     let moreItems = 0;
@@ -186,7 +187,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
         {prefix}
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
-            <customizations.SubValueHandle path={path}>
+            <customizations.SubValueHandle value={value} path={path}>
               <div style={valueFont}>{isArray ? '[' : '{'}</div>
             </customizations.SubValueHandle>
             { isHovered &&
@@ -264,7 +265,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
     return <Use hook={useHover} children={([hoverRef, isHovered]) =>
       <div className="ValueComposite-abbreviated-row" ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
         {prefix}
-        <customizations.SubValueHandle path={path}>
+        <customizations.SubValueHandle value={value} path={path}>
           <div style={{...valueFont, ...flexRow()}}>
             {abbreviated}
           </div>

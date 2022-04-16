@@ -241,9 +241,11 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
   const env = useContext(EnvContext);
   const possibleEnv = useContext(PossibleEnvContext);
 
+  const [subConfig, updateSubConfig] = useAt(config, updateConfig, 'subConfig');
+
   const view: ToolView = useCallback(({autoFocus}) => (
     <ToolFrame
-      config={config.subConfig} env={env} possibleEnv={possibleEnv}
+      config={subConfig} updateConfig={updateSubConfig} env={env} possibleEnv={possibleEnv}
       onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}
       onCode={() => {
         const id = newId();
@@ -266,7 +268,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
         <ShowView view={toolView} autoFocus={autoFocus} />
       {/* </div> */}
     </ToolFrame>
-  ), [config, env, possibleEnv, toolView, updateConfig]);
+  ), [config, env, possibleEnv, subConfig, toolView, updateConfig, updateSubConfig]);
   useView(reportView, view);
 
   return component;

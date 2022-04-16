@@ -9,7 +9,7 @@ window.addEventListener("mousemove", (ev) => {
   mouseClientY = ev.clientY;
 })
 
-export default function useHover(): [(elem: HTMLElement | null) => void, boolean] {
+export default function useHover(): [(elem: HTMLElement | null) => void, boolean, HTMLElement | null] {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [elem, setElem] = useState<HTMLElement | null>(null);
 
@@ -26,7 +26,7 @@ export default function useHover(): [(elem: HTMLElement | null) => void, boolean
   useElementEventListener(elem, 'mouseenter', useCallback(() => setIsHovered(true), []));
   useElementEventListener(elem, 'mouseleave', useCallback(() => setIsHovered(false), []));
 
-  return [setElem, isHovered];
+  return [setElem, isHovered, elem];
 }
 
 export const UseHover = hookToComponent(useHover);

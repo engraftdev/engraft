@@ -15,9 +15,9 @@ import { codeConfigSetTo } from "./CodeTool";
 
 const wildcard = {wildcard: true};
 
-type PatternStep = string | typeof wildcard;
+type PatternStep = string | number | typeof wildcard;
 type Pattern = PatternStep[];
-type Path = string[];
+type Path = (string | number)[];
 
 function isWildcard(step: PatternStep): step is typeof wildcard {
   return typeof step === 'object';
@@ -172,7 +172,7 @@ const ExtractorContext = createContext<ExtractorContextValue>({
 });
 
 interface SubValueHandleProps {
-  path: string[],
+  path: (string | number)[],
   children: ReactNode,
 }
 

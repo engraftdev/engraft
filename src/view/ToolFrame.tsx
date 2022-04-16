@@ -1,13 +1,15 @@
 import { ReactNode, memo } from "react";
 import { ToolConfig, VarInfos, PossibleVarInfos } from "../tools-framework/tools";
-import { useStateUpdateOnly } from "../util/state";
+import { Updater, useStateUpdateOnly } from "../util/state";
 import { Value } from "./Value";
 import WindowPortal from "../util/WindowPortal";
+import { ValueEditable } from "./ValueEditable";
 
 
 export interface ToolFrameProps {
   children: ReactNode;
   config: ToolConfig;
+  updateConfig?: Updater<ToolConfig>;
   onClose?: () => void;
   onCode?: () => void;
   onNotebook?: () => void;
@@ -15,7 +17,7 @@ export interface ToolFrameProps {
   possibleEnv: PossibleVarInfos;
 }
 
-export const ToolFrame = memo(function ToolFrame({children, config, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
+export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>
@@ -49,7 +51,10 @@ export const ToolFrame = memo(function ToolFrame({children, config, onClose, onN
       }}
     >
       <h3>Config</h3>
-      <Value value={config}/>
+      { updateConfig ?
+        <ValueEditable value={config} updater={updateConfig}/> :
+        <Value value={config}/>
+      }
       <h3>Env</h3>
       <Value value={env}/>
       <h3>Possible env</h3>
