@@ -398,9 +398,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
     if (activePatternIndex > patternsWithIds.length) {  // can be an element of patterns, or a blank afterwards
       setActivePatternIndex(patternsWithIds.length);
     }
-  // TODO: this is really bad – exhaustive-deps thinks patternsWithIds.length doesn't trigger re-render cuz it's an
-  //       "outer scope value". this is a flaw in my changing-render-func approach.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePatternIndex, patternsWithIds.length])
 
 
