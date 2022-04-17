@@ -12,24 +12,34 @@ export class Task<Progress, Complete> {
   }
 
   start() {
-    this.step();
+    this.requestStep();
   }
 
   cancel() {
     this.cancelled = true;
   }
 
+  private requestStep() {
+    requestIdleCallback((deadline) => this.step(deadline));
+  }
 
-  private step() {
+  private step(deadline: IdleDeadline) {
+    // We assume the task can only be cancelled outside of this function.
     if (this.cancelled) { return; }
-    let curr = this.generator.next();
-    if (this.cancelled) { return; }
+
+    let curr: IteratorResult<Progress, Complete>;;
+    while (true) {
+      curr = this.generator.next();
+      if (curr.done || deadline.timeRemaining() === 0) {
+        break;
+      }
+    }
 
     if (curr.done) {
       this.options.onComplete && this.options.onComplete(curr.value);
     } else {
       this.options.onProgress && this.options.onProgress(curr.value);
-      requestIdleCallback(() => this.step());
+      this.requestStep();
     }
   }
 }
