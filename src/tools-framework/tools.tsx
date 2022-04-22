@@ -28,7 +28,7 @@ export interface ToolProps<C extends ToolConfig> {
 
 export interface Tool<C extends ToolConfig> {
   (props: ToolProps<C>): ReactElement<any, any> | null;
-  defaultConfig: () => C;
+  defaultConfig: (defaultCode?: string) => C;
 }
 
 export let toolIndex: { [toolName: string]: Tool<any> } = {};
@@ -36,7 +36,7 @@ export let toolIndex: { [toolName: string]: Tool<any> } = {};
 export function registerTool<C extends ToolConfig>(
   func: (props: ToolProps<C>) => ReactElement<any, any> | null,
   toolName: C['toolName'],
-  defaultConfig: C | (() => C)
+  defaultConfig: C | ((defaultCode?: string) => C)
 ) {
   let defaultConfigFunc: () => C;
   if (typeof defaultConfig === 'object') {

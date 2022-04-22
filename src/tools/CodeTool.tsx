@@ -24,17 +24,24 @@ import { notebookConfigSetTo } from "./NotebookTool";
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
-export interface CodeConfigCodeMode {
+export interface CodeConfigShared {
   toolName: 'code',
-  modeName: 'code',
-  code: string,
-  subTools: {[id: string]: ToolConfig}
+  // defaultCode says that whoever made this CodeTool thought this would be a nice code for it.
+  // * So, if we switch TO tool-mode, we will provide this as the default input for the tool.
+  // * And if we switch FROM tool-mode, we will provide this as the default code again.
+  // * Q: Should this be defaultCode or defaultInputConfig?
+  defaultCode: string | undefined,
 }
 
-export interface CodeConfigToolMode {
-  toolName: 'code',
+export interface CodeConfigCodeMode extends CodeConfigShared {
+  modeName: 'code',
+  code: string,
+  subTools: {[id: string]: ToolConfig},
+}
+
+export interface CodeConfigToolMode extends CodeConfigShared {
   modeName: 'tool',
-  subConfig: ToolConfig
+  subConfig: ToolConfig,
 }
 
 export const CodeTool = memo(function CodeTool(props: ToolProps<CodeConfig>) {
@@ -46,13 +53,18 @@ export const CodeTool = memo(function CodeTool(props: ToolProps<CodeConfig>) {
     return <CodeToolToolMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigToolMode>} />;
   }
 })
-registerTool(CodeTool, 'code', {
+registerTool<CodeConfig>(CodeTool, 'code', (defaultCode) => ({
   toolName: 'code',
   modeName: 'code',
+  defaultCode,
   code: '',
   subTools: {},
-});
+}));
 
+
+// Some notes about codeConfigSetTo:
+// * Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
+//   ToolFrame, and with it, the ability to switch out of the given tool into a different one.
 export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
   // TODO: this is a hack, isn't it? (the config.toolName === 'code' part, I mean)
   if (typeof config !== 'string' && config.toolName === 'code') {
@@ -62,8 +74,8 @@ export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
   return {
     toolName: 'code',
     ...(typeof config === 'string' ?
-        { modeName: 'code', code: config, subTools: {} }:
-        { modeName: 'tool', subConfig: config }
+        { modeName: 'code', code: config, subTools: {}, defaultCode: config }:
+        { modeName: 'tool', subConfig: config, defaultCode: undefined }
     )
   };
 }
@@ -184,14 +196,15 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
       return id;
     };
     function replaceWithTool(tool: Tool<ToolConfig>) {
-      updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: tool.defaultConfig()}))
+      // console.log('replaceWithTool', config.defaultInput, tool.defaultConfig(config.defaultInput));
+      updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: tool.defaultConfig(config.defaultCode), defaultCode: config.defaultCode}))
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
       refCompletions(() => envRef.current, () => possibleEnvRef.current)
     ];
     return [...setup, refsExtension(refSet), javascript({jsx: true}), autocompletion({override: completions})];
-  }, [envRef, possibleEnvRef, refSet, updateConfig, updateSubToolConfigs])
+  }, [config.defaultCode, envRef, possibleEnvRef, refSet, updateConfig, updateSubToolConfigs])
 
   const onChange = useCallback((value: string) => {
     updateKeys(updateConfig, {code: value});
@@ -246,7 +259,15 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
   const view: ToolView = useCallback(({autoFocus}) => (
     <ToolFrame
       config={subConfig} updateConfig={updateSubConfig} env={env} possibleEnv={possibleEnv}
-      onClose={() => {updateConfig(() => ({toolName: 'code', modeName: 'code', code: '', subTools: {}}))}}
+      onClose={() => {
+        updateConfig(() => ({
+          toolName: 'code',
+          modeName: 'code',
+          code: config.defaultCode || '',
+          subTools: {},
+          defaultCode: config.defaultCode,
+        }));
+      }}
       onCode={() => {
         const id = newId();
         updateConfig(() => ({
@@ -254,6 +275,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
           modeName: 'code',
           code: refCode(id),
           subTools: {[id]: config},
+          defaultCode: undefined,  // TODO
         }))
       }}
       onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {
@@ -261,6 +283,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
           toolName: 'code',
           modeName: 'tool',
           subConfig: notebookConfigSetTo(config),
+          defaultCode: undefined,  // TODO
         }))
       }}
     >

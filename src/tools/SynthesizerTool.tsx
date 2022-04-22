@@ -267,10 +267,10 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
     {inputComponent}
   </>
 });
-registerTool<SynthesizerConfig>(SynthesizerTool, 'synthesizer', () => {
+registerTool<SynthesizerConfig>(SynthesizerTool, 'synthesizer', (defaultInput) => {
   return {
     toolName: 'synthesizer',
-    inputConfig: codeConfigSetTo(''),
+    inputConfig: codeConfigSetTo(defaultInput || ''),
     code: 'input',
     inOutPairs: []
   };

@@ -45,7 +45,7 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
     <div style={{padding: 10, display: 'grid', gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column', columnGap: 20, rowGap: 10, overflowX: 'auto'}}>
       {links.map((link, i) =>
         <Fragment key={link.id}>
-          <ColDivider i={i} updateLinks={updateLinks}/>
+          <ColDivider i={i} updateLinks={updateLinks} prevVar={config.prevVar}/>
           <div style={{alignSelf: 'end', maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
             <ScrollShadow>
               <ValueOfTool toolValue={outputs[link.id]}/>
@@ -56,9 +56,9 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
           </div>
         </Fragment>
       )}
-      <ColDivider i={links.length} updateLinks={updateLinks}/>
+      <ColDivider i={links.length} updateLinks={updateLinks} prevVar={config.prevVar}/>
     </div>
-  ), [links, outputs, updateLinks, views]);
+  ), [config.prevVar, links, outputs, updateLinks, views]);
   useView(reportView, view);
 
   return <>
@@ -76,7 +76,7 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
     )}
   </>;
 });
-registerTool<ChainConfig>(ChainTool, 'chain', () => {
+registerTool<ChainConfig>(ChainTool, 'chain', (defaultInput) => {
   const prevVar = newVarConfig('prev');
   return {
     toolName: 'chain',
@@ -84,7 +84,7 @@ registerTool<ChainConfig>(ChainTool, 'chain', () => {
     links: [
       {
         id: newId(),
-        config: codeConfigSetTo(''),
+        config: codeConfigSetTo(defaultInput || ''),
       },
     ],
   };
@@ -156,16 +156,16 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
 
 
 
-const ColDivider = memo(function ColDivider({i, updateLinks}: {i: number, updateLinks: Updater<Link[]>}) {
+const ColDivider = memo(function ColDivider({i, updateLinks, prevVar}: {i: number, updateLinks: Updater<Link[]>, prevVar: VarConfig}) {
   const onClick = useCallback(() => {
     // TODO: updateF / $spec nonsense
     updateLinks((oldLinks) => {
       let newLinks = oldLinks.slice();
-      const newLink: Link = {id: newId(), config: codeConfigSetTo('')};
+      const newLink: Link = {id: newId(), config: i === 0 ? codeConfigSetTo('') : codeConfigSetTo(prevVar.id)};
       newLinks.splice(i, 0, newLink);
       return newLinks;
     });
-  }, [i, updateLinks]);
+  }, [i, prevVar.id, updateLinks]);
 
   // const [hoverRef, isHovered] = useHover();
 

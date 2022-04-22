@@ -371,10 +371,10 @@ export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<Extrac
     {inputComponent}
   </>
 });
-registerTool<ExtractorConfig>(ExtractorTool, 'extractor', () => {
+registerTool<ExtractorConfig>(ExtractorTool, 'extractor', (defaultInput) => {
   return {
     toolName: 'extractor',
-    inputConfig: codeConfigSetTo(''),
+    inputConfig: codeConfigSetTo(defaultInput || ''),
     patternsWithIds: [],
     minimized: false,
   };

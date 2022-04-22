@@ -67,11 +67,11 @@ export const MapTool = memo(function MapTool(props: ToolProps<MapConfig>) {
     )}
   </>
 });
-registerTool<MapConfig>(MapTool, 'map', () => {
+registerTool<MapConfig>(MapTool, 'map', (defaultInput) => {
   const itemVar = newVarConfig('item');
   return {
     toolName: 'map',
-    inputConfig: codeConfigSetTo(''),
+    inputConfig: codeConfigSetTo(defaultInput || ''),
     itemVar,
     perItemConfig: codeConfigSetTo(itemVar.id),
   };
