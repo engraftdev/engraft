@@ -28,7 +28,8 @@
               "modeName": "code",
               "code": "{\n origin: '*',\n format: 'json',\n action: 'query',\n generator: 'random',\n grnnamespace: 0,\n prop: 'pageimages|extracts',\n exintro: true,\n rvprop: 'content',\n grnlimit: 5\n}",
               "subTools": {}
-            }
+            },
+            "autoSend": true
           }
         },
         "upstreamIds": {}
