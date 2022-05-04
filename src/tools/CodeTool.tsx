@@ -229,7 +229,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     })}
   </>
 
-  return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', maxWidth: '100%'}}>
+  return <div style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', width: '100%', boxSizing: 'border-box'}}>
     {contents}
   </div>;
 });

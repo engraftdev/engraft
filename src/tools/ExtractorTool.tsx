@@ -446,7 +446,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   }
 
   return (
-    <div ref={hoverRef} style={{padding: 10}}>
+    <div ref={hoverRef} style={{...flexCol(), padding: 10, height: '100%', boxSizing: 'border-box'}}>
       <div
         className="ExtractorTool-top"
         style={{
@@ -525,10 +525,11 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           </div>
         </div>
       </div>
-
-      <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-        <ValueOfTool toolValue={inputOutput} customizations={customizations} />
-      </ExtractorContext.Provider>
+      <div style={{minHeight: 0, overflow: 'scroll'}}>
+        <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
+          <ValueOfTool toolValue={inputOutput} customizations={customizations} />
+        </ExtractorContext.Provider>
+      </div>
     </div>
   );
 })

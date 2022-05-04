@@ -42,14 +42,19 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
   useOutput(reportOutput, output);
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <div style={{padding: 10, display: 'grid', gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column', columnGap: 20, rowGap: 10, overflowX: 'auto'}}>
+    <div style={{
+      padding: 10,
+      display: 'grid',
+      gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column',
+      overflowX: 'auto'
+    }}>
       {links.map((link, i) =>
         <Fragment key={link.id}>
-          <ColDivider i={i} updateLinks={updateLinks} prevVar={config.prevVar}/>
-          <div style={{maxWidth: 400, alignSelf: 'end'}}>
+          {/* <ColDivider i={i} updateLinks={updateLinks} prevVar={config.prevVar}/> */}
+          <div className="ChainTool-tool" style={{display: 'inline-block', maxWidth: 400, height: 350, alignSelf: 'end', boxSizing: 'border-box'}}>
             <ShowView view={views[link.id]} autoFocus={autoFocus}/>
           </div>
-          <div style={{maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
+          <div className="ChainTool-value" style={{display: 'inline-block', maxWidth: 400, height: 350, overflow: 'auto', padding: 4, border: '1px solid rgba(0,0,0,0.3)', boxSizing: 'border-box'}}>
             <ScrollShadow>
               <ValueOfTool toolValue={outputs[link.id]}/>
             </ScrollShadow>

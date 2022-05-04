@@ -20,8 +20,14 @@ export interface ToolFrameProps {
 export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
-  return <div style={{ minWidth: 100, border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', maxWidth: '100%' }}>
-    <div style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
+  return <div
+    className="ToolFrame"
+    style={{
+      border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
+      width: '100%', height: '100%'
+    }}
+  >
+    <div className="ToolFrame-bar" style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
       <div style={{marginLeft: 2}}>{config.toolName}</div>
       <div style={{flexGrow: 1, minWidth: 6}}></div>
       {onCode &&
@@ -43,7 +49,9 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
         >×</div>
       }
     </div>
-    {children}
+    <div style={{minHeight: 0}}>
+      {children}
+    </div>
     {showInspector && <WindowPortal
       title="Tool info"
       onClose={() => {

@@ -60,7 +60,7 @@ const App = memo(function App() {
     <style>
       {appCss}
     </style>
-    <div style={{...!showTool && {display: 'none'}}}>
+    <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
       <EnvContext.Provider value={context}>
         <ToolWithView key={`${configIsFromLocalStorage}`} config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
