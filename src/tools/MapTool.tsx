@@ -1,5 +1,4 @@
-import _ from "lodash";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "../tools-framework/tools";
 import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
@@ -97,41 +96,6 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
     }
   }, [highlightedIndex, inputArray, setHighlightedIndex])
 
-  const [mainDiv, setMainDiv] = useState<HTMLDivElement | null>(null)
-  const [indexBoxDiv, setIndexBoxDiv] = useState<HTMLDivElement | null>(null)
-  const [perItemBoxDiv, setPerItemBoxDiv] = useState<HTMLDivElement | null>(null)
-
-  const [perItemBoxDivResizes, setPerItemBoxDivResizes] = useState(0);
-
-  useEffect(() => {
-    if (perItemBoxDiv) {
-      const observer = new ResizeObserver(() => setPerItemBoxDivResizes((n) => n + 1));
-      observer.observe(perItemBoxDiv);
-      return () => observer.disconnect();
-    }
-  }, [perItemBoxDiv])
-
-  const trapezoidPoints = useMemo(() => {
-    if (!mainDiv || !indexBoxDiv || !perItemBoxDiv) {
-      return [];
-    }
-
-    void perItemBoxDivResizes;  // re-run this on resizes
-
-    const mainDivRect = mainDiv.getBoundingClientRect();
-    const indexBoxDivRect = indexBoxDiv.getBoundingClientRect()
-    const perItemBoxDivRect = perItemBoxDiv.getBoundingClientRect()
-
-    return [
-      [indexBoxDivRect.left - mainDivRect.x, indexBoxDivRect.bottom - mainDivRect.y],
-      [indexBoxDivRect.right - mainDivRect.x, indexBoxDivRect.bottom - mainDivRect.y],
-      [perItemBoxDivRect.right - mainDivRect.x, perItemBoxDivRect.top - mainDivRect.y],
-      // [perItemBoxDivRect.right - mainDivRect.x, perItemBoxDivRect.bottom - mainDivRect.y],
-      // [perItemBoxDivRect.left - mainDivRect.x, perItemBoxDivRect.bottom - mainDivRect.y],
-      [perItemBoxDivRect.left - mainDivRect.x, perItemBoxDivRect.top - mainDivRect.y],
-    ];
-  }, [indexBoxDiv, mainDiv, perItemBoxDiv, perItemBoxDivResizes]);
-
   const maxItemsDisplayed = 10;
   let inputArrayTruncated = inputArray;
   if (inputArrayTruncated && inputArrayTruncated.length > maxItemsDisplayed) {
@@ -139,35 +103,39 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
   }
 
   return (
-    <div ref={setMainDiv} style={{padding: 10, position: 'relative'}}>
+    <div style={{padding: 10, position: 'relative'}}>
       <div className="row-top" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
         <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
 
       {inputArrayTruncated &&
         <>
-          <svg width={1} height={1} style={{position: 'absolute', left: 0, top: 0, overflow: 'visible'}}>
-            <polygon
-              className="ExpansionTrapezoid-trapezoid"
-              points={_.flatten(trapezoidPoints).join(' ')}
-              fill="lightblue"
-              // fill="transparent" stroke="lightblue" strokeWidth={3}
-            />
-          </svg>
           <div>
             {inputArrayTruncated.map((elem, i) =>
-              <div key={i} style={{display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)', padding: 3,
-                                  cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
-                    onClick={() => setHighlightedIndex(i)}
-                    ref={i === highlightedIndex ? setIndexBoxDiv : undefined}>
-                <div style={{pointerEvents: 'none'}}>
-                  {/* <Value value={elem.toolValue}/> */}
-                  {i}
+              <div key={i} style={{
+                display: 'inline-block',
+                ...i === highlightedIndex && {
+                  borderBottom: '10px solid lightblue',
+                  marginBottom: -10,
+                  ...i > 0 && {
+                    borderLeft: '10px solid transparent',
+                    marginLeft: -10,
+                  },
+                  ...i < maxItemsDisplayed - 1 && {
+                    borderRight: '10px solid transparent',
+                    marginRight: -10,
+                  },
+                }
+              }}>
+                <div style={{border: '1px solid rgba(0,0,0,0.2)', padding: 3,
+                             cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
+                      onClick={() => setHighlightedIndex(i)}>
+                  <div style={{pointerEvents: 'none'}}>{i}</div>
                 </div>
               </div>
             )}
           </div>
-          <div ref={setPerItemBoxDiv} style={{
+          <div style={{
               border: '3px solid lightblue',
               padding: 10, marginTop: 10}}>
             <div className="row-top" style={{marginBottom: 10}}>
