@@ -46,13 +46,13 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
       {links.map((link, i) =>
         <Fragment key={link.id}>
           <ColDivider i={i} updateLinks={updateLinks} prevVar={config.prevVar}/>
-          <div style={{alignSelf: 'end', maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
+          <div style={{maxWidth: 400, alignSelf: 'end'}}>
+            <ShowView view={views[link.id]} autoFocus={autoFocus}/>
+          </div>
+          <div style={{maxWidth: 400, maxHeight: 400, overflow: 'auto'}}>
             <ScrollShadow>
               <ValueOfTool toolValue={outputs[link.id]}/>
             </ScrollShadow>
-          </div>
-          <div style={{maxWidth: 400}}>
-            <ShowView view={views[link.id]} autoFocus={autoFocus}/>
           </div>
         </Fragment>
       )}
