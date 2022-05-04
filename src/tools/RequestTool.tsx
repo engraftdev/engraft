@@ -5,6 +5,9 @@ import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useAt } from "../util/state";
 import { codeConfigSetTo } from "./CodeTool";
 import { TextConfig } from "./TextTool";
+import offlineData from "./RequestTool-offlineData.json";
+
+const OFFLINE_MODE = true;
 
 export interface RequestConfig extends ToolConfig {
   toolName: 'request';
@@ -20,6 +23,11 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
   const [autoSend, updateAutoSend] = useAt(config, updateConfig, 'autoSend');
 
   const send = useCallback(async () => {
+    if (OFFLINE_MODE) {
+      reportOutput({ toolValue: offlineData })
+      return;
+    }
+
     if (!urlOutput || typeof urlOutput.toolValue !== 'string') { return; }
     const url = new URL(urlOutput.toolValue);
     let params = paramsOutput?.toolValue as object || {}

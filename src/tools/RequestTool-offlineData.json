@@ -1,0 +1,94 @@
+{
+  "continue": {
+    "imcontinue": "62081879|Coat_of_Arms_of_Svetloyarsky_rayon_(Volgograd_oblast).png",
+    "grncontinue": "0.852641440443|0.852641440443|0|0",
+    "continue": "grncontinue||extracts"
+  },
+  "warnings": {
+    "extracts": {
+      "*": "HTML may be malformed and/or unbalanced and may omit inline images. Use at your own risk. Known problems are listed at https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:TextExtracts#Caveats."
+    }
+  },
+  "query": {
+    "pages": {
+      "62081879": {
+        "pageid": 62081879,
+        "ns": 0,
+        "title": "Sadovy, Svetloyarsky District, Volgograd Oblast",
+        "extract": "<p><b>Sadovy</b> (Russian: <span lang=\"ru\">Садовый</span>) is a rural locality (a settlement) in Svetloyarsky District, Volgograd Oblast, Russia. The population was 53 as of 2010. There is 1 street.\n</p>"
+      },
+      "52414": {
+        "pageid": 52414,
+        "ns": 0,
+        "title": "42 BC",
+        "images": [
+          {
+            "ns": 6,
+            "title": "File:Phil2.png"
+          },
+          {
+            "ns": 6,
+            "title": "File:Phil3.png"
+          }
+        ],
+        "extract": "<p class=\"mw-empty-elt\">\n</p>\n\n\n\n<p><br>\nYear <b>42 BC</b> was either a common year starting on Monday, Tuesday or Wednesday or a leap year starting on Tuesday (link will display the full calendar) of the Julian calendar (the sources differ, see leap year error for further information) and a common year starting on Tuesday of the Proleptic Julian calendar. At the time, it was known as the <b>Year of the Consulship of Lepidus and Plancus</b> (or, less frequently, <b>year 712 <i>Ab urbe condita</i></b>). The denomination 42 BC for this year has been used since the early medieval period, when the Anno Domini calendar era became the prevalent method in Europe for naming years.\n</p>"
+      },
+      "27363223": {
+        "pageid": 27363223,
+        "ns": 0,
+        "title": "William Martin (novelist)",
+        "images": [
+          {
+            "ns": 6,
+            "title": "File:Big Book blue.svg"
+          },
+          {
+            "ns": 6,
+            "title": "File:Flag of the United States.svg"
+          }
+        ],
+        "extract": "<p><b>William Martin</b> is an American author of historical novels, a native of Boston, MA.\n</p>"
+      },
+      "27416078": {
+        "pageid": 27416078,
+        "ns": 0,
+        "title": "Jarno Laasala",
+        "images": [
+          {
+            "ns": 6,
+            "title": "File:Crystal Clear app Login Manager 2.png"
+          },
+          {
+            "ns": 6,
+            "title": "File:Flag of Finland.svg"
+          },
+          {
+            "ns": 6,
+            "title": "File:Jarno Laasala, Dudesons 2010.jpg"
+          },
+          {
+            "ns": 6,
+            "title": "File:OOjs UI icon edit-ltr-progressive.svg"
+          }
+        ],
+        "extract": "<p><b>Jarno Pekka Laasala</b> (born 19 September 1979 Seinäjoki the capital of the space) is a Finnish filmmaker and stunt performer. He is a member and co-founder of the stunt group The Dudesons and CEO of the production company Rabbit Films.\n</p><p>As a child Laasala was a <i>Super Mario Bros.</i> (Nintendo) champion in Finland.</p><p>In addition to being the CEO of Rabbit Films, Laasala studied and completed a Masters of Science degree.\n</p>"
+      },
+      "34357735": {
+        "pageid": 34357735,
+        "ns": 0,
+        "title": "John Frederick Archbold",
+        "images": [
+          {
+            "ns": 6,
+            "title": "File:OOjs UI icon edit-ltr-progressive.svg"
+          },
+          {
+            "ns": 6,
+            "title": "File:Wikisource-logo.svg"
+          }
+        ],
+        "extract": "<p>\n\n<b>John Frederick Archbold</b> (1785–1870) was a barrister and legal writer. He was the first editor of the English criminal law textbook <i>Archbold Criminal Pleading, Evidence and Practice</i>, which is still routinely used in court today.\n</p>"
+      }
+    }
+  }
+}
