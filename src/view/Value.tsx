@@ -12,9 +12,15 @@ import ScrollShadow from './ScrollShadow';
 import { flexCol, flexRow, inlineBlock } from "./styles";
 
 
+export interface ValueFrameProps {
+  children?: ReactNode | undefined;
+  type?: string;
+  innerStyle?: CSSProperties;
+  outerStyle?: CSSProperties;
+}
 
-export const ValueFrame = memo(function ValueFrame({children, type, style, ...props}: {type?: string} & HTMLProps<HTMLDivElement>) {
-  const withShadow = <ScrollShadow className="ValueFrame-shadow" style={{...style, overflow: 'auto'}} {...props}>
+export const ValueFrame = memo(function ValueFrame({children, type, innerStyle, outerStyle}: ValueFrameProps) {
+  const withShadow = <ScrollShadow className="ValueFrame-shadow" outerStyle={{...outerStyle}} innerStyle={{...innerStyle, overflow: 'auto'}}>
     {children}
   </ScrollShadow>
 
@@ -148,7 +154,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
 
   if (typeof value === 'string') {
     return wrapInline(
-      <ValueFrame style={{...!isTopLevel && {maxHeight: 50}}}>
+      <ValueFrame innerStyle={{...!isTopLevel && {maxHeight: 50}}}>
         <div
             className='Value-is-string'
             // todo: hacky hanging indent

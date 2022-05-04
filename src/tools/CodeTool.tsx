@@ -2,7 +2,7 @@ import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
-import React, { memo, useCallback, useContext, useEffect, useMemo } from "react";
+import React, { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
 import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarInfo, VarInfos } from "../tools-framework/tools";
@@ -14,7 +14,7 @@ import { createElementFromReact } from "../util/createElementFrom";
 import { DOM } from "../util/DOM";
 import { newId } from "../util/id";
 import { usePortalSet } from "../util/PortalSet";
-import refsExtension, { refCode } from "../util/refsExtension";
+import refsExtension, { refCode, refRE } from "../util/refsExtension";
 import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
 import { useRefForCallback } from "../util/useRefForCallback";
 import IsolateStyles from "../view/IsolateStyles";
@@ -78,6 +78,15 @@ export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
         { modeName: 'tool', subConfig: config, defaultCode: undefined }
     )
   };
+}
+
+
+export function summarizeCodeConfig(config: CodeConfig): ReactNode {
+  if (config.modeName === 'code') {
+    return <pre>{config.code.replaceAll(refRE, '_')}</pre>;
+  } else {
+    return config.subConfig.toolName;
+  }
 }
 
 

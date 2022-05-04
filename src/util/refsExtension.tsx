@@ -8,7 +8,7 @@ import { idRegExp } from "./id";
 export function refCode(s: string) {
   return s;
 }
-const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
+export const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
 
 function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   const matches = Array.from(text.sliceString(0).matchAll(refRE));
