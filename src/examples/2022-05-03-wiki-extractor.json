@@ -1,0 +1,170 @@
+{
+  "toolName": "code",
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDhole279857",
+          "label": "response"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "request",
+            "urlConfig": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "text",
+                "text": "https://en.wikipedia.org/w/api.php",
+                "subTools": {}
+              }
+            },
+            "paramsConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "{\n origin: '*',\n format: 'json',\n action: 'query',\n generator: 'random',\n grnnamespace: 0,\n prop: 'pageimages|extracts',\n exintro: true,\n rvprop: 'content',\n grnlimit: 5\n}",
+              "subTools": {}
+            },
+            "autoSend": true
+          }
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDslicer681048",
+          "label": "pages"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "extractor",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDhole279857",
+              "subTools": {},
+              "defaultCode": ""
+            },
+            "patternsWithIds": [
+              {
+                "id": "IDmile435960",
+                "pattern": [
+                  "query",
+                  "pages",
+                  {
+                    "wildcard": true
+                  },
+                  "title"
+                ]
+              },
+              {
+                "id": "IDplayground655394",
+                "pattern": [
+                  "query",
+                  "pages",
+                  {
+                    "wildcard": true
+                  },
+                  "extract"
+                ]
+              }
+            ],
+            "minimized": false
+          }
+        },
+        "upstreamIds": {
+          "IDhole279857": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDgrape419949",
+          "label": "markdown pieces"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "map",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDslicer681048",
+              "subTools": {}
+            },
+            "itemVar": {
+              "id": "IDjet873332",
+              "label": "item"
+            },
+            "perItemConfig": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "markdown",
+                "sourceConfig": {
+                  "toolName": "code",
+                  "modeName": "tool",
+                  "subConfig": {
+                    "toolName": "text",
+                    "text": "# IDpainter564219\n\nIDtalos285013",
+                    "subTools": {
+                      "IDpainter564219": {
+                        "toolName": "code",
+                        "modeName": "code",
+                        "code": "IDjet873332.title",
+                        "subTools": {}
+                      },
+                      "IDcondor751779": {
+                        "toolName": "code",
+                        "modeName": "code",
+                        "code": "IDjet873332.thumbnail.source",
+                        "subTools": {}
+                      },
+                      "IDtalos285013": {
+                        "toolName": "code",
+                        "modeName": "code",
+                        "code": "IDjet873332.extract",
+                        "subTools": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "upstreamIds": {
+          "IDslicer681048": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDstallion401711",
+          "label": ""
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "markdown",
+            "sourceConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDgrape419949.join('\\n\\n')",
+              "subTools": {}
+            }
+          }
+        },
+        "upstreamIds": {
+          "IDgrape419949": true
+        }
+      }
+    ]
+  }
+}
