@@ -1,29 +1,35 @@
-import React, { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig } from "../tools-framework/tools";
+import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "../tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
 import { AddObjToContext } from "../util/context";
 import { newId } from "../util/id";
-import { Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
+import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 import { updateF } from "../util/updateF";
-import { Use } from "../util/Use";
 import useHover from "../util/useHover";
-import ScrollShadow from "../view/ScrollShadow";
-import { ValueOfTool } from "../view/Value";
-import { codeConfigSetTo } from "./CodeTool";
+import { flexCol } from "../view/styles";
+import { ValueFrame, ValueOfTool } from "../view/Value";
+import { CodeConfig, codeConfigSetTo, summarizeCodeConfig } from "./CodeTool";
 
 export interface ChainConfig {
   toolName: 'chain';
   prevVar: VarConfig;
-  links: Link[];
+  links: Link[];  // invariant: at least one link plz
 }
 
 interface Link {
   id: string,
   config: ToolConfig,
+  blocksWide: number,
+  blocksHigh: number,
 }
 
+const BLOCK_WIDTH = 50;
+const BLOCK_HEIGHT = 50;
 
-export const ChainTool = memo(function ChainTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ChainConfig>) {
+
+export const ChainTool = memo(function ChainTool(props: ToolProps<ChainConfig>) {
+  const { config, updateConfig, reportOutput, reportView } = props;
+
   const [links, updateLinks] = useAt(config, updateConfig, 'links');
 
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
@@ -41,29 +47,9 @@ export const ChainTool = memo(function ChainTool({ config, updateConfig, reportO
   }, [links, outputs])
   useOutput(reportOutput, output);
 
-  const view: ToolView = useCallback(({autoFocus}) => (
-    <div style={{
-      padding: 10,
-      display: 'grid',
-      gridTemplateRows: 'repeat(2, auto)', gridAutoFlow: 'column',
-      overflowX: 'auto'
-    }}>
-      {links.map((link, i) =>
-        <Fragment key={link.id}>
-          {/* <ColDivider i={i} updateLinks={updateLinks} prevVar={config.prevVar}/> */}
-          <div className="ChainTool-tool" style={{display: 'inline-block', maxWidth: 400, height: 350, alignSelf: 'end', boxSizing: 'border-box'}}>
-            <ShowView view={views[link.id]} autoFocus={autoFocus}/>
-          </div>
-          <div className="ChainTool-value" style={{display: 'inline-block', maxWidth: 400, height: 350, overflow: 'auto', padding: 4, border: '1px solid rgba(0,0,0,0.3)', boxSizing: 'border-box'}}>
-            <ScrollShadow>
-              <ValueOfTool toolValue={outputs[link.id]}/>
-            </ScrollShadow>
-          </div>
-        </Fragment>
-      )}
-      <ColDivider i={links.length} updateLinks={updateLinks} prevVar={config.prevVar}/>
-    </div>
-  ), [config.prevVar, links, outputs, updateLinks, views]);
+  const view: ToolView = useCallback((viewProps) => (
+    <ChainView {...props} {...viewProps} outputs={outputs} views={views}/>
+  ), [outputs, props, views]);
   useView(reportView, view);
 
   return <>
@@ -90,6 +76,8 @@ registerTool<ChainConfig>(ChainTool, 'chain', (defaultInput) => {
       {
         id: newId(),
         config: codeConfigSetTo(defaultInput || ''),
+        blocksWide: 2,
+        blocksHigh: 1,
       },
     ],
   };
@@ -159,28 +147,175 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }
 });
 
+interface ChainViewProps extends ToolProps<ChainConfig>, ToolViewProps {
+  outputs: {[id: string]: ToolValue | null};
+  views: {[id: string]: ToolView | null}
+}
 
+const ChainView = memo(function ChainView(props: ChainViewProps) {
+  const {config, views} = props;
 
-const ColDivider = memo(function ColDivider({i, updateLinks, prevVar}: {i: number, updateLinks: Updater<Link[]>, prevVar: VarConfig}) {
-  const onClick = useCallback(() => {
+  const [selectedLinkId, setSelectedLinkId] = useState<string | undefined>(undefined);
+  // TODO: come up with a better autofocus mechanism which lets us set selectedLinkId when the chain
+  // is first made
+
+  return (
+    <div className="Chain" style={{...flexCol()}}>
+      <div
+        className="Chain-links"
+        style={{
+          display: 'flex',
+          overflowX: 'auto'
+        }}
+      >
+        {config.links.map((link, i) =>
+          <LinkView
+            {...props}
+            key={link.id}
+            id={link.id}
+            selectedLinkId={selectedLinkId}
+            setSelectedLinkId={setSelectedLinkId}
+          />
+        )}
+      </div>
+      { selectedLinkId !== undefined &&
+        <div key={selectedLinkId} className="Chain-formula" style={{display: 'flex', marginTop: 4}}>
+          <img src="fx.png" alt="formula symbol" height={20} style={{padding: 4}}/>
+          <ShowView view={views[selectedLinkId]} />
+        </div>
+      }
+    </div>
+  );
+})
+
+interface LinkProps extends ChainViewProps {
+  id: string;
+  selectedLinkId: string | undefined;
+  setSelectedLinkId: Dispatch<SetStateAction<string | undefined>>;
+}
+
+const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLinkId, setSelectedLinkId}: LinkProps) {
+  const [links, updateLinks] = useAt(config, updateConfig, 'links');
+  const linkIndex = links.findIndex((link) => link.id === id);
+  const [link, updateLink] = useAtIndex(links, updateLinks, linkIndex);
+
+  const [hoverRef, isHovered] = useHover()
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const onClickAdd = useCallback((ev: ReactMouseEvent) => {
     // TODO: updateF / $spec nonsense
     updateLinks((oldLinks) => {
       let newLinks = oldLinks.slice();
-      const newLink: Link = {id: newId(), config: i === 0 ? codeConfigSetTo('') : codeConfigSetTo(prevVar.id)};
-      newLinks.splice(i, 0, newLink);
+      const newLink: Link = {
+        id: newId(),
+        config: codeConfigSetTo(config.prevVar.id),
+        blocksWide: link.blocksWide || 2,
+        blocksHigh: link.blocksHigh || 1,
+      };
+      newLinks.splice(linkIndex + 1, 0, newLink);
+
+      // TODO: side effect lol
+      setSelectedLinkId(newLink.id);
+
       return newLinks;
     });
-  }, [i, prevVar.id, updateLinks]);
+    ev.stopPropagation();
+  }, [config.prevVar.id, link.blocksHigh, link.blocksWide, linkIndex, setSelectedLinkId, updateLinks]);
 
-  // const [hoverRef, isHovered] = useHover();
+  const onClickDelete = useCallback((ev: ReactMouseEvent) => {
+    updateLinks((oldLinks) => {
+      let newLinks = oldLinks.slice();
+      newLinks.splice(linkIndex, 1);
+      return newLinks;
+    });
+    ev.stopPropagation();
+  }, [linkIndex, updateLinks]);
 
-  return <Use hook={useHover}>
-    {([hoverRef, isHovered]) =>
-      <div ref={hoverRef} style={{gridRow: '1/3', width: 10, display: 'flex', flexDirection: 'row', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
-        <div style={{borderLeft: isHovered ? `1px dashed rgba(0,0,0,0.5)` : '1px dashed rgba(0,0,0,0.2)', width: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-          {/* {true && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none', transform: 'rotate(90 deg)'}}>insert row</div>} */}
-        </div>
-      </div>
+  const onMouseDownResize = useCallback((ev: ReactMouseEvent) => {
+    const {blocksWide: initBlocksWide, blocksHigh: initBlocksHigh} = link;
+    const {clientX: initClientX, clientY: initClientY} = ev;
+    const moveListener = (ev: MouseEvent) => {
+      const {clientX, clientY} = ev;
+      const blocksWide = Math.round((clientX - initClientX) / BLOCK_WIDTH) + initBlocksWide;
+      const blocksHigh = Math.round((clientY - initClientY) / BLOCK_HEIGHT) + initBlocksHigh;
+      updateKeys(updateLink, {blocksWide, blocksHigh});
+    };
+    const upListener = () => {
+      window.removeEventListener('mousemove', moveListener);
+      window.removeEventListener('mouseup', upListener);
+      setIsDragging(false);
     }
-    </Use>;
-});
+    window.addEventListener('mousemove', moveListener);
+    window.addEventListener('mouseup', upListener);
+    setIsDragging(true);
+    ev.stopPropagation();
+  }, [link, updateLink]);
+
+  return (
+    <div
+      ref={hoverRef}
+      className="ChainTool-link"
+      style={{
+        width: link.blocksWide * BLOCK_WIDTH, height: link.blocksHigh * BLOCK_HEIGHT,
+        border: '1px solid rgba(0,0,0,0.3)', boxSizing: 'border-box',
+        marginLeft: linkIndex > 0 ? -1 : 0,
+        minWidth: 0,
+        ...flexCol(),
+      }}
+    >
+      <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', margin: 4 }}>
+        <ValueOfTool toolValue={outputs[link.id]}/>
+      </ValueFrame>
+      <div
+        className="ChainTool-link-bar"
+        onClick={() => setSelectedLinkId(link.id === selectedLinkId ? undefined : link.id)}
+        style={{
+          height: 15,
+          background: link.id === selectedLinkId ? 'rgba(26, 115, 232, 0.5)' : '#e4e4e4',
+          fontSize: 13,
+          color: '#0008',
+          display: 'flex',
+          userSelect: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{marginLeft: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
+          {summarizeCodeConfig(link.config as CodeConfig)}
+        </div>
+        <div style={{flexGrow: 1, minWidth: 6}}></div>
+        { (isHovered && links.length > 1) &&
+          <div
+            onClick={onClickDelete}
+            style={{
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 2
+            }}
+          >
+            ×
+          </div>
+        }
+        { isHovered &&
+          <div
+            onClick={onClickAdd}
+            style={{
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 2
+            }}
+          >
+            +
+          </div>
+        }
+        { (isHovered || isDragging) &&
+          <div
+            style={{
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'nwse-resize',  // TODO: persist cursor during drag
+            }}
+            onMouseDown={onMouseDownResize}
+          >
+            ⤡
+          </div>
+        }
+      </div>
+    </div>
+  );
+})
