@@ -11,13 +11,11 @@ export interface ToolFrameProps {
   config: ToolConfig;
   updateConfig?: Updater<ToolConfig>;
   onClose?: () => void;
-  onCode?: () => void;
-  onNotebook?: () => void;
   env: VarInfos;
   possibleEnv: PossibleVarInfos;
 }
 
-export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, onNotebook, onCode, env, possibleEnv}: ToolFrameProps) {
+export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div
@@ -30,16 +28,11 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
     <div className="ToolFrame-bar" style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
       <div style={{marginLeft: 2}}>{config.toolName}</div>
       <div style={{flexGrow: 1, minWidth: 6}}></div>
-      {onCode &&
-        <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onCode}
-        >co</div>
-      }
-      {onNotebook &&
-        <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onNotebook}
-        >nb</div>
-      }
+      {/* TODO: Feedback for clicking 'cp' */}
+      {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
+      <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
+        onClick={() => {navigator.clipboard.writeText(JSON.stringify(config))}}
+      >cp</div>
       <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
         onClick={() => {updateShowInspector((i) => !i)}}
       >i</div>

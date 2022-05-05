@@ -44,7 +44,7 @@ export const setup = [
     ...commentKeymap,
     ...completionKeymap,
     ...lintKeymap
-  ])
+  ]),
 ]
 
 

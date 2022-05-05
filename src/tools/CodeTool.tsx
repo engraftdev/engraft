@@ -2,6 +2,7 @@ import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
+import { EditorView } from '@codemirror/view';
 import React, { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
@@ -210,9 +211,31 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
-      refCompletions(() => envRef.current, () => possibleEnvRef.current)
+      refCompletions(() => envRef.current, () => possibleEnvRef.current),
     ];
-    return [...setup, refsExtension(refSet), javascript({jsx: true}), autocompletion({override: completions})];
+    return [
+      ...setup,
+      refsExtension(refSet),
+      javascript({jsx: true}),
+      autocompletion({override: completions}),
+      EditorView.domEventHandlers({
+        paste(event, view) {
+          const text = event.clipboardData?.getData('text');
+          if (text) {
+            try {
+              const parsed = JSON.parse(text);
+              if (parsed.toolName) {
+                // TODO: for now, we just replace – someday we should check about insertions
+                updateConfig(() => codeConfigSetTo(parsed));
+                event.preventDefault();
+              }
+            } catch {
+
+            }
+          }
+        }
+      }),
+    ];
   }, [config.defaultCode, envRef, possibleEnvRef, refSet, updateConfig, updateSubToolConfigs])
 
   const onChange = useCallback((value: string) => {
@@ -276,24 +299,6 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
           subTools: {},
           defaultCode: config.defaultCode,
         }));
-      }}
-      onCode={() => {
-        const id = newId();
-        updateConfig(() => ({
-          toolName: 'code',
-          modeName: 'code',
-          code: refCode(id),
-          subTools: {[id]: config},
-          defaultCode: undefined,  // TODO
-        }))
-      }}
-      onNotebook={config.subConfig.toolName === 'notebook' ? undefined : () => {
-        updateConfig(() => ({
-          toolName: 'code',
-          modeName: 'tool',
-          subConfig: notebookConfigSetTo(config),
-          defaultCode: undefined,  // TODO
-        }))
       }}
     >
       {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
