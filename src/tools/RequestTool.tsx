@@ -7,7 +7,7 @@ import { codeConfigSetTo } from "./CodeTool";
 import { TextConfig } from "./TextTool";
 import offlineData from "./RequestTool-offlineData.json";
 
-const OFFLINE_MODE = true;
+const OFFLINE_MODE = false;
 
 export interface RequestConfig extends ToolConfig {
   toolName: 'request';
