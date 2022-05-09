@@ -6,6 +6,7 @@ import { codeConfigSetTo } from "./tools/CodeTool";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
 
 import './tools/builtInTools';
+import { ValueOfTool } from "./view/Value";
 
 interface EmbedProps {
   reportOutput: Setter<ToolValue | null>;
@@ -41,6 +42,9 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialCo
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
 
   return <div>
+    <div style={{padding: 5}}>
+      <ValueOfTool toolValue={output}/>
+    </div>
     <div>
       <EnvContext.Provider value={env}>
         <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
