@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo } from "react";
+import { CSSProperties, memo, useCallback, useEffect, useMemo } from "react";
 import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "../tools-framework/tools";
 import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
 import range from "../util/range";
@@ -102,18 +102,20 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
   }
 
   return (
-    <div style={{padding: 10, position: 'relative'}}>
-      <div className="MapTool-top xRow" style={{marginBottom: 10, gap: 10}}>
-        <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
+    <div className="xCol xGap10 xPad10">
+      <div className="MapTool-top xRow xGap10">
+        <b>input</b> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
 
       {inputArrayTruncated &&
         <>
-          <div>
-            {inputArrayTruncated.map((elem, i) =>
-              <div key={i} style={{
-                display: 'inline-block',
-                ...i === highlightedIndex && {
+          <div className="MapTool-indices xRow">
+            {inputArrayTruncated.map((elem, i) => {
+              let background = 'none';
+              let trapezoid: CSSProperties = {};
+              if (i === highlightedIndex) {
+                background = 'lightblue';
+                trapezoid = {
                   borderBottom: '10px solid lightblue',
                   marginBottom: -10,
                   ...i > 0 && {
@@ -124,22 +126,26 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
                     borderRight: '10px solid transparent',
                     marginRight: -10,
                   },
-                }
-              }}>
-                <div style={{border: '1px solid rgba(0,0,0,0.2)', padding: 3,
-                             cursor: 'pointer', background: i === highlightedIndex ? 'lightblue' : 'none'}}
-                      onClick={() => setHighlightedIndex(i)}>
-                  <div style={{pointerEvents: 'none'}}>{i}</div>
+                };
+              }
+
+              return <div key={i} className="xUnclickable" style={trapezoid}>
+                <div className="xClickable"
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.2)', padding: 3,
+                    background
+                  }}
+                  onClick={() => setHighlightedIndex(i)}
+                >
+                  {i}
                 </div>
               </div>
-            )}
+            })}
           </div>
-          <div style={{
-              border: '3px solid lightblue',
-              padding: 10, marginTop: 10}}>
-            <div className="row-top" style={{marginBottom: 10}}>
+          <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
+            <div className="xRow xAlignTop xGap10">
               <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
-              {' = '}
+              <div style={{lineHeight: 1}}>=</div>
               <div style={{minWidth: 0}}>
                 <Value value={inputArrayTruncated[highlightedIndex]?.toolValue}/>
               </div>

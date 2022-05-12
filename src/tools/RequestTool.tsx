@@ -46,19 +46,19 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
   }, [autoSend, sendDebounced])
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <div style={{padding: 10}}>
-      <div className="row-top" style={{marginBottom: 10}}>
+    <div className="xCol xGap10 xPad10">
+      <div className="xRow xGap10">
         <b>url</b> <ShowView view={urlView} autoFocus={autoFocus}/>
       </div>
-      <div className="row-top" style={{marginBottom: 10}}>
+      <div className="xRow xGap10">
         <b>params</b> <ShowView view={paramsView}/>
       </div>
-      <div style={{display: 'flex'}}>
+      <div className="xRow">
         <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
         {autoSend ?
           sendDebouncedControl.isPending() ? 'about to auto-send' : 'auto-send on' :
           'auto-send off'}
-        <div style={{flexGrow: 1}} />
+        <div className="xSpacer" />
         <button onClick={send}>send now</button>
       </div>
     </div>

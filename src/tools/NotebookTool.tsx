@@ -47,7 +47,10 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
   )!
 
   const view: ToolView = useCallback(() => (
-    <div style={{padding: 10, display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10}}>
+    <div className="NotebookTool xPad10 xChildrenMinWidth0"
+      style={{
+        display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
+      }}>
       {cells.map((cell, i) =>
         <Fragment key={cell.var.id}>
           <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
@@ -122,9 +125,18 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
 
   return <Use hook={useHover}>
     {([hoverRef, isHovered]) =>
-      <div ref={hoverRef} style={{gridColumn: '1/4', height: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer'}} onClick={onClick}>
-        <div style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          {isHovered && <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>insert row</div>}
+      <div ref={hoverRef} className="xCol xAlignVCenter xClickable"
+        style={{gridColumn: '1/4', height: 10}}
+        onClick={onClick}
+      >
+        <div className="xCenter"
+          style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 0}}
+        >
+          {isHovered &&
+            <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>
+              insert row
+            </div>
+          }
         </div>
       </div>
     }
@@ -207,23 +219,25 @@ interface CellViewProps {
 const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
+  const alreadyDisplayed = toolOutput?.alreadyDisplayed;
+
   return <>
-    <div style={{}}>
-      <div style={{position: 'sticky', top: 10, display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+    <div className="NotebookTool-CellView-cell-cell">
+      <div className="xRow xGap10 xStickyTop10">
+        <div className="xSpacer"/>
+        <div className="xClickable" style={{zoom: "60%"}} onClick={removeCell}>✖️</div>
         <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
-        <div style={{borderRadius: 30, zoom: "60%", cursor: 'pointer', marginLeft: 10}} onClick={removeCell}>✖️</div>
-        {/* <pre style={{fontSize: '70%', fontStyle: 'italic'}}>{varConfig.id}</pre>
-        <pre style={{fontSize: '7px', fontStyle: 'italic'}}>depends on: {Object.keys(cell.upstreamIds).join(", ")}</pre> */}
+        <div className="xLineHeight1">=</div>
       </div>
     </div>
-    <div className="notebook-CellView-right" style={{...(toolOutput?.alreadyDisplayed ? {gridColumn: '2 / 4'} : {}), display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, maxWidth: '100%'}}>
-      <div style={{maxWidth: '100%', position: 'sticky', top: 10}}>
+    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed ? {gridColumn: '2 / 4'} : {})}}>
+      <div className="xStickyTop10">
         <ShowView view={toolView}/>
       </div>
     </div>
-    { !toolOutput?.alreadyDisplayed &&
-      <div style={{maxWidth: '100%', minWidth: 60}}>
-        <div style={{position: 'sticky', top: 10}}>
+    { !alreadyDisplayed &&
+      <div className="NotebookTool-CellView-output-cell">
+        <div className="xStickyTop10">
           <ValueOfTool toolValue={toolOutput}/>
         </div>
       </div>

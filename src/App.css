@@ -29,6 +29,9 @@ body {
 .xCol.xAlignHCenter {
   align-items: center;
 }
+.xCol.xAlignVCenter {
+  justify-content: center;
+}
 
 .xCenter {
   display: flex;
@@ -37,11 +40,31 @@ body {
   justify-content: center;
 }
 
+.xCenterCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.xGap10 {
+  gap: 10px;
+}
+
+.xSpacer {
+  flex-grow: 1;
+}
+
 .xInlineBlock {
   display: inline-block;
 }
 
+.xUnclickable {
+  pointer-events: none;
+}
+
 .xClickable {
+  pointer-events: auto;
   user-select: none;
   cursor: pointer;
 }
@@ -50,4 +73,21 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.xPad10 {
+  padding: 10px;
+}
+
+.xStickyTop10 {
+  position: sticky;
+  top: 10px;
+}
+
+.xLineHeight1 {
+  line-height: 1;
+}
+
+.xChildrenMinWidth0 > * {
+  min-width: 0;
 }

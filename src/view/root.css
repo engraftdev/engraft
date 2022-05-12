@@ -17,18 +17,6 @@ h2 {
   margin-bottom: 3px;
 }
 
-.row-center {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.row-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
 #overlay {
   width: 1px;
   height: 1px;

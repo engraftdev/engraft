@@ -35,8 +35,8 @@ export const ImportTool = memo(function ImportTool({ config, updateConfig, repor
   useOutput(reportOutput, result);
 
   const view: ToolView = useCallback(() => (
-    <div style={{padding: 10}}>
-      <div className="row-top" style={{marginBottom: 10}}>
+    <div className="xCol xGap10 xPad10">
+      <div className="xRow xGap10">
         <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
       </div>
       <button onClick={sendRequest}>import</button>

@@ -23,18 +23,18 @@ export const LetTool = memo(function LetTool({ config, updateConfig, reportOutpu
   const [bindingVar, updateBindingVar] = useAt(config, updateConfig, 'bindingVar');
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <div style={{padding: 10}}>
-      <div className="row-top" style={{marginBottom: 10}}>
+    <div className="xCol xGap10 xPad10">
+      <div className="xRow xGap10">
         <b>let</b>
         {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
       </div>
 
-      <div className="row-top" style={{marginBottom: 10}}>
+      <div className="xRow xGap10">
         <b>be</b>
         <ShowView view={bindingView} />
       </div>
 
-      <div className="row-top" style={{marginBottom: 10}}>
+      <div className="xRow xGap10">
         <b>in</b>
         <ShowView view={bodyView} />
       </div>
