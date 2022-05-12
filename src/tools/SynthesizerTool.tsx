@@ -22,7 +22,6 @@ import { newId } from "../util/id";
 import { Updater, useAt } from "../util/state";
 import { SynthesisState, synthesizeGen } from "../util/synthesizer";
 import { Task } from "../util/Task";
-import { flexRow } from "../view/styles";
 import { codeConfigSetTo } from "./CodeTool";
 
 
@@ -198,7 +197,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <div style={{padding: 10}}>
-      <div className="SynthesizerTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+      <div className="SynthesizerTool-input-row xRow" style={{marginBottom: 10, gap: 10}}>
         <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
 
@@ -214,7 +213,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
           />
         )}
       </div>
-      <div style={{...flexRow(), marginTop: 10}}>
+      <div className="xRow" style={{marginTop: 10}}>
         <button
           onClick={() => {
             // eslint-disable-next-line no-eval
@@ -253,7 +252,7 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
           </button>
         }
       </div>
-      <div className="SynthesizerTool-output-row" style={{marginTop: 10, ...flexRow(), gap: 10}}>
+      <div className="SynthesizerTool-output-row xRow" style={{marginTop: 10, gap: 10}}>
         <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{code}</div>
       </div>
       <div>

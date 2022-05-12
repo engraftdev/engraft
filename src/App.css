@@ -1,3 +1,53 @@
 body {
   margin: 100px;
 }
+
+.xRow {
+  display: flex;
+  flex-direction: row;
+}
+.xRow.xAlignTop {
+  align-items: flex-start;
+}
+.xRow.xAlignBottom {
+  align-items: flex-start;
+}
+.xRow.xAlignVCenter {
+  align-items: center;
+}
+
+.xCol {
+  display: flex;
+  flex-direction: column;
+}
+.xCol.xAlignLeft {
+  align-items: flex-start;
+}
+.xCol.xAlignRight {
+  align-items: flex-end;
+}
+.xCol.xAlignHCenter {
+  align-items: center;
+}
+
+.xCenter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.xInlineBlock {
+  display: inline-block;
+}
+
+.xClickable {
+  user-select: none;
+  cursor: pointer;
+}
+
+.xEllipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

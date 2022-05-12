@@ -9,7 +9,7 @@ import { useStateSetOnly } from "../util/state";
 import { Use } from "../util/Use";
 import useHover from "../util/useHover";
 import ScrollShadow from './ScrollShadow';
-import { flexCol, flexRow, inlineBlock } from "./styles";
+import { inlineBlock } from "./styles";
 
 
 export interface ValueFrameProps {
@@ -46,7 +46,7 @@ const valueFont: CSSProperties = {
 }
 
 export const Indent = memo(function Indent({children, style}: {children: ReactNode, style?: CSSProperties}) {
-  return <div style={{marginLeft: 10, ...flexCol('left'), ...style}}>
+  return <div className="xCol xAlignLeft" style={{marginLeft: 10, ...style}}>
     {children}
   </div>;
 });
@@ -91,7 +91,7 @@ export interface ValueInternalProps {
 
 const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations, isTopLevel}: ValueInternalProps) {
   function wrapInline(children: ReactNode) {
-    return <div className='ValueInternal-wrapInline-row' style={{...flexRow(), width: '100%'}}>
+    return <div className='ValueInternal-wrapInline-row xRow' style={{width: '100%'}}>
       {prefix}
       <customizations.SubValueHandle value={value} path={path}>
         {children}
@@ -189,10 +189,10 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
     }
 
     return <>
-      <div className='ValueComposite-open-row' style={{...flexRow(), width: '100%'}}>
+      <div className='ValueComposite-open-row xRow' style={{width: '100%'}}>
         {prefix}
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
-          <div className='ValueComposite-open-row' ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+          <div className='ValueComposite-open-row xRow' ref={hoverRef} style={{flexGrow: 1}}>
             <customizations.SubValueHandle value={value} path={path}>
               <div style={valueFont}>{isArray ? '[' : '{'}</div>
             </customizations.SubValueHandle>
@@ -243,7 +243,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
           </div>
         }
       </Indent>
-      <div className='ValueComposite-close-row' style={{...flexRow(), width: '100%'}}>
+      <div className='ValueComposite-close-row xRow' style={{width: '100%'}}>
         <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
         {suffix}
       </div>
@@ -269,10 +269,10 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
       </>
     }
     return <Use hook={useHover} children={([hoverRef, isHovered]) =>
-      <div className="ValueComposite-abbreviated-row" ref={hoverRef} style={{...flexRow(), flexGrow: 1}}>
+      <div className="ValueComposite-abbreviated-row xRow" ref={hoverRef} style={{flexGrow: 1}}>
         {prefix}
         <customizations.SubValueHandle value={value} path={path}>
-          <div style={{...valueFont, ...flexRow()}}>
+          <div className="xRow" style={{...valueFont}}>
             {abbreviated}
           </div>
         </customizations.SubValueHandle>

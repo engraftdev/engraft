@@ -5,7 +5,6 @@ import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/use
 import MarkdownIt from 'markdown-it';
 import { codeConfigSetTo } from "./CodeTool";
 import { useMemoObject } from "../util/useMemoObject";
-import { flexCol } from "../view/styles";
 
 export interface MarkdownConfig {
   toolName: 'markdown';
@@ -31,7 +30,7 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
   }, [md, sourceOutput])
 
   const view: ToolView = useCallback(() => (
-    <div style={{...flexCol(), gap: 20, padding: 10}}>
+    <div className="xCol" style={{gap: 20, padding: 10}}>
       {/* <div style={{flexShrink: 0}}> */}
       <div>
         <ShowView view={sourceView} />

@@ -9,7 +9,6 @@ import { Use } from "../util/Use";
 import { useWindowEventListener } from "../util/useEventListener";
 import useHover from "../util/useHover";
 import { useKeyHeld } from "../util/useKeyHeld";
-import { flexCol, flexRow } from "../view/styles";
 import { pathString, ValueCustomizations, ValueOfTool } from "../view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
@@ -293,8 +292,8 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
     }
   })
 
-  return <div ref={patternRef} style={{...flexRow()}}>
-    <div style={{fontFamily: 'monospace',  ...flexRow()}}>
+  return <div ref={patternRef} className="xRow">
+    <div className="xRow" style={{fontFamily: 'monospace'}}>
       $
       {pattern.map((step, stepIdx) =>
         <React.Fragment key={stepIdx}>
@@ -424,9 +423,9 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
 
   // todo: very hacky
   if (minimized) {
-    return <div style={{padding: 2, ...flexRow('center')}}>
+    return <div className="xRow xAlignVCenter" style={{padding: 2}}>
       <ShowView view={inputView} autoFocus={autoFocus} />
-      <div style={{...flexCol()}}>
+      <div className="xCol">
         {patternsWithIds.map(({pattern, id}) =>
           <div key={id} style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
             {['', ...pattern.map(step => isWildcard(step) ? '★' : step)].join('.')}
@@ -446,7 +445,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   }
 
   return (
-    <div ref={hoverRef} style={{...flexCol(), padding: 10, height: '100%', boxSizing: 'border-box'}}>
+    <div ref={hoverRef} className="xCol" style={{padding: 10, height: '100%', boxSizing: 'border-box'}}>
       <div
         className="ExtractorTool-top"
         style={{
@@ -469,13 +468,13 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         >
           ⊖
         </div>
-        <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+        <div className="ExtractorTool-input-row xRow" style={{marginBottom: 10, gap: 10}}>
           <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
         </div>
 
-        <div style={{...flexRow(), gap: 10}}>
+        <div className="xRow" style={{gap: 10}}>
           <span style={{fontWeight: 'bold'}}>patterns</span>
-          <div style={{...flexCol()}}>
+          <div className="xCol">
             {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
               <div
                 key={patternWithId?.id || 'new'}

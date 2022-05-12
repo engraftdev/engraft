@@ -4,7 +4,6 @@ import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/use
 import ChalkEditor from "../util/ChalkEditor";
 import { compileExpression } from "../util/compile";
 import { useAt } from "../util/state";
-import { flexRow } from "../view/styles";
 import { codeConfigSetTo } from "./CodeTool";
 
 // TODO: Hacky headless reportOutput.
@@ -36,7 +35,7 @@ export const ChalkTool = memo(function ChalkTool({ config, updateConfig, reportO
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <div style={{padding: 10}}>
-      <div className="ExtractorTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+      <div className="ExtractorTool-input-row xRow" style={{marginBottom: 10, gap: 10}}>
         <span style={{fontWeight: 'bold'}}>input</span>
         <ShowView view={inputView} autoFocus={autoFocus} />
       </div>

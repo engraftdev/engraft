@@ -6,7 +6,6 @@ import { newId } from "../util/id";
 import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
 import { updateF } from "../util/updateF";
 import useHover from "../util/useHover";
-import { flexCol } from "../view/styles";
 import { ValueFrame, ValueOfTool } from "../view/Value";
 import { CodeConfig, codeConfigSetTo, summarizeCodeConfig } from "./CodeTool";
 
@@ -160,11 +159,10 @@ const ChainView = memo(function ChainView(props: ChainViewProps) {
   // is first made
 
   return (
-    <div className="Chain" style={{...flexCol()}}>
+    <div className="Chain xCol">
       <div
-        className="Chain-links"
+        className="Chain-links xRow"
         style={{
-          display: 'flex',
           overflowX: 'auto'
         }}
       >
@@ -179,7 +177,7 @@ const ChainView = memo(function ChainView(props: ChainViewProps) {
         )}
       </div>
       { selectedLinkId !== undefined &&
-        <div key={selectedLinkId} className="Chain-formula" style={{display: 'flex', marginTop: 4}}>
+        <div key={selectedLinkId} className="Chain-formula xRow" style={{marginTop: 4}}>
           <img src="fx.png" alt="formula symbol" height={20} style={{padding: 4}}/>
           <ShowView view={views[selectedLinkId]} />
         </div>
@@ -255,40 +253,37 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
   return (
     <div
       ref={hoverRef}
-      className="ChainTool-link"
+      className="ChainTool-link xCol"
       style={{
         width: link.blocksWide * BLOCK_WIDTH, height: link.blocksHigh * BLOCK_HEIGHT,
         border: '1px solid rgba(0,0,0,0.3)', boxSizing: 'border-box',
         marginLeft: linkIndex > 0 ? -1 : 0,
         minWidth: 0,
-        ...flexCol(),
       }}
     >
       <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', margin: 4 }}>
         <ValueOfTool toolValue={outputs[link.id]}/>
       </ValueFrame>
       <div
-        className="ChainTool-link-bar"
+        className="ChainTool-link-bar xRow xClickable"
         onClick={() => setSelectedLinkId(link.id === selectedLinkId ? undefined : link.id)}
         style={{
           height: 15,
           background: link.id === selectedLinkId ? 'rgba(26, 115, 232, 0.5)' : '#e4e4e4',
           fontSize: 13,
           color: '#0008',
-          display: 'flex',
-          userSelect: 'none',
-          cursor: 'pointer',
         }}
       >
-        <div style={{marginLeft: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
+        <div className="xEllipsis" style={{marginLeft: 2}}>
           {summarizeCodeConfig(link.config as CodeConfig)}
         </div>
         <div style={{flexGrow: 1, minWidth: 6}}></div>
         { (isHovered && links.length > 1) &&
           <div
+            className="xCenter"
             onClick={onClickDelete}
             style={{
-              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 2
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', marginRight: 2
             }}
           >
             ×
@@ -296,9 +291,10 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
         }
         { isHovered &&
           <div
+            className="xCenter"
             onClick={onClickAdd}
             style={{
-              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 2
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', marginRight: 2
             }}
           >
             +
@@ -306,8 +302,9 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
         }
         { (isHovered || isDragging) &&
           <div
+            className="xCenter"
             style={{
-              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 15, background: 'rgba(26, 115, 232, 1)', color: 'white',
               cursor: 'nwse-resize',  // TODO: persist cursor during drag
             }}
             onMouseDown={onMouseDownResize}
