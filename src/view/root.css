@@ -49,3 +49,102 @@ pre {
 .Value {
   max-width: 100%;
 }
+
+
+
+
+.xRow {
+  display: flex;
+  flex-direction: row;
+  max-height: 100%;  /* TODO: is this a good general rule? */
+}
+.xRow.xAlignTop {
+  align-items: flex-start;
+}
+.xRow.xAlignBottom {
+  align-items: flex-start;
+}
+.xRow.xAlignVCenter {
+  align-items: center;
+}
+
+.xCol {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;  /* TODO: is this a good general rule? */
+}
+.xCol.xAlignLeft {
+  align-items: flex-start;
+}
+.xCol.xAlignRight {
+  align-items: flex-end;
+}
+.xCol.xAlignHCenter {
+  align-items: center;
+}
+.xCol.xAlignVCenter {
+  justify-content: center;
+}
+
+.xCenter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.xCenterCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.xGap10 {
+  gap: 10px;
+}
+
+.xExpand {
+  flex-grow: 1;
+}
+
+.xInlineBlock {
+  display: inline-block;
+}
+
+.xUnclickable {
+  pointer-events: none;
+}
+
+.xClickable {
+  pointer-events: auto;
+  user-select: none;
+  cursor: pointer;
+}
+
+.xEllipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xPad10 {
+  padding: 10px;
+}
+
+.xStickyTop10 {
+  position: sticky;
+  top: 10px;
+}
+
+.xLineHeight1 {
+  line-height: 1;
+}
+
+.xChildrenMinWidth0 > * {
+  min-width: 0;
+}
+
+.xWidthFitContent {
+  width: fit-content;
+}

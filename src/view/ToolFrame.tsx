@@ -4,6 +4,7 @@ import { Updater, useStateUpdateOnly } from "../util/state";
 import { Value } from "./Value";
 import WindowPortal from "../util/WindowPortal";
 import { ValueEditable } from "./ValueEditable";
+import IsolateStyles from "./IsolateStyles";
 
 
 export interface ToolFrameProps {
@@ -51,15 +52,17 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
         updateShowInspector(() => false);
       }}
     >
-      <h3>Config</h3>
-      { updateConfig ?
-        <ValueEditable value={config} updater={updateConfig}/> :
-        <Value value={config}/>
-      }
-      <h3>Env</h3>
-      <Value value={env}/>
-      <h3>Possible env</h3>
-      <Value value={possibleEnv}/>
+      <IsolateStyles>
+        <h3>Config</h3>
+        { updateConfig ?
+          <ValueEditable value={config} updater={updateConfig}/> :
+          <Value value={config}/>
+        }
+        <h3>Env</h3>
+        <Value value={env}/>
+        <h3>Possible env</h3>
+        <Value value={possibleEnv}/>
+      </IsolateStyles>
     </WindowPortal>}
   </div>;
 });

@@ -224,13 +224,13 @@ const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput,
   return <>
     <div className="NotebookTool-CellView-cell-cell">
       <div className="xRow xGap10 xStickyTop10">
-        <div className="xSpacer"/>
+        <div className="xExpand"/>
         <div className="xClickable" style={{zoom: "60%"}} onClick={removeCell}>✖️</div>
         <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
         <div className="xLineHeight1">=</div>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed ? {gridColumn: '2 / 4'} : {})}}>
+    <div className="NotebookTool-CellView-tool-cell xCol xWidthFitContent" style={{...(alreadyDisplayed ? {gridColumn: '2 / 4'} : {})}}>
       <div className="xStickyTop10">
         <ShowView view={toolView}/>
       </div>

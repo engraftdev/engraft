@@ -58,7 +58,7 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
         {autoSend ?
           sendDebouncedControl.isPending() ? 'about to auto-send' : 'auto-send on' :
           'auto-send off'}
-        <div className="xSpacer" />
+        <div className="xExpand" />
         <button onClick={send}>send now</button>
       </div>
     </div>

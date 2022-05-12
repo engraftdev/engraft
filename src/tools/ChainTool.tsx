@@ -277,7 +277,7 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
         <div className="xEllipsis" style={{marginLeft: 2}}>
           {summarizeCodeConfig(link.config as CodeConfig)}
         </div>
-        <div style={{flexGrow: 1, minWidth: 6}}></div>
+        <div className="xExpand" style={{minWidth: 6}}></div>
         { (isHovered && links.length > 1) &&
           <div
             className="xCenter"
