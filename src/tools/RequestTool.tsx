@@ -6,6 +6,9 @@ import { useAt } from "../util/state";
 import { codeConfigSetTo } from "./CodeTool";
 import { TextConfig } from "./TextTool";
 import offlineData from "./RequestTool-offlineData.json";
+import { Use } from "../util/Use";
+import useSize from "../util/useSize";
+import { RowToCol } from "../util/RowToCol";
 
 const OFFLINE_MODE = false;
 
@@ -47,12 +50,12 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <div className="xCol xGap10 xPad10">
-      <div className="xRow xGap10">
+      <RowToCol minRowWidth={200} className="xGap10">
         <b>url</b> <ShowView view={urlView} autoFocus={autoFocus}/>
-      </div>
-      <div className="xRow xGap10">
+      </RowToCol>
+      <RowToCol minRowWidth={200} className="xGap10">
         <b>params</b> <ShowView view={paramsView}/>
-      </div>
+      </RowToCol>
       <div className="xRow">
         <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
         {autoSend ?

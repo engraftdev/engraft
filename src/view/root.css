@@ -141,6 +141,10 @@ pre {
   line-height: 1;
 }
 
+.xShrinkable {
+  min-width: 0;
+}
+
 .xChildrenMinWidth0 > * {
   min-width: 0;
 }

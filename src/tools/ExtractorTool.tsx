@@ -4,6 +4,7 @@ import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { newId } from "../util/id";
 import { mapUpdate } from "../util/mapUpdate";
+import { RowToCol } from "../util/RowToCol";
 import { useAt } from "../util/state";
 import { Use } from "../util/Use";
 import { useWindowEventListener } from "../util/useEventListener";
@@ -293,7 +294,7 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
   })
 
   return <div ref={patternRef} className="xRow">
-    <div className="xRow" style={{fontFamily: 'monospace'}}>
+    <div className="xRow xShrinkable xEllipsis" style={{fontFamily: 'monospace'}}>
       $
       {pattern.map((step, stepIdx) =>
         <React.Fragment key={stepIdx}>
@@ -447,7 +448,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   return (
     <div ref={hoverRef} className="xCol" style={{padding: 10, height: '100%', boxSizing: 'border-box'}}>
       <div
-        className="ExtractorTool-top"
+        className="ExtractorTool-top xCol xGap10"
         style={{
           position: 'sticky',
           zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
@@ -468,11 +469,11 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         >
           ⊖
         </div>
-        <div className="ExtractorTool-input-row xRow" style={{marginBottom: 10, gap: 10}}>
+        <RowToCol className="ExtractorTool-input xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
-        </div>
+        </RowToCol>
 
-        <div className="xRow" style={{gap: 10}}>
+        <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>patterns</span>
           <div className="xCol">
             {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
@@ -522,7 +523,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
               </div>
             )}
           </div>
-        </div>
+        </RowToCol>
       </div>
       <div style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>

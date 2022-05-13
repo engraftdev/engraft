@@ -1,5 +1,4 @@
 import { useCallback, useLayoutEffect, useState } from "react";
-import { hookToComponent } from "./Use";
 import { useElementEventListener } from "./useEventListener";
 
 let mouseClientX: number;
@@ -28,5 +27,3 @@ export default function useHover(): [(elem: HTMLElement | null) => void, boolean
 
   return [setElem, isHovered, elem];
 }
-
-export const UseHover = hookToComponent(useHover);
