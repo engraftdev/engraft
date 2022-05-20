@@ -42,7 +42,7 @@ function makeConfig(name) {
         },
         devtool: isDevelopment ? 'eval-cheap-module-source-map' : false,
         resolve: {
-            extensions: [".ts", ".tsx", ".js", ".json"],
+            extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
             alias: {  // BS for datavoyager
                 'font-awesome-sass-loader$': false,
             },

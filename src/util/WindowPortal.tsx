@@ -1,15 +1,14 @@
-import { memo, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { useWindowEventListener } from "./useEventListener";
 
-export interface WindowPortalProps {
-  children?: ReactNode,
+export interface UseWindowContainerProps {
   title?: string
   onClose?: () => void,
 }
 
-const WindowPortal = memo(function WindowPortal({children, title, onClose}: WindowPortalProps) {
-  const containerEl = useMemo(() => document.createElement('div'), []);
+export function useWindowContainer({title, onClose}: UseWindowContainerProps): HTMLDivElement | undefined {
+  const container = useMemo(() => document.createElement('div'), []);
 
   // NOTE: externalWindow can't be computed in useMemo due to the most bizarre JS behavior I've ever seen
   const [externalWindow, setExternalWindow] = useState<Window>();
@@ -21,10 +20,10 @@ const WindowPortal = memo(function WindowPortal({children, title, onClose}: Wind
 
   useEffect(() => {
     if (externalWindow) {
-      externalWindow.document.body.appendChild(containerEl);
-      return () => void externalWindow.document.body.removeChild(containerEl);
+      externalWindow.document.body.appendChild(container);
+      return () => void externalWindow.document.body.removeChild(container);
     }
-  }, [containerEl, externalWindow])
+  }, [container, externalWindow])
 
   useEffect(() => {
     if (title && externalWindow) {
@@ -34,8 +33,22 @@ const WindowPortal = memo(function WindowPortal({children, title, onClose}: Wind
 
   useWindowEventListener('beforeunload', (ev) => {
     onClose && onClose();
-  }, externalWindow)
+  }, externalWindow);
 
-  return ReactDOM.createPortal(children, containerEl);
+  return externalWindow ? container : undefined;
+}
+
+
+
+export interface WindowPortalProps extends UseWindowContainerProps {
+  children?: ReactNode,
+}
+
+export const WindowPortal = memo(function WindowPortal({children, ...props}: WindowPortalProps) {
+  const container = useWindowContainer(props);
+  if (container) {
+    return ReactDOM.createPortal(children, container);
+  } else {
+    return <></>;
+  }
 });
-export default WindowPortal

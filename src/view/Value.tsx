@@ -304,6 +304,18 @@ export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
 
 // TODO: awful naming huh?
 export const ValueOfTool = memo(function ValueOfTool({toolValue, customizations, style, ...props}: ValueOfToolProps) {
+  return <ToolValueBuffer
+    toolValue={toolValue}
+    renderValue={(value) => <Value value={value} customizations={customizations}/>}
+  />;
+});
+
+export type ToolValueBufferProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
+  toolValue: ToolValue | null;
+  renderValue: (value: any) => ReactNode;
+}
+
+export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue, style, ...props}: ToolValueBufferProps) {
   const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
 
   useEffect(() => {
@@ -317,7 +329,7 @@ export const ValueOfTool = memo(function ValueOfTool({toolValue, customizations,
       ...style,
       opacity: toolValue === null ? 0.3 : 1,
     }} {...props}>
-      <Value value={lastValue.toolValue} customizations={customizations}/>
+      {renderValue(lastValue.toolValue)}
     </div> :
     <div style={{fontSize: 13, fontStyle: 'italic'}}>
       no output yet

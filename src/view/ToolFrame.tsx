@@ -2,7 +2,7 @@ import { ReactNode, memo } from "react";
 import { ToolConfig, VarInfos, PossibleVarInfos } from "../tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "../util/state";
 import { Value } from "./Value";
-import WindowPortal from "../util/WindowPortal";
+import { WindowPortal } from "../util/WindowPortal";
 import { ValueEditable } from "./ValueEditable";
 import IsolateStyles from "./IsolateStyles";
 

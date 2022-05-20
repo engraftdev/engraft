@@ -25,3 +25,10 @@ declare module 'internmap' {
     constructor(entries?: readonly (readonly [K, V])[] | null, key?: (key: string) => any)
   }
 }
+
+declare module '@observablehq/inspector' {
+  export class Inspector {
+    constructor(elem: HTMLElement)
+    fulfilled(value: any)
+  }
+}

@@ -35,6 +35,12 @@ pre {
   max-width: 100%;
 }
 
+/* TODO: This is a hack to deal with strange visible-widgetBuffer issues in pop-up windows */
+/* I'm not sure what awful consequences it is going to have */
+.cm-widgetBuffer {
+  display: none;
+}
+
 /* ::-webkit-scrollbar {
   -webkit-appearance: none;
   width: 7px;

@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import './tools/builtInTools';
 import { synthesizeGen } from './util/synthesizer';
 import { runToCompletion } from './util/Task';
 import { Value } from './view/Value';
