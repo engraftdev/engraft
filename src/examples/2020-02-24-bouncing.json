@@ -40,11 +40,11 @@
           "modeName": "tool",
           "subConfig": {
             "toolName": "world",
-            "iterationsCount": 18,
+            "iterationsCount": 50,
             "initConfig": {
               "toolName": "code",
               "modeName": "code",
-              "code": "{\n x: rand() * IDcollege900260,\n y: rand() * IDtoy988307,\n vx: (rand() - 0.5) * 160,\n vy: (rand() - 0.5) * 160,\n}",
+              "code": "{\n x: rand() * IDcollege900260,\n y: rand() * IDtoy988307,\n vx: (rand() - 0.5) * 10,\n vy: (rand() - 0.5) * 10,\n}",
               "subTools": {}
             },
             "stateVar": {

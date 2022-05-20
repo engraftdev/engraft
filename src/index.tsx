@@ -1,5 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { HashRouter, Route, Routes } from "react-router-dom";
 import App from './App';
 // import TestSynthesizer from './TestSynthesizer';
 // import TestVoyager from './TestVoyager';
@@ -11,11 +12,11 @@ const root = createRoot(document.getElementById('root')!);
 
 root.render(
   <React.StrictMode>
-    {/* <App /> */}
-    {/* <TestSynthesizer/> */}
-    {/* <TestVoyager/> */}
-    {/* <TestUseLiveTool/> */}
-    <TestSynonyms/>
-    {/* <TestObservableEmbed/> */}
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<App/>}/>
+        <Route path="/synonyms" element={<TestSynonyms/>}/>
+      </Routes>
+    </HashRouter>
   </React.StrictMode>,
 );
