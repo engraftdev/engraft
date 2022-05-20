@@ -123,7 +123,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
   }, [output, reportOutput])
 
   return (
-    <div>
+    <div style={{marginBottom: 10}}>
       <ToolValueBuffer
         toolValue={output}
         renderValue={(value) => <ObservableInspector value={value}/>}

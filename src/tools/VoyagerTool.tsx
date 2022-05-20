@@ -4,7 +4,6 @@ import { registerTool, ToolConfig, ToolProps, ToolView, ToolViewProps } from "..
 import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
 import { useAt } from "../util/state";
 import { usePrevious } from "../util/usePrevious";
-import { flexCol, flexRow } from "../view/styles";
 import { codeConfigSetTo } from "./CodeTool";
 import voyagerCss from './VoyagerTool.css';
 
@@ -111,8 +110,8 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
   }, [voyagerInstance, data, spec, dataPrev, specPrev])
 
   return (
-    <div style={{padding: 10, ...flexCol(), width: 800}}>
-      <div className="VoyagerTool-input-row" style={{marginBottom: 10, ...flexRow(), gap: 10}}>
+    <div className="xCol" style={{padding: 10, minWidth: 800}}>
+      <div className="VoyagerTool-input-row xRow xGap10">
         <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
       <div>

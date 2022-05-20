@@ -4,7 +4,6 @@ import * as libVoyager from "datavoyager";
 import { VoyagerConfig as LibVoyagerConfig } from "datavoyager/build/models/config";
 
 import voyagerCss from './tools/VoyagerTool.css';
-import { flexCol } from './view/styles';
 
 const TestVoyager = memo(function TestVoyager() {
   const [container, setContainer] = useState<HTMLDivElement | null>();
@@ -44,7 +43,7 @@ const TestVoyager = memo(function TestVoyager() {
     }, [container]);
 
     return (
-      <div style={{padding: 10, ...flexCol(), width: 800}}>
+      <div className="xCol" style={{padding: 10, width: 800}}>
         <style>{voyagerCss}</style>
         <div ref={setContainer}/>
       </div>

@@ -11,27 +11,19 @@ function App() {
   // set when 'go' is clicked
   const [word, setWord] = useState(undefined);
 
-  const [data, setData] = useState(undefined);
+  // set by fetch
+  const [response, setResponse] = useState(undefined);
   useEffect(() => {
     if (!word) { return; }
 
     fetch(`http://words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/${word}/json`)
       .then((resp) => resp.json())
-      .then(setData);
+      .then(setResponse);
   }, [word])
 
-  // const [synonyms, setSynonyms] = useState([]);
-  // useEffect(() => {
-  //   if (!data) { return; }
-  //   console.log('i dunno what to do with `data`', data);
-  //   setSynonyms(['i dunno', 'what to do']);
-  //   // setSynonyms(
-  //   //   [...new Set(Object.values(data).map(partOfSpeech => partOfSpeech.syn).flat())]
-  //   // )
-  // }, [data]);
-
-  let synonyms = useLiveTool({data}, { defaultValue: [], hide: true});
-  console.log("syn got", synonyms)
+  // set by TBD processing
+  let synonyms = ["I", "don't", "know"];
+  // let synonyms = useLiveTool({response}, { defaultValue: [], hide: false});
 
   return (
     <main>
