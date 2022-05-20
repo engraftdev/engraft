@@ -15,6 +15,7 @@ import { codeConfigSetTo } from "./CodeTool";
 export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
   cells: Cell[];
+  prevVar: VarConfig;
 }
 
 interface Cell {
@@ -28,6 +29,13 @@ interface Cell {
 const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
 export const NotebookTool = memo(function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
+  // TODO: migration; not great
+  useEffect(() => {
+    if (!config.prevVar) {
+      updateKeys(updateConfig, { prevVar: newVarConfig('prev') });
+    }
+  }, [config.prevVar, updateConfig])
+
   const [cells, updateCells] = useAt(config, updateConfig, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -53,7 +61,7 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
       }}>
       {cells.map((cell, i) =>
         <Fragment key={cell.var.id}>
-          <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
+          <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
           <CellView cell={cell}
             // TODO: memoize these?
             updateCell={atIndex(updateCells, i)}
@@ -66,9 +74,9 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
           />
         </Fragment>
       )}
-      <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel}/>
+      <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
     </div>
-  ), [cells, outputs, smallestUnusedLabel, updateCells, views])
+  ), [cells, config.prevVar, outputs, smallestUnusedLabel, updateCells, views])
   useView(reportView, view);
 
   const output = useMemo(() => {
@@ -92,26 +100,40 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
       cells={cells}
       updateCells={updateCells}
       outputs={outputs}
-      reportView={reportCellView} reportOutput={reportCellOutput}/>
+      reportView={reportCellView}
+      reportOutput={reportCellOutput}
+      prevVar={config.prevVar}
+    />
   )}</>;
 })
-registerTool<NotebookConfig>(NotebookTool, 'notebook', () => ({
+registerTool<NotebookConfig>(NotebookTool, 'notebook', (defaultInput) => ({
   toolName: 'notebook',
   cells: [
-    { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(''), upstreamIds: {} }
-  ]
+    { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(defaultInput || ''), upstreamIds: {} }
+  ],
+  prevVar: newVarConfig('prev')
 }));
 
 
+interface RowDividerProps {
+  i: number;
+  updateCells: Updater<Cell[]>;
+  smallestUnusedLabel: string;
+  prevVar: VarConfig;
+}
 
-const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) {
+const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel, prevVar}: RowDividerProps) {
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
-      newCells.splice(i, 0, {var: newVarConfig(smallestUnusedLabel), config: codeConfigSetTo(''), upstreamIds: {}});
+      newCells.splice(i, 0, {
+        var: newVarConfig(smallestUnusedLabel),
+        config: codeConfigSetTo(i === 0 ? '' : prevVar.id),
+        upstreamIds: {},
+      });
       return newCells;
     })
-  }, [i, smallestUnusedLabel, updateCells]);
+  }, [i, prevVar.id, smallestUnusedLabel, updateCells]);
 
   // const [hoverRef, isHovered] = useHover();
 
@@ -146,9 +168,11 @@ interface CellModelProps {
 
   reportView: (id: string, view: ToolView | null) => void;
   reportOutput: (id: string, value: ToolValue | null) => void;
+
+  prevVar: VarConfig;
 }
 
-const CellModel = memo(function CellModel({id, cells, updateCells, outputs, reportView, reportOutput}: CellModelProps) {
+const CellModel = memo(function CellModel({id, cells, updateCells, outputs, reportView, reportOutput, prevVar}: CellModelProps) {
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var.id === id);
     if (i === -1) {
@@ -165,16 +189,33 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   useEffect(() => reportView(id, view), [id, reportView, view]);
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
 
+  const prevVal: ToolValue | null | undefined = useMemo(() => {
+    const prevCell: Cell | undefined = cells[i - 1];
+    if (prevCell) {
+      return outputs[prevCell.var.id];
+    }
+  }, [cells, i, outputs])
+  const prevVarContext = useMemo(() => {
+    if (prevVal) {
+      const prevVarInfo = {
+        config: prevVar,
+        value: prevVal,
+      };
+      return {[prevVar.id]: prevVarInfo};
+    } else {
+      return undefined;
+    }
+  }, [prevVal, prevVar])
 
   const newVarInfos = useDebounce(useMemo(() => {
-    let result: {[label: string]: VarInfo} = {};
+    let result: {[label: string]: VarInfo} = {...prevVarContext};
     cells.forEach((otherCell) => {
       if (cell.upstreamIds[otherCell.var.id]) {
         result[otherCell.var.id] = {config: otherCell.var, value: outputs[otherCell.var.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
-  }, [cell.upstreamIds, cells, outputs]), objEqWith(objEqWith(refEq)))
+  }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
   const newPossibleVarInfos = useDebounce(useMemo(() => {
