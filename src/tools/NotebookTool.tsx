@@ -102,14 +102,6 @@ registerTool<NotebookConfig>(NotebookTool, 'notebook', () => ({
   ]
 }));
 
-export function notebookConfigSetTo(config: ToolConfig): NotebookConfig {
-  return {
-    toolName: 'notebook',
-    cells: [
-      { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(config), upstreamIds: {} }
-    ]
-  };
-}
 
 
 const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel}: {i: number, updateCells: Updater<Cell[]>, smallestUnusedLabel: string}) {

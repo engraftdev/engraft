@@ -21,7 +21,6 @@ import { useRefForCallback } from "../util/useRefForCallback";
 import IsolateStyles from "../view/IsolateStyles";
 import { ToolFrame } from "../view/ToolFrame";
 import { VarUse } from "../view/Vars";
-import { notebookConfigSetTo } from "./NotebookTool";
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
