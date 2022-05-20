@@ -32,3 +32,7 @@ declare module '@observablehq/inspector' {
     fulfilled(value: any)
   }
 }
+
+declare module 'isoformat' {
+  export function format(date: Date, orElse: string)
+}

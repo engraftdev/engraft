@@ -43,6 +43,7 @@
     "immutable": "^4.0.0",
     "internmap": "^2.0.3",
     "is-valid-identifier": "^2.0.2",
+    "isoformat": "^0.2.1",
     "lodash": "^4.17.21",
     "markdown-it": "^12.3.2",
     "object-inspect": "^1.12.0",

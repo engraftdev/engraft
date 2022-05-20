@@ -10,7 +10,7 @@ import { Use } from "../util/Use";
 import useHover from "../util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
-
+import { format } from "isoformat";
 
 export interface ValueFrameProps {
   children?: ReactNode | undefined;
@@ -124,6 +124,14 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
       <ValueFrame type='blob'>
         <button onClick={() => saveFile(value, 'file')}>download</button>
       </ValueFrame>
+    );
+  }
+
+  if (value instanceof Date) {
+    return wrapInline(
+      <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
+        {format(value, "Invalid Date")}
+      </div>
     );
   }
 
