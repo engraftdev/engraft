@@ -123,6 +123,8 @@ interface RowDividerProps {
 }
 
 const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel, prevVar}: RowDividerProps) {
+  return null;
+
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();

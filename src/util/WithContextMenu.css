@@ -1,0 +1,13 @@
+.WithContextMenu {
+  width: fit-content;
+  display: inline-block;
+}
+
+.react-contextmenu-item--divider:not(.react-contextmenu-item--heading) {
+  margin-left: 15px;
+}
+
+.react-contextmenu-item--heading:first-child {
+  margin-top: -23px;
+  border-radius: 10px;
+}

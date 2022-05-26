@@ -1,10 +1,13 @@
-import { ReactNode, memo } from "react";
+import { ReactNode, memo, useCallback } from "react";
 import { ToolConfig, VarInfos, PossibleVarInfos } from "../tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "../util/state";
 import { Value } from "./Value";
 import { WindowPortal } from "../util/WindowPortal";
 import { ValueEditable } from "./ValueEditable";
 import IsolateStyles from "./IsolateStyles";
+import { Menu, MenuMaker, WithContextMenu } from "../util/WithContextMenu";
+import { Use } from "../util/Use";
+import useHover from "../util/useHover";
 
 
 export interface ToolFrameProps {
@@ -19,30 +22,52 @@ export interface ToolFrameProps {
 export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
+  const menuMaker: MenuMaker = useCallback(() => {
+    return [
+      // { type: 'heading', heading: 'TOOL' },
+      { type: 'contents', contents: 'Copy config' },
+      { type: 'contents', contents: 'Show debug info' },
+      { type: 'contents', contents: 'Delete tool' },
+    ]
+  }, [])
+
   return <div
     className="ToolFrame"
     style={{
-      border: '1px solid #0083', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
+      border: '1px solid #c4c4ff', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
       width: '100%', height: '100%'
     }}
   >
-    <div className="ToolFrame-bar" style={{height: 15, background: '#e4e4e4', fontSize: 13, color: '#0008', display: 'flex'}}>
-      <div style={{marginLeft: 2}}>{config.toolName}</div>
-      <div style={{flexGrow: 1, minWidth: 6}}></div>
-      {/* TODO: Feedback for clicking 'cp' */}
-      {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
-      <div style={{background: '#0003', width: 15, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-        onClick={() => {navigator.clipboard.writeText(JSON.stringify(config))}}
-      >cp</div>
-      <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-        onClick={() => {updateShowInspector((i) => !i)}}
-      >i</div>
-      {onClose &&
-        <div style={{background: '#0003', width: 10, height: 10, fontSize: 10, lineHeight: '10px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginRight: 3}}
-          onClick={onClose}
-        >×</div>
-      }
-    </div>
+    <Use hook={useHover} children={([hoverRef, isHovered]) =>
+      <div ref={hoverRef} className="ToolFrame-bar" style={{height: 15, fontSize: 13, color: '#0008', display: 'flex'}}>
+
+        <div style={{
+          // paddingLeft: 5, paddingRight: 2, background: '#e4e4ff', borderBottomLeftRadius: 5
+          paddingLeft: 2, paddingRight: 5, background: '#e4e4ff', borderBottomRightRadius: 5,
+          userSelect: 'none', lineHeight: '15px',
+        }}>
+          {config.toolName}
+        </div>
+
+        {/* TODO: Feedback for clicking 'cp' */}
+        {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
+        { isHovered && <>
+          <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+            onClick={() => {navigator.clipboard.writeText(JSON.stringify(config))}}
+          >cp</div>
+          <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+            onClick={() => {updateShowInspector((i) => !i)}}
+          >i</div>
+          {onClose &&
+            <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+              onClick={onClose}
+            >×</div>
+          }
+        </>}
+
+        <div style={{flexGrow: 1, minWidth: 6}}></div>
+      </div>
+    }/>
     <div style={{minHeight: 0}}>
       {children}
     </div>
