@@ -123,7 +123,7 @@ interface RowDividerProps {
 }
 
 const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel, prevVar}: RowDividerProps) {
-  return null;
+  // return null;
 
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
@@ -145,15 +145,15 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
         style={{gridColumn: '1/4', height: 10}}
         onClick={onClick}
       >
-        <div className="xCenter"
-          style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 0}}
-        >
-          {isHovered &&
+        {isHovered &&
+          <div className="xCenter"
+            style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 0}}
+          >
             <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>
               insert row
             </div>
-          }
-        </div>
+          </div>
+        }
       </div>
     }
     </Use>;
