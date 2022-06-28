@@ -5,13 +5,17 @@ import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { codeConfigSetTo } from "src/tools/CodeTool";
 import { TextConfig } from "src/tools/TextTool";
-import offlineData from "./offlineData.json";
-import offlineData2 from "./offlineData2.json";
 import { Use } from "src/util/Use";
 import useSize from "src/util/useSize";
 import { RowToCol } from "src/util/RowToCol";
 
-const OFFLINE_MODE = true;
+const offlineDataContext = require.context('./offline-data', true, /\.\/(.*)\.json$/)
+const offlineData = Object.fromEntries(
+  offlineDataContext.keys().map(id => [
+    id.match(/\.\/(.*)$/)![1],
+    offlineDataContext(id)
+  ])
+);
 
 export interface RequestConfig extends ToolConfig {
   toolName: 'request';
@@ -27,12 +31,13 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
   const [autoSend, updateAutoSend] = useAt(config, updateConfig, 'autoSend');
 
   const send = useCallback(async () => {
-    if (OFFLINE_MODE) {
-      reportOutput({ toolValue: offlineData2 })
+    if (!urlOutput || typeof urlOutput.toolValue !== 'string') { return; }
+
+    if (offlineData[urlOutput.toolValue]) {
+      reportOutput({ toolValue: offlineData[urlOutput.toolValue] })
       return;
     }
 
-    if (!urlOutput || typeof urlOutput.toolValue !== 'string') { return; }
     const url = new URL(urlOutput.toolValue);
     let params = paramsOutput?.toolValue as object || {}
     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, (v as any).toString()))
