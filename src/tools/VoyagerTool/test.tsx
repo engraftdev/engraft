@@ -1,11 +1,11 @@
 import { memo, useEffect, useMemo, useState } from 'react';
-import './tools/builtInTools';
+import '../builtInTools';
 import * as libVoyager from "datavoyager";
 import { VoyagerConfig as LibVoyagerConfig } from "datavoyager/build/models/config";
 
 import voyagerCss from './tools/VoyagerTool.css';
 
-const TestVoyager = memo(function TestVoyager() {
+export const TestVoyager = memo(function TestVoyager() {
   const [container, setContainer] = useState<HTMLDivElement | null>();
 
     useEffect(() => {
@@ -49,5 +49,3 @@ const TestVoyager = memo(function TestVoyager() {
       </div>
     );
 });
-
-export default TestVoyager;

@@ -43,8 +43,9 @@ function makeConfig(name) {
         devtool: isDevelopment ? 'eval-cheap-module-source-map' : false,
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
-            alias: {  // BS for datavoyager
-                'font-awesome-sass-loader$': false,
+            alias: {
+                src: resolve(__dirname, 'src'),  // 'absolute' paths
+                'font-awesome-sass-loader$': false,  // BS for datavoyager
             },
         },
         devServer: {

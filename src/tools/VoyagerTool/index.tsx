@@ -1,11 +1,11 @@
 import { CreateVoyager, Voyager } from "datavoyager";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView, ToolViewProps } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useAt } from "../util/state";
-import { usePrevious } from "../util/usePrevious";
-import { codeConfigSetTo } from "./CodeTool";
-import voyagerCss from './VoyagerTool.css';
+import { registerTool, ToolConfig, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { useAt } from "src/util/state";
+import { usePrevious } from "src/util/usePrevious";
+import { codeConfigSetTo } from "src/tools/CodeTool";
+import style from './style.css';
 
 
 export interface VoyagerConfig extends ToolConfig {
@@ -115,7 +115,7 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
         <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
       <div>
-        <style>{voyagerCss}</style>
+        <style>{style}</style>
         <div ref={setContainer}/>
       </div>
     </div>

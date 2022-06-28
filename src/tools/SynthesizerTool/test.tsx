@@ -1,7 +1,7 @@
 import { memo } from 'react';
-import { synthesizeGen } from './util/synthesizer';
-import { runToCompletion } from './util/Task';
-import { Value } from './view/Value';
+import { synthesizeGen } from './synthesizer';
+import { runToCompletion } from 'src/util/Task';
+import { Value } from 'src/view/Value';
 
 
 const synthesisPrompts: [any, any][][] = [
@@ -40,7 +40,7 @@ const synthesisPrompts: [any, any][][] = [
   ],
 ]
 
-const TestSynthesizer = memo(function TestSynthesizer() {
+export const TestSynthesizer = memo(function TestSynthesizer() {
   return <div>
     {synthesisPrompts.map((prompt, i) =>
       <div key={i}>
@@ -59,5 +59,3 @@ const TestSynthesizer = memo(function TestSynthesizer() {
     )}
   </div>
 });
-
-export default TestSynthesizer;

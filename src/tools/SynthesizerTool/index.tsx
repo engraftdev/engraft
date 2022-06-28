@@ -14,15 +14,15 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper";
 import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import CodeMirror from "../util/CodeMirror";
-import { compileExpression } from "../util/compile";
-import { newId } from "../util/id";
-import { Updater, useAt } from "../util/state";
-import { SynthesisState, synthesizeGen } from "../util/synthesizer";
-import { Task } from "../util/Task";
-import { codeConfigSetTo } from "./CodeTool";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import CodeMirror from "src/util/CodeMirror";
+import { compileExpression } from "src/util/compile";
+import { newId } from "src/util/id";
+import { Updater, useAt } from "src/util/state";
+import { SynthesisState, synthesizeGen } from "./synthesizer";
+import { Task } from "src/util/Task";
+import { codeConfigSetTo } from "src/tools/CodeTool";
 
 
 

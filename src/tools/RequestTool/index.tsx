@@ -1,14 +1,15 @@
 import { memo, useCallback, useEffect } from "react";
 import { useDebounce } from "use-debounce";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
-import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useAt } from "../util/state";
-import { codeConfigSetTo } from "./CodeTool";
-import { TextConfig } from "./TextTool";
-import offlineData2 from "./RequestTool-offlineData2.json";
-import { Use } from "../util/Use";
-import useSize from "../util/useSize";
-import { RowToCol } from "../util/RowToCol";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { useAt } from "src/util/state";
+import { codeConfigSetTo } from "src/tools/CodeTool";
+import { TextConfig } from "src/tools/TextTool";
+import offlineData from "./offlineData.json";
+import offlineData2 from "./offlineData2.json";
+import { Use } from "src/util/Use";
+import useSize from "src/util/useSize";
+import { RowToCol } from "src/util/RowToCol";
 
 const OFFLINE_MODE = true;
 
