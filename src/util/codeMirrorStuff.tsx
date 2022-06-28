@@ -13,8 +13,8 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
 import { memo, useCallback } from "react";
-import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "../tools-framework/tools";
-import { updateKeys, Updater, useAt } from "../util/state";
+import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "src/tools-framework/tools";
+import { updateKeys, Updater, useAt } from "src/util/state";
 import { refCode } from "./refsExtension";
 
 

@@ -1,6 +1,6 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "../util/state";
+import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { ToolConfig, toolIndex, ToolValue, ToolView, ToolViewProps } from "./tools";
 
 // TODO: Tool<any> rather than Tool<ToolConfig>; we trust you'll attach a defaultConfig at some point?

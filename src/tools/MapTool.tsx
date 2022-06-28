@@ -1,10 +1,10 @@
 import { CSSProperties, memo, useCallback, useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "../tools-framework/tools";
-import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
-import range from "../util/range";
-import { useAt, useStateSetOnly } from "../util/state";
-import { Value } from "../view/Value";
-import { VarDefinition } from "../view/Vars";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "src/tools-framework/tools";
+import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
+import range from "src/util/range";
+import { useAt, useStateSetOnly } from "src/util/state";
+import { Value } from "src/view/Value";
+import { VarDefinition } from "src/view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
 

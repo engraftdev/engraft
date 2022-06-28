@@ -1,9 +1,9 @@
 import { memo, useCallback, useEffect } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
-import { ToolWithView } from "../tools-framework/ToolWithView";
-import { useView } from "../tools-framework/useSubTool";
-import { Setter, useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "../util/state";
-import { Value } from "../view/Value";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
+import { ToolWithView } from "src/tools-framework/ToolWithView";
+import { useView } from "src/tools-framework/useSubTool";
+import { Setter, useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
+import { Value } from "src/view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface StateConfig extends ToolConfig {

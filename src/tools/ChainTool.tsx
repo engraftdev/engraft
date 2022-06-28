@@ -1,12 +1,12 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "../tools-framework/tools";
-import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
-import { AddObjToContext } from "../util/context";
-import { newId } from "../util/id";
-import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
-import { updateF } from "../util/updateF";
-import useHover from "../util/useHover";
-import { ValueFrame, ValueOfTool } from "../view/Value";
+import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "src/tools-framework/tools";
+import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
+import { AddObjToContext } from "src/util/context";
+import { newId } from "src/util/id";
+import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { updateF } from "src/util/updateF";
+import useHover from "src/util/useHover";
+import { ValueFrame, ValueOfTool } from "src/view/Value";
 import { CodeConfig, codeConfigSetTo, summarizeCodeConfig } from "./CodeTool";
 
 export interface ChainConfig {

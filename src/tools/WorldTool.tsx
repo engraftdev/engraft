@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useTools, useView } from "../tools-framework/useSubTool";
-import { useAt, useStateSetOnly } from "../util/state";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
+import { useAt, useStateSetOnly } from "src/util/state";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface WorldConfig {

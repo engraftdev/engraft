@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { newId } from "../util/id";
-import { RowToCol } from "../util/RowToCol";
-import { useAt } from "../util/state";
-import useHover from "../util/useHover";
-import { useKeyHeld } from "../util/useKeyHeld";
-import { ValueOfTool } from "../view/Value";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { newId } from "src/util/id";
+import { RowToCol } from "src/util/RowToCol";
+import { useAt } from "src/util/state";
+import useHover from "src/util/useHover";
+import { useKeyHeld } from "src/util/useKeyHeld";
+import { ValueOfTool } from "src/view/Value";
 import { codeConfigSetTo } from "./CodeTool";
 
 

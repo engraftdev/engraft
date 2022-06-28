@@ -1,10 +1,10 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
+import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "src/tools-framework/tools";
 
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
 import { codeConfigSetTo } from "./CodeTool";
-import { useMemoObject } from "../util/useMemoObject";
+import { useMemoObject } from "src/util/useMemoObject";
 
 export interface MarkdownConfig {
   toolName: 'markdown';

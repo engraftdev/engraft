@@ -1,8 +1,8 @@
 import { memo, useCallback } from "react";
 import { RgbColorPicker } from 'react-colorful';
-import { registerTool, ToolProps, ToolView } from "../tools-framework/tools";
-import { useOutput, useView } from "../tools-framework/useSubTool";
-import { useMemoObject } from "../util/useMemoObject";
+import { registerTool, ToolProps, ToolView } from "src/tools-framework/tools";
+import { useOutput, useView } from "src/tools-framework/useSubTool";
+import { useMemoObject } from "src/util/useMemoObject";
 
 export interface ColorConfig {
   toolName: 'color';

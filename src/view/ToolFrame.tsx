@@ -1,13 +1,13 @@
 import { ReactNode, memo, useCallback } from "react";
-import { ToolConfig, VarInfos, PossibleVarInfos } from "../tools-framework/tools";
-import { Updater, useStateUpdateOnly } from "../util/state";
+import { ToolConfig, VarInfos, PossibleVarInfos } from "src/tools-framework/tools";
+import { Updater, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
-import { WindowPortal } from "../util/WindowPortal";
+import { WindowPortal } from "src/util/WindowPortal";
 import { ValueEditable } from "./ValueEditable";
 import IsolateStyles from "./IsolateStyles";
-import { Menu, MenuMaker, WithContextMenu } from "../util/WithContextMenu";
-import { Use } from "../util/Use";
-import useHover from "../util/useHover";
+import { Menu, MenuMaker, WithContextMenu } from "src/util/WithContextMenu";
+import { Use } from "src/util/Use";
+import useHover from "src/util/useHover";
 
 
 export interface ToolFrameProps {

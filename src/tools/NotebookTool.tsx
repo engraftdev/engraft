@@ -1,14 +1,14 @@
 import _ from "lodash";
 import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "../tools-framework/tools";
-import { ShowView, useOutput, useTool, useView } from "../tools-framework/useSubTool";
-import { AddObjToContext } from "../util/context";
-import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "../util/state";
-import { Use } from "../util/Use";
-import useDebounce, { objEqWith, refEq } from "../util/useDebounce";
-import useHover from "../util/useHover";
-import { ValueOfTool } from "../view/Value";
-import { VarDefinition } from "../view/Vars";
+import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "src/tools-framework/tools";
+import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
+import { AddObjToContext } from "src/util/context";
+import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { Use } from "src/util/Use";
+import useDebounce, { objEqWith, refEq } from "src/util/useDebounce";
+import useHover from "src/util/useHover";
+import { ValueOfTool } from "src/view/Value";
+import { VarDefinition } from "src/view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
 

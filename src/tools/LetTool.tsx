@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "../tools-framework/tools";
-import { ShowView, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useAt } from "../util/state";
-import { VarDefinition } from "../view/Vars";
+import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "src/tools-framework/tools";
+import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { useAt } from "src/util/state";
+import { VarDefinition } from "src/view/Vars";
 import { codeConfigSetTo } from "./CodeTool";
 
 export interface LetConfig extends ToolConfig {

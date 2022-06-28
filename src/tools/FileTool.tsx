@@ -1,9 +1,9 @@
 import { memo, useCallback } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { registerTool, ToolProps, ToolView } from "../tools-framework/tools";
-import { useOutput, useView } from "../tools-framework/useSubTool";
-import { updateKeys } from "../util/state";
-import { useMemoObject } from "../util/useMemoObject";
+import { registerTool, ToolProps, ToolView } from "src/tools-framework/tools";
+import { useOutput, useView } from "src/tools-framework/useSubTool";
+import { updateKeys } from "src/util/state";
+import { useMemoObject } from "src/util/useMemoObject";
 
 export interface FileConfig {
   toolName: 'file';

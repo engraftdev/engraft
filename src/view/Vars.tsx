@@ -1,7 +1,7 @@
 import { memo, useRef, useState } from "react";
-import { VarConfig, VarInfo } from "../tools-framework/tools";
-import { ControlledSpan } from "../util/ControlledTextInput";
-import { updateKeys, Updater } from "../util/state";
+import { VarConfig, VarInfo } from "src/tools-framework/tools";
+import { ControlledSpan } from "src/util/ControlledTextInput";
+import { updateKeys, Updater } from "src/util/state";
 import rectConnect from 'rect-connect';
 import { ObjectInspector } from "react-inspector";
 

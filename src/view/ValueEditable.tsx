@@ -1,7 +1,7 @@
 import { createContext, memo, useCallback, useContext, MouseEvent } from "react";
-import { at, atIndex, Updater } from "../util/state";
-import { Use } from "../util/Use";
-import useHover from "../util/useHover";
+import { at, atIndex, Updater } from "src/util/state";
+import { Use } from "src/util/Use";
+import useHover from "src/util/useHover";
 import { pathString, SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
 
 const ValueEditableContext = createContext<Updater<any> | undefined>(undefined);

@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "../tools-framework/tools";
-import { useOutput, useView } from "../tools-framework/useSubTool";
-import ControlledTextInput from "../util/ControlledTextInput";
-import { useAt } from "../util/state";
+import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
+import { useOutput, useView } from "src/tools-framework/useSubTool";
+import ControlledTextInput from "src/util/ControlledTextInput";
+import { useAt } from "src/util/state";
 
 export interface ImportConfig extends ToolConfig {
   toolName: 'import';

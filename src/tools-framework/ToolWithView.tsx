@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { useStateSetOnly } from "../util/state";
-import IsolateStyles from "../view/IsolateStyles";
+import { useStateSetOnly } from "src/util/state";
+import IsolateStyles from "src/view/IsolateStyles";
 import { toolIndex, ToolProps, ToolView, ToolViewProps } from "./tools";
 import { ShowView } from "./useSubTool";
 

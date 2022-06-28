@@ -1,8 +1,8 @@
 import { memo, useCallback } from "react";
 import { TableInspector } from "react-inspector";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import { useMemoObject } from "../util/useMemoObject";
+import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { useMemoObject } from "src/util/useMemoObject";
 
 
 export interface TableConfig {

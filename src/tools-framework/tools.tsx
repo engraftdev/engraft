@@ -1,8 +1,8 @@
 import { createContext, memo, ReactElement, ReactNode } from "react";
-import { AddToContext } from "../util/context";
-import { newId } from "../util/id";
-import { Setter, Updater } from "../util/state";
-import { useMemoObject } from "../util/useMemoObject";
+import { AddToContext } from "src/util/context";
+import { newId } from "src/util/id";
+import { Setter, Updater } from "src/util/state";
+import { useMemoObject } from "src/util/useMemoObject";
 
 export type ToolValue = {
   toolValue: unknown;

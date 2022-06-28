@@ -1,9 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "../tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "../tools-framework/useSubTool";
-import ChalkEditor from "../util/ChalkEditor";
-import { compileExpression } from "../util/compile";
-import { useAt } from "../util/state";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import ChalkEditor from "src/util/ChalkEditor";
+import { compileExpression } from "src/util/compile";
+import { useAt } from "src/util/state";
 import { codeConfigSetTo } from "./CodeTool";
 
 // TODO: Hacky headless reportOutput.

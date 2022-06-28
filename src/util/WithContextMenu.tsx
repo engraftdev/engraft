@@ -1,10 +1,10 @@
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-import cssWithContextMenu from './WithContextMenu.css';
-import cssContextmenu from './WithContextMenu-contextmenu.css'
+import * as React from "react"
+import * as ReactDOM from "react-dom"
+import cssWithContextMenu from "./WithContextMenu.css";
+import cssContextmenu from "./WithContextMenu-contextmenu.css"
 
-import classNames from 'classnames'
-import IsolateStyles from '../view/IsolateStyles';
+import classNames from "classnames"
+import IsolateStyles from "src/view/IsolateStyles";
 
 
 export type MenuItem =
