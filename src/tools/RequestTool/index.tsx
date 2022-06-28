@@ -5,8 +5,6 @@ import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { codeConfigSetTo } from "src/tools/CodeTool";
 import { TextConfig } from "src/tools/TextTool";
-import { Use } from "src/util/Use";
-import useSize from "src/util/useSize";
 import { RowToCol } from "src/util/RowToCol";
 
 const offlineDataContext = require.context('./offline-data', true, /\.\/(.*)\.json$/)
