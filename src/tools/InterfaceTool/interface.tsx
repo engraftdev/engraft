@@ -31,7 +31,8 @@ export const InterfaceContext = createContext<InterfaceContextInfo>({
 
 export type InterfaceNode = (
   {
-    type: 'div',
+    type: 'element',
+    tag: 'div',
     style: CSSProperties,
     children: InterfaceNode[],
   } | {
@@ -61,16 +62,17 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
 
   let inner: ReactNode;
   switch (node.type) {
-    case 'div':
+    case 'element':
+      const Tag = node.tag;
       inner = (
-        <div style={node.style}>
+        <Tag style={node.style}>
           {node.children.map(child =>
             <InterfaceNodeView node={child} data={innerData} isGhost={isGhost}/>
           )}
           { context.editMode &&
             <GhostView node={node} innerData={innerData}/>
           }
-        </div>
+        </Tag>
       );
       break;
     case 'for-each':
@@ -97,7 +99,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
 
     return (
       <div
-      className="InterfaceNodeView-editbox"
+        className="InterfaceNodeView-editbox"
         style={{
           padding: 2,
           margin: 2,
@@ -178,7 +180,8 @@ const GhostView = memo(function GhostView(props: GhostViewProps) {
         type: 'for-each',
         id: hashId(node.id, 'for-each'),
         item: {
-          type: 'div',
+          type: 'element',
+          tag: 'div',
           id: hashId(node.id, 'for-each-div'),
           style: {},
           children: [],
@@ -193,7 +196,8 @@ const GhostView = memo(function GhostView(props: GhostViewProps) {
         return null;
       } else {
         const ghostNode: InterfaceNode = {
-          type: 'div',
+          type: 'element',
+          tag: 'div',
           id: hashId(node.id, 'key', key),
           style: {},
           children: [],
@@ -214,7 +218,7 @@ function isArrayShown(node: InterfaceNode, preScope: boolean): boolean {
   }
 
   switch (node.type) {
-    case 'div':
+    case 'element':
       return node.children.some(child => isArrayShown(child, true));
     case 'for-each':
       return true;
@@ -229,7 +233,7 @@ function isTextShown(node: InterfaceNode, preScope: boolean): boolean {
   }
 
   switch (node.type) {
-    case 'div':
+    case 'element':
       return node.children.some(child => isTextShown(child, true));
     case 'text':
       return true;
@@ -244,7 +248,7 @@ function keysShown(node: InterfaceNode, preScope: boolean): Set<string> {
   }
 
   switch (node.type) {
-    case 'div':
+    case 'element':
       let keys = new Set<string>();
       node.children.forEach(child =>
         keysShown(child, true).forEach(key => keys.add(key))

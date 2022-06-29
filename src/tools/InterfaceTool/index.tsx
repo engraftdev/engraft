@@ -51,12 +51,38 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
   const [ selection, setSelection ] = useState<Selection | null>(null);
 
   const rootNode: InterfaceNode = {
-    type: 'div',
     id: 'root',
+    type: 'element',
+    tag: 'div',
     style: {},
     children: [
+      // {
+      //   id: 'for-each',
+      //   type: 'for-each',
+      //   item: {
+      //     id: 'item',
+      //     type: 'element',
+      //     tag: 'div',
+      //     style: {},
+      //     children: [
+      //       {
+      //         scope: 'title',
+      //         id: 'title-div',
+      //         type: 'element',
+      //         tag: 'div',
+      //         style: {},
+      //         children: [
+      //           {
+      //             id: 'title',
+      //             type: 'text',
+      //           },
+      //         ],
+      //       },
+      //     ],
+      //   },
+      // },
     ],
-  }
+  };
 
   return (
     <div className="xCol xGap10 xPad10">
@@ -69,39 +95,52 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
           <div
             className="xCol xGap10"
             style={{
-              width: 100,
+              width: 200,
               flexShrink: 0,
               flexGrow: 0,
             }}
           >
-            <b>selected node</b>
             { selection
               ? <SelectionInspector selection={selection} rootNode={rootNode} />
               : <span>none</span>
             }
-            {/*  */}
-
           </div>
-          <ErrorBoundary>
-            <InterfaceContext.Provider
-              value={{
-                editMode: true,
-                selection,
-                setSelection,
-              }}
-            >
-              <InterfaceNodeView data={inputOutput.toolValue} node={rootNode}/>
-            </InterfaceContext.Provider>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <InterfaceContext.Provider
-              value={{
-                editMode: false,
-              }}
-            >
-              <InterfaceNodeView data={inputOutput.toolValue} node={rootNode}/>
-            </InterfaceContext.Provider>
-          </ErrorBoundary>
+          <div
+            className="xCol xGap10"
+            style={{
+              width: 300,
+            }}
+          >
+            <b>edit view</b>
+            <ErrorBoundary>
+              <InterfaceContext.Provider
+                value={{
+                  editMode: true,
+                  selection,
+                  setSelection,
+                }}
+              >
+                <InterfaceNodeView data={inputOutput.toolValue} node={rootNode}/>
+              </InterfaceContext.Provider>
+            </ErrorBoundary>
+          </div>
+          <div
+            className="xCol xGap10"
+            style={{
+              width: 300,
+            }}
+          >
+            <b>run view</b>
+            <ErrorBoundary>
+              <InterfaceContext.Provider
+                value={{
+                  editMode: false,
+                }}
+              >
+                <InterfaceNodeView data={inputOutput.toolValue} node={rootNode}/>
+              </InterfaceContext.Provider>
+            </ErrorBoundary>
+          </div>
         </div>
       }
     </div>
@@ -124,13 +163,16 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
 
   return (
     <div className="xCol xGap10">
+      <b>id</b>
       <div style={{fontSize: "50%", fontStyle: 'italic'}}>{selection.id}</div>
+      <b>type</b>
       <div>
         {selectedNode ? selectedNode.type : 'cannot find node'}
       </div>
-      <ValueFrame outerStyle={{ minHeight: 0, maxHeight: 100, display: 'flex', margin: 0 }}>
+      <b>data</b>
+      {/* <ValueFrame outerStyle={{ minHeight: 0, maxHeight: 100, display: 'flex', margin: 0 }}> */}
         <Value value={selection.data} />
-      </ValueFrame>
+      {/* </ValueFrame> */}
     </div>
   )
 });
