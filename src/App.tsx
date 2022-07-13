@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import appCss from './App.css';
 import { examples } from './examples/examples';
 import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
@@ -24,6 +24,8 @@ function varInfoObject(varInfos: VarInfo[]) {
 }
 
 const App = memo(function App() {
+  const [version, incrementVersion] = useReducer((version) => version + 1, 0);
+
   const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
   const [configIsFromLocalStorage, setIsConfigFromLocalStorage] = useState(false);
 
@@ -56,7 +58,7 @@ const App = memo(function App() {
   const [showTool, setShowTool] = useStateSetOnly(true);
   const [showOutput, setShowOutput] = useStateSetOnly(false);
 
-  return <>
+  return <Fragment key={version}>
     <style>
       {appCss}
     </style>
@@ -101,6 +103,7 @@ const App = memo(function App() {
       <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
       {' '}
       <select value='none' onChange={(ev) => {
+          incrementVersion();
           updateConfig(() => examples.find((ex) => ex.name === ev.target.value)!.config);
         }}>
         <option value='none' disabled={true}>Load example...</option>
@@ -118,7 +121,7 @@ const App = memo(function App() {
       <input type='checkbox' checked={showOutput} onChange={(ev) => setShowOutput(ev.target.checked)}/>
       <label>Show output</label>
     </div>
-  </>
+  </Fragment>
 });
 
 export default App;
