@@ -1,13 +1,17 @@
 import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
-import { hashId } from 'src/util/id';
+import { hashId, updateById } from 'src/util/id';
 import { Use } from 'src/util/Use';
 import useHover from 'src/util/useHover';
 
 
 // TODO: "selection = id + data" is not robust to changing data
 export type Selection = {
-  id: string;
+  node: InterfaceNode;
   data: any;
+
+  // if you're a ghost, provide this function
+  // it says how to transform the root node to make you real
+  realize?: (rootNode: InterfaceNode) => InterfaceNode;
 }
 
 export type InterfaceContextInfo = {
@@ -16,8 +20,10 @@ export type InterfaceContextInfo = {
   editMode: true,
 
   selection: Selection | null,
-  setSelection: (id: Selection | null) => void,
-}
+  setSelection: (selection: Selection | null) => void,
+
+  realize: (rootNode: InterfaceNode) => InterfaceNode,
+};
 
 export const InterfaceContext = createContext<InterfaceContextInfo>({
   editMode: false,
@@ -32,7 +38,7 @@ export const InterfaceContext = createContext<InterfaceContextInfo>({
 export type InterfaceNode = (
   {
     type: 'element',
-    tag: 'div',
+    tag: string,
     style: CSSProperties,
     children: InterfaceNode[],
   } | {
@@ -40,6 +46,7 @@ export type InterfaceNode = (
     item: InterfaceNode,
   } | {
     type: 'text',
+    rawHtml: boolean,
   }
 ) & {
   id: string,
@@ -63,7 +70,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
   let inner: ReactNode;
   switch (node.type) {
     case 'element':
-      const Tag = node.tag;
+      const Tag = node.tag as keyof JSX.IntrinsicElements;
       inner = (
         <Tag style={node.style}>
           {node.children.map(child =>
@@ -87,14 +94,18 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
       } else {
         text = JSON.stringify(innerData);
       }
-      inner = text;
+      if (node.rawHtml) {
+        inner = <span dangerouslySetInnerHTML={{__html: text}} />;
+      } else {
+        inner = <span>{text}</span>;
+      }
       break;
     default:
       throw new Error('waaaaat');
   }
 
   if (context.editMode) {
-    const isSelected = context.selection?.id === node.id && context.selection?.data === innerData;
+    const isSelected = context.selection?.node.id === node.id && context.selection?.data === innerData;
     const boxBorder = `1px ${isGhost ? 'dashed' : 'solid'} ${isSelected ? '#88f' : '#ccc'}`;
 
     return (
@@ -125,20 +136,23 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div
             ref={hoverRef}
+            className="InterfaceNodeView-editbox-label"
             style={{
               position: 'absolute', top: -5, left: 2, fontSize: 8,
-              color: isHovered ? "#000" : "#aaa",
+              color: isSelected ? '#44f' : isHovered ? "#000" : "#aaa",
               backgroundColor: 'white',
               userSelect: 'none',
             }}
             onClick={() => {
               context.setSelection({
-                id: node.id,
+                node,
                 data: innerData,
+
+                realize: isGhost ? context.realize : undefined,
               });
             }}
           >
-            {node.type}
+            {node.type}{node.scope ? ` (.${node.scope})` : ''}
           </div>
         }/>
         {inner}
@@ -155,12 +169,28 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
 // ghost stuff
 
 interface GhostViewProps {
-  node: InterfaceNode,
+  node: InterfaceNode & {type: 'element'},  // always an 'element' node
   innerData: any,
 }
 
 const GhostView = memo(function GhostView(props: GhostViewProps) {
   const { node, innerData } = props;
+  const interfaceContext = useContext(InterfaceContext) as InterfaceContextInfo & {editMode: true};  // only use GhostView in edit mode
+  const { realize } = interfaceContext;
+
+  function realizeChild(ghostNode: InterfaceNode) {
+    return function(rootNode: InterfaceNode) {
+      return updateById(realize(rootNode), node.id, (oldNode: InterfaceNode & {type: 'element'}) => {
+        return {
+          ...oldNode,
+          children: [
+            ...oldNode.children,
+            ghostNode,
+          ],
+        };
+      });
+    }
+  }
 
   if (typeof innerData === 'string' || typeof innerData === 'number') {
     if (isTextShown(node, false)) {
@@ -168,9 +198,13 @@ const GhostView = memo(function GhostView(props: GhostViewProps) {
     } else {
       const ghostNode: InterfaceNode = {
         type: 'text',
-        id: hashId(node.id, 'text')
+        id: hashId(node.id, 'text'),
+        rawHtml: false,
       }
-      return <InterfaceNodeView node={ghostNode} data={innerData} isGhost={true}/>;
+      // TODO: this pattern is a "ghost child" I guess
+      return <InterfaceContext.Provider value={{...interfaceContext, realize: realizeChild(ghostNode)}}>
+        <InterfaceNodeView node={ghostNode} data={innerData} isGhost={true}/>
+      </InterfaceContext.Provider>;
     }
   } else if (Array.isArray(innerData)) {
     if (isArrayShown(node, false)) {
@@ -187,7 +221,9 @@ const GhostView = memo(function GhostView(props: GhostViewProps) {
           children: [],
         },
       };
-      return <InterfaceNodeView node={ghostNode} data={innerData} isGhost={true}/>;
+      return <InterfaceContext.Provider value={{...interfaceContext, realize: realizeChild(ghostNode)}}>
+        <InterfaceNodeView node={ghostNode} data={innerData} isGhost={true}/>
+      </InterfaceContext.Provider>;
     }
   } else if (typeof innerData === 'object') {
     const keysAlreadyShown = keysShown(node, false);
@@ -196,20 +232,22 @@ const GhostView = memo(function GhostView(props: GhostViewProps) {
         return null;
       } else {
         const ghostNode: InterfaceNode = {
+          scope: key,
           type: 'element',
           tag: 'div',
           id: hashId(node.id, 'key', key),
           style: {},
           children: [],
         }
-        return <InterfaceNodeView node={ghostNode} data={innerData[key]} isGhost={true}/>;
+        return <InterfaceContext.Provider value={{...interfaceContext, realize: realizeChild(ghostNode)}}>
+          <InterfaceNodeView node={ghostNode} data={innerData} isGhost={true}/>
+        </InterfaceContext.Provider>;
       }
     })}</>;
   } else {
     return null;
   }
 });
-
 
 // asking the question: is the array being passed in here getting for-eached?
 function isArrayShown(node: InterfaceNode, preScope: boolean): boolean {

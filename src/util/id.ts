@@ -54,7 +54,7 @@ export function getById(obj: any, id: string): any {
   return undefined;
 }
 
-export function updateById(obj: any, id: string, updater: (old: any) => any): any {
+export function updateById<T>(obj: any, id: string, updater: (old: T) => T): any {
   if (Array.isArray(obj)) {
     return obj.map(item => updateById(item, id, updater));
   } else if (obj && typeof obj === 'object') {

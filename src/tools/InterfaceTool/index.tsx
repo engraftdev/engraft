@@ -1,13 +1,11 @@
-import { createContext, memo, useCallback, useEffect, useMemo, useState } from "react";
+import { CSSProperties, Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
-import { getById, newId } from "src/util/id";
-import { RowToCol } from "src/util/RowToCol";
-import { useAt } from "src/util/state";
-import useHover from "src/util/useHover";
-import { useKeyHeld } from "src/util/useKeyHeld";
-import { Value, ValueFrame, ValueOfTool } from "src/view/Value";
+import { getById, updateById } from "src/util/id";
+import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
+import { Value } from "src/view/Value";
 import { codeConfigSetTo } from "../CodeTool";
 import { InterfaceContext, InterfaceNode, InterfaceNodeView, Selection } from "./interface";
 
@@ -15,6 +13,7 @@ import { InterfaceContext, InterfaceNode, InterfaceNodeView, Selection } from ".
 export interface InterfaceConfig extends ToolConfig {
   toolName: 'interface';
   inputConfig: ToolConfig;
+  rootNode: InterfaceNode;
 }
 
 export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<InterfaceConfig>) {
@@ -22,7 +21,22 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
 
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
-  useOutput(reportOutput, {toolValue: {view: null, values: null}, alreadyDisplayed: true})
+  const output = useMemo(() => {
+    if (!inputOutput) return null;
+
+    return {
+      toolValue: {
+        view: (
+          <InterfaceContext.Provider value={{ editMode: false }} >
+            <InterfaceNodeView data={inputOutput.toolValue} node={config.rootNode}/>
+          </InterfaceContext.Provider>
+        ),
+        values: null
+      },
+      alreadyDisplayed: true
+    };
+  }, [config.rootNode, inputOutput])
+  useOutput(reportOutput, output)
 
   const view: ToolView = useCallback((viewProps) => (
     <InterfaceToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
@@ -37,6 +51,13 @@ registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
   return {
     toolName: 'interface',
     inputConfig: codeConfigSetTo(defaultInput || ''),
+    rootNode: {
+      id: 'root',
+      type: 'element',
+      tag: 'div',
+      style: {},
+      children: [],
+    },
   };
 });
 
@@ -50,39 +71,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
 
   const [ selection, setSelection ] = useState<Selection | null>(null);
 
-  const rootNode: InterfaceNode = {
-    id: 'root',
-    type: 'element',
-    tag: 'div',
-    style: {},
-    children: [
-      // {
-      //   id: 'for-each',
-      //   type: 'for-each',
-      //   item: {
-      //     id: 'item',
-      //     type: 'element',
-      //     tag: 'div',
-      //     style: {},
-      //     children: [
-      //       {
-      //         scope: 'title',
-      //         id: 'title-div',
-      //         type: 'element',
-      //         tag: 'div',
-      //         style: {},
-      //         children: [
-      //           {
-      //             id: 'title',
-      //             type: 'text',
-      //           },
-      //         ],
-      //       },
-      //     ],
-      //   },
-      // },
-    ],
-  };
+  const [ rootNode, updateRootNode ] = useAt(config, updateConfig, 'rootNode');
 
   return (
     <div className="xCol xGap10 xPad10">
@@ -101,7 +90,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
             }}
           >
             { selection
-              ? <SelectionInspector selection={selection} rootNode={rootNode} />
+              ? <SelectionInspector selection={selection} updateRootNode={updateRootNode} />
               : <span>none</span>
             }
           </div>
@@ -118,6 +107,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
                   editMode: true,
                   selection,
                   setSelection,
+                  realize: (node: InterfaceNode) => node,
                 }}
               >
                 <InterfaceNodeView data={inputOutput.toolValue} node={rootNode}/>
@@ -150,29 +140,112 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
 
 interface SelectionInspectorProps {
   selection: Selection,
-  rootNode: InterfaceNode,
+  updateRootNode: Updater<InterfaceNode>,
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
-  const { selection, rootNode } = props;
+  const { selection, updateRootNode } = props;
 
-  const selectedNode: InterfaceNode | undefined = useMemo(() => {
-    console.log(rootNode, selection.id);
-    return getById(rootNode, selection.id);
-  }, [rootNode, selection.id]);
+  const realize = selection.realize;
 
-  return (
+  return <Fragment key={selection.node.id}>
     <div className="xCol xGap10">
-      <b>id</b>
-      <div style={{fontSize: "50%", fontStyle: 'italic'}}>{selection.id}</div>
+      {realize &&
+        <>
+          <button onClick={() => updateRootNode(realize)}>realize</button>
+        </>
+      }
       <b>type</b>
       <div>
-        {selectedNode ? selectedNode.type : 'cannot find node'}
+        {selection.node.type}
       </div>
+      { selection.node.type === 'element' &&
+        <SelectionInspectorForElement {...props} />
+      }
+      { selection.node.type === 'text' &&
+        <SelectionInspectorForText {...props} />
+      }
       <b>data</b>
-      {/* <ValueFrame outerStyle={{ minHeight: 0, maxHeight: 100, display: 'flex', margin: 0 }}> */}
-        <Value value={selection.data} />
-      {/* </ValueFrame> */}
+      <Value value={selection.data} />
+      <b>debug</b>
+      <Value value={selection.node} />
     </div>
-  )
+  </Fragment>
+});
+
+const SelectionInspectorForElement = memo(function SelectionInspectorForElement(props: SelectionInspectorProps) {
+  const { selection, updateRootNode } = props;
+
+  const node = selection.node as InterfaceNode & {type: 'element'};
+
+  const realize = selection.realize;
+
+  const onChangeTag = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateRootNode((rootNode) => {
+      if (realize) { rootNode = realize(rootNode); }
+      rootNode = updateById(rootNode, node.id, (node: InterfaceNode & {type: 'element'}) => ({
+        ...node,
+        tag: e.target.value,
+      }));
+      return rootNode;
+    });
+  }, [node.id, realize, updateRootNode]);
+
+  const [styleConfig, updateStyleConfig] = useStateUpdateOnly(codeConfigSetTo(''))
+  const [styleOutput, setStyleOutput] = useStateSetOnly<ToolValue | null>(null)
+
+  useEffect(() => {
+    if (styleOutput?.toolValue) {
+      console.log("running!", styleOutput.toolValue);
+      updateRootNode((rootNode) => {
+        if (realize) { rootNode = realize(rootNode); }
+        rootNode = updateById(rootNode, node.id, (node: InterfaceNode & {type: 'element'}) => ({
+          ...node,
+          style: styleOutput.toolValue as CSSProperties,
+        }));
+        return rootNode;
+      });
+    }
+  }, [node.id, realize, styleOutput, updateRootNode]);
+
+  return <>
+    <b>tag</b>
+    <div>
+      <select value={node.tag} onChange={onChangeTag}>
+        <option value="div">div</option>
+        <option value="h1">h1</option>
+        <option value="h2">h2</option>
+        <option value="h3">h3</option>
+      </select>
+    </div>
+    <b>style</b>
+    <ToolWithView config={styleConfig} updateConfig={updateStyleConfig} reportOutput={setStyleOutput}/>
+  </>;
+});
+
+
+const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps) {
+  const { selection, updateRootNode } = props;
+
+  const node = selection.node as InterfaceNode & {type: 'text'};
+
+  const realize = selection.realize;
+
+  const onChangeRawHtml = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateRootNode((rootNode) => {
+      if (realize) { rootNode = realize(rootNode); }
+      rootNode = updateById(rootNode, node.id, (node: InterfaceNode & {type: 'text'}) => ({
+        ...node,
+        rawHtml: e.target.checked,
+      }));
+      return rootNode;
+    });
+  }, [node.id, realize, updateRootNode]);
+
+  return <>
+    <b>raw html?</b>
+    <div>
+      <input type="checkbox" checked={node.rawHtml} onChange={onChangeRawHtml} />
+    </div>
+  </>;
 });
