@@ -73,8 +73,8 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
       const Tag = node.tag as keyof JSX.IntrinsicElements;
       inner = (
         <Tag style={node.style}>
-          {node.children.map(child =>
-            <InterfaceNodeView node={child} data={innerData} isGhost={isGhost}/>
+          {node.children.map((child, i) =>
+            <InterfaceNodeView key={i} node={child} data={innerData} isGhost={isGhost}/>
           )}
           { context.editMode &&
             <GhostView node={node} innerData={innerData}/>
@@ -83,8 +83,8 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
       );
       break;
     case 'for-each':
-      inner = innerData.map((datum: any) =>
-        <InterfaceNodeView node={node.item} data={datum} isGhost={isGhost}/>
+      inner = innerData.map((datum: any, i: number) =>
+        <InterfaceNodeView key={i} node={node.item} data={datum} isGhost={isGhost}/>
       )
       break;
     case 'text':

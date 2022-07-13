@@ -77,7 +77,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
     <div className="xCol xGap10 xPad10">
       <div className="xRow xGap10">
         <b>input</b>
-        <ShowView view={inputView} />
+        <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
       { inputOutput &&
         <div className="xRow xGap10">
@@ -90,7 +90,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
             }}
           >
             { selection
-              ? <SelectionInspector selection={selection} updateRootNode={updateRootNode} />
+              ? <SelectionInspector key={selection.node.id} selection={selection} rootNode={rootNode} updateRootNode={updateRootNode} />
               : <span>none</span>
             }
           </div>
@@ -140,43 +140,48 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
 
 interface SelectionInspectorProps {
   selection: Selection,
+  rootNode: InterfaceNode,
   updateRootNode: Updater<InterfaceNode>,
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
-  const { selection, updateRootNode } = props;
+  const { selection, rootNode, updateRootNode } = props;
 
-  const realize = selection.realize;
+  // TODO: selection is a total mess, cuz it's not updated when the node changes. this is a shortcut for now
+  const nodeInTree: InterfaceNode | undefined = getById(rootNode, selection.node.id);
+  const node = nodeInTree || selection.node;
+  const realize = nodeInTree ? undefined : selection.realize;  // if the node is realized already, don't offer an option to realize it
+  let betterSelection = { ...selection, node, realize };
+  let betterProps = { ...props, selection: betterSelection };
 
-  return <Fragment key={selection.node.id}>
-    <div className="xCol xGap10">
-      {realize &&
-        <>
-          <button onClick={() => updateRootNode(realize)}>realize</button>
-        </>
-      }
+  return (
+    <div className="xCol xGap10" style={{position: 'relative'}}>
       <b>type</b>
       <div>
-        {selection.node.type}
+        {node.type}
       </div>
-      { selection.node.type === 'element' &&
-        <SelectionInspectorForElement {...props} />
+      { node.type === 'element' &&
+        <SelectionInspectorForElement {...betterProps} node={node}/>
       }
-      { selection.node.type === 'text' &&
-        <SelectionInspectorForText {...props} />
+      { node.type === 'text' &&
+        <SelectionInspectorForText {...betterProps} node={node}/>
       }
       <b>data</b>
       <Value value={selection.data} />
       <b>debug</b>
-      <Value value={selection.node} />
+      <Value value={node} />
+      { realize &&
+        <div
+          style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', backgroundColor: '#f4f4f4', opacity: '50%', cursor: 'pointer'}}
+          onClick={() => { updateRootNode(realize); } }
+        />
+      }
     </div>
-  </Fragment>
+  )
 });
 
-const SelectionInspectorForElement = memo(function SelectionInspectorForElement(props: SelectionInspectorProps) {
-  const { selection, updateRootNode } = props;
-
-  const node = selection.node as InterfaceNode & {type: 'element'};
+const SelectionInspectorForElement = memo(function SelectionInspectorForElement(props: SelectionInspectorProps & { node: InterfaceNode & {type: 'element'} }) {
+  const { selection, updateRootNode, node } = props;
 
   const realize = selection.realize;
 
@@ -191,12 +196,11 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     });
   }, [node.id, realize, updateRootNode]);
 
-  const [styleConfig, updateStyleConfig] = useStateUpdateOnly(codeConfigSetTo(''))
+  const [styleConfig, updateStyleConfig] = useStateUpdateOnly(codeConfigSetTo(JSON.stringify(node.style)));
   const [styleOutput, setStyleOutput] = useStateSetOnly<ToolValue | null>(null)
 
   useEffect(() => {
     if (styleOutput?.toolValue) {
-      console.log("running!", styleOutput.toolValue);
       updateRootNode((rootNode) => {
         if (realize) { rootNode = realize(rootNode); }
         rootNode = updateById(rootNode, node.id, (node: InterfaceNode & {type: 'element'}) => ({
@@ -224,20 +228,20 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
 });
 
 
-const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps) {
-  const { selection, updateRootNode } = props;
-
-  const node = selection.node as InterfaceNode & {type: 'text'};
+const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps & { node: InterfaceNode & {type: 'text'} }) {
+  const { selection, updateRootNode, node } = props;
 
   const realize = selection.realize;
 
   const onChangeRawHtml = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateRootNode((rootNode) => {
-      if (realize) { rootNode = realize(rootNode); }
+      if (realize) { console.log("realize!"); rootNode = realize(rootNode); }
+      console.log("onChangeRawHtml, old root node is", rootNode);
       rootNode = updateById(rootNode, node.id, (node: InterfaceNode & {type: 'text'}) => ({
         ...node,
         rawHtml: e.target.checked,
       }));
+      console.log("onChangeRawHtml, new root node is", rootNode);
       return rootNode;
     });
   }, [node.id, realize, updateRootNode]);
