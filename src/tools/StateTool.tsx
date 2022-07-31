@@ -1,25 +1,20 @@
-import { memo, useCallback, useEffect } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
-import { ToolWithView } from "src/tools-framework/ToolWithView";
+import { memo, useCallback, useEffect, useMemo } from "react";
+import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
-import { Setter, useAt, useSetter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
-import { Value } from "src/view/Value";
-import { codeConfigSetTo } from "./CodeTool";
+import { Setter, updaterToSetter, useAt, useStateSetOnly } from "src/util/state";
+import { SettableValue } from "src/view/SettableValue";
+
 
 export interface StateConfig extends ToolConfig {
   toolName: 'state';
-  stateValue: any;
+  initialValue: any;
 }
 
-// OK, for now we're making TRULY PERSISTENT STATE :O
-// that means state values are persisted in the config
-// that means they need to be JSONable (no functions, DOM elements, etc)
-
-// other ideas include: initialize as undefined every time; some kinda configurable init
-
 export const StateTool = memo(function StateTool({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) {
-  const [stateValue, updateStateValue] = useAt(config, updateConfig, 'stateValue')
-  const setStateValue = useSetter(updateStateValue);
+  const [initialValue, updateInitialValue] = useAt(config, updateConfig, 'initialValue')
+  const setInitialValue = useMemo(() => updaterToSetter(updateInitialValue), [updateInitialValue])
+
+  const [stateValue, setStateValue] = useStateSetOnly(initialValue);
 
   // TODO: make sure state is serializable befoer you set it
 
@@ -28,29 +23,38 @@ export const StateTool = memo(function StateTool({ config, updateConfig, reportO
   }, [reportOutput, setStateValue, stateValue])
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <StateToolView stateValue={stateValue} setStateValue={setStateValue}/>
-  ), [setStateValue, stateValue]);
+    <StateToolView
+      stateValue={stateValue} setStateValue={setStateValue}
+      initialValue={initialValue} setInitialValue={setInitialValue}
+    />
+  ), [initialValue, setInitialValue, setStateValue, stateValue]);
   useView(reportView, view);
 
   return null;
 });
 registerTool<StateConfig>(StateTool, 'state', () => ({
   toolName: 'state',
-  stateValue: undefined
+  initialValue: undefined
 }));
 
 
-const StateToolView = memo(function StateToolView({stateValue, setStateValue}: {stateValue: any, setStateValue: Setter<any>}) {
-  const [config, updateConfig] = useStateUpdateOnly(codeConfigSetTo(''))
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
+type StateToolViewProps = {
+  stateValue: any,
+  setStateValue: Setter<any>,
+
+  initialValue: any,
+  setInitialValue: Setter<any>,
+}
+
+const StateToolView = memo(function StateToolView(props: StateToolViewProps) {
+  const { stateValue, setStateValue, initialValue, setInitialValue } = props;
 
   return (
     <div style={{padding: 10}}>
-      <Value value={stateValue}/>
+      <SettableValue value={stateValue} setValue={setStateValue}/>
       <details>
-        <summary>set to...</summary>
-        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput}/>
-        {output && <button onClick={() => setStateValue(output.toolValue)}>set</button>}
+        <summary>initial value...</summary>
+        <SettableValue value={initialValue} setValue={setInitialValue}/>
       </details>
     </div>
   );

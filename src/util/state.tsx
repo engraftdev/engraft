@@ -6,6 +6,10 @@ export type Replace<T, U> = Omit<T, keyof U> & U;
 export type Setter<T> = (newT: T) => void;
 export type Updater<T, U extends T = T> = (f: (oldU: U) => T) => void;
 
+export function updaterToSetter<T, U extends T = T>(updater: Updater<T, U>): Setter<T> {
+  return (newT) => updater((_) => newT);
+}
+
 // React's useState returns a setter that doesn't work for function types
 //   (it interprets function arguments as updaters, not new function values)
 // this fixes that
