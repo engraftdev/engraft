@@ -1,5 +1,5 @@
 {
-  "name": "v1",
+  "name": "live-compose-v1",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -68,7 +68,9 @@
     "start": "webpack-dev-server --config-name app",
     "build": "NODE_ENV=production webpack --config-name app",
     "build-lib": "NODE_ENV=production webpack --config-name lib",
-    "watch-lib": "webpack --config-name lib --watch"
+    "watch-lib": "webpack --config-name lib --watch",
+    "build-lib-tsc": "tsc && tsc-alias",
+    "build-lib2": "NODE_ENV=production webpack --config-name lib2"
   },
   "babel": {
     "presets": [
@@ -83,13 +85,17 @@
   },
   "devDependencies": {
     "cors-anywhere": "^0.4.4",
+    "tsc-alias": "^1.7.0",
     "webpack": "^5.64.4",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.6.0"
+    "webpack-dev-server": "^4.6.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "eslintConfig": {
     "extends": [
       "react-app"
     ]
-  }
+  },
+  "main": "build/liveCompose2.js",
+  "types": "lib/lib.d.ts"
 }

@@ -19,7 +19,9 @@ export const ImportTool = memo(function ImportTool({ config, updateConfig, repor
   // automatic .default?
 
   const sendRequest = useCallback(async () => {
-    const result = await import(/*webpackIgnore: true*/ `https://cdn.skypack.dev/${name}`);
+    // TODO: The `import` below doesn't work in lib2 output. Ugh.
+    const url = `https://cdn.skypack.dev/${name}`;
+    const result = await import(/*webpackIgnore: true*/ url);
     setResult({toolValue: result});
   }, [name]);
 

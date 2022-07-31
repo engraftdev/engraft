@@ -2,6 +2,7 @@ const { resolve } = require('path');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -30,11 +31,22 @@ function makeConfig(name) {
             experiments: {
                 outputModule: true
             },
+        } : {}),
+
+        ...(name === 'lib2' ? {
+            entry: ['./src/lib.tsx'],
+            output: {
+                filename: 'build/liveCompose2.js',
+                path: __dirname,
+                library: {
+                    type: 'module',
+                },
+            },
+            experiments: {
+                outputModule: true
+            },
+            externals: [nodeExternals()],
             // externalsType: 'module',
-            // externals: {
-            //     react: 'react',
-            //     "react-dom": "react-dom",
-            // }
         } : {}),
 
         infrastructureLogging: {
@@ -49,7 +61,7 @@ function makeConfig(name) {
             },
         },
         devServer: {
-            port: '3000',
+            port: 'auto',
             hot: true,
             static: './public',
             client: {
@@ -57,6 +69,10 @@ function makeConfig(name) {
                     errors: true,
                     warnings: false,
                 },
+            },
+            onListening: function (devServer) {
+                const port = devServer.server.address().port;
+                console.log('Listening on port:', port, `- http://localhost:${port}/`);
             },
         },
         module: {
@@ -90,4 +106,4 @@ function makeConfig(name) {
 }
 
 
-module.exports = [ makeConfig('app'), makeConfig('lib') ];
+module.exports = [ makeConfig('app'), makeConfig('lib'), makeConfig('lib2') ];

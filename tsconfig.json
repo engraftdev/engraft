@@ -17,12 +17,15 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
       "src/*": ["./src/*"]
-    }
+    },
+    "outDir": "lib",
+    "sourceMap": true,
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": [
     "src"

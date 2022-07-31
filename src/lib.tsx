@@ -349,7 +349,6 @@ const Split = memo(function Split({left, right}: SplitProps) {
 })
 
 
-
 //////////////////
 // Dependencies //
 //////////////////
@@ -357,3 +356,13 @@ const Split = memo(function Split({left, right}: SplitProps) {
 export { default as React } from 'react';
 export { default as ReactDOM } from 'react-dom';
 
+
+////////////////
+// Re-exports //
+////////////////
+
+export { EnvContext } from 'src/tools-framework/tools';
+export type { ToolConfig, ToolValue } from 'src/tools-framework/tools';
+export { useTool } from 'src/tools-framework/useSubTool';
+export { ToolWithView } from 'src/tools-framework/ToolWithView';
+export { codeConfigSetTo } from 'src/tools/CodeTool';
