@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
+import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
 import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
@@ -16,6 +16,7 @@ export interface NotebookConfig extends ToolConfig {
   toolName: 'notebook';
   cells: Cell[];
   prevVar: VarConfig;
+  outputBelowInput?: boolean;
 }
 
 interface Cell {
@@ -54,29 +55,48 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
     !cells.find((cell) => cell.var.label === label)
   )!
 
+  const [outputBelowInput, updateOutputBelowInput] = useAt(config, updateConfig, 'outputBelowInput');
+  const onChangeOutputBelowInput = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+    updateOutputBelowInput(() => ev.target.checked);
+  }, [updateOutputBelowInput]);
+
   const view: ToolView = useCallback(() => (
-    <div className="NotebookTool xPad10 xChildrenMinWidth0"
-      style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
-      }}>
-      {cells.map((cell, i) =>
-        <Fragment key={cell.var.id}>
-          <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
-          <CellView cell={cell}
-            // TODO: memoize these?
-            updateCell={atIndex(updateCells, i)}
-            removeCell={() => {
-              const newCells = [...cells];
-              newCells.splice(i, 1);
-              updateCells(() => newCells);
-            }}
-            toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
+    <div className="NotebookTool xPad10">
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            checked={outputBelowInput}
+            onChange={onChangeOutputBelowInput}
+            style={{marginRight: 5}}
           />
-        </Fragment>
-      )}
-      <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
+          output below input
+        </label>
+      </div>
+      <div className="xChildrenMinWidth0"
+        style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
+        }}>
+        {cells.map((cell, i) =>
+          <Fragment key={cell.var.id}>
+            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
+            <CellView cell={cell}
+              // TODO: memoize these?
+              updateCell={atIndex(updateCells, i)}
+              removeCell={() => {
+                const newCells = [...cells];
+                newCells.splice(i, 1);
+                updateCells(() => newCells);
+              }}
+              toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
+              outputBelowInput={outputBelowInput || false}
+            />
+          </Fragment>
+        )}
+        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
+      </div>
     </div>
-  ), [cells, config.prevVar, outputs, smallestUnusedLabel, updateCells, views])
+  ), [cells, config.prevVar, onChangeOutputBelowInput, outputBelowInput, outputs, smallestUnusedLabel, updateCells, views])
   useView(reportView, view);
 
   const output = useMemo(() => {
@@ -249,9 +269,11 @@ interface CellViewProps {
   toolView: ToolView | null,
 
   removeCell: () => void;
+
+  outputBelowInput: boolean;
 }
 
-const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell}: CellViewProps) {
+const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell, outputBelowInput}: CellViewProps) {
   const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
 
   const alreadyDisplayed = toolOutput?.alreadyDisplayed;
@@ -265,13 +287,13 @@ const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput,
         <div className="xLineHeight1">=</div>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol xWidthFitContent" style={{...(alreadyDisplayed ? {gridColumn: '2 / 4'} : {})}}>
+    <div className="NotebookTool-CellView-tool-cell xCol xWidthFitContent" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
       <div className="xStickyTop10">
         <ShowView view={toolView}/>
       </div>
     </div>
     { !alreadyDisplayed &&
-      <div className="NotebookTool-CellView-output-cell">
+      <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
         <div className="xStickyTop10">
           <ValueOfTool toolValue={toolOutput}/>
         </div>
