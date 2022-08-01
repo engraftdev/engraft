@@ -287,7 +287,7 @@ const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput,
         <div className="xLineHeight1">=</div>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol xWidthFitContent" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
+    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
       <div className="xStickyTop10">
         <ShowView view={toolView}/>
       </div>

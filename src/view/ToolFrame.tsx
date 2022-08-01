@@ -32,10 +32,10 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
   }, [])
 
   return <div
-    className="ToolFrame"
+    className="ToolFrame xWidthFitContent"
     style={{
       border: '1px solid #c4c4ff', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
-      width: '100%', height: '100%'
+      height: '100%', maxWidth: '100%',
     }}
   >
     <Use hook={useHover} children={([hoverRef, isHovered]) =>

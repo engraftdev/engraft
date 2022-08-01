@@ -53,7 +53,7 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
   }, [autoSend, sendDebounced])
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <div className="xCol xGap10 xPad10">
+    <div className="xCol xGap10 xPad10 xWidthFitContent">
       <RowToCol minRowWidth={200} className="xGap10">
         <b>url</b> <ShowView view={urlView} autoFocus={autoFocus}/>
       </RowToCol>
