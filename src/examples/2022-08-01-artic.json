@@ -1,0 +1,287 @@
+{
+  "toolName": "code",
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDgateway411437",
+          "label": "terms"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "[\"Dali\", \"Picasso\"]",
+          "subTools": {},
+          "defaultCode": ""
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDfibula203751",
+          "label": "per artist"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "map",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDnymphea196713",
+              "subTools": {},
+              "defaultCode": "IDnymphea196713"
+            },
+            "itemVar": {
+              "id": "IDarcher577311",
+              "label": "item"
+            },
+            "perItemConfig": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var": {
+                      "id": "IDhose874537",
+                      "label": "artist resp"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "tool",
+                      "subConfig": {
+                        "toolName": "request",
+                        "urlConfig": {
+                          "toolName": "code",
+                          "modeName": "tool",
+                          "subConfig": {
+                            "toolName": "text",
+                            "text": "https://api.artic.edu/api/v1/artists/search",
+                            "subTools": {}
+                          }
+                        },
+                        "paramsConfig": {
+                          "toolName": "code",
+                          "modeName": "code",
+                          "code": "{\n  q: IDarcher577311,\n  size: 1,\n}",
+                          "subTools": {},
+                          "defaultCode": "{\n  origin: '*',\n  format: 'json',\n  action: 'query',\n  generator: 'random',\n  grnnamespace: 0,\n  prop: 'pageimages|extracts',\n  exintro: true,\n  grnlimit: 1\n}"
+                        },
+                        "autoSend": true
+                      },
+                      "defaultCode": "IDarcher577311"
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDpepper989487",
+                      "label": "artist id"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "tool",
+                      "subConfig": {
+                        "toolName": "extractor",
+                        "inputConfig": {
+                          "toolName": "code",
+                          "modeName": "code",
+                          "code": "IDhose874537",
+                          "subTools": {},
+                          "defaultCode": "IDdresser344063"
+                        },
+                        "patternsWithIds": [
+                          {
+                            "id": "IDpressure267969",
+                            "pattern": [
+                              "data",
+                              0,
+                              "id"
+                            ]
+                          }
+                        ],
+                        "minimized": true
+                      },
+                      "defaultCode": "IDdresser344063"
+                    },
+                    "upstreamIds": {
+                      "IDhose874537": true
+                    }
+                  },
+                  {
+                    "var": {
+                      "id": "IDearth121280",
+                      "label": "artworks resp"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "tool",
+                      "subConfig": {
+                        "toolName": "request",
+                        "urlConfig": {
+                          "toolName": "code",
+                          "modeName": "tool",
+                          "subConfig": {
+                            "toolName": "text",
+                            "text": "https://api.artic.edu/api/v1/artworks/search",
+                            "subTools": {}
+                          }
+                        },
+                        "paramsConfig": {
+                          "toolName": "code",
+                          "modeName": "code",
+                          "code": "{\n  fields: 'date_end',\n  limit: 100,\n  page: 1,\n  params: {\n    query: {\n      term: {\n        artist_id: IDdresser344063\n      }\n    }\n  }\n}",
+                          "subTools": {},
+                          "defaultCode": "{\n  origin: '*',\n  format: 'json',\n  action: 'query',\n  generator: 'random',\n  grnnamespace: 0,\n  prop: 'pageimages|extracts',\n  exintro: true,\n  grnlimit: 1\n}"
+                        },
+                        "autoSend": true
+                      }
+                    },
+                    "upstreamIds": {
+                      "IDpepper989487": true
+                    }
+                  },
+                  {
+                    "var": {
+                      "id": "IDarcheology996674",
+                      "label": "artworks years"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "tool",
+                      "subConfig": {
+                        "toolName": "extractor",
+                        "inputConfig": {
+                          "toolName": "code",
+                          "modeName": "code",
+                          "code": "IDdresser344063",
+                          "subTools": {},
+                          "defaultCode": "IDdresser344063"
+                        },
+                        "patternsWithIds": [
+                          {
+                            "id": "IDnewsboy300062",
+                            "pattern": [
+                              "data",
+                              {
+                                "wildcard": true
+                              },
+                              "date_end"
+                            ]
+                          }
+                        ],
+                        "minimized": true
+                      },
+                      "defaultCode": "IDdresser344063"
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var": {
+                      "id": "IDcoat018167",
+                      "label": "artist name"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "tool",
+                      "subConfig": {
+                        "toolName": "extractor",
+                        "inputConfig": {
+                          "toolName": "code",
+                          "modeName": "code",
+                          "code": "IDhose874537",
+                          "subTools": {},
+                          "defaultCode": ""
+                        },
+                        "patternsWithIds": [
+                          {
+                            "id": "IDfrill594479",
+                            "pattern": [
+                              "data",
+                              0,
+                              "title"
+                            ]
+                          }
+                        ],
+                        "minimized": true
+                      }
+                    },
+                    "upstreamIds": {
+                      "IDhose874537": true
+                    }
+                  },
+                  {
+                    "var": {
+                      "id": "IDleader359445",
+                      "label": "cell 5"
+                    },
+                    "config": {
+                      "toolName": "code",
+                      "modeName": "code",
+                      "code": "IDarcheology996674.map((year) => ({\n  artist: IDcoat018167,\n  year: new Date(year, 0)\n}))",
+                      "subTools": {},
+                      "defaultCode": "IDdresser344063"
+                    },
+                    "upstreamIds": {
+                      "IDcoat018167": true,
+                      "IDarcheology996674": true
+                    }
+                  }
+                ],
+                "prevVar": {
+                  "id": "IDdresser344063",
+                  "label": "prev"
+                },
+                "outputBelowInput": true
+              },
+              "defaultCode": "IDarcher577311"
+            }
+          },
+          "defaultCode": "IDnymphea196713"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDenemy044787",
+          "label": "cell 2"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDfibula203751.flat()",
+          "subTools": {}
+        },
+        "upstreamIds": {
+          "IDfibula203751": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDsandal190415",
+          "label": "cell 1"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDnymphea196713",
+          "subTools": {},
+          "defaultCode": "IDnymphea196713"
+        },
+        "upstreamIds": {
+          "IDenemy044787": true
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDnymphea196713",
+      "label": "prev"
+    },
+    "outputBelowInput": false
+  },
+  "defaultCode": ""
+}
