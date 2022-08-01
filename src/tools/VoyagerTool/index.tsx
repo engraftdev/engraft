@@ -91,26 +91,30 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
   useEffect(() => {
     if (!voyagerInstance) { return; }
 
-    const dataChanged = data !== dataPrev && data;
-    const specChanged = spec !== specPrev && spec !== voyagerInstance.getSpec(false);
+    try {
+      const dataChanged = data !== dataPrev && data;
+      const specChanged = spec !== specPrev && spec !== voyagerInstance.getSpec(false);
 
-    if (dataChanged || specChanged) {
-      if (spec) {
-        voyagerInstance.setSpec({...spec as any, data: {values: data}});
-        // Not sure why this is necessary, but it is:
-        voyagerInstance.updateConfig({
-          hideFooter: true,
-          hideHeader: true,
-          showDataSourceSelector: false,
-        })
-      } else {
-        voyagerInstance.updateData({values: data as any})
+      if (dataChanged || specChanged) {
+        if (spec) {
+          voyagerInstance.setSpec({...spec as any, data: {values: data}});
+          // Not sure why this is necessary, but it is:
+          voyagerInstance.updateConfig({
+            hideFooter: true,
+            hideHeader: true,
+            showDataSourceSelector: false,
+          })
+        } else {
+          voyagerInstance.updateData({values: data as any})
+        }
       }
+    } catch (e) {
+      console.error("VoyagerTool:", e);
     }
   }, [voyagerInstance, data, spec, dataPrev, specPrev])
 
   return (
-    <div className="xCol" style={{padding: 10, minWidth: 800}}>
+    <div className="xCol" style={{padding: 10, minWidth: 1000}}>
       <div className="VoyagerTool-input-row xRow xGap10">
         <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
       </div>
