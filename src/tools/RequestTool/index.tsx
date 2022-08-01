@@ -38,7 +38,7 @@ export const RequestTool = memo(function RequestTool({ config, updateConfig, rep
 
     const url = new URL(urlOutput.toolValue);
     let params = paramsOutput?.toolValue as object || {}
-    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, JSON.stringify(v as any)))
+    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, typeof v === 'string' ? v : JSON.stringify(v as any)))
     const resp = await fetch(url.toString());
     const data: unknown = await resp.json();
     reportOutput({toolValue: data});
