@@ -6,6 +6,8 @@ import { useAt } from "src/util/state";
 import { usePrevious } from "src/util/usePrevious";
 import { codeConfigSetTo } from "src/tools/CodeTool";
 import style from './style.css';
+import _ from "lodash";
+import { useRefForCallback } from "src/util/useRefForCallback";
 
 
 export interface VoyagerConfig extends ToolConfig {
@@ -67,6 +69,8 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
 
   const [spec, updateSpec] = useAt(config, updateConfig, 'spec');
 
+  const specRef = useRefForCallback(spec);
+
   useEffect(() => {
     if (container) {
       const voyagerInstance = CreateVoyager(container, {
@@ -76,14 +80,22 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
       }, undefined as any);
       setVoyagerInstance(voyagerInstance);
 
-      voyagerInstance.onStateChange((state) => {
+      const unsubscribe = voyagerInstance.onStateChange((state) => {
         // Load info from instance into state
-        updateSpec(() => voyagerInstance.getSpec(false));
+        console.log("onStateChange", state.shelfPreview.spec === voyagerInstance.getSpec(false))
+        const newSpec = voyagerInstance.getSpec(false);
+        if (!_.isEqual(specRef.current, newSpec)) {
+          console.log("loading info from instance into state", specRef.current, newSpec);
+          updateSpec(() => newSpec);
+        }
       })
 
       // TODO: is there a way to clean up? shrug
+      return () => {
+        unsubscribe();
+      }
     }
-  }, [container, updateSpec]);
+  }, [container, specRef, updateSpec]);
 
   // Load info from state into instance
   const dataPrev = usePrevious(data, undefined);
@@ -92,10 +104,11 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
     if (!voyagerInstance) { return; }
 
     try {
-      const dataChanged = data !== dataPrev && data;
-      const specChanged = spec !== specPrev && spec !== voyagerInstance.getSpec(false);
+      const dataChanged = _.isEqual(data, dataPrev) && data;
+      const specChanged = _.isEqual(spec, specPrev) && _.isEqual(spec, voyagerInstance.getSpec(false));
 
       if (dataChanged || specChanged) {
+        console.log("loading info from state into instance");
         if (spec) {
           voyagerInstance.setSpec({...spec as any, data: {values: data}});
           // Not sure why this is necessary, but it is:
