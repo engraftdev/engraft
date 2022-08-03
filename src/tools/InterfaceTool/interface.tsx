@@ -292,9 +292,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
             context.updateControlValues((controlValues) => {
               if (!controlValues[name]) {
                 controlValues = update(controlValues, {[name]: {$set: {}}});
-                console.log('name', name, 'new controlValues', controlValues);
               }
-              console.log({name, key});
               controlValues = update(controlValues, {[name]: {[key]: {$set: ev.target.checked}}});
               return controlValues;
             });

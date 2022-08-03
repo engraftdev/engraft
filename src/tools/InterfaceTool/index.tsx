@@ -58,7 +58,6 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
         return true;
       }
     }) as InterfaceNode[];
-    console.log("controlNodes", controlNodes);
     for (const node of controlNodes) {
       const element = node.element as InterfaceElement & {type: 'control'};
       if (!defaultValues[element.name]) {
@@ -133,7 +132,6 @@ registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
 // we add and remove elements from `data` to make it match the shape
 // and return the new value
 function matchShape(data: any, shape: any): any {
-  console.log('matchShape', data, shape);
   if (typeof data !== 'object' || typeof shape !== 'object') {
     console.warn('matchShape: data and shape must be objects', data, shape);
     throw new Error('can only match shapes of objects');
