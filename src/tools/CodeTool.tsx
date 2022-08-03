@@ -22,6 +22,7 @@ import IsolateStyles from "src/view/IsolateStyles";
 import { ToolFrame } from "src/view/ToolFrame";
 import { VarUse } from "src/view/Vars";
 import update from 'immutability-helper';
+import { GoogleMap } from 'src/view/GoogleMap';
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
@@ -145,6 +146,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         createElementFromReact,
         DOM,
         update,
+        GoogleMap,
       };
       try {
         const result = compiled(scope);

@@ -14,6 +14,7 @@
     "@codemirror/lang-markdown": "^0.19.6",
     "@codemirror/state": "^0.19.9",
     "@codemirror/view": "^0.19.42",
+    "@googlemaps/react-wrapper": "^1.1.35",
     "@observablehq/inspector": "^3.2.4",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@simbathesailor/use-what-changed": "^2.0.0",
@@ -84,6 +85,7 @@
     ]
   },
   "devDependencies": {
+    "@types/google.maps": "^3.49.2",
     "cors-anywhere": "^0.4.4",
     "tsc-alias": "^1.7.0",
     "webpack": "^5.64.4",
