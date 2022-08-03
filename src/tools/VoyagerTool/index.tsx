@@ -82,10 +82,9 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
 
       const unsubscribe = voyagerInstance.onStateChange((state) => {
         // Load info from instance into state
-        console.log("onStateChange", state.shelfPreview.spec === voyagerInstance.getSpec(false))
         const newSpec = voyagerInstance.getSpec(false);
         if (!_.isEqual(specRef.current, newSpec)) {
-          console.log("loading info from instance into state", specRef.current, newSpec);
+          // console.log("loading info from instance into state", specRef.current, newSpec);
           updateSpec(() => newSpec);
         }
       })
@@ -108,7 +107,7 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
       const specChanged = _.isEqual(spec, specPrev) && _.isEqual(spec, voyagerInstance.getSpec(false));
 
       if (dataChanged || specChanged) {
-        console.log("loading info from state into instance");
+        // console.log("loading info from state into instance");
         if (spec) {
           voyagerInstance.setSpec({...spec as any, data: {values: data}});
           // Not sure why this is necessary, but it is:

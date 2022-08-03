@@ -3,12 +3,12 @@ import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
-import { getById, updateById } from "src/util/id";
+import { getById, findNested, newId, updateById, findAllNested } from "src/util/id";
 import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
 import { codeConfigSetTo } from "../CodeTool";
-import { InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
+import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
 
 import builtinStyles from './builtin.css';
 
@@ -23,30 +23,81 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
 
   const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
 
+  const [controlValues, updateControlValues] = useStateUpdateOnly<ControlValues>({});
+
+  const [rootElement, updateRootElement] = useAt(config, updateConfig, 'rootElement');
+
+  const rootNodeWithoutGhosts = useMemo(() => {
+    try {
+      return renderElementToNode(rootElement, inputOutput?.toolValue, '', false);
+    } catch (e) {
+      console.warn('error generating rootNodeWithoutGhosts', e);
+      return null;
+    }
+  }, [rootElement, inputOutput]);
+
+  const rootNodeWithGhosts = useMemo(() => {
+    try {
+      return renderElementToNode(rootElement, inputOutput?.toolValue, '', true);
+    } catch (e) {
+      console.warn('error generating rootNodeWithGhosts', e);
+      return null;
+    }
+  }, [rootElement, inputOutput]);
+
+  useEffect(() => {
+    // TODO: update controlValues based on control names & keys in rootNodeWithoutGhosts
+
+    // const controlNodes = findAllNested(rootNodeWithoutGhosts, (obj: unknown) => {
+    //   if (obj && typeof obj === 'object' && (obj as any).type === 'control') {
+    //     return true;
+    //   }
+    // }) as InterfaceNode[];
+
+    // updateControlValues((oldControlValues) => ({...oldControlValues, [element.name]: {}}));
+    // for (const node of controlNodes) {
+    //   const element = node.element as InterfaceElement & {type: 'control'};
+    //   if (!controlValues[element.name]) {
+
+    //   }
+    // }
+  }, []);
+
   const output = useMemo(() => {
     if (!inputOutput) return null;
 
     try {
       const renderedNode = renderElementToNode(config.rootElement, inputOutput.toolValue, '', false);
+      const view = (
+        <InterfaceContext.Provider value={{ controlValues, updateControlValues, editMode: false }} >
+          <style>{builtinStyles}</style>
+          <InterfaceNodeView node={renderedNode}/>
+        </InterfaceContext.Provider>
+      );
 
       return {
-        toolValue:
-          // TODO: package this with control values, stuff like that
-          <InterfaceContext.Provider value={{ editMode: false }} >
-            <style>{builtinStyles}</style>
-            <InterfaceNodeView node={renderedNode}/>
-          </InterfaceContext.Provider>,
+        toolValue: {
+          view,
+          controlValues,
+        },
         alreadyDisplayed: true
       };
     } catch (e) {
+      console.warn('error generating output', e);
       return null;
     }
-  }, [config.rootElement, inputOutput])
+  }, [config.rootElement, controlValues, inputOutput, updateControlValues])
   useOutput(reportOutput, output)
 
   const view: ToolView = useCallback((viewProps) => (
-    <InterfaceToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
-  ), [props, inputView, inputOutput]);
+    <InterfaceToolView
+      {...props} {...viewProps}
+      inputView={inputView} inputOutput={inputOutput}
+      rootNodeWithGhosts={rootNodeWithGhosts}
+      rootNodeWithoutGhosts={rootNodeWithoutGhosts}
+      controlValues={controlValues} updateControlValues={updateControlValues}
+    />
+  ), [props, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues]);
   useView(reportView, view);
 
   return <>
@@ -71,30 +122,18 @@ registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
 interface InterfaceToolViewProps extends ToolProps<InterfaceConfig>, ToolViewProps {
   inputView: ToolView | null;
   inputOutput: ToolValue | null;
+  rootNodeWithGhosts: InterfaceNode | null;
+  rootNodeWithoutGhosts: InterfaceNode | null;
+  controlValues: ControlValues;
+  updateControlValues: Updater<ControlValues>;
 }
 
 const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolViewProps) {
-  const { config, updateConfig, autoFocus, inputView, inputOutput } = props;
+  const { config, updateConfig, autoFocus, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues } = props;
 
   const [ selectedNodeId, setSelectedNodeId ] = useState<string | null>(null);
 
   const [ rootElement, updateRootElement ] = useAt(config, updateConfig, 'rootElement');
-
-  const rootNodeWithoutGhosts = useMemo(() => {
-    try {
-      return renderElementToNode(rootElement, inputOutput?.toolValue, '', false);
-    } catch {
-      return null;
-    }
-  }, [rootElement, inputOutput]);
-
-  const rootNodeWithGhosts = useMemo(() => {
-    try {
-      return renderElementToNode(rootElement, inputOutput?.toolValue, '', true);
-    } catch {
-      return null;
-    }
-  }, [rootElement, inputOutput]);
 
   return (
     <div className="xCol xGap10 xPad10">
@@ -133,6 +172,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
             { rootNodeWithGhosts
               ? <InterfaceContext.Provider
                   value={{
+                    controlValues, updateControlValues,
                     editMode: true,
                     selectedNodeId,
                     setSelectedNodeId,
@@ -154,6 +194,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
             { rootNodeWithoutGhosts
               ? <InterfaceContext.Provider
                   value={{
+                    controlValues, updateControlValues,
                     editMode: false,
                   }}
                 >
@@ -178,9 +219,34 @@ interface SelectionInspectorProps {
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
-  const { selectedNodeId, updateRootElement, rootNode } = props;
+  const { selectedNodeId, updateRootElement, rootNode, rootElement } = props;
 
   const node: InterfaceNode | undefined = getById(rootNode, selectedNodeId);
+
+  const onClickInsertBelowCheckbox = useCallback(() => {
+    const parentElement = findNested(rootElement, (obj) => {
+      if (obj && typeof obj === 'object' && 'children' in obj) {
+        return (obj as any).children.some((child: any) => child.id === node!.element.id);
+      }
+    }) as InterfaceElementOf<'element'> | undefined;
+    if (!parentElement) {
+      throw new Error("parent not found");
+    }
+    const idx = parentElement.children.indexOf(node!.element);
+    const checkboxElement: InterfaceElement = {
+      id: newId(),
+      type: 'control',
+      controlType: 'checkbox',
+      name: 'control 1',  // TODO: generate names
+      keyFuncCode: '(data) => "key"',
+    };
+    updateRootElement((rootElement) =>
+      updateById<InterfaceElementOf<'element'>>(rootElement, parentElement.id,
+        updateF({children: {$splice: [[idx+1, 0, checkboxElement]]}})
+      )
+    );
+  }, [node, rootElement, updateRootElement])
+
   if (!node) {
     return <span>error: node cannot be found</span>
   }
@@ -199,6 +265,11 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
       { element.type === 'text' &&
         <SelectionInspectorForText {...props} node={node}/>
       }
+      { element.type === 'control' &&
+        <SelectionInspectorForControl {...props} node={node}/>
+      }
+      <b>insert below...</b>
+      <button onClick={onClickInsertBelowCheckbox}>checkbox</button>
       <b>debug</b>
       <Details summary='node'>
         <Value value={node} />
@@ -287,6 +358,40 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
     <b>raw html?</b>
     <div>
       <input type="checkbox" checked={element.rawHtml} onChange={onChangeRawHtml} />
+    </div>
+  </>;
+});
+
+
+const SelectionInspectorForControl = memo(function SelectionInspectorForControl(props: SelectionInspectorProps & { node: InterfaceNode }) {
+  const { updateRootElement, node } = props;
+
+  const element = node.element as InterfaceElement & { type: 'control' };
+
+  const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateRootElement((rootElement) =>
+      updateById<InterfaceElementOf<'control'>>(rootElement, element.id,
+        updateF({name: {$set: e.target.value}})
+      )
+    );
+  }, [element.id, updateRootElement]);
+
+  const onChangeKeyFuncCode = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateRootElement((rootElement) =>
+      updateById<InterfaceElementOf<'control'>>(rootElement, element.id,
+        updateF({keyFuncCode: {$set: e.target.value}})
+      )
+    );
+  }, [element.id, updateRootElement]);
+
+  return <>
+    <b>control name</b>
+    <div>
+      <input type="text" value={element.name} onChange={onChangeName} />
+    </div>
+    <b>control key function</b>
+    <div>
+      <input type="text" value={element.keyFuncCode} onChange={onChangeKeyFuncCode} />
     </div>
   </>;
 });

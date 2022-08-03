@@ -1,0 +1,181 @@
+{
+  "toolName": "code",
+  "modeName": "tool",
+  "subConfig": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var": {
+          "id": "IDcouch526648",
+          "label": "cell 1"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "request",
+            "urlConfig": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "text",
+                "text": "http://0.0.0.0:1337/https://maps.googleapis.com/maps/api/place/textsearch/json",
+                "subTools": {}
+              }
+            },
+            "paramsConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "{\n  key: 'AIzaSyB41l6-ZZrqZt2ZnyFPeJjC_2EzqZ6qaRI',\n  query: 'pizza',\n}",
+              "subTools": {},
+              "defaultCode": "{\n  origin: '*',\n  format: 'json',\n  action: 'query',\n  generator: 'random',\n  grnnamespace: 0,\n  prop: 'pageimages|extracts',\n  exintro: true,\n  grnlimit: 1\n}"
+            },
+            "autoSend": true
+          },
+          "defaultCode": ""
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDgasosaurus282667",
+          "label": "cell 2"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "extractor",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDderby171590",
+              "subTools": {},
+              "defaultCode": "IDderby171590"
+            },
+            "patternsWithIds": [
+              {
+                "id": "IDbison191259",
+                "pattern": [
+                  "results",
+                  {
+                    "wildcard": true
+                  },
+                  "name"
+                ]
+              },
+              {
+                "id": "IDvanilla216640",
+                "pattern": [
+                  "results",
+                  {
+                    "wildcard": true
+                  },
+                  "rating"
+                ]
+              },
+              {
+                "id": "IDalbertonykus771581",
+                "pattern": [
+                  "results",
+                  {
+                    "wildcard": true
+                  },
+                  "formatted_address"
+                ]
+              }
+            ],
+            "minimized": false
+          },
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDleech543603",
+          "label": "cell 3"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "interface",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDderby171590",
+              "subTools": {},
+              "defaultCode": "IDderby171590"
+            },
+            "rootElement": {
+              "id": "root",
+              "type": "element",
+              "tag": "div",
+              "style": {
+                "display": "flex",
+                "flexWrap": "wrap"
+              },
+              "children": [
+                {
+                  "type": "for-each",
+                  "id": "IDmass232646",
+                  "item": {
+                    "type": "element",
+                    "tag": "div",
+                    "id": "IDcatfish292914",
+                    "style": {},
+                    "children": [
+                      {
+                        "scope": "name",
+                        "type": "element",
+                        "tag": "div",
+                        "id": "IDcream317851",
+                        "style": {
+                          "fontWeight": "bold",
+                          "textAlign": "center"
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "id": "IDfarmer839991",
+                            "rawHtml": false
+                          }
+                        ]
+                      },
+                      {
+                        "scope": "rating",
+                        "type": "element",
+                        "tag": "div",
+                        "id": "IDpromise821949",
+                        "style": {
+                          "fontStyle": "italic",
+                          "textAlign": "center"
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "id": "IDtrade901209",
+                            "rawHtml": false
+                          }
+                        ]
+                      }
+                    ],
+                    "className": "card"
+                  }
+                }
+              ]
+            }
+          },
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {}
+      }
+    ],
+    "prevVar": {
+      "id": "IDderby171590",
+      "label": "prev"
+    }
+  },
+  "defaultCode": ""
+}

@@ -32,26 +32,49 @@ const runtimeObjectIdMap = new WeakMap<any, string>();
 // This is also independent: functional getters and updaters by id for nested objects
 // TODO: hacky
 
-export function getById(obj: any, id: string): any {
-  if (Array.isArray(obj)) {
-    for (const item of obj) {
-      const result = getById(item, id);
-      if (result !== undefined) {
-        return result;
-      }
-    }
-  } else if (obj && typeof obj === 'object') {
-    if (obj.id === id) {
-      return obj;
-    }
-    for (const item of Object.values(obj)) {
-      const result = getById(item, id);
-      if (result !== undefined) {
-        return result;
+export function findNested(obj: unknown, pred: (obj: unknown) => boolean | void): unknown {
+  if (pred(obj)) {
+    return obj;
+  }
+  if (obj && typeof obj === 'object') {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const result = findNested((obj as any)[key], pred);
+        if (result !== undefined) {
+          return result;
+        }
       }
     }
   }
   return undefined;
+}
+
+export function getById(obj: unknown, id: string): any {
+  return findNested(obj, (obj) => {
+    if (obj && typeof obj === 'object') {
+      return (obj as any).id === id;
+    }
+  });
+
+  // if (Array.isArray(obj)) {
+  //   for (const item of obj) {
+  //     const result = getById(item, id);
+  //     if (result !== undefined) {
+  //       return result;
+  //     }
+  //   }
+  // } else if (obj && typeof obj === 'object') {
+  //   if (obj.id === id) {
+  //     return obj;
+  //   }
+  //   for (const item of Object.values(obj)) {
+  //     const result = getById(item, id);
+  //     if (result !== undefined) {
+  //       return result;
+  //     }
+  //   }
+  // }
+  // return undefined;
 }
 
 export function updateById<T>(obj: any, id: string, updater: (old: T) => T): any {

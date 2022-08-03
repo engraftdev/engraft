@@ -1,8 +1,11 @@
 import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
+import { compileExpressionCached } from 'src/util/compile';
 import { hashId, updateById } from 'src/util/id';
+import { Updater } from 'src/util/state';
 import { updateF } from "src/util/updateF";
 import { Use } from 'src/util/Use';
 import useHover from 'src/util/useHover';
+import update from 'immutability-helper';
 
 
 // **************
@@ -28,6 +31,11 @@ export type InterfaceElement = {
   } | {
     type: 'text',
     rawHtml: boolean,
+  } | {
+    type: 'control',
+    controlType: 'checkbox' | 'text',
+    name: string,
+    keyFuncCode: string,
   }
 )
 
@@ -38,7 +46,8 @@ export type InterfaceNode = {
   innerData: any,
   element: InterfaceElement,
   children: InterfaceNode[],
-  ghostInfo: GhostInfo | undefined;
+  ghostInfo: GhostInfo | undefined,
+  controlKey?: string,
 }
 
 // this says "this node is a ghost; here's how to realize it"
@@ -84,6 +93,14 @@ export function renderElementToNode(element: InterfaceElement, data: any, parent
       );
       break;
     case 'text':
+      break;
+    case 'control':
+      try {
+        const keyValue = (compileExpressionCached(element.keyFuncCode)({}) as (data: any) => string)(node.innerData);
+        node.controlKey = typeof keyValue === 'string' ? keyValue : JSON.stringify(keyValue);
+      } catch (e) {
+        console.warn(e);
+      }
       break;
     default:
       throw new Error('waaaaat');
@@ -196,18 +213,31 @@ function keysShown(element: InterfaceElement, preScope: boolean): Set<string> {
 // **************
 
 export type InterfaceContextInfo = {
-  editMode: false,
-} | {
-  editMode: true,
+  controlValues: ControlValues,
+  updateControlValues: Updater<ControlValues>,
+} & (
+  {
+    editMode: false,
+  } | {
+    editMode: true,
 
-  selectedNodeId: string | null,
-  setSelectedNodeId: (selectedNodeId: string | null) => void,
-};
+    selectedNodeId: string | null,
+    setSelectedNodeId: (selectedNodeId: string | null) => void,
+  }
+);
 
 export const InterfaceContext = createContext<InterfaceContextInfo>({
+  controlValues: {},
+  updateControlValues: () => {},
   editMode: false,
 });
 
+
+export type ControlValues = {
+  [name: string]: {
+    [key: string]: any,
+  }
+}
 
 
 export interface InterfaceNodeViewProps {
@@ -249,6 +279,39 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
         inner = <span style={innerStyle} dangerouslySetInnerHTML={{__html: text}} />;
       } else {
         inner = <span style={innerStyle}>{text}</span>;
+      }
+      break;
+    case 'control':
+      const name = element.name;
+      const key = node.controlKey;
+      const value = key && (context.controlValues[name] || {})[key];
+      switch (element.controlType) {
+        case 'checkbox': {
+          const onChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+            if (!key) { return; }
+            context.updateControlValues((controlValues) => {
+              if (!controlValues[name]) {
+                controlValues = update(controlValues, {[name]: {$set: {}}});
+                console.log('name', name, 'new controlValues', controlValues);
+              }
+              console.log({name, key});
+              controlValues = update(controlValues, {[name]: {[key]: {$set: ev.target.checked}}});
+              return controlValues;
+            });
+          };
+          inner = <input type="checkbox" checked={value} onChange={onChange} disabled={!key}/>;
+        } break;
+        case 'text': {
+          const onChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+            if (!key) { return; }
+            context.updateControlValues(
+              updateF({[name]: updateF({[key]: ev.target.value}, {})})
+            )
+          };
+          inner = <input type="text" value={value} onChange={onChange} disabled={!key}/>;
+        } break;
+        default:
+          throw new Error('waaaaat');
       }
       break;
     default:

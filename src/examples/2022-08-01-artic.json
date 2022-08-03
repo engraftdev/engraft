@@ -12,7 +12,7 @@
         "config": {
           "toolName": "code",
           "modeName": "code",
-          "code": "[\"Dali\", \"Picasso\"]",
+          "code": "[\"Dali\", \"Picasso\", \"O'Keeffe\"]",
           "subTools": {},
           "defaultCode": ""
         },
@@ -262,19 +262,25 @@
       },
       {
         "var": {
-          "id": "IDsandal190415",
-          "label": "cell 1"
+          "id": "IDflight230697",
+          "label": "cell 3"
         },
         "config": {
           "toolName": "code",
-          "modeName": "code",
-          "code": "IDnymphea196713",
-          "subTools": {},
+          "modeName": "tool",
+          "subConfig": {
+            "toolName": "voyager",
+            "inputConfig": {
+              "toolName": "code",
+              "modeName": "code",
+              "code": "IDnymphea196713",
+              "subTools": {},
+              "defaultCode": ""
+            }
+          },
           "defaultCode": "IDnymphea196713"
         },
-        "upstreamIds": {
-          "IDenemy044787": true
-        }
+        "upstreamIds": {}
       }
     ],
     "prevVar": {
