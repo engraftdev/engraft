@@ -183,7 +183,8 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
     <div style={{flexGrow: 1}}/>
     <div
       style={{fontSize: '50%', marginLeft: 30, visibility: isPatternHovered || isEditing ? 'visible' : 'hidden'}}
-      onClick={() => {
+      onClick={(ev) => {
+        ev.stopPropagation();
         setIsEditing(!isEditing);
       }}
     >

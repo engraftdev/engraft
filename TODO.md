@@ -1,4 +1,4 @@
-[ ] ExtractTool pencil is broken
+[x] ExtractTool pencil is broken
 [ ] single-line values sometimes get shadowed, idk why
 [ ] RequestTool: pagination (ex: for artic)
 [ ] NotebookTool: cell name token renaming jumps around
