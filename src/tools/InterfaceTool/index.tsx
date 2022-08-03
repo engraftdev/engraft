@@ -10,6 +10,7 @@ import { Value } from "src/view/Value";
 import { codeConfigSetTo } from "../CodeTool";
 import { InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
 
+import builtinStyles from './builtin.css';
 
 export interface InterfaceConfig extends ToolConfig {
   toolName: 'interface';
@@ -32,6 +33,7 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
         toolValue:
           // TODO: package this with control values, stuff like that
           <InterfaceContext.Provider value={{ editMode: false }} >
+            <style>{builtinStyles}</style>
             <InterfaceNodeView node={renderedNode}/>
           </InterfaceContext.Provider>,
         alreadyDisplayed: true
@@ -60,6 +62,7 @@ registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
       type: 'element',
       tag: 'div',
       style: {},
+      className: '',
       children: [],
     },
   };
@@ -123,7 +126,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
           <div
             className="xCol xGap10"
             style={{
-              width: 300,
+              flex: 1,
             }}
           >
             <b>edit view</b>
@@ -135,6 +138,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
                     setSelectedNodeId,
                   }}
                 >
+                  <style>{builtinStyles}</style>
                   <InterfaceNodeView node={rootNodeWithGhosts}/>
                 </InterfaceContext.Provider>
               : <span>error</span>
@@ -143,7 +147,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
           <div
             className="xCol xGap10"
             style={{
-              minWidth: 300,
+              flex: 1,
             }}
           >
             <b>run view</b>
@@ -153,6 +157,7 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
                     editMode: false,
                   }}
                 >
+                  <style>{builtinStyles}</style>
                   <InterfaceNodeView node={rootNodeWithoutGhosts}/>
                 </InterfaceContext.Provider>
               : <span>error</span>
@@ -239,6 +244,14 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     }
   }, [element.id, styleOutput, updateRootElement]);
 
+  const onChangeClasses = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateRootElement((rootElement) =>
+      updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
+        updateF({className: {$set: e.target.value}})
+      )
+    );
+  }, [element.id, updateRootElement]);
+
   return <>
     <b>tag</b>
     <div>
@@ -251,6 +264,8 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     </div>
     <b>style</b>
     <ToolWithView config={styleConfig} updateConfig={updateStyleConfig} reportOutput={setStyleOutput}/>
+    <b>classes</b>
+    <input value={element.className} onChange={onChangeClasses}/>
   </>;
 });
 

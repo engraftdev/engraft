@@ -1,4 +1,3 @@
-import update from "immutability-helper";
 import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
 import { hashId, updateById } from 'src/util/id';
 import { updateF } from "src/util/updateF";
@@ -21,6 +20,7 @@ export type InterfaceElement = {
     type: 'element',
     tag: string,
     style: CSSProperties,
+    className: string,
     children: InterfaceElement[],
   } | {
     type: 'for-each',
@@ -112,6 +112,7 @@ function makeGhostElements(element: InterfaceElement, innerData: any, id: string
           tag: 'div',
           id: hashId(id, 'for-each-div'),
           style: {},
+          className: '',
           children: [],
         },
       };
@@ -129,6 +130,7 @@ function makeGhostElements(element: InterfaceElement, innerData: any, id: string
           tag: 'div',
           id: hashId(id, 'key', key),
           style: {},
+          className: '',
           children: [],
         }
         return ghostElement;
@@ -219,11 +221,12 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
   const { element, ghostInfo } = node;
 
   let inner: ReactNode;
+  let innerStyle: CSSProperties = ghostInfo ? { opacity: "40%", filter: "blur(0.5px)" } : {};
   switch (element.type) {
     case 'element':
       const Tag = element.tag as keyof JSX.IntrinsicElements;
       inner = (
-        <Tag style={element.style}>
+        <Tag style={element.style} className={element.className}>
           {node.children.map((child, i) =>
             <InterfaceNodeView key={i} node={child}/>
           )}
@@ -243,9 +246,9 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
         text = JSON.stringify(node.innerData);
       }
       if (element.rawHtml) {
-        inner = <span dangerouslySetInnerHTML={{__html: text}} />;
+        inner = <span style={innerStyle} dangerouslySetInnerHTML={{__html: text}} />;
       } else {
-        inner = <span>{text}</span>;
+        inner = <span style={innerStyle}>{text}</span>;
       }
       break;
     default:
