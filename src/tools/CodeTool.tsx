@@ -21,6 +21,7 @@ import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { ToolFrame } from "src/view/ToolFrame";
 import { VarUse } from "src/view/Vars";
+import update from 'immutability-helper';
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
@@ -143,6 +144,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         rand,
         createElementFromReact,
         DOM,
+        update,
       };
       try {
         const result = compiled(scope);

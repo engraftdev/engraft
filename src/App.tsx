@@ -79,7 +79,7 @@ const App = memo(function App() {
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
         try {
-          await navigator.clipboard.writeText(JSON.stringify(config));
+          await navigator.clipboard.writeText(JSON.stringify(config, null, 2));
           setCopyPasteMessage('Copied successfully');
         } catch (e) {
           setCopyPasteMessage('Copy unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));

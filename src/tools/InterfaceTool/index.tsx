@@ -9,6 +9,7 @@ import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
 import { codeConfigSetTo } from "../CodeTool";
 import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
+import update from 'immutability-helper';
 
 import builtinStyles from './builtin.css';
 
@@ -46,22 +47,30 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
   }, [rootElement, inputOutput]);
 
   useEffect(() => {
-    // TODO: update controlValues based on control names & keys in rootNodeWithoutGhosts
+    if (!rootNodeWithoutGhosts) {
+      return;
+    }
 
-    // const controlNodes = findAllNested(rootNodeWithoutGhosts, (obj: unknown) => {
-    //   if (obj && typeof obj === 'object' && (obj as any).type === 'control') {
-    //     return true;
-    //   }
-    // }) as InterfaceNode[];
+    // construct "defaultValues" shape by scanning all nodes
+    const defaultValues: ControlValues = {};
+    const controlNodes = findAllNested(rootNodeWithoutGhosts, (obj: unknown) => {
+      if (obj && typeof obj === 'object' && (obj as any).element?.type === 'control') {
+        return true;
+      }
+    }) as InterfaceNode[];
+    console.log("controlNodes", controlNodes);
+    for (const node of controlNodes) {
+      const element = node.element as InterfaceElement & {type: 'control'};
+      if (!defaultValues[element.name]) {
+        defaultValues[element.name] = {};
+      }
+      if (node.controlKey) {
+        defaultValues[element.name][node.controlKey] = {checkbox: false, text: ''}[element.controlType];
+      }
+    }
 
-    // updateControlValues((oldControlValues) => ({...oldControlValues, [element.name]: {}}));
-    // for (const node of controlNodes) {
-    //   const element = node.element as InterfaceElement & {type: 'control'};
-    //   if (!controlValues[element.name]) {
-
-    //   }
-    // }
-  }, []);
+    updateControlValues((oldValues) => matchShape(oldValues, defaultValues));
+  }, [rootNodeWithoutGhosts, updateControlValues]);
 
   const output = useMemo(() => {
     if (!inputOutput) return null;
@@ -118,6 +127,44 @@ registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
     },
   };
 });
+
+// here, "shape" is expected to be a nested object-of-objects with default values at the bottom
+//   (like `false` and `''`)
+// we add and remove elements from `data` to make it match the shape
+// and return the new value
+function matchShape(data: any, shape: any): any {
+  console.log('matchShape', data, shape);
+  if (typeof data !== 'object' || typeof shape !== 'object') {
+    console.warn('matchShape: data and shape must be objects', data, shape);
+    throw new Error('can only match shapes of objects');
+  }
+
+  // for keys in data...
+  for (const key of Object.keys(data)) {
+    if (!(key in shape)) {
+      // if not in shape, remove them
+      data = update(data, {$unset: [key]});
+    } else {
+      // if in shape & is object, recurse
+      if (typeof shape[key] === 'object') {
+        const childData = matchShape(data[key], shape[key]);
+        if (childData !== data[key]) {
+          data = update(data, {[key]: {$set: childData}});
+        }
+      }
+    }
+  }
+
+  // for keys in shape...
+  for (const key of Object.keys(shape)) {
+    if (!(key in data)) {
+      // if not in data, add them
+      data = update(data, {[key]: {$set: shape[key]}});
+    }
+  }
+
+  return data;
+}
 
 interface InterfaceToolViewProps extends ToolProps<InterfaceConfig>, ToolViewProps {
   inputView: ToolView | null;

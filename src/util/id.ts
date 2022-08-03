@@ -49,6 +49,21 @@ export function findNested(obj: unknown, pred: (obj: unknown) => boolean | void)
   return undefined;
 }
 
+export function findAllNested(obj: unknown, pred: (obj: unknown) => boolean | void): unknown[] {
+  const result = [];
+  if (pred(obj)) {
+    result.push(obj);
+  }
+  if (obj && typeof obj === 'object') {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        result.push(...findAllNested((obj as any)[key], pred));
+      }
+    }
+  }
+  return result;
+}
+
 export function getById(obj: unknown, id: string): any {
   return findNested(obj, (obj) => {
     if (obj && typeof obj === 'object') {

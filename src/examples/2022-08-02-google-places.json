@@ -38,6 +38,20 @@
       },
       {
         "var": {
+          "id": "IDpractice094836",
+          "label": "cell 6"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "update(IDderby171590, {results: (r) => r.slice(0, 5)})",
+          "subTools": {},
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var": {
           "id": "IDgasosaurus282667",
           "label": "cell 2"
         },
@@ -85,7 +99,7 @@
                 ]
               }
             ],
-            "minimized": false
+            "minimized": true
           },
           "defaultCode": "IDderby171590"
         },
@@ -94,7 +108,7 @@
       {
         "var": {
           "id": "IDleech543603",
-          "label": "cell 3"
+          "label": "interface"
         },
         "config": {
           "toolName": "code",
@@ -159,6 +173,13 @@
                             "rawHtml": false
                           }
                         ]
+                      },
+                      {
+                        "id": "IDplatinum955409",
+                        "type": "control",
+                        "controlType": "checkbox",
+                        "name": "control 1",
+                        "keyFuncCode": "(data) => data.formatted_address"
                       }
                     ],
                     "className": "card"
@@ -170,6 +191,61 @@
           "defaultCode": "IDderby171590"
         },
         "upstreamIds": {}
+      },
+      {
+        "var": {
+          "id": "IDnightshade237186",
+          "label": "cell 7"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDleech543603.view",
+          "subTools": {},
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {
+          "IDleech543603": true
+        }
+      },
+      {
+        "var": {
+          "id": "IDspruce030795",
+          "label": "cell 4"
+        },
+        "config": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "IDleech543603.controlValues",
+          "subTools": {
+            "IDreward009040": {
+              "toolName": "code",
+              "modeName": "tool",
+              "subConfig": {
+                "toolName": "interface",
+                "inputConfig": {
+                  "toolName": "code",
+                  "modeName": "code",
+                  "code": "",
+                  "subTools": {},
+                  "defaultCode": ""
+                },
+                "rootElement": {
+                  "id": "root",
+                  "type": "element",
+                  "tag": "div",
+                  "style": {},
+                  "className": "",
+                  "children": []
+                }
+              }
+            }
+          },
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {
+          "IDleech543603": true
+        }
       }
     ],
     "prevVar": {
