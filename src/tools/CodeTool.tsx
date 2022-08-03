@@ -260,7 +260,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     })}
   </>
 
-  return <div className="xWidthFitContent" style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', boxSizing: 'border-box'}}>
+  return <div className="xWidthFitContent" style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', boxSizing: 'border-box', maxWidth: '100%'}}>
     {contents}
   </div>;
 });
