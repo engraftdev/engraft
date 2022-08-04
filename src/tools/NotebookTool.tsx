@@ -5,7 +5,7 @@ import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSu
 import { AddObjToContext } from "src/util/context";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
-import useDebounce, { objEqWith, refEq } from "src/util/useDebounce";
+import { useDedupe, objEqWith, refEq } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { ValueOfTool } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
@@ -229,7 +229,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
     }
   }, [prevVal, prevVar])
 
-  const newVarInfos = useDebounce(useMemo(() => {
+  const newVarInfos = useDedupe(useMemo(() => {
     let result: {[label: string]: VarInfo} = {...prevVarContext};
     cells.forEach((otherCell) => {
       if (cell.upstreamIds[otherCell.var.id]) {
@@ -240,7 +240,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
-  const newPossibleVarInfos = useDebounce(useMemo(() => {
+  const newPossibleVarInfos = useDedupe(useMemo(() => {
     let result: {[label: string]: PossibleVarInfo} = {};
     cells.forEach((otherCell) => {
       if (otherCell !== cell && otherCell.var.label.length > 0) {

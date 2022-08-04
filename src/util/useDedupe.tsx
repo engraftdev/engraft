@@ -2,19 +2,13 @@ import { useRef } from "react";
 
 type Eq<T> = (x1: T, x2: T) => boolean;
 
-// TODO: rename this; it's overloaded
-
-export default function useDebounce<T extends object>(t: T, eq: Eq<T>): T {
+export function useDedupe<T>(t: T, eq: Eq<T>): T {
   const lastT = useRef<T>();
 
-  if (t === lastT.current) {
-    return lastT.current;
-  }
-  if (lastT.current && eq(t, lastT.current)) {
-    return lastT.current;
+  if (!lastT.current || (t !== lastT.current && !eq(t, lastT.current))) {
+    lastT.current = t;
   }
 
-  lastT.current = t;
   return lastT.current;
 }
 

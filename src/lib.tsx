@@ -10,7 +10,7 @@ import { codeConfigSetTo } from "./tools/CodeTool";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
-import useDebounce from "./util/useDebounce";
+import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
 import { ToolValueBuffer, Value, ValueOfTool } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
@@ -176,7 +176,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
 
   // * Manage the tool *
 
-  const stableVariables = useDebounce(variables, _.isEqual);
+  const stableVariables = useDedupe(variables, _.isEqual);
 
   const env = useMemo(() => {
     let env: {[id: string]: VarInfo} = {};
