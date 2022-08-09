@@ -1,16 +1,25 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
 import { Setter, updaterToSetter, useAt, useStateSetOnly } from "src/util/state";
 import { SettableValue } from "src/view/SettableValue";
 
 
-export interface StateProgram extends ToolProgram {
-  toolName: 'state';
-  initialValue: any;
+export type Program = {
+  toolName: 'state',
+  initialValue: any,
 }
 
-export const StateTool = memo(function StateTool({ program, updateProgram, reportOutput, reportView }: ToolProps<StateProgram>) {
+export const programFactory: ProgramFactory<Program> = () => {
+  return {
+    toolName: 'state',
+    initialValue: undefined,
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [initialValue, updateInitialValue] = useAt(program, updateProgram, 'initialValue')
   const setInitialValue = useMemo(() => updaterToSetter(updateInitialValue), [updateInitialValue])
 
@@ -23,7 +32,7 @@ export const StateTool = memo(function StateTool({ program, updateProgram, repor
   }, [reportOutput, setStateValue, stateValue])
 
   const view: ToolView = useCallback(({autoFocus}) => (
-    <StateToolView
+    <View
       stateValue={stateValue} setStateValue={setStateValue}
       initialValue={initialValue} setInitialValue={setInitialValue}
     />
@@ -32,13 +41,9 @@ export const StateTool = memo(function StateTool({ program, updateProgram, repor
 
   return null;
 });
-registerTool<StateProgram>(StateTool, 'state', () => ({
-  toolName: 'state',
-  initialValue: undefined
-}));
 
 
-type StateToolViewProps = {
+type ViewProps = {
   stateValue: any,
   setStateValue: Setter<any>,
 
@@ -46,7 +51,7 @@ type StateToolViewProps = {
   setInitialValue: Setter<any>,
 }
 
-const StateToolView = memo(function StateToolView(props: StateToolViewProps) {
+const View = memo((props: ViewProps) => {
   const { stateValue, setStateValue, initialValue, setInitialValue } = props;
 
   return (

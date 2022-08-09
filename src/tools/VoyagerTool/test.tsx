@@ -1,5 +1,4 @@
 import { memo, useEffect, useState } from 'react';
-import "tools/builtInTools";
 import * as libVoyager from "datavoyager";
 
 import voyagerCss from './tools/VoyagerTool.css';

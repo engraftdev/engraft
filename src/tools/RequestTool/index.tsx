@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect } from "react";
-import { useDebounce } from "use-debounce";
-import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { useAt } from "src/util/state";
 import { codeProgramSetTo } from "src/tools/CodeTool";
-import { TextProgram } from "src/tools/TextTool";
+import { Program as TextProgram } from "src/tools/TextTool";
 import { RowToCol } from "src/util/RowToCol";
+import { useAt } from "src/util/state";
+import { useDebounce } from "use-debounce";
 
 const offlineDataContext = require.context('./offline-data', true, /\.\/(.*)\.json$/)
 const offlineData = Object.fromEntries(
@@ -15,14 +15,30 @@ const offlineData = Object.fromEntries(
   ])
 );
 
-export interface RequestProgram extends ToolProgram {
+export type Program = {
   toolName: 'request';
   urlProgram: ToolProgram;
   paramsProgram: ToolProgram;
   autoSend: boolean;
 }
 
-export const RequestTool = memo(function RequestTool({ program, updateProgram, reportOutput, reportView }: ToolProps<RequestProgram>) {
+export const programFactory: ProgramFactory<Program> = () => {
+  const textProgram: TextProgram = {
+    toolName: 'text',
+    text: 'https://en.wikipedia.org/w/api.php',
+    subTools: {},
+  };
+  return {
+    toolName: 'request',
+    urlProgram: codeProgramSetTo(textProgram),
+    paramsProgram: codeProgramSetTo(paramsDefault),
+    autoSend: true,
+  }
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [urlComponent, urlView, urlOutput] = useSubTool({program, updateProgram, subKey: 'urlProgram'});
   const [paramsComponent, paramsView, paramsOutput] = useSubTool({program, updateProgram, subKey: 'paramsProgram'});
 
@@ -87,16 +103,4 @@ const paramsDefault = `{
   exintro: true,
   grnlimit: 1
 }`
-registerTool<RequestProgram>(RequestTool, 'request', () => {
-  const textProgram: TextProgram = {
-    toolName: 'text',
-    text: 'https://en.wikipedia.org/w/api.php',
-    subTools: {},
-  };
-  return {
-    toolName: 'request',
-    urlProgram: codeProgramSetTo(textProgram),
-    paramsProgram: codeProgramSetTo(paramsDefault),
-    autoSend: true,
-  }
-});
+

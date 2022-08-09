@@ -14,15 +14,15 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper";
 import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
 import CodeMirror from "src/util/CodeMirror";
 import { compileExpression } from "src/util/compile";
 import { newId } from "src/util/id";
 import { Updater, useAt } from "src/util/state";
-import { SynthesisState, synthesizeGen } from "./synthesizer";
 import { Task } from "src/util/Task";
-import { codeProgramSetTo } from "src/tools/CodeTool";
+import { SynthesisState, synthesizeGen } from "./synthesizer";
 
 
 
@@ -32,112 +32,25 @@ interface InOutPair {
   outCode: string,
 }
 
-export interface SynthesizerProgram extends ToolProgram {
+export type Program = {
   toolName: 'synthesizer';
   inputProgram: ToolProgram;
   code: string;
   inOutPairs: InOutPair[];
 }
 
-export const codeMirrorExtensions = [
-  highlightSpecialChars(),
-  history(),
-  drawSelection(),
-  dropCursor(),
-  EditorState.allowMultipleSelections.of(true),
-  indentOnInput(),
-  defaultHighlightStyle.fallback,
-  bracketMatching(),
-  closeBrackets(),
-  keymap.of([
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...commentKeymap,
-    ...completionKeymap,
-    ...lintKeymap
-  ]),
-  javascript({jsx: true})
-]
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  return {
+    toolName: 'synthesizer',
+    inputProgram: codeProgramSetTo(defaultCode || ''),
+    code: 'input',
+    inOutPairs: []
+  };
+};
 
-interface InOutPairViewProps {
-  pair: InOutPair;
-  pairIdx: number;
-  updateInOutPairs: Updater<InOutPair[]>;
-  isExtra: boolean;
-  func: ((value: any) => unknown) | undefined;
-}
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateInOutPairs, isExtra, func}: InOutPairViewProps) {
-  const fadeStyle: CSSProperties = isExtra ? { opacity: 0.5 } : {};
-
-  const onChangeIn = useCallback((code: string) => {
-    updateInOutPairs((old) => update(old, {[pairIdx]: {inCode: {$set: code}}}))
-  }, [pairIdx, updateInOutPairs]);
-  const onChangeOut = useCallback((code: string) => {
-    updateInOutPairs((old) => update(old, {[pairIdx]: {outCode: {$set: code}}}))
-  }, [pairIdx, updateInOutPairs]);
-  const onFocus = useCallback(() => {
-    if (isExtra) {
-      updateInOutPairs((old) => update(old, {$push: [pair]}))
-    }
-  }, [isExtra, pair, updateInOutPairs])
-
-  const isCorrect = useMemo(() => {
-    if (func) {
-      try {
-        // eslint-disable-next-line no-eval
-        const inVal = eval(pair.inCode), outVal = eval(pair.outCode);
-        return _.isEqual(outVal, func(inVal));
-      } catch {
-      }
-    }
-    return false;
-  }, [func, pair.inCode, pair.outCode])
-
-  const incorrectStyle: CSSProperties = !isExtra && !isCorrect ? {
-    borderRadius: 3,
-    padding: 3,
-    margin: -3,
-    background: 'rgba(255,0,0,0.1)',
-  } : {};
-
-  return <Fragment>
-    <CodeMirror
-      extensions={codeMirrorExtensions}
-      style={{...fadeStyle, minWidth: 0}}
-      text={pair.inCode}
-      onChange={onChangeIn}
-      onFocus={onFocus}
-    />
-    <div
-      style={{...fadeStyle, marginLeft: 5, marginRight: 5}}
-    >
-      →
-    </div>
-    <CodeMirror
-      extensions={codeMirrorExtensions}
-      style={{...fadeStyle, minWidth: 0, ...incorrectStyle}}
-      text={pair.outCode}
-      onChange={onChangeOut}
-      onFocus={onFocus}
-    />
-    { !isExtra ?
-      <div
-        style={{fontSize: '50%', marginLeft: 7, cursor: 'pointer'}}
-        onClick={(ev) => {
-          updateInOutPairs((old) => update(old, {$splice: [[pairIdx, 1]]}))
-        }}
-      >
-        ❌
-      </div> :
-      <div/>
-    }
-  </Fragment>
-})
-
-export const SynthesizerTool = memo(function SynthesizerTool({ program, updateProgram, reportOutput, reportView }: ToolProps<SynthesizerProgram>) {
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const [inOutPairs, updateInOutPairs] = useAt(program, updateProgram, 'inOutPairs');
@@ -266,11 +179,103 @@ export const SynthesizerTool = memo(function SynthesizerTool({ program, updatePr
     {inputComponent}
   </>
 });
-registerTool<SynthesizerProgram>(SynthesizerTool, 'synthesizer', (defaultInput) => {
-  return {
-    toolName: 'synthesizer',
-    inputProgram: codeProgramSetTo(defaultInput || ''),
-    code: 'input',
-    inOutPairs: []
-  };
-});
+
+
+
+export const codeMirrorExtensions = [
+  highlightSpecialChars(),
+  history(),
+  drawSelection(),
+  dropCursor(),
+  EditorState.allowMultipleSelections.of(true),
+  indentOnInput(),
+  defaultHighlightStyle.fallback,
+  bracketMatching(),
+  closeBrackets(),
+  keymap.of([
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...commentKeymap,
+    ...completionKeymap,
+    ...lintKeymap
+  ]),
+  javascript({jsx: true})
+]
+
+interface InOutPairViewProps {
+  pair: InOutPair;
+  pairIdx: number;
+  updateInOutPairs: Updater<InOutPair[]>;
+  isExtra: boolean;
+  func: ((value: any) => unknown) | undefined;
+}
+
+export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateInOutPairs, isExtra, func}: InOutPairViewProps) {
+  const fadeStyle: CSSProperties = isExtra ? { opacity: 0.5 } : {};
+
+  const onChangeIn = useCallback((code: string) => {
+    updateInOutPairs((old) => update(old, {[pairIdx]: {inCode: {$set: code}}}))
+  }, [pairIdx, updateInOutPairs]);
+  const onChangeOut = useCallback((code: string) => {
+    updateInOutPairs((old) => update(old, {[pairIdx]: {outCode: {$set: code}}}))
+  }, [pairIdx, updateInOutPairs]);
+  const onFocus = useCallback(() => {
+    if (isExtra) {
+      updateInOutPairs((old) => update(old, {$push: [pair]}))
+    }
+  }, [isExtra, pair, updateInOutPairs])
+
+  const isCorrect = useMemo(() => {
+    if (func) {
+      try {
+        // eslint-disable-next-line no-eval
+        const inVal = eval(pair.inCode), outVal = eval(pair.outCode);
+        return _.isEqual(outVal, func(inVal));
+      } catch {
+      }
+    }
+    return false;
+  }, [func, pair.inCode, pair.outCode])
+
+  const incorrectStyle: CSSProperties = !isExtra && !isCorrect ? {
+    borderRadius: 3,
+    padding: 3,
+    margin: -3,
+    background: 'rgba(255,0,0,0.1)',
+  } : {};
+
+  return <Fragment>
+    <CodeMirror
+      extensions={codeMirrorExtensions}
+      style={{...fadeStyle, minWidth: 0}}
+      text={pair.inCode}
+      onChange={onChangeIn}
+      onFocus={onFocus}
+    />
+    <div
+      style={{...fadeStyle, marginLeft: 5, marginRight: 5}}
+    >
+      →
+    </div>
+    <CodeMirror
+      extensions={codeMirrorExtensions}
+      style={{...fadeStyle, minWidth: 0, ...incorrectStyle}}
+      text={pair.outCode}
+      onChange={onChangeOut}
+      onFocus={onFocus}
+    />
+    { !isExtra ?
+      <div
+        style={{fontSize: '50%', marginLeft: 7, cursor: 'pointer'}}
+        onClick={(ev) => {
+          updateInOutPairs((old) => update(old, {$splice: [[pairIdx, 1]]}))
+        }}
+      >
+        ❌
+      </div> :
+      <div/>
+    }
+  </Fragment>
+})

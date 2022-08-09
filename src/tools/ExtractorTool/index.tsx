@@ -1,6 +1,7 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
 import { newId } from "src/util/id";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";
@@ -9,7 +10,6 @@ import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
 import { pathString, ValueCustomizations, ValueOfTool } from "src/view/Value";
-import { codeProgramSetTo } from "src/tools/CodeTool";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
 
 interface PatternWithId {
@@ -17,12 +17,58 @@ interface PatternWithId {
   pattern: Pattern;
 };
 
-export interface ExtractorProgram extends ToolProgram {
+export type Program = {
   toolName: 'extractor';
   inputProgram: ToolProgram;
   patternsWithIds: PatternWithId[];
   minimized: boolean;
 }
+
+export const programFactory: ProgramFactory<Program> = (defaultInputCode?: string) => {
+  return {
+    toolName: 'extractor',
+    inputProgram: codeProgramSetTo(defaultInputCode || ''),
+    patternsWithIds: [],
+    minimized: false,
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
+
+  const { patternsWithIds } = program;
+
+  const mergedPatterns = useMemo(() => {
+    return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
+  }, [patternsWithIds])
+
+  const output = useMemo(() => {
+    // TODO: fix this; it should integrate results of patterns intelligently
+    if (!inputOutput || !mergedPatterns) {
+      return null;
+    }
+    try {
+      return { toolValue: mergedPatterns(inputOutput.toolValue) };
+    } catch (e) {
+      console.warn(e);
+      return null;
+    }
+  }, [inputOutput, mergedPatterns])
+  useOutput(reportOutput, output)
+
+  // const metaHeld = useKeyHeld('Meta');
+
+  const view: ToolView = useCallback((viewProps) => (
+    <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
+  ), [props, inputView, inputOutput]);
+  useView(reportView, view);
+
+  return <>
+    {inputComponent}
+  </>
+});
 
 interface ExtractorContextValue {
   activePattern: Pattern | undefined;
@@ -202,53 +248,8 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
   </div>
 })
 
-export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<ExtractorProgram>) {
-  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
-
-  const { patternsWithIds } = program;
-
-  const mergedPatterns = useMemo(() => {
-    return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
-  }, [patternsWithIds])
-
-  const output = useMemo(() => {
-    // TODO: fix this; it should integrate results of patterns intelligently
-    if (!inputOutput || !mergedPatterns) {
-      return null;
-    }
-    try {
-      return { toolValue: mergedPatterns(inputOutput.toolValue) };
-    } catch (e) {
-      console.warn(e);
-      return null;
-    }
-  }, [inputOutput, mergedPatterns])
-  useOutput(reportOutput, output)
-
-  // const metaHeld = useKeyHeld('Meta');
-
-  const view: ToolView = useCallback((viewProps) => (
-    <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
-  ), [props, inputView, inputOutput]);
-  useView(reportView, view);
-
-  return <>
-    {inputComponent}
-  </>
-});
-registerTool<ExtractorProgram>(ExtractorTool, 'extractor', (defaultInput) => {
-  return {
-    toolName: 'extractor',
-    inputProgram: codeProgramSetTo(defaultInput || ''),
-    patternsWithIds: [],
-    minimized: false,
-  };
-});
-
-
-interface ExtractorToolViewProps extends ToolProps<ExtractorProgram>, ToolViewProps {
+interface ExtractorToolViewProps extends ToolProps<Program>, ToolViewProps {
   inputView: ToolView | null;
   inputOutput: ToolValue | null;
 }

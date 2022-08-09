@@ -1,13 +1,8 @@
 import { memo, useCallback, useEffect } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
 import { Setter, useAt, useSetter } from "src/util/state";
 import { SettableValue } from "src/view/SettableValue";
-
-export interface PersistentStateProgram extends ToolProgram {
-  toolName: 'persistent-state';
-  stateValue: any;
-}
 
 // OK, for now we're making TRULY PERSISTENT STATE :O
 // that means state values are persisted in the program
@@ -15,7 +10,21 @@ export interface PersistentStateProgram extends ToolProgram {
 
 // other ideas include: initialize as undefined every time; some kinda configurable init
 
-export const PersistentStateTool = memo(function PersistentStateTool({ program, updateProgram, reportOutput, reportView }: ToolProps<PersistentStateProgram>) {
+export type Program = {
+  toolName: 'persistent-state';
+  stateValue: any;
+}
+
+export const programFactory: ProgramFactory<Program> = () => {
+  return {
+    toolName: 'persistent-state',
+    stateValue: undefined,
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [stateValue, updateStateValue] = useAt(program, updateProgram, 'stateValue')
   const setStateValue = useSetter(updateStateValue);
 
@@ -32,10 +41,6 @@ export const PersistentStateTool = memo(function PersistentStateTool({ program, 
 
   return null;
 });
-registerTool<PersistentStateProgram>(PersistentStateTool, 'persistent-state', () => ({
-  toolName: 'persistent-state',
-  stateValue: undefined
-}));
 
 
 const PersistentStateToolView = memo(function PersistentStateToolView({stateValue, setStateValue}: {stateValue: any, setStateValue: Setter<any>}) {

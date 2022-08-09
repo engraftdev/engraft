@@ -3,10 +3,10 @@ import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from '@codemirror/view';
-import React, { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
+import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, registerTool, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -21,9 +21,9 @@ import { ToolFrame } from "src/view/ToolFrame";
 import { VarUse } from "src/view/Vars";
 import { globals } from './globals';
 
-export type CodeProgram = CodeProgramCodeMode | CodeProgramToolMode;
+export type Program = ProgramCodeMode | ProgramToolMode;
 
-export interface CodeProgramShared {
+export interface ProgramShared {
   toolName: 'code',
   // defaultCode says that whoever made this CodeTool thought this would be a nice code for it.
   // * So, if we switch TO tool-mode, we will provide this as the default input for the tool.
@@ -32,42 +32,43 @@ export interface CodeProgramShared {
   defaultCode: string | undefined,
 }
 
-export interface CodeProgramCodeMode extends CodeProgramShared {
+export interface ProgramCodeMode extends ProgramShared {
   modeName: 'code',
   code: string,
   subTools: {[id: string]: ToolProgram},
 }
 
-export interface CodeProgramToolMode extends CodeProgramShared {
+export interface ProgramToolMode extends ProgramShared {
   modeName: 'tool',
   subProgram: ToolProgram,
 }
 
-export const CodeTool = memo(function CodeTool(props: ToolProps<CodeProgram>) {
-  const {program, updateProgram} = props;
-
-  if (program.modeName === 'code') {
-    return <CodeToolCodeMode {...props} program={program} updateProgram={updateProgram as Updater<CodeProgram, CodeProgramCodeMode>} />;
-  } else {
-    return <CodeToolToolMode {...props} program={program} updateProgram={updateProgram as Updater<CodeProgram, CodeProgramToolMode>} />;
-  }
-})
-registerTool<CodeProgram>(CodeTool, 'code', (defaultCode) => ({
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => ({
   toolName: 'code',
   modeName: 'code',
   defaultCode,
   code: '',
   subTools: {},
-}));
+});
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const {program, updateProgram} = props;
+
+  if (program.modeName === 'code') {
+    return <CodeToolCodeMode {...props} program={program} updateProgram={updateProgram as Updater<Program, ProgramCodeMode>} />;
+  } else {
+    return <CodeToolToolMode {...props} program={program} updateProgram={updateProgram as Updater<Program, ProgramToolMode>} />;
+  }
+})
 
 
 // Some notes about codeProgramSetTo:
 // * Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
 //   ToolFrame, and with it, the ability to switch out of the given tool into a different one.
-export function codeProgramSetTo(program: ToolProgram | string): CodeProgram {
+export function codeProgramSetTo(program: ToolProgram | string): Program {
   // TODO: this is a hack, isn't it? (the program.toolName === 'code' part, I mean)
   if (typeof program !== 'string' && program.toolName === 'code') {
-    return program as CodeProgram;
+    return program as Program;
   }
 
   return {
@@ -80,7 +81,7 @@ export function codeProgramSetTo(program: ToolProgram | string): CodeProgram {
 }
 
 
-export function summarizeCodeProgram(program: CodeProgram): ReactNode {
+export function summarizeCodeProgram(program: Program): ReactNode {
   if (program.modeName === 'code') {
     return <pre>{program.code.replaceAll(refRE, '_')}</pre>;
   } else {
@@ -102,9 +103,9 @@ function transformCached(code: string) {
   return computed;
 }
 
-type CodeToolCodeModeProps = Replace<ToolProps<CodeProgram>, {
-  program: CodeProgramCodeMode,
-  updateProgram: Updater<CodeProgram, CodeProgramCodeMode>,
+type CodeToolCodeModeProps = Replace<ToolProps<Program>, {
+  program: ProgramCodeMode,
+  updateProgram: Updater<Program, ProgramCodeMode>,
 }>
 
 export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCodeModeProps) {
@@ -194,16 +195,16 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
   const envRef = useRefForCallback(env);
   const possibleEnvRef = useRefForCallback(possibleEnv);
   const extensions = useMemo(() => {
-    function insertTool(tool: Tool<ToolProgram>) {
+    function insertTool(tool: Tool) {
       const id = newId();
-      const newProgram = codeProgramSetTo(tool.defaultProgram());
+      const newProgram = codeProgramSetTo(tool.programFactory());
       updateKeys(updateSubToolPrograms, {[id]: newProgram});
       // TODO: we never remove these! lol
       return id;
     };
-    function replaceWithTool(tool: Tool<ToolProgram>) {
+    function replaceWithTool(tool: Tool) {
       // console.log('replaceWithTool', program.defaultInput, tool.defaultProgram(program.defaultInput));
-      updateProgram(() => ({toolName: 'code', modeName: 'tool', subProgram: tool.defaultProgram(program.defaultCode), defaultCode: program.defaultCode}))
+      updateProgram(() => ({toolName: 'code', modeName: 'tool', subProgram: tool.programFactory(program.defaultCode), defaultCode: program.defaultCode}))
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
@@ -268,9 +269,9 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
 // TOOL MODE //
 ///////////////
 
-type CodeToolToolModeProps = Replace<ToolProps<CodeProgram>, {
-  program: CodeProgramToolMode,
-  updateProgram: Updater<CodeProgram, CodeProgramToolMode>,
+type CodeToolToolModeProps = Replace<ToolProps<Program>, {
+  program: ProgramToolMode,
+  updateProgram: Updater<Program, ProgramToolMode>,
 }>
 
 export const CodeToolToolMode = memo(function CodeToolToolMode({ program, reportOutput, reportView, updateProgram}: CodeToolToolModeProps) {

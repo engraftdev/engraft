@@ -1,11 +1,11 @@
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { codeProgramSetTo } from "./CodeTool";
 
-export interface WorldProgram {
+export interface Program {
   toolName: 'world';
   iterationsCount: number;
   initProgram: ToolProgram;
@@ -14,7 +14,21 @@ export interface WorldProgram {
   viewProgram: ToolProgram;
 }
 
-export const WorldTool = memo(function WorldTool({ program, updateProgram, reportOutput, reportView }: ToolProps<WorldProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  const stateVar = newVar('state');
+  return {
+    toolName: 'world',
+    iterationsCount: 20,
+    initProgram: codeProgramSetTo('{}'),
+    stateVar,
+    upProgram: codeProgramSetTo(stateVar.id),
+    viewProgram: codeProgramSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [initComponent, initView, initOutput] = useSubTool({program, updateProgram, subKey: 'initProgram'})
 
   const { iterationsCount } = program;
@@ -93,15 +107,4 @@ export const WorldTool = memo(function WorldTool({ program, updateProgram, repor
       {viewComponent}
     </ProvideVarBinding>
   </>
-});
-registerTool<WorldProgram>(WorldTool, 'world', () => {
-  const stateVar = newVar('state');
-  return {
-    toolName: 'world',
-    iterationsCount: 20,
-    initProgram: codeProgramSetTo('{}'),
-    stateVar,
-    upProgram: codeProgramSetTo(stateVar.id),
-    viewProgram: codeProgramSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
-  };
 });

@@ -12,7 +12,7 @@ export const ToolWithView = memo(function ToolWithView({ program, updateProgram,
   const Tool = lookUpTool(program.toolName);
 
   return <>
-    <Tool program={program} updateProgram={updateProgram} reportOutput={reportOutput} reportView={setView} />
+    <Tool.Component program={program} updateProgram={updateProgram} reportOutput={reportOutput} reportView={setView} />
     <IsolateStyles>
       <ShowView view={view} {...rest} />
     </IsolateStyles>

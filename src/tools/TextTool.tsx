@@ -3,7 +3,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, registerTool, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -17,14 +17,22 @@ import IsolateStyles from "src/view/IsolateStyles";
 import { VarUse } from "src/view/Vars";
 import { codeProgramSetTo } from "./CodeTool";
 
-export interface TextProgram {
+export interface Program {
   toolName: 'text';
   text: string;
   subTools: {[id: string]: ToolProgram};
 }
 
-export const TextTool = memo(function TextTool(props: ToolProps<TextProgram>) {
-  const { program, updateProgram, reportOutput, reportView} = props;
+export const programFactory: ProgramFactory<Program> = () => {
+  return {
+    toolName: 'text',
+    text: '',
+    subTools: {},
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
 
@@ -71,14 +79,9 @@ export const TextTool = memo(function TextTool(props: ToolProps<TextProgram>) {
     )}
   </>;
 })
-registerTool(TextTool, 'text', {
-  toolName: 'text',
-  text: '',
-  subTools: {},
-});
 
 
-interface TextToolViewProps extends ToolProps<TextProgram>, ToolViewProps {
+interface TextToolViewProps extends ToolProps<Program>, ToolViewProps {
   views: {[id: string]: ToolView | null};
   env: VarBindings;
   possibleEnv: PossibleVarBindings;
@@ -97,7 +100,7 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
   const extensions = useMemo(() => {
     function insertTool(tool: Tool<ToolProgram>) {
       const id = newId();
-      const newProgram = codeProgramSetTo(tool.defaultProgram());
+      const newProgram = codeProgramSetTo(tool.programFactory());
       updateKeys(updateSubToolPrograms, {[id]: newProgram});
       // TODO: we never remove these! lol
       return id;

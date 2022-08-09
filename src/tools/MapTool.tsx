@@ -1,5 +1,5 @@
 import { CSSProperties, memo, useCallback, useEffect, useMemo } from "react";
-import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var } from "src/tools-framework/tools";
 import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
@@ -8,15 +8,24 @@ import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./CodeTool";
 
 
-
-export interface MapProgram extends ToolProgram {
+export type Program = {
   toolName: 'map';
   inputProgram: ToolProgram;
   itemVar: Var;
   perItemProgram: ToolProgram;
 }
 
-export const MapTool = memo(function MapTool(props: ToolProps<MapProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  const itemVar = newVar('item');
+  return {
+    toolName: 'map',
+    inputProgram: codeProgramSetTo(defaultCode || ''),
+    itemVar,
+    perItemProgram: codeProgramSetTo(itemVar.id)
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
@@ -65,18 +74,9 @@ export const MapTool = memo(function MapTool(props: ToolProps<MapProgram>) {
     )}
   </>
 });
-registerTool<MapProgram>(MapTool, 'map', (defaultInput) => {
-  const itemVar = newVar('item');
-  return {
-    toolName: 'map',
-    inputProgram: codeProgramSetTo(defaultInput || ''),
-    itemVar,
-    perItemProgram: codeProgramSetTo(itemVar.id),
-  };
-});
 
 
-interface MapToolViewProps extends ToolProps<MapProgram>, ToolViewProps {
+interface MapToolViewProps extends ToolProps<Program>, ToolViewProps {
   inputView: ToolView | null;
   inputArray: ToolValue[] | null;
   perItemViews: PerTool<ToolView | null>;

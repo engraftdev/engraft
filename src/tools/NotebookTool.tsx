@@ -1,18 +1,18 @@
 import _ from "lodash";
 import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, Var, VarBinding } from "src/tools-framework/tools";
+import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
-import { useDedupe, objEqWith, refEq } from "src/util/useDedupe";
+import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { ValueOfTool } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./CodeTool";
 
 
-export interface NotebookProgram extends ToolProgram {
+export type Program = {
   toolName: 'notebook';
   cells: Cell[];
   prevVar: Var;
@@ -27,9 +27,19 @@ interface Cell {
   // output?
 }
 
-const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
+export const programFactory: ProgramFactory<Program> = (defaultInput) => {
+  return {
+    toolName: 'notebook',
+    cells: [
+      { var_: newVar(defaultCellLabels[0]), program: codeProgramSetTo(defaultInput || ''), upstreamIds: {} }
+    ],
+    prevVar: newVar('prev')
+  };
+}
 
-export const NotebookTool = memo(function NotebookTool({ program, updateProgram, reportOutput, reportView }: ToolProps<NotebookProgram>) {
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   // TODO: migration; not great
   useEffect(() => {
     if (!program.prevVar) {
@@ -126,13 +136,8 @@ export const NotebookTool = memo(function NotebookTool({ program, updateProgram,
     />
   )}</>;
 })
-registerTool<NotebookProgram>(NotebookTool, 'notebook', (defaultInput) => ({
-  toolName: 'notebook',
-  cells: [
-    { var_: newVar(defaultCellLabels[0]), program: codeProgramSetTo(defaultInput || ''), upstreamIds: {} }
-  ],
-  prevVar: newVar('prev')
-}));
+
+const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
 
 interface RowDividerProps {

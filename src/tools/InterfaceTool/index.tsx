@@ -1,25 +1,40 @@
+import update from 'immutability-helper';
 import { CSSProperties, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
-import { getById, findNested, newId, updateById, findAllNested } from "src/util/id";
+import { findAllNested, findNested, getById, newId, updateById } from "src/util/id";
 import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
 import { codeProgramSetTo } from "../CodeTool";
 import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
-import update from 'immutability-helper';
 
 import builtinStyles from './builtin.css';
 
-export interface InterfaceProgram extends ToolProgram {
+export type Program = {
   toolName: 'interface';
   inputProgram: ToolProgram;
   rootElement: InterfaceElement;
 }
 
-export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<InterfaceProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  return {
+    toolName: 'interface',
+    inputProgram: codeProgramSetTo(defaultCode || ''),
+    rootElement: {
+      id: 'root',
+      type: 'element',
+      tag: 'div',
+      style: {},
+      className: '',
+      children: [],
+    },
+  };
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
@@ -112,20 +127,6 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
     {inputComponent}
   </>
 });
-registerTool<InterfaceProgram>(InterfaceTool, 'interface', (defaultInput) => {
-  return {
-    toolName: 'interface',
-    inputProgram: codeProgramSetTo(defaultInput || ''),
-    rootElement: {
-      id: 'root',
-      type: 'element',
-      tag: 'div',
-      style: {},
-      className: '',
-      children: [],
-    },
-  };
-});
 
 // here, "shape" is expected to be a nested object-of-objects with default values at the bottom
 //   (like `false` and `''`)
@@ -164,7 +165,7 @@ function matchShape(data: any, shape: any): any {
   return data;
 }
 
-interface InterfaceToolViewProps extends ToolProps<InterfaceProgram>, ToolViewProps {
+interface InterfaceToolViewProps extends ToolProps<Program>, ToolViewProps {
   inputView: ToolView | null;
   inputOutput: ToolValue | null;
   rootNodeWithGhosts: InterfaceNode | null;

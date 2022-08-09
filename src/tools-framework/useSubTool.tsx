@@ -53,7 +53,7 @@ export function useTool<C extends ToolProgram>({program, updateProgram}: UseTool
   const toolName = program.toolName;
   const Tool = lookUpTool(toolName);
 
-  const component = <Tool
+  const component = <Tool.Component
     program={program}
     updateProgram={updateProgram}
     reportOutput={setOutput}
@@ -150,7 +150,7 @@ const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, progra
   const toolName = program.toolName;
   const Tool = lookUpTool(toolName);
 
-  return <Tool
+  return <Tool.Component
     program={program}
     updateProgram={updateProgram}
     reportOutput={reportOutput}

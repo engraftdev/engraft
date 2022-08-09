@@ -2,10 +2,9 @@ import _ from "lodash";
 import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import libCss from "./lib.css";
-import { EnvContext, ToolProgram, ToolValue, ToolView, VarBinding } from "./tools-framework/tools";
+import { EnvContext, registerTool, ToolProgram, ToolValue, ToolView, VarBinding } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
-import './tools/builtInTools';
 import { codeProgramSetTo } from "./tools/CodeTool";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
@@ -14,9 +13,11 @@ import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
 import { ToolValueBuffer, Value, ValueOfTool } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
+import { builtinTools } from "./tools";
 
 
 
+builtinTools.map(registerTool);
 
 ////////////////////
 // EmbedComponent //

@@ -48,7 +48,7 @@ export const setup = [
 ]
 
 
-export function toolCompletions(insertTool: (tool: Tool<any>) => string, replaceWithTool?: (tool: Tool<any>) => void): CompletionSource {
+export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithTool?: (tool: Tool) => void): CompletionSource {
   return (completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/\/?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
@@ -129,7 +129,7 @@ export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubTool
   const reportView = useCallback((view: ToolView | null) => updateKeys(updateViews, {[id]: view}), [id, updateViews]);
 
   const Tool = lookUpTool(program.toolName);
-  return <Tool
+  return <Tool.Component
     program={program}
     updateProgram={updateProgram}
     reportOutput={reportOutput}

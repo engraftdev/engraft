@@ -1,15 +1,24 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import ControlledTextInput from "src/util/ControlledTextInput";
 import { useAt } from "src/util/state";
 
-export interface ImportProgram extends ToolProgram {
+export type Program = {
   toolName: 'import';
   name: string;
 }
 
-export const ImportTool = memo(function ImportTool({ program, updateProgram, reportOutput, reportView }: ToolProps<ImportProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  return {
+    toolName: 'import',
+    name: 'lodash',
+  }
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [result, setResult] = useState<ToolValue | null>(null);
 
   const [name, updateName] = useAt(program, updateProgram, 'name');
@@ -47,8 +56,4 @@ export const ImportTool = memo(function ImportTool({ program, updateProgram, rep
   useView(reportView, view);
 
   return <></>;
-});
-registerTool(ImportTool, 'import', {
-  toolName: 'import',
-  name: 'lodash',
 });

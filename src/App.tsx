@@ -1,15 +1,17 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import appCss from './App.css';
 import { examples } from './examples/examples';
-import { EnvContext, ToolProgram, ToolValue, VarBinding } from './tools-framework/tools';
+import { EnvContext, registerTool, ToolProgram, ToolValue, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
-import './tools/builtInTools';
-import { CodeProgram, codeProgramSetTo } from './tools/CodeTool';
+import { Program as CodeProgram, codeProgramSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ValueOfTool } from './view/Value';
+import { builtinTools } from './tools';
 
 
+
+builtinTools.map(registerTool);
 
 /*
 TODO: fix remounting text-editor bug

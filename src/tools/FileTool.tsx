@@ -1,15 +1,23 @@
 import { memo, useCallback } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { registerTool, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateKeys } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
 
-export interface FileProgram {
+export interface Program {
   toolName: 'file';
   dataUrl: string | null;
 }
-export const FileTool = memo(function FileTool({ program, updateProgram, reportOutput, reportView }: ToolProps<FileProgram>) {
+
+export const programFactory: ProgramFactory<Program> = () => ({
+  toolName: 'file',
+  dataUrl: null,
+});
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const output = useMemoObject({toolValue: program.dataUrl});
   useOutput(reportOutput, output);
 
@@ -45,8 +53,4 @@ export const FileTool = memo(function FileTool({ program, updateProgram, reportO
   useView(reportView, view);
 
   return null;
-})
-registerTool(FileTool, 'file', {
-  toolName: 'file',
-  dataUrl: null,
 });

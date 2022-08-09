@@ -1,5 +1,7 @@
 import { memo, useCallback, useState } from "react";
-import { codeProgramSetTo, ToolValue, ToolWithView } from "src/lib";
+import { ToolValue } from "src/tools-framework/tools";
+import { ToolWithView } from "src/tools-framework/ToolWithView";
+import { codeProgramSetTo } from "src/tools/CodeTool";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
 

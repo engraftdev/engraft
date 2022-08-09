@@ -1,17 +1,25 @@
-import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolView, lookUpTool } from "src/tools-framework/tools";
-
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
-import { codeProgramSetTo } from "./CodeTool";
+import { memo, useCallback, useMemo } from "react";
+import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
+import { codeProgramSetTo } from "./CodeTool";
+import { programFactory as textProgramFactory } from "./TextTool";
 
-export interface MarkdownProgram {
-  toolName: 'markdown';
-  sourceProgram: ToolProgram;
+export type Program = {
+  toolName: 'markdown',
+  sourceProgram: ToolProgram,
 }
 
-export const MarkdownTool = memo(function MarkdownTool({program, updateProgram, reportView, reportOutput}: ToolProps<MarkdownProgram>) {
+export const programFactory: ProgramFactory<Program> = () => ({
+  toolName: 'markdown',
+  // TODO: idk if I like this "textProgramFactory" import
+  sourceProgram: codeProgramSetTo(textProgramFactory()),
+});
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [sourceComponent, sourceView, sourceOutput] = useSubTool({program, updateProgram, subKey: 'sourceProgram'})
 
   const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
@@ -46,8 +54,4 @@ export const MarkdownTool = memo(function MarkdownTool({program, updateProgram, 
   useView(reportView, view);
 
   return sourceComponent;
-})
-registerTool<MarkdownProgram>(MarkdownTool, 'markdown', () => ({
-  toolName: 'markdown',
-  sourceProgram: codeProgramSetTo(lookUpTool('text').defaultProgram()),
-}));
+});

@@ -1,14 +1,19 @@
-import { memo, useMemo, useCallback } from "react";
-import { registerTool, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { memo, useCallback, useMemo } from "react";
+import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 
-export interface CheckboxProgram extends ToolProgram {
+export type Program = {
   toolName: 'checkbox';
   checked: boolean;
 }
 
-export const AdderTool = memo(function AdderTool(props: ToolProps<CheckboxProgram>) {
+export const programFactory: ProgramFactory<Program> = () => ({
+  toolName: 'checkbox',
+  checked: false,
+});
+
+export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [checked, updateChecked] = useAt(program, updateProgram, 'checked');
@@ -31,8 +36,3 @@ export const AdderTool = memo(function AdderTool(props: ToolProps<CheckboxProgra
 
   return <></>;
 });
-
-registerTool<CheckboxProgram>(AdderTool, 'checkbox', () => ({
-  toolName: 'checkbox',
-  checked: false,
-}));

@@ -4,6 +4,11 @@ import { newId } from "src/util/id";
 import { Setter, Updater } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
 
+export type Tool<P extends ToolProgram = any> = {
+  Component: ToolComponent<P>;
+  programFactory: ProgramFactory<P>;
+}
+
 export type ToolValue = {
   toolValue: unknown;
   alreadyDisplayed?: boolean;
@@ -26,26 +31,13 @@ export interface ToolProps<P extends ToolProgram> {
   reportView: Setter<ToolView | null>;
 }
 
-export interface Tool<P extends ToolProgram> {
+export interface ToolComponent<P extends ToolProgram> {
   (props: ToolProps<P>): ReactElement<any, any> | null;
-  defaultProgram: (defaultCode?: string) => P;
 }
 
-let toolIndex: { [toolName: string]: Tool<any> } = {};
+export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;
 
-export function registerTool<C extends ToolProgram>(
-  func: (props: ToolProps<C>) => ReactElement<any, any> | null,
-  toolName: C['toolName'],
-  defaultProgram: C | ((defaultCode?: string) => C)
-) {
-  let defaultProgramFunc: () => C;
-  if (typeof defaultProgram === 'object') {
-    defaultProgramFunc = () => (defaultProgram as C);
-  } else {
-    defaultProgramFunc = defaultProgram;
-  }
-  toolIndex[toolName] = Object.assign(func, { defaultProgram: defaultProgramFunc });
-}
+let toolIndex: { [toolName: string]: Tool } = {};
 
 export function lookUpTool(toolName: string): Tool<any> {
   const tool = toolIndex[toolName];
@@ -59,6 +51,20 @@ export function lookUpTool(toolName: string): Tool<any> {
 // intentionally awkward name to remind you to prefer use of lookUpTool
 export function getFullToolIndex(): { [toolName: string]: Tool<any> } {
   return toolIndex;
+}
+
+export function registerTool(tool: Tool<any>) {
+  // do some checks to make sure the tool is valid
+  if (!tool.programFactory) {
+    throw new Error(`Tool has no programFactory`);
+  }
+  if (!tool.Component) {
+    throw new Error(`Tool has no Component`);
+  }
+
+  const { toolName } = tool.programFactory();
+  (tool.Component as any).displayName = toolName;
+  toolIndex[toolName] = tool;
 }
 
 

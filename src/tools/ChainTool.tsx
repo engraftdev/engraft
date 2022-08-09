@@ -1,5 +1,5 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { EnvContext, newVar, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var, VarBinding } from "src/tools-framework/tools";
+import { EnvContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
@@ -7,9 +7,9 @@ import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { ValueFrame, ValueOfTool } from "src/view/Value";
-import { CodeProgram, codeProgramSetTo, summarizeCodeProgram } from "./CodeTool";
+import { codeProgramSetTo, Program as CodeProgram, summarizeCodeProgram } from "./CodeTool";
 
-export interface ChainProgram {
+export interface Program {
   toolName: 'chain';
   prevVar: Var;
   links: Link[];  // invariant: at least one link plz
@@ -22,11 +22,26 @@ interface Link {
   blocksHigh: number,
 }
 
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  const prevVar = newVar('prev');
+  return {
+    toolName: 'chain',
+    prevVar,
+    links: [
+      {
+        id: newId(),
+        program: codeProgramSetTo(defaultCode || ''),
+        blocksWide: 2,
+        blocksHigh: 1,
+      },
+    ],
+  };
+};
+
 const BLOCK_WIDTH = 50;
 const BLOCK_HEIGHT = 50;
 
-
-export const ChainTool = memo(function ChainTool(props: ToolProps<ChainProgram>) {
+export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [links, updateLinks] = useAt(program, updateProgram, 'links');
@@ -65,21 +80,6 @@ export const ChainTool = memo(function ChainTool(props: ToolProps<ChainProgram>)
       />
     )}
   </>;
-});
-registerTool<ChainProgram>(ChainTool, 'chain', (defaultInput) => {
-  const prevVar = newVar('prev');
-  return {
-    toolName: 'chain',
-    prevVar,
-    links: [
-      {
-        id: newId(),
-        program: codeProgramSetTo(defaultInput || ''),
-        blocksWide: 2,
-        blocksHigh: 1,
-      },
-    ],
-  };
 });
 
 interface CellModelProps {
@@ -146,7 +146,7 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }
 });
 
-interface ChainViewProps extends ToolProps<ChainProgram>, ToolViewProps {
+interface ChainViewProps extends ToolProps<Program>, ToolViewProps {
   outputs: {[id: string]: ToolValue | null};
   views: {[id: string]: ToolView | null}
 }

@@ -1,18 +1,29 @@
 import { memo, useCallback, useEffect } from "react";
-import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./CodeTool";
 
-export interface LetProgram extends ToolProgram {
+export type Program = {
   toolName: 'let';
   bindingVar: Var;
   bindingProgram: ToolProgram;
   bodyProgram: ToolProgram;
 }
 
-export const LetTool = memo(function LetTool({ program, updateProgram, reportOutput, reportView }: ToolProps<LetProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  return {
+    toolName: 'let',
+    bindingVar: newVar(),
+    bindingProgram: codeProgramSetTo(''),
+    bodyProgram: codeProgramSetTo(''),
+  }
+};
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const [bindingComponent, bindingView, bindingOutput] = useSubTool({program, updateProgram, subKey: 'bindingProgram'});
   const [bodyComponent, bodyView, bodyOutput] = useSubTool({program, updateProgram, subKey: 'bodyProgram'});
 
@@ -52,9 +63,3 @@ export const LetTool = memo(function LetTool({ program, updateProgram, reportOut
     }
   </>
 });
-registerTool<LetProgram>(LetTool, 'let', () => ({
-  toolName: 'let',
-  bindingVar: newVar(),
-  bindingProgram: codeProgramSetTo(''),
-  bodyProgram: codeProgramSetTo(''),
-}));

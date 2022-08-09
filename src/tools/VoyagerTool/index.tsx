@@ -2,7 +2,7 @@ import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } fr
 import type { Schema } from "datavoyager/build/models";
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { registerTool, ToolProgram, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { codeProgramSetTo } from "src/tools/CodeTool";
 import { useAt } from "src/util/state";
@@ -13,13 +13,21 @@ import style from './style.css';
 
 type Spec = ReturnType<typeof selectMainSpec>;
 
-export interface VoyagerProgram extends ToolProgram {
+export type Program = {
   toolName: 'voyager';
   inputProgram: ToolProgram;
   spec: Spec | undefined;
 }
 
-export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerProgram>) {
+export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+  return {
+    toolName: 'voyager',
+    inputProgram: codeProgramSetTo(defaultCode || ''),
+    spec: undefined,
+  };
+}
+
+export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
@@ -50,16 +58,9 @@ export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerPro
     {inputComponent}
   </>
 });
-registerTool<VoyagerProgram>(VoyagerTool, 'voyager', () => {
-  return {
-    toolName: 'voyager',
-    inputProgram: codeProgramSetTo(''),
-    spec: undefined,
-  };
-});
 
 
-interface VoyagerToolViewProps extends ToolProps<VoyagerProgram>, ToolViewProps {
+interface VoyagerToolViewProps extends ToolProps<Program>, ToolViewProps {
   data: unknown;
   inputView: ToolView | null;
 }

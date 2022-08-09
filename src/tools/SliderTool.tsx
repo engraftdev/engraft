@@ -1,17 +1,29 @@
 import { memo, useCallback } from "react";
-import { registerTool, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateKeys } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
 
-export interface SliderProgram {
+
+export interface Program {
   toolName: 'slider';
   value: number;
   min: number;
   max: number;
   step: number;
 }
-export const SliderTool = memo(function SliderTool({ program, updateProgram, reportOutput, reportView }: ToolProps<SliderProgram>) {
+
+export const programFactory: ProgramFactory<Program> = () => ({
+  toolName: 'slider',
+  value: 0,
+  min: -10,
+  max: 10,
+  step: 1,
+});
+
+export const Component = memo((props: ToolProps<Program>) => {
+  const { program, updateProgram, reportOutput, reportView } = props;
+
   const output = useMemoObject({toolValue: program.value});
   useOutput(reportOutput, output);
 
@@ -30,10 +42,4 @@ export const SliderTool = memo(function SliderTool({ program, updateProgram, rep
 
   return null;
 })
-registerTool(SliderTool, 'slider', {
-  toolName: 'slider',
-  value: 0,
-  min: -10,
-  max: 10,
-  step: 1
-});
+
