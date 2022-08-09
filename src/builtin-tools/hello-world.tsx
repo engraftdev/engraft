@@ -10,10 +10,16 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
+  const { reportOutput, reportView } = props;
+
   useEffect(() => {
-    props.reportOutput({toolValue: "Hello world!"});
-    props.reportView(() => <h1>Hello world!</h1>)
-  }, [props])
+    reportOutput({
+      value: "Output: Hello world!"
+    });
+    reportView({
+      render: () => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>
+    });
+  }, [reportOutput, reportView])
 
   return <></>;
 });

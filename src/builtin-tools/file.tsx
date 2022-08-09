@@ -1,6 +1,6 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateKeys } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
@@ -18,8 +18,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
-  const output = useMemoObject({toolValue: program.dataUrl});
-  useOutput(reportOutput, output);
+  useOutput(reportOutput, useMemoObject({
+    value: program.dataUrl
+  }));
 
   // TODO: questionable; easier to put this here, but it really belongs in a render component
   const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -34,23 +35,23 @@ export const Component = memo((props: ToolProps<Program>) => {
     reader.readAsDataURL(acceptedFiles[0]);  // todo: multiple / 0 files
   }, [updateProgram]);
 
-  const view: ToolView = useCallback(() => (
-    <Dropzone onDrop={onDrop}>
-      {({getRootProps, getInputProps}) =>
-        <div {...getRootProps({className: "root", style: {padding: 10}})}>
-          { program.dataUrl ?
-            <>{program.dataUrl.length} characters</> :
-            <>
-              <div>drop here, or click</div>
-              <input {...getInputProps({className: "input"})}/>
-            </>
-          }
-          {/* TODO: input; delete */}
-        </div>
-      }
-    </Dropzone>
-  ), [program.dataUrl, onDrop]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <Dropzone onDrop={onDrop}>
+        {({getRootProps, getInputProps}) =>
+          <div {...getRootProps({className: "root", style: {padding: 10}})}>
+            { program.dataUrl ?
+              <>{program.dataUrl.length} characters</> :
+              <>
+                <div>drop here, or click</div>
+                <input {...getInputProps({className: "input"})}/>
+              </>
+            }
+            {/* TODO: input; delete */}
+          </div>
+        }
+      </Dropzone>
+  }), [onDrop, program.dataUrl]));
 
   return null;
 });

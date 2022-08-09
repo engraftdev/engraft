@@ -21,27 +21,26 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [xComponent, xView, xOutput] = useSubTool({program, updateProgram, subKey: 'xProgram'});
   const [yComponent, yView, yOutput] = useSubTool({program, updateProgram, subKey: 'yProgram'});
 
-  const output = useMemo(() => {
+  useOutput(reportOutput, useMemo(() => {
     if (xOutput && yOutput) {
-      return {toolValue: (xOutput.toolValue as any) + (yOutput.toolValue as any)};
+      return {value: (xOutput.value as any) + (yOutput.value as any)};
     }
-  }, [xOutput, yOutput])
-  useOutput(reportOutput, output);
+  }, [xOutput, yOutput]));
 
-  const view: ToolView = useCallback(({autoFocus}) => (
-    <div className="xCol xGap10 xPad10">
-      <div className="xRow xGap10">
-        <b>x</b>
-        <ShowView view={xView} autoFocus={autoFocus} />
-      </div>
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <div className="xCol xGap10 xPad10">
+        <div className="xRow xGap10">
+          <b>x</b>
+          <ShowView view={xView} />
+        </div>
 
-      <div className="xRow xGap10">
-        <b>y</b>
-        <ShowView view={yView} />
+        <div className="xRow xGap10">
+          <b>y</b>
+          <ShowView view={yView} />
+        </div>
       </div>
-    </div>
-  ), [xView, yView]);
-  useView(reportView, view);
+  }), [xView, yView]));
 
   return <>
     {xComponent}

@@ -24,34 +24,36 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
 
-  const sourceOutputWithAlreadyDisplayed = useMemoObject({toolValue: sourceOutput?.toolValue, alreadyDisplayed: true});
-  useOutput(reportOutput, sourceOutputWithAlreadyDisplayed);
+  useOutput(reportOutput, useMemoObject({
+    value: sourceOutput?.value,
+    alreadyDisplayed: true
+  }));
 
   const htmlOrError = useMemo(() => {
     if (!sourceOutput) {
       return {error: 'missing source'};
     }
-    if (typeof(sourceOutput.toolValue) !== 'string') {
+    if (typeof(sourceOutput.value) !== 'string') {
       return {error: 'source is not string'};
     }
-    return {html: md.render(sourceOutput.toolValue)}
+    return {html: md.render(sourceOutput.value)}
   }, [md, sourceOutput])
 
-  const view: ToolView = useCallback(() => (
-    <div className="xCol" style={{gap: 20, padding: 10}}>
-      {/* <div style={{flexShrink: 0}}> */}
-      <div>
-        <ShowView view={sourceView} />
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <div className="xCol" style={{gap: 20, padding: 10}}>
+        {/* <div style={{flexShrink: 0}}> */}
+        <div>
+          <ShowView view={sourceView} />
+        </div>
+        <div>
+          {htmlOrError.html ?
+            <div dangerouslySetInnerHTML={{__html: htmlOrError.html}} /> :
+            <span style={{color: 'red'}}>{htmlOrError.error}</span>
+          }
+        </div>
       </div>
-      <div>
-        {htmlOrError.html ?
-          <div dangerouslySetInnerHTML={{__html: htmlOrError.html}} /> :
-          <span style={{color: 'red'}}>{htmlOrError.error}</span>
-        }
-      </div>
-    </div>
-  ), [htmlOrError.error, htmlOrError.html, sourceView]);
-  useView(reportView, view);
+  }), [htmlOrError.error, htmlOrError.html, sourceView]));
 
   return sourceComponent;
 });

@@ -1,6 +1,6 @@
 import { CSSProperties, ElementType, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolValue } from "src/tools-framework/tools";
+import { ToolOutput } from "src/tools-framework/tools";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
@@ -306,7 +306,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
 
 export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
-  toolValue: ToolValue | null;
+  toolValue: ToolOutput | null;
   customizations?: ValueCustomizations;
 }
 
@@ -319,12 +319,12 @@ export const ValueOfTool = memo(function ValueOfTool({toolValue, customizations,
 });
 
 export type ToolValueBufferProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
-  toolValue: ToolValue | null;
+  toolValue: ToolOutput | null;
   renderValue: (value: any) => ReactNode;
 }
 
 export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue, style, ...props}: ToolValueBufferProps) {
-  const [lastValue, setLastValue] = useStateSetOnly<ToolValue | null>(null);
+  const [lastValue, setLastValue] = useStateSetOnly<ToolOutput | null>(null);
 
   useEffect(() => {
     if (toolValue) {
@@ -337,7 +337,7 @@ export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderV
       ...style,
       opacity: toolValue === null ? 0.3 : 1,
     }} {...props}>
-      {renderValue(lastValue.toolValue)}
+      {renderValue(lastValue.value)}
     </div> :
     <div style={{fontSize: 13, fontStyle: 'italic'}}>
       no output yet

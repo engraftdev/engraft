@@ -6,7 +6,7 @@ import { EditorView } from '@codemirror/view';
 import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -130,15 +130,16 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
-  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
 
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+  // TODO: should this be useMemo?
+  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
   useEffect(() => {
     if (compiled) {
       const rand = seedrandom('live-compose 2022');
       const scope = {
-        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
-        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue])),
+        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.value])),
+        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.value])),
         ...globals,
         rand
       };
@@ -146,10 +147,10 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         const result = compiled(scope);
         if (result instanceof Promise) {
           result.then((value) => {
-            setOutput({toolValue: value});
+            setOutput({value: value});
           })
         } else {
-          setOutput({toolValue: compiled(scope)});
+          setOutput({value: compiled(scope)});
         }
       } catch (e) {
         // console.warn("error with", program.code)
@@ -162,15 +163,15 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   }, [compiled, env, outputs, setOutput])
   useOutput(reportOutput, output);
 
-  const view: ToolView = useCallback((viewProps) => (
-    <CodeToolCodeModeView
-      {...props} {...viewProps}
-      updateSubToolPrograms={updateSubToolPrograms}
-      views={views}
-      env={env} possibleEnv={possibleEnv}
-    />
-  ), [env, possibleEnv, props, updateSubToolPrograms, views])
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <CodeToolCodeModeView
+        {...props} {...viewProps}
+        updateSubToolPrograms={updateSubToolPrograms}
+        views={views}
+        env={env} possibleEnv={possibleEnv}
+      />
+  }), [env, possibleEnv, props, updateSubToolPrograms, views]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -180,7 +181,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   </>;
 });
 
-interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewProps {
+interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewRenderProps {
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>;
   views: {[id: string]: ToolView | null};
   env: VarBindings;
@@ -285,25 +286,25 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ program, report
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
-  const view: ToolView = useCallback(({autoFocus}) => (
-    <ToolFrame
-      program={subProgram} updateProgram={updateSubProgram} env={env} possibleEnv={possibleEnv}
-      onClose={() => {
-        updateProgram(() => ({
-          toolName: 'code',
-          modeName: 'code',
-          code: program.defaultCode || '',
-          subTools: {},
-          defaultCode: program.defaultCode,
-        }));
-      }}
-    >
-      {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
-        <ShowView view={toolView} autoFocus={autoFocus} />
-      {/* </div> */}
-    </ToolFrame>
-  ), [program, env, possibleEnv, subProgram, toolView, updateProgram, updateSubProgram]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: ({autoFocus}) =>
+      <ToolFrame
+        program={subProgram} updateProgram={updateSubProgram} env={env} possibleEnv={possibleEnv}
+        onClose={() => {
+          updateProgram(() => ({
+            toolName: 'code',
+            modeName: 'code',
+            code: program.defaultCode || '',
+            subTools: {},
+            defaultCode: program.defaultCode,
+          }));
+        }}
+      >
+        {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
+          <ShowView view={toolView} autoFocus={autoFocus} />
+        {/* </div> */}
+      </ToolFrame>
+  }), [program, env, possibleEnv, subProgram, toolView, updateProgram, updateSubProgram]));
 
   return component;
 });

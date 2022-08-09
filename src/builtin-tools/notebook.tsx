@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, Var, VarBinding } from "src/tools-framework/tools";
+import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
@@ -50,13 +50,13 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
-  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
 
   const reportCellView = useCallback((id: string, view: ToolView | null) => {
     // console.log("reportCellView", id);
     updateKeys(updateViews, {[id]: view})
   }, [updateViews])
-  const reportCellOutput = useCallback((id: string, output: ToolValue | null) => {
+  const reportCellOutput = useCallback((id: string, output: ToolOutput | null) => {
     // console.log("reportCellOutput", id);
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
@@ -70,54 +70,53 @@ export const Component = memo((props: ToolProps<Program>) => {
     updateOutputBelowInput(() => ev.target.checked);
   }, [updateOutputBelowInput]);
 
-  const view: ToolView = useCallback(() => (
-    <div className="NotebookTool xPad10">
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={outputBelowInput}
-            onChange={onChangeOutputBelowInput}
-            style={{marginRight: 5}}
-          />
-          output below input
-        </label>
-      </div>
-      <div className="xChildrenMinWidth0"
-        style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
-        }}>
-        {cells.map((cell, i) =>
-          <Fragment key={cell.var_.id}>
-            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
-            <CellView cell={cell}
-              // TODO: memoize these?
-              updateCell={atIndex(updateCells, i)}
-              removeCell={() => {
-                const newCells = [...cells];
-                newCells.splice(i, 1);
-                updateCells(() => newCells);
-              }}
-              toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
-              outputBelowInput={outputBelowInput || false}
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <div className="NotebookTool xPad10">
+        {/* TODO: figure out where to put 'output below input' */}
+        <div style={{display: 'none'}}>
+          <label>
+            <input
+              type="checkbox"
+              checked={outputBelowInput}
+              onChange={onChangeOutputBelowInput}
+              style={{marginRight: 5}}
             />
-          </Fragment>
-        )}
-        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+            output below input
+          </label>
+        </div>
+        <div className="xChildrenMinWidth0"
+          style={{
+            display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
+          }}>
+          {cells.map((cell, i) =>
+            <Fragment key={cell.var_.id}>
+              <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+              <CellView cell={cell}
+                // TODO: memoize these?
+                updateCell={atIndex(updateCells, i)}
+                removeCell={() => {
+                  const newCells = [...cells];
+                  newCells.splice(i, 1);
+                  updateCells(() => newCells);
+                }}
+                toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
+                outputBelowInput={outputBelowInput || false}
+              />
+            </Fragment>
+          )}
+          <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+        </div>
       </div>
-    </div>
-  ), [cells, program.prevVar, onChangeOutputBelowInput, outputBelowInput, outputs, smallestUnusedLabel, updateCells, views])
-  useView(reportView, view);
+  }), [cells, onChangeOutputBelowInput, outputBelowInput, outputs, program.prevVar, smallestUnusedLabel, updateCells, views]));
 
-  const output = useMemo(() => {
+  useOutput(reportOutput, useMemo(() => {
     const lastCell = cells[cells.length - 1] as Cell | null;
     if (!lastCell) {
       return null;
     }
-
     return outputs[lastCell.var_.id];
-  }, [cells, outputs])
-  useOutput(reportOutput, output);
+  }, [cells, outputs]));
 
   // const newBindings = useMemo(() => {
   //   return {};
@@ -191,10 +190,10 @@ interface CellModelProps {
   cells: Cell[];
   updateCells: Updater<Cell[]>;
 
-  outputs: {[id: string]: ToolValue | null};
+  outputs: {[id: string]: ToolOutput | null};
 
   reportView: (id: string, view: ToolView | null) => void;
-  reportOutput: (id: string, value: ToolValue | null) => void;
+  reportOutput: (id: string, value: ToolOutput | null) => void;
 
   prevVar: Var;
 }
@@ -216,7 +215,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   useEffect(() => reportView(id, view), [id, reportView, view]);
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
 
-  const prevVal: ToolValue | null | undefined = useMemo(() => {
+  const prevVal: ToolOutput | null | undefined = useMemo(() => {
     const prevCell: Cell | undefined = cells[i - 1];
     if (prevCell) {
       return outputs[prevCell.var_.id];
@@ -270,7 +269,7 @@ interface CellViewProps {
   cell: Cell;
   updateCell: Updater<Cell>;
 
-  toolOutput: ToolValue | null,
+  toolOutput: ToolOutput | null,
   toolView: ToolView | null,
 
   removeCell: () => void;

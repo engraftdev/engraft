@@ -1,5 +1,5 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { codeProgramSetTo } from "src/builtin-tools/code";
 import { newId } from "src/util/id";
@@ -44,26 +44,25 @@ export const Component = memo((props: ToolProps<Program>) => {
     return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
   }, [patternsWithIds])
 
-  const output = useMemo(() => {
+  useOutput(reportOutput, useMemo(() => {
     // TODO: fix this; it should integrate results of patterns intelligently
     if (!inputOutput || !mergedPatterns) {
       return null;
     }
     try {
-      return { toolValue: mergedPatterns(inputOutput.toolValue) };
+      return { value: mergedPatterns(inputOutput.value) };
     } catch (e) {
       console.warn(e);
       return null;
     }
-  }, [inputOutput, mergedPatterns])
-  useOutput(reportOutput, output)
+  }, [inputOutput, mergedPatterns]))
 
   // const metaHeld = useKeyHeld('Meta');
 
-  const view: ToolView = useCallback((viewProps) => (
-    <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
-  ), [props, inputView, inputOutput]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutput}/>
+  }), [props, inputView, inputOutput]));
 
   return <>
     {inputComponent}
@@ -249,9 +248,9 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
 })
 
 
-interface ExtractorToolViewProps extends ToolProps<Program>, ToolViewProps {
+interface ExtractorToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   inputView: ToolView | null;
-  inputOutput: ToolValue | null;
+  inputOutput: ToolOutput | null;
 }
 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {

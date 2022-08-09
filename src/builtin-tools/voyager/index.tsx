@@ -1,10 +1,10 @@
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "datavoyager";
 import type { Schema } from "datavoyager/build/models";
 import _ from "lodash";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { codeProgramSetTo } from "src/builtin-tools/code";
+import { ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { useDedupe } from "src/util/useDedupe";
 import { useRefForCallback } from "src/util/useRefForCallback";
@@ -34,25 +34,28 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const data = useMemo(() => {
     if (inputOutput) {
-      const value = inputOutput.toolValue;
+      const value = inputOutput.value;
       if (value instanceof Array) {
         if (value.length === 0 || value[0] instanceof Object) {
-          return inputOutput.toolValue
+          return inputOutput.value
         }
       }
     }
   }, [inputOutput])
 
-  useOutput(reportOutput, {toolValue: undefined, alreadyDisplayed: true})
+  useOutput(reportOutput, useMemo(() => ({
+    value: undefined,
+    alreadyDisplayed: true
+  }), []));
 
-  const view: ToolView = useCallback((viewProps) => (
-    <VoyagerToolView
-      {...props} {...viewProps}
-      data={data}
-      inputView={inputView}
-    />
-  ), [data, inputView, props]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <VoyagerToolView
+        {...props} {...viewProps}
+        data={data}
+        inputView={inputView}
+      />
+  }), [data, inputView, props]));
 
   return <>
     {inputComponent}
@@ -60,7 +63,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 });
 
 
-interface VoyagerToolViewProps extends ToolProps<Program>, ToolViewProps {
+interface VoyagerToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   data: unknown;
   inputView: ToolView | null;
 }

@@ -49,7 +49,7 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
       if (!inspected) { return; }
       if (!varBinding) { return; }
       if (varBinding.value) {
-        return <ObjectInspector data={varBinding.value.toolValue} />;
+        return <ObjectInspector data={varBinding.value.value} />;
       } else {
         return <span style={{fontStyle: 'italic'}}>missing</span>;
       }

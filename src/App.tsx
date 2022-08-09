@@ -1,7 +1,7 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import appCss from './App.css';
 import { examples } from './examples/examples';
-import { EnvContext, registerTool, ToolProgram, ToolValue, VarBinding } from './tools-framework/tools';
+import { EnvContext, registerTool, ToolProgram, ToolOutput, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 import { Program as CodeProgram, codeProgramSetTo } from './builtin-tools/code';
 import range from './util/range';
@@ -33,8 +33,8 @@ const App = memo(function App() {
 
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDarray000000', label: 'array'}, value: {toolValue: [1, 2, 3]}},
-    {var_: {id: 'IDrange000000', label: 'range'}, value: {toolValue: range}},
+    {var_: {id: 'IDarray000000', label: 'array'}, value: {value: [1, 2, 3]}},
+    {var_: {id: 'IDrange000000', label: 'range'}, value: {value: range}},
   ]), []);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const App = memo(function App() {
     }
   }, [program])
 
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
   const [showTool, setShowTool] = useStateSetOnly(true);
   const [showOutput, setShowOutput] = useStateSetOnly(false);

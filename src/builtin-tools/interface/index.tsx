@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { CSSProperties, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
@@ -45,7 +45,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const rootNodeWithoutGhosts = useMemo(() => {
     try {
-      return renderElementToNode(rootElement, inputOutput?.toolValue, '', false);
+      return renderElementToNode(rootElement, inputOutput?.value, '', false);
     } catch (e) {
       console.warn('error generating rootNodeWithoutGhosts', e);
       return null;
@@ -54,7 +54,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const rootNodeWithGhosts = useMemo(() => {
     try {
-      return renderElementToNode(rootElement, inputOutput?.toolValue, '', true);
+      return renderElementToNode(rootElement, inputOutput?.value, '', true);
     } catch (e) {
       console.warn('error generating rootNodeWithGhosts', e);
       return null;
@@ -86,11 +86,11 @@ export const Component = memo((props: ToolProps<Program>) => {
     updateControlValues((oldValues) => matchShape(oldValues, defaultValues));
   }, [rootNodeWithoutGhosts, updateControlValues]);
 
-  const output = useMemo(() => {
+  useOutput(reportOutput, useMemo(() => {
     if (!inputOutput) return null;
 
     try {
-      const renderedNode = renderElementToNode(program.rootElement, inputOutput.toolValue, '', false);
+      const renderedNode = renderElementToNode(program.rootElement, inputOutput.value, '', false);
       const view = (
         <InterfaceContext.Provider value={{ controlValues, updateControlValues, editMode: false }} >
           <style>{builtinStyles}</style>
@@ -99,7 +99,7 @@ export const Component = memo((props: ToolProps<Program>) => {
       );
 
       return {
-        toolValue: {
+        value: {
           view,
           controlValues,
         },
@@ -109,19 +109,18 @@ export const Component = memo((props: ToolProps<Program>) => {
       console.warn('error generating output', e);
       return null;
     }
-  }, [program.rootElement, controlValues, inputOutput, updateControlValues])
-  useOutput(reportOutput, output)
+  }, [program.rootElement, controlValues, inputOutput, updateControlValues]))
 
-  const view: ToolView = useCallback((viewProps) => (
-    <InterfaceToolView
-      {...props} {...viewProps}
-      inputView={inputView} inputOutput={inputOutput}
-      rootNodeWithGhosts={rootNodeWithGhosts}
-      rootNodeWithoutGhosts={rootNodeWithoutGhosts}
-      controlValues={controlValues} updateControlValues={updateControlValues}
-    />
-  ), [props, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <InterfaceToolView
+        {...props} {...viewProps}
+        inputView={inputView} inputOutput={inputOutput}
+        rootNodeWithGhosts={rootNodeWithGhosts}
+        rootNodeWithoutGhosts={rootNodeWithoutGhosts}
+        controlValues={controlValues} updateControlValues={updateControlValues}
+      />
+  }), [props, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues]));
 
   return <>
     {inputComponent}
@@ -165,9 +164,9 @@ function matchShape(data: any, shape: any): any {
   return data;
 }
 
-interface InterfaceToolViewProps extends ToolProps<Program>, ToolViewProps {
+interface InterfaceToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   inputView: ToolView | null;
-  inputOutput: ToolValue | null;
+  inputOutput: ToolOutput | null;
   rootNodeWithGhosts: InterfaceNode | null;
   rootNodeWithoutGhosts: InterfaceNode | null;
   controlValues: ControlValues;
@@ -349,13 +348,13 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   }, [element.id, updateRootElement]);
 
   const [styleProgram, updateStyleProgram] = useStateUpdateOnly(codeProgramSetTo(JSON.stringify(element.style)));
-  const [styleOutput, setStyleOutput] = useStateSetOnly<ToolValue | null>(null)
+  const [styleOutput, setStyleOutput] = useStateSetOnly<ToolOutput | null>(null)
 
   useEffect(() => {
-    if (styleOutput?.toolValue) {
+    if (styleOutput?.value) {
       updateRootElement((rootElement) =>
         updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
-          updateF({style: {$set: styleOutput.toolValue as CSSProperties}})
+          updateF({style: {$set: styleOutput.value as CSSProperties}})
         )
       );
     }

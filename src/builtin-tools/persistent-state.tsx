@@ -1,6 +1,6 @@
-import { memo, useCallback, useEffect } from "react";
-import { ProgramFactory, ToolProps, ToolView } from "src/tools-framework/tools";
-import { useView } from "src/tools-framework/useSubTool";
+import { memo, useMemo } from "react";
+import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { Setter, useAt, useSetter } from "src/util/state";
 import { SettableValue } from "src/view/SettableValue";
 
@@ -30,14 +30,14 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   // TODO: make sure state is serializable befoer you set it
 
-  useEffect(() => {
-    reportOutput({toolValue: {get: stateValue, set: setStateValue}});
-  }, [reportOutput, setStateValue, stateValue])
+  useOutput(reportOutput, useMemo(() => ({
+    value: {get: stateValue, set: setStateValue}
+  }), [setStateValue, stateValue]));
 
-  const view: ToolView = useCallback(({autoFocus}) => (
-    <PersistentStateToolView stateValue={stateValue} setStateValue={setStateValue}/>
-  ), [setStateValue, stateValue]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <PersistentStateToolView stateValue={stateValue} setStateValue={setStateValue}/>
+  }), [setStateValue, stateValue]));
 
   return null;
 });

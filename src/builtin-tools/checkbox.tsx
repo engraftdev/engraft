@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
@@ -18,21 +18,20 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [checked, updateChecked] = useAt(program, updateProgram, 'checked');
 
-  const output = useMemo(() => {
-    return {toolValue: checked};
-  }, [checked])
-  useOutput(reportOutput, output);
+  useOutput(reportOutput, useMemo(() => ({
+    value: checked
+  }), [checked]));
 
-  const view = useCallback(() => {
-    return <input
-      type="checkbox"
-      checked={checked}
-      onChange={() => {
-        updateChecked((checked) => !checked)
-      }}
-    />;
-  }, [checked, updateChecked]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={() => {
+          updateChecked((checked) => !checked)
+        }}
+      />
+  }), [checked, updateChecked]));
 
   return <></>;
 });

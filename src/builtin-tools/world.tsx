@@ -1,6 +1,6 @@
 import _ from "lodash";
-import { memo, useCallback, useEffect, useMemo } from "react";
-import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
+import { memo, useEffect, useMemo } from "react";
+import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { codeProgramSetTo } from "./code";
@@ -55,46 +55,46 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
   }, [highlightedIndex, iterationsCount, setHighlightedIndex])
 
-  const view: ToolView = useCallback(({autoFocus}) => (
-    <div style={{
-      padding: 10, display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
-      background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
-      }}>
-      <div style={{textAlign: 'right'}}>step</div>
-      <div>
-        <input
-          type="range"
-          value={highlightedIndex}
-          onChange={(ev) => setHighlightedIndex(+ev.target.value)}
-          min={0} max={iterationsCount - 1} step={1}/>
-        {' '}
-        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
-        {/* /
-        <div>max</div> <input
-          type="range"
-          value={iterationsCount}
-          onChange={(ev) => updateIterationsCount(() => +ev.target.value)}
-          min={0} max={100} step={1}/>
-        {' '}
-        <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{iterationsCount}</div> */}
+  useView(reportView, useMemo(() => ({
+    render: ({autoFocus}) =>
+      <div style={{
+        padding: 10, display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
+        background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
+        }}>
+        <div style={{textAlign: 'right'}}>step</div>
+        <div>
+          <input
+            type="range"
+            value={highlightedIndex}
+            onChange={(ev) => setHighlightedIndex(+ev.target.value)}
+            min={0} max={iterationsCount - 1} step={1}/>
+          {' '}
+          <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
+          {/* /
+          <div>max</div> <input
+            type="range"
+            value={iterationsCount}
+            onChange={(ev) => updateIterationsCount(() => +ev.target.value)}
+            min={0} max={100} step={1}/>
+          {' '}
+          <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{iterationsCount}</div> */}
+        </div>
+        <div style={{textAlign: 'right'}}>init</div>
+        <div>
+          <ShowView view={initView} autoFocus={autoFocus} />
+        </div>
+        <div style={{textAlign: 'right'}}>update</div>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          {/* <Value value={(highlightedIndex === 0 ? initOutput : upOutputs[highlightedIndex - 1]) || undefined}
+            style={{maxHeight: 30}}/> */}
+          <ShowView view={upViews[highlightedIndex]} />
+          {/* <Value value={upOutputs[highlightedIndex]?.toolValue || undefined}
+            style={{maxHeight: 100}}/> */}
+        </div>
+        <div style={{textAlign: 'right'}}>view</div>
+        <ShowView view={viewView} />
       </div>
-      <div style={{textAlign: 'right'}}>init</div>
-      <div>
-        <ShowView view={initView} autoFocus={autoFocus} />
-      </div>
-      <div style={{textAlign: 'right'}}>update</div>
-      <div style={{display: 'flex', flexDirection: 'column'}}>
-        {/* <Value value={(highlightedIndex === 0 ? initOutput : upOutputs[highlightedIndex - 1]) || undefined}
-          style={{maxHeight: 30}}/> */}
-        <ShowView view={upViews[highlightedIndex]} autoFocus={autoFocus} />
-        {/* <Value value={upOutputs[highlightedIndex]?.toolValue || undefined}
-          style={{maxHeight: 100}}/> */}
-      </div>
-      <div style={{textAlign: 'right'}}>view</div>
-      <ShowView view={viewView} autoFocus={autoFocus} />
-    </div>
-  ), [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewView]);
-  useView(reportView, view);
+  }), [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewView]));
 
   return <>
     {initComponent}

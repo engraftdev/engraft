@@ -1,5 +1,5 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { EnvContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var, VarBinding } from "src/tools-framework/tools";
+import { EnvContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
@@ -46,25 +46,24 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [links, updateLinks] = useAt(program, updateProgram, 'links');
 
-  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
 
-  const output = useMemo(() => {
+  useOutput(reportOutput, useMemo(() => {
     if (links.length > 0) {
       const finalLink = links[links.length - 1];
-      const finalOutput = outputs[finalLink.id] as ToolValue | undefined;
+      const finalOutput = outputs[finalLink.id] as ToolOutput | undefined;
       if (finalOutput) {
         return finalOutput;
       }
     }
     return null;
-  }, [links, outputs])
-  useOutput(reportOutput, output);
+  }, [links, outputs]));
 
-  const view: ToolView = useCallback((viewProps) => (
-    <ChainView {...props} {...viewProps} outputs={outputs} views={views}/>
-  ), [outputs, props, views]);
-  useView(reportView, view);
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <ChainView {...props} {...viewProps} outputs={outputs} views={views}/>
+  }), [outputs, props, views]));
 
   return <>
     {links.map((link) =>
@@ -88,8 +87,8 @@ interface CellModelProps {
   links: Link[];
   updateLinks: Updater<Link[]>;
 
-  outputs: {[id: string]: ToolValue | null};
-  updateOutputs: Updater<{[id: string]: ToolValue | null}>;
+  outputs: {[id: string]: ToolOutput | null};
+  updateOutputs: Updater<{[id: string]: ToolOutput | null}>;
 
   updateViews: Updater<{[id: string]: ToolView | null}>;
 
@@ -119,7 +118,7 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
     return () => updateOutputs(updateF({$unset: [id]}));
   }, [id, output, updateOutputs])
 
-  const prevVal: ToolValue | null | undefined = useMemo(() => {
+  const prevVal: ToolOutput | null | undefined = useMemo(() => {
     const prevLink: Link | undefined = links[i - 1];
     if (prevLink) {
       return outputs[prevLink.id];
@@ -146,8 +145,8 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }
 });
 
-interface ChainViewProps extends ToolProps<Program>, ToolViewProps {
-  outputs: {[id: string]: ToolValue | null};
+interface ChainViewProps extends ToolProps<Program>, ToolViewRenderProps {
+  outputs: {[id: string]: ToolOutput | null};
   views: {[id: string]: ToolView | null}
 }
 

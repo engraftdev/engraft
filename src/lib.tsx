@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import libCss from "./lib.css";
-import { EnvContext, registerTool, ToolProgram, ToolValue, ToolView, VarBinding } from "./tools-framework/tools";
+import { EnvContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
 import { codeProgramSetTo } from "./builtin-tools/code";
@@ -26,7 +26,7 @@ builtinTools.map(registerTool);
 // TODO: This is the old guy, for Observable. It should be removed eventually.
 
 interface EmbedComponentProps {
-  reportOutput: Setter<ToolValue | null>;
+  reportOutput: Setter<ToolOutput | null>;
   variables: {[name: string]: any} | undefined
   initialProgramJson: string | undefined;
 }
@@ -45,12 +45,12 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
     let env: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {value: value}};
     });
     return env;
   }, [variables]);
 
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
 
   useEffect(() => {
     reportOutput(output);
@@ -91,7 +91,7 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
 
 interface ObservableEmbedProps {
   localStorageKey: string;
-  reportOutput: Setter<ToolValue | null>;
+  reportOutput: Setter<ToolOutput | null>;
   variables: {[name: string]: any} | undefined;
 }
 
@@ -100,7 +100,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
     let env: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {value: value}};
     });
     return env;
   }, [variables]);
@@ -117,7 +117,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
     }
   }, [program, localStorageKey])
 
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
+  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
 
   useEffect(() => {
     reportOutput(output);
@@ -183,7 +183,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
     let env: {[id: string]: VarBinding} = {};
     Object.entries(stableVariables).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {value: value}};
     });
     return env;
   }, [stableVariables]);
@@ -234,7 +234,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
     </>);
   }, [component, defaultValue, env, hide, newRoot, origContainer, output, stableVariables, useDefault, view]);
 
-  return (!hide && useDefault) || !output ? defaultValue : output?.toolValue;
+  return (!hide && useDefault) || !output ? defaultValue : output?.value;
 }
 
 const useLiveToolDemoKey = 'use-live-tool-demo';
@@ -251,7 +251,7 @@ function programFromLocalStorage(key: string) {
 export interface UseLiveToolRHSProps {
   variables: {[name: string]: any};
   defaultValue: any;
-  output: ToolValue | null;
+  output: ToolOutput | null;
   view: ToolView | null;
   useDefault: boolean;
   setUseDefault: Dispatch<boolean>;
@@ -363,7 +363,7 @@ export { default as ReactDOM } from 'react-dom';
 ////////////////
 
 export { EnvContext } from 'src/tools-framework/tools';
-export type { ToolProgram, ToolValue } from 'src/tools-framework/tools';
+export type { ToolProgram, ToolOutput as ToolValue } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
 export { codeProgramSetTo } from 'src/builtin-tools/code';

@@ -9,8 +9,8 @@ export type Tool<P extends ToolProgram = any> = {
   programFactory: ProgramFactory<P>;
 }
 
-export type ToolValue = {
-  toolValue: unknown;
+export type ToolOutput = {
+  value: unknown;
   alreadyDisplayed?: boolean;
 };
 
@@ -18,16 +18,18 @@ export interface ToolProgram {
   toolName: string;
 }
 
-export interface ToolViewProps {
+export interface ToolViewRenderProps {
   autoFocus?: boolean
 }
 
-export type ToolView = (props: ToolViewProps) => ReactElement<any, any> | null;
+export type ToolView = {
+  render: (props: ToolViewRenderProps) => ReactElement<any, any> | null
+}
 
 export interface ToolProps<P extends ToolProgram> {
   program: P;
   updateProgram: Updater<P>;
-  reportOutput: Setter<ToolValue | null>;
+  reportOutput: Setter<ToolOutput | null>;
   reportView: Setter<ToolView | null>;
 }
 
@@ -71,7 +73,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  value?: ToolValue;
+  value?: ToolOutput;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};
@@ -106,7 +108,7 @@ export function newVar(label = 'new var') {
 
 export interface ProvideVarBindingProps {
   var_: Var;
-  value?: ToolValue;
+  value?: ToolOutput;
   children?: ReactNode | undefined,
 }
 

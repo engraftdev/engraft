@@ -13,7 +13,7 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
 import { memo, useCallback } from "react";
-import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolProgram, ToolValue, ToolView, VarBindings } from "src/tools-framework/tools";
+import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolProgram, ToolOutput, ToolView, VarBindings } from "src/tools-framework/tools";
 import { updateKeys, Updater, useAt } from "src/util/state";
 import { refCode } from "./refsExtension";
 
@@ -117,7 +117,7 @@ export interface SubToolProps {
   id: string,
   subToolPrograms: {[id: string]: ToolProgram},
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>,
-  updateOutputs: Updater<{[id: string]: ToolValue | null}>,
+  updateOutputs: Updater<{[id: string]: ToolOutput | null}>,
   updateViews: Updater<{[id: string]: ToolView | null}>,
 }
 
@@ -125,7 +125,7 @@ export interface SubToolProps {
 export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubToolPrograms, updateOutputs, updateViews}: SubToolProps) {
   const [program, updateProgram] = useAt(subToolPrograms, updateSubToolPrograms, id);
 
-  const reportOutput = useCallback((output: ToolValue | null) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
+  const reportOutput = useCallback((output: ToolOutput | null) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
   const reportView = useCallback((view: ToolView | null) => updateKeys(updateViews, {[id]: view}), [id, updateViews]);
 
   const Tool = lookUpTool(program.toolName);

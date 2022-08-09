@@ -1,7 +1,7 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
-import { lookUpTool, ToolProgram, ToolValue, ToolView, ToolViewProps } from "./tools";
+import { lookUpTool, ToolProgram, ToolOutput, ToolView, ToolViewRenderProps } from "./tools";
 
 export function useView(reportView: Setter<ToolView | null>, view: ToolView) {
   useEffect(() => {
@@ -10,7 +10,7 @@ export function useView(reportView: Setter<ToolView | null>, view: ToolView) {
   }, [reportView, view])
 }
 
-export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolValue | null | undefined) {
+export function useOutput(reportOutput: Setter<ToolOutput | null>, output: ToolOutput | null | undefined) {
   useEffect(() => {
     reportOutput(output || null);
     return () => reportOutput(null);
@@ -22,7 +22,7 @@ export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolVa
 
 
 
-export interface ShowViewProps extends ToolViewProps {
+export interface ShowViewProps extends ToolViewRenderProps {
   view: ToolView | null;
 }
 
@@ -31,7 +31,7 @@ export const ShowView = memo(function ShowView({view, ...rest}: ShowViewProps) {
     return null;
   }
 
-  return view(rest);
+  return view.render(rest);
 })
 
 
@@ -43,11 +43,11 @@ export interface UseToolProps<C extends ToolProgram> {
 export type UseToolReturn = [
   component: JSX.Element,
   view: ToolView | null,
-  output: ToolValue | null,
+  output: ToolOutput | null,
 ]
 
 export function useTool<C extends ToolProgram>({program, updateProgram}: UseToolProps<C>): UseToolReturn {
-  const [output, setOutput] = useStateSetOnly<ToolValue | null>(null)
+  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null)
   const [view, setView] = useStateSetOnly<ToolView | null>(null)
 
   const toolName = program.toolName;
@@ -90,7 +90,7 @@ type PerToolInternal<T> = Immutable.Map<string, T>
 export type UseToolsReturn = [
   components: PerTool<JSX.Element>,
   views: PerTool<ToolView | null>,
-  outputs: PerTool<ToolValue | null>,
+  outputs: PerTool<ToolOutput | null>,
 ]
 
 function cleanUpOldProperties<T, U>(oldA: PerToolInternal<T>, newB: PerTool<U>) {
@@ -104,7 +104,7 @@ function cleanUpOldProperties<T, U>(oldA: PerToolInternal<T>, newB: PerTool<U>) 
 }
 
 export function useTools<C extends ToolProgram>(tools: {[key: string]: UseToolProps<C>}): UseToolsReturn {
-  const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolValue | null>>(Immutable.Map())
+  const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolOutput | null>>(Immutable.Map())
   const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
 
   useEffect(() => {
@@ -133,12 +133,12 @@ interface ToolAtProps {
   keyName: string,
   program: ToolProgram,
   updateProgram: Updater<ToolProgram>
-  updateOutputs: Updater<PerToolInternal<ToolValue | null>>,
+  updateOutputs: Updater<PerToolInternal<ToolOutput | null>>,
   updateViews: Updater<PerToolInternal<ToolView | null>>,
 }
 
 const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, program, updateProgram}: ToolAtProps) {
-  const reportOutput = useCallback((output: ToolValue | null) => {
+  const reportOutput = useCallback((output: ToolOutput | null) => {
     return updateOutputs((oldOutputs) => oldOutputs.set(keyName, output));
   }, [keyName, updateOutputs])
   const reportView = useCallback((view: ToolView | null) => {

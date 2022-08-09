@@ -3,7 +3,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -40,14 +40,14 @@ export const Component = memo((props: ToolProps<Program>) => {
   const possibleEnv = useContext(PossibleEnvContext)
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
-  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
+  const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
 
   const replacedText = useMemo(() => {
     let result = program.text;
-    const applyReplacement = ([k, v]: readonly [string, ToolValue | null]) => {
+    const applyReplacement = ([k, v]: readonly [string, ToolOutput | null]) => {
       let replacementText = '';
       if (v) {
-        const toolValue = v.toolValue;
+        const toolValue = v.value;
         if (typeof toolValue === 'object' && toolValue) {
           replacementText = toolValue.toString();
         }
@@ -59,18 +59,20 @@ export const Component = memo((props: ToolProps<Program>) => {
     Object.entries(outputs).forEach(applyReplacement);
     return result;
   }, [program.text, env, outputs])
-  const output = useMemoObject({toolValue: replacedText});
-  useOutput(reportOutput, output);
 
-  const view: ToolView = useCallback((viewProps) => (
-    <TextToolView
-      {...props} {...viewProps}
-      views={views}
-      env={env}
-      possibleEnv={possibleEnv}
-    />
-  ), [env, possibleEnv, props, views])
-  useView(reportView, view);
+  useOutput(reportOutput, useMemoObject({
+    value: replacedText
+  }));
+
+  useView(reportView, useMemo(() => ({
+    render: (viewProps) =>
+      <TextToolView
+        {...props} {...viewProps}
+        views={views}
+        env={env}
+        possibleEnv={possibleEnv}
+      />
+  }), [env, possibleEnv, props, views]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -81,7 +83,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 })
 
 
-interface TextToolViewProps extends ToolProps<Program>, ToolViewProps {
+interface TextToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   views: {[id: string]: ToolView | null};
   env: VarBindings;
   possibleEnv: PossibleVarBindings;

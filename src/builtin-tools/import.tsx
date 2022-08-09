@@ -1,5 +1,5 @@
-import { memo, useCallback, useEffect, useState } from "react";
-import { ProgramFactory, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { ProgramFactory, ToolOutput, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import ControlledTextInput from "src/util/ControlledTextInput";
 import { useAt } from "src/util/state";
@@ -19,7 +19,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [result, setResult] = useState<ToolValue | null>(null);
+  const [result, setResult] = useState<ToolOutput | null>(null);
 
   const [name, updateName] = useAt(program, updateProgram, 'name');
 
@@ -31,7 +31,7 @@ export const Component = memo((props: ToolProps<Program>) => {
     // TODO: The `import` below doesn't work in lib2 output. Ugh.
     const url = `https://cdn.skypack.dev/${name}`;
     const result = await import(/*webpackIgnore: true*/ url);
-    setResult({toolValue: result});
+    setResult({value: result});
   }, [name]);
 
   // special: run when loaded
@@ -45,15 +45,15 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   useOutput(reportOutput, result);
 
-  const view: ToolView = useCallback(() => (
-    <div className="xCol xGap10 xPad10">
-      <div className="xRow xGap10">
-        <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
+  useView(reportView, useMemo(() => ({
+    render: () =>
+      <div className="xCol xGap10 xPad10">
+        <div className="xRow xGap10">
+          <b>name</b> <ControlledTextInput value={name} onChange={(ev) => updateName(() => ev.target.value)} />
+        </div>
+        <button onClick={sendRequest}>import</button>
       </div>
-      <button onClick={sendRequest}>import</button>
-    </div>
-  ), [name, sendRequest, updateName]);
-  useView(reportView, view);
+  }), [name, sendRequest, updateName]));
 
   return <></>;
 });
