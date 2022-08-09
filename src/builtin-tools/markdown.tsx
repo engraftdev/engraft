@@ -3,8 +3,8 @@ import { memo, useCallback, useMemo } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
-import { codeProgramSetTo } from "./CodeTool";
-import { programFactory as textProgramFactory } from "./TextTool";
+import { codeProgramSetTo } from "./code";
+import { programFactory as textProgramFactory } from "./text";
 
 export type Program = {
   toolName: 'markdown',

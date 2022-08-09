@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useMemo } from "react";
 import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 export interface Program {
   toolName: 'world';

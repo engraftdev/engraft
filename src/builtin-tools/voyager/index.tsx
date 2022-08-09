@@ -4,7 +4,7 @@ import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "src/tools/CodeTool";
+import { codeProgramSetTo } from "src/builtin-tools/code";
 import { useAt } from "src/util/state";
 import { useDedupe } from "src/util/useDedupe";
 import { useRefForCallback } from "src/util/useRefForCallback";

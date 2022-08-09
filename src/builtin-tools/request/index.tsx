@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "src/tools/CodeTool";
-import { Program as TextProgram } from "src/tools/TextTool";
+import { codeProgramSetTo } from "src/builtin-tools/code";
+import { Program as TextProgram } from "src/builtin-tools/text";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";
 import { useDebounce } from "use-debounce";

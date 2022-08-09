@@ -5,7 +5,7 @@ import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { Value } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 
 export type Program = {

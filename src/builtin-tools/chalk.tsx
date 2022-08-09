@@ -4,7 +4,7 @@ import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/us
 import ChalkEditor from "src/util/ChalkEditor";
 import { compileExpression } from "src/util/compile";
 import { useAt } from "src/util/state";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 // TODO: Hacky headless reportOutput.
 

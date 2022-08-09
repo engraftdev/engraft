@@ -8,7 +8,7 @@ import { findAllNested, findNested, getById, newId, updateById } from "src/util/
 import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
-import { codeProgramSetTo } from "../CodeTool";
+import { codeProgramSetTo } from "../code";
 import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
 
 import builtinStyles from './builtin.css';

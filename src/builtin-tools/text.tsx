@@ -15,7 +15,7 @@ import { useMemoObject } from "src/util/useMemoObject";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { VarUse } from "src/view/Vars";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 export interface Program {
   toolName: 'text';

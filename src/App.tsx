@@ -3,11 +3,11 @@ import appCss from './App.css';
 import { examples } from './examples/examples';
 import { EnvContext, registerTool, ToolProgram, ToolValue, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
-import { Program as CodeProgram, codeProgramSetTo } from './tools/CodeTool';
+import { Program as CodeProgram, codeProgramSetTo } from './builtin-tools/code';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ValueOfTool } from './view/Value';
-import { builtinTools } from './tools';
+import { builtinTools } from "./builtinTools";
 
 
 

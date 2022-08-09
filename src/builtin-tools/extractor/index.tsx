@@ -1,7 +1,7 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "src/tools/CodeTool";
+import { codeProgramSetTo } from "src/builtin-tools/code";
 import { newId } from "src/util/id";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";

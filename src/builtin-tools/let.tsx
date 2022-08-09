@@ -3,7 +3,7 @@ import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, Tool
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 export type Program = {
   toolName: 'let';

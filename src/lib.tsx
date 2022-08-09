@@ -5,7 +5,7 @@ import libCss from "./lib.css";
 import { EnvContext, registerTool, ToolProgram, ToolValue, ToolView, VarBinding } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
-import { codeProgramSetTo } from "./tools/CodeTool";
+import { codeProgramSetTo } from "./builtin-tools/code";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
@@ -13,7 +13,7 @@ import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
 import { ToolValueBuffer, Value, ValueOfTool } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
-import { builtinTools } from "./tools";
+import { builtinTools } from "./builtinTools";
 
 
 
@@ -366,4 +366,4 @@ export { EnvContext } from 'src/tools-framework/tools';
 export type { ToolProgram, ToolValue } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
-export { codeProgramSetTo } from 'src/tools/CodeTool';
+export { codeProgramSetTo } from 'src/builtin-tools/code';

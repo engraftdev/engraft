@@ -16,7 +16,7 @@ import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "src/tools/CodeTool";
+import { codeProgramSetTo } from "src/builtin-tools/code";
 import CodeMirror from "src/util/CodeMirror";
 import { compileExpression } from "src/util/compile";
 import { newId } from "src/util/id";

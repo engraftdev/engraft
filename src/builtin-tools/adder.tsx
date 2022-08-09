@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 export type Program = {
   toolName: 'adder';

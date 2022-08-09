@@ -9,7 +9,7 @@ import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { ValueOfTool } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./code";
 
 
 export type Program = {

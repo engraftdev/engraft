@@ -7,7 +7,7 @@ import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { ValueFrame, ValueOfTool } from "src/view/Value";
-import { codeProgramSetTo, Program as CodeProgram, summarizeCodeProgram } from "./CodeTool";
+import { codeProgramSetTo, Program as CodeProgram, summarizeCodeProgram } from "./code";
 
 export interface Program {
   toolName: 'chain';
