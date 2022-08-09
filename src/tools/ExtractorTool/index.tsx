@@ -1,5 +1,5 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";
 import { RowToCol } from "src/util/RowToCol";
@@ -9,7 +9,7 @@ import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
 import { pathString, ValueCustomizations, ValueOfTool } from "src/view/Value";
-import { codeConfigSetTo } from "src/tools/CodeTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
 
 interface PatternWithId {
@@ -17,9 +17,9 @@ interface PatternWithId {
   pattern: Pattern;
 };
 
-export interface ExtractorConfig extends ToolConfig {
+export interface ExtractorProgram extends ToolProgram {
   toolName: 'extractor';
-  inputConfig: ToolConfig;
+  inputProgram: ToolProgram;
   patternsWithIds: PatternWithId[];
   minimized: boolean;
 }
@@ -202,12 +202,12 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
   </div>
 })
 
-export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<ExtractorConfig>) {
-  const { config, updateConfig, reportOutput, reportView } = props;
+export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<ExtractorProgram>) {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
-  const { patternsWithIds } = config;
+  const { patternsWithIds } = program;
 
   const mergedPatterns = useMemo(() => {
     return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
@@ -238,26 +238,26 @@ export const ExtractorTool = memo(function ExtractorTool(props: ToolProps<Extrac
     {inputComponent}
   </>
 });
-registerTool<ExtractorConfig>(ExtractorTool, 'extractor', (defaultInput) => {
+registerTool<ExtractorProgram>(ExtractorTool, 'extractor', (defaultInput) => {
   return {
     toolName: 'extractor',
-    inputConfig: codeConfigSetTo(defaultInput || ''),
+    inputProgram: codeProgramSetTo(defaultInput || ''),
     patternsWithIds: [],
     minimized: false,
   };
 });
 
 
-interface ExtractorToolViewProps extends ToolProps<ExtractorConfig>, ToolViewProps {
+interface ExtractorToolViewProps extends ToolProps<ExtractorProgram>, ToolViewProps {
   inputView: ToolView | null;
   inputOutput: ToolValue | null;
 }
 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
-  const { config, updateConfig, autoFocus, inputView, inputOutput } = props;
+  const { program, updateProgram, autoFocus, inputView, inputOutput } = props;
 
-  const [patternsWithIds, updatePatternsWithIds] = useAt(config, updateConfig, 'patternsWithIds');
-  const [minimized, updateMinimized] = useAt(config, updateConfig, 'minimized');
+  const [patternsWithIds, updatePatternsWithIds] = useAt(program, updateProgram, 'patternsWithIds');
+  const [minimized, updateMinimized] = useAt(program, updateProgram, 'minimized');
 
   const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
 

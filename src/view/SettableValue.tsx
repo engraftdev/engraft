@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import { codeConfigSetTo, ToolValue, ToolWithView } from "src/lib";
+import { codeProgramSetTo, ToolValue, ToolWithView } from "src/lib";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
 
@@ -17,7 +17,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
 
-  const [entryConfig, updateEntryConfig] = useStateUpdateOnly(codeConfigSetTo(''))
+  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(codeProgramSetTo(''))
   const [entryOutput, setEntryOutput] = useStateSetOnly<ToolValue | null>(null)
 
   const onClickSet = useCallback(() => {
@@ -34,7 +34,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
       {expanded &&
         <>
           <div>←</div>
-          <ToolWithView config={entryConfig} updateConfig={updateEntryConfig} reportOutput={setEntryOutput}/>
+          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutput={setEntryOutput}/>
           <button disabled={entryOutput === null} onClick={onClickSet}>set</button>
         </>
       }

@@ -1,35 +1,35 @@
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "src/tools-framework/tools";
+import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
-export interface WorldConfig {
+export interface WorldProgram {
   toolName: 'world';
   iterationsCount: number;
-  initConfig: ToolConfig;
-  stateVar: VarConfig;
-  updateConfig: ToolConfig;
-  viewConfig: ToolConfig;
+  initProgram: ToolProgram;
+  stateVar: Var;
+  upProgram: ToolProgram;
+  viewProgram: ToolProgram;
 }
 
-export const WorldTool = memo(function WorldTool({ config, updateConfig, reportOutput, reportView }: ToolProps<WorldConfig>) {
-  const [initComponent, initView, initOutput] = useSubTool({config, updateConfig, subKey: 'initConfig'})
+export const WorldTool = memo(function WorldTool({ program, updateProgram, reportOutput, reportView }: ToolProps<WorldProgram>) {
+  const [initComponent, initView, initOutput] = useSubTool({program, updateProgram, subKey: 'initProgram'})
 
-  const { iterationsCount } = config;
+  const { iterationsCount } = program;
 
   const iterations = useMemo(() => {
-    return _.range(config.iterationsCount)
-  }, [config.iterationsCount])
+    return _.range(program.iterationsCount)
+  }, [program.iterationsCount])
 
-  const [upConfig, updateUpConfig] = useAt(config, updateConfig, 'updateConfig');
+  const [upProgram, updateUpProgram] = useAt(program, updateProgram, 'upProgram');
 
   const [upComponents, upViews, upOutputs] = useTools(Object.fromEntries(iterations.map((elem, i) => {
-    return [i, {config: upConfig, updateConfig: updateUpConfig}]
+    return [i, {program: upProgram, updateProgram: updateUpProgram}]
   })))
 
-  const [viewComponent, viewView, viewOutput] = useSubTool({config, updateConfig, subKey: 'viewConfig'})
+  const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram'})
 
   useOutput(reportOutput, viewOutput);
 
@@ -85,23 +85,23 @@ export const WorldTool = memo(function WorldTool({ config, updateConfig, reportO
   return <>
     {initComponent}
     {iterations.map((inputArrayElem, i) =>
-      <ProvideVar key={i} config={config.stateVar} value={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
+      <ProvideVarBinding key={i} var_={program.stateVar} value={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
         {upComponents[i]}
-      </ProvideVar>
+      </ProvideVarBinding>
     )}
-    <ProvideVar config={config.stateVar} value={(upOutputs[highlightedIndex]) || undefined}>
+    <ProvideVarBinding var_={program.stateVar} value={(upOutputs[highlightedIndex]) || undefined}>
       {viewComponent}
-    </ProvideVar>
+    </ProvideVarBinding>
   </>
 });
-registerTool<WorldConfig>(WorldTool, 'world', () => {
-  const stateVar = newVarConfig('state');
+registerTool<WorldProgram>(WorldTool, 'world', () => {
+  const stateVar = newVar('state');
   return {
     toolName: 'world',
     iterationsCount: 20,
-    initConfig: codeConfigSetTo('{}'),
+    initProgram: codeProgramSetTo('{}'),
     stateVar,
-    updateConfig: codeConfigSetTo(stateVar.id),
-    viewConfig: codeConfigSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+    upProgram: codeProgramSetTo(stateVar.id),
+    viewProgram: codeProgramSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
   };
 });

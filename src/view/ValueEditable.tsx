@@ -1,6 +1,5 @@
-import { createContext, memo, useCallback, useContext, MouseEvent } from "react";
+import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
 import { at, atIndex, Updater } from "src/util/state";
-import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
 import { pathString, SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
 

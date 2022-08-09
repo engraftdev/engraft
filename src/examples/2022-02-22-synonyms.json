@@ -1,15 +1,15 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDcopper241184",
           "label": "word"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "IDreport359691.get",
@@ -20,25 +20,25 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDpyroraptor110749",
           "label": "response"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "request",
-            "urlConfig": {
+            "urlProgram": {
               "toolName": "code",
               "modeName": "tool",
-              "subConfig": {
+              "subProgram": {
                 "toolName": "text",
                 "text": "http://words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/IDcopper241184/json",
                 "subTools": {}
               }
             },
-            "paramsConfig": {
+            "paramsProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "",
@@ -52,16 +52,16 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDbracket986524",
           "label": "per POS"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "map",
-            "inputConfig": {
+            "inputProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDpyroraptor110749",
@@ -71,7 +71,7 @@
               "id": "IDrainbow180100",
               "label": "item"
             },
-            "perItemConfig": {
+            "perItemProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDrainbow180100[1].syn",
@@ -84,11 +84,11 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDlist469273",
           "label": "all POS"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "IDbracket986524.flat()",
@@ -99,14 +99,14 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDreport359691",
           "label": "word state"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "state",
             "stateValue": "fun"
           }
@@ -114,11 +114,11 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDeye594052",
           "label": ""
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "<div>\n <h2>Synonyms of {IDreport359691.get}</h2>\n {IDlist469273.map(pos =>\n <div>\n <button onClick={() => IDreport359691.set(pos)}>\n {pos}\n </button>\n </div>)}\n</div>",

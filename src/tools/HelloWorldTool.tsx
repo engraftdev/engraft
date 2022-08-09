@@ -1,11 +1,11 @@
 import { memo, useEffect } from "react";
-import { registerTool, ToolConfig, ToolProps } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps } from "src/tools-framework/tools";
 
-export interface HelloWorldConfig extends ToolConfig {
+export interface HelloWorldProgram extends ToolProgram {
   toolName: 'hello-world';
 }
 
-export const HelloWorldTool = memo(function HelloWorldTool(props: ToolProps<HelloWorldConfig>) {
+export const HelloWorldTool = memo(function HelloWorldTool(props: ToolProps<HelloWorldProgram>) {
   useEffect(() => {
     props.reportOutput({toolValue: "Hello world!"});
     props.reportView(() => <h1>Hello world!</h1>)
@@ -14,6 +14,6 @@ export const HelloWorldTool = memo(function HelloWorldTool(props: ToolProps<Hell
   return <></>;
 });
 
-registerTool<HelloWorldConfig>(HelloWorldTool, 'hello-world', () => ({
+registerTool<HelloWorldProgram>(HelloWorldTool, 'hello-world', () => ({
   toolName: 'hello-world',
 }));

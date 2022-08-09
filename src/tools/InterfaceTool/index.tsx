@@ -1,5 +1,5 @@
 import { CSSProperties, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
@@ -7,26 +7,26 @@ import { getById, findNested, newId, updateById, findAllNested } from "src/util/
 import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
-import { codeConfigSetTo } from "../CodeTool";
+import { codeProgramSetTo } from "../CodeTool";
 import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
 import update from 'immutability-helper';
 
 import builtinStyles from './builtin.css';
 
-export interface InterfaceConfig extends ToolConfig {
+export interface InterfaceProgram extends ToolProgram {
   toolName: 'interface';
-  inputConfig: ToolConfig;
+  inputProgram: ToolProgram;
   rootElement: InterfaceElement;
 }
 
-export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<InterfaceConfig>) {
-  const { config, updateConfig, reportOutput, reportView } = props;
+export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<InterfaceProgram>) {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const [controlValues, updateControlValues] = useStateUpdateOnly<ControlValues>({});
 
-  const [rootElement, updateRootElement] = useAt(config, updateConfig, 'rootElement');
+  const [rootElement, _updateRootElement] = useAt(program, updateProgram, 'rootElement');
 
   const rootNodeWithoutGhosts = useMemo(() => {
     try {
@@ -75,7 +75,7 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
     if (!inputOutput) return null;
 
     try {
-      const renderedNode = renderElementToNode(config.rootElement, inputOutput.toolValue, '', false);
+      const renderedNode = renderElementToNode(program.rootElement, inputOutput.toolValue, '', false);
       const view = (
         <InterfaceContext.Provider value={{ controlValues, updateControlValues, editMode: false }} >
           <style>{builtinStyles}</style>
@@ -94,7 +94,7 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
       console.warn('error generating output', e);
       return null;
     }
-  }, [config.rootElement, controlValues, inputOutput, updateControlValues])
+  }, [program.rootElement, controlValues, inputOutput, updateControlValues])
   useOutput(reportOutput, output)
 
   const view: ToolView = useCallback((viewProps) => (
@@ -112,10 +112,10 @@ export const InterfaceTool = memo(function InterfaceTool(props: ToolProps<Interf
     {inputComponent}
   </>
 });
-registerTool<InterfaceConfig>(InterfaceTool, 'interface', (defaultInput) => {
+registerTool<InterfaceProgram>(InterfaceTool, 'interface', (defaultInput) => {
   return {
     toolName: 'interface',
-    inputConfig: codeConfigSetTo(defaultInput || ''),
+    inputProgram: codeProgramSetTo(defaultInput || ''),
     rootElement: {
       id: 'root',
       type: 'element',
@@ -164,7 +164,7 @@ function matchShape(data: any, shape: any): any {
   return data;
 }
 
-interface InterfaceToolViewProps extends ToolProps<InterfaceConfig>, ToolViewProps {
+interface InterfaceToolViewProps extends ToolProps<InterfaceProgram>, ToolViewProps {
   inputView: ToolView | null;
   inputOutput: ToolValue | null;
   rootNodeWithGhosts: InterfaceNode | null;
@@ -174,11 +174,11 @@ interface InterfaceToolViewProps extends ToolProps<InterfaceConfig>, ToolViewPro
 }
 
 const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolViewProps) {
-  const { config, updateConfig, autoFocus, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues } = props;
+  const { program, updateProgram, autoFocus, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues } = props;
 
   const [ selectedNodeId, setSelectedNodeId ] = useState<string | null>(null);
 
-  const [ rootElement, updateRootElement ] = useAt(config, updateConfig, 'rootElement');
+  const [ rootElement, updateRootElement ] = useAt(program, updateProgram, 'rootElement');
 
   return (
     <div className="xCol xGap10 xPad10">
@@ -347,7 +347,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     );
   }, [element.id, updateRootElement]);
 
-  const [styleConfig, updateStyleConfig] = useStateUpdateOnly(codeConfigSetTo(JSON.stringify(element.style)));
+  const [styleProgram, updateStyleProgram] = useStateUpdateOnly(codeProgramSetTo(JSON.stringify(element.style)));
   const [styleOutput, setStyleOutput] = useStateSetOnly<ToolValue | null>(null)
 
   useEffect(() => {
@@ -379,7 +379,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
       </select>
     </div>
     <b>style</b>
-    <ToolWithView config={styleConfig} updateConfig={updateStyleConfig} reportOutput={setStyleOutput}/>
+    <ToolWithView program={styleProgram} updateProgram={updateStyleProgram} reportOutput={setStyleOutput}/>
     <b>classes</b>
     <input value={element.className} onChange={onChangeClasses}/>
   </>;

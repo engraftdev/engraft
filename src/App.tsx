@@ -1,10 +1,10 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import appCss from './App.css';
 import { examples } from './examples/examples';
-import { EnvContext, ToolConfig, ToolValue, VarInfo } from './tools-framework/tools';
+import { EnvContext, ToolProgram, ToolValue, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 import './tools/builtInTools';
-import { CodeConfig, codeConfigSetTo } from './tools/CodeTool';
+import { CodeProgram, codeProgramSetTo } from './tools/CodeTool';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ValueOfTool } from './view/Value';
@@ -17,41 +17,41 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultConfig: CodeConfig = codeConfigSetTo('');
+const defaultProgram: CodeProgram = codeProgramSetTo('');
 
-function varInfoObject(varInfos: VarInfo[]) {
-  return Object.fromEntries(varInfos.map((varInfo) => [varInfo.config.id, varInfo]));
+function varInfoObject(varInfos: VarBinding[]) {
+  return Object.fromEntries(varInfos.map((varInfo) => [varInfo.var_.id, varInfo]));
 }
 
 const App = memo(function App() {
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
-  const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(defaultConfig);
-  const [configIsFromLocalStorage, setIsConfigFromLocalStorage] = useState(false);
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);
+  const [programIsFromLocalStorage, setIsProgramFromLocalStorage] = useState(false);
 
   const context = useMemo(() => varInfoObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {config: {id: 'IDarray000000', label: 'array'}, value: {toolValue: [1, 2, 3]}},
-    {config: {id: 'IDrange000000', label: 'range'}, value: {toolValue: range}},
+    {var_: {id: 'IDarray000000', label: 'array'}, value: {toolValue: [1, 2, 3]}},
+    {var_: {id: 'IDrange000000', label: 'range'}, value: {toolValue: range}},
   ]), []);
 
   useEffect(() => {
-    const configJson = window.localStorage.getItem(localStorageKey)
-    if (configJson) {
-      updateConfig(() => JSON.parse(configJson));
-      setIsConfigFromLocalStorage(true);
+    const programJson = window.localStorage.getItem(localStorageKey)
+    if (programJson) {
+      updateProgram(() => JSON.parse(programJson));
+      setIsProgramFromLocalStorage(true);
     }
-  }, [updateConfig])
+  }, [updateProgram])
 
   useEffect(() => {
     try {
-      if (config !== defaultConfig) {
-        window.localStorage.setItem(localStorageKey, JSON.stringify(config));
+      if (program !== defaultProgram) {
+        window.localStorage.setItem(localStorageKey, JSON.stringify(program));
       }
     } catch (e) {
       console.warn("error saving to local storage", e);
     }
-  }, [config])
+  }, [program])
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
@@ -64,7 +64,7 @@ const App = memo(function App() {
     </style>
     <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
       <EnvContext.Provider value={context}>
-        <ToolWithView key={`${configIsFromLocalStorage}`} config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+        <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <br/>
@@ -79,7 +79,7 @@ const App = memo(function App() {
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
         try {
-          await navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+          await navigator.clipboard.writeText(JSON.stringify(program, null, 2));
           setCopyPasteMessage('Copied successfully');
         } catch (e) {
           setCopyPasteMessage('Copy unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));
@@ -89,7 +89,7 @@ const App = memo(function App() {
       <button className="button-add" onClick={async () => {
         try {
           const text = await navigator.clipboard.readText();
-          updateConfig(() => JSON.parse(text));
+          updateProgram(() => JSON.parse(text));
           setCopyPasteMessage('Pasted successfully');
         } catch (e) {
           setCopyPasteMessage('Paste unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));
@@ -100,14 +100,14 @@ const App = memo(function App() {
     </div>
     <br/>
     <div>
-      <button onClick={() => updateConfig(() => defaultConfig)}>Reset</button>
+      <button onClick={() => updateProgram(() => defaultProgram)}>Reset</button>
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateConfig(() => examples.find((ex) => ex.name === ev.target.value)!.config);
+          updateProgram(() => examples.find((ex) => ex.name === ev.target.value)!.program);
         }}>
         <option value='none' disabled={true}>Load example...</option>
-        {examples.map(({name, config}) =>
+        {examples.map(({name, program}) =>
           <option key={name} value={name}>{name}</option>
         )}
       </select>

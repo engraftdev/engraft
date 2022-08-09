@@ -1,5 +1,4 @@
 import { useLayoutEffect, useState } from "react";
-import { hookToComponent } from "./Use";
 
 export default function useSize(): [(elem: HTMLElement | null) => void, DOMRectReadOnly | undefined] {
   const [domRect, setDomRect] = useState<DOMRectReadOnly | undefined>(undefined);

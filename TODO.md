@@ -15,3 +15,4 @@
 [ ] get rid of "Output below input"
 [ ] (optional) capping height of output? using shadowbox?
 [ ] MDX as a nice way to stick react nodes into markdown
+[ ] autofocus doesn't really work; rethink it

@@ -1,18 +1,18 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolValue, ToolView } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import ControlledTextInput from "src/util/ControlledTextInput";
 import { useAt } from "src/util/state";
 
-export interface ImportConfig extends ToolConfig {
+export interface ImportProgram extends ToolProgram {
   toolName: 'import';
   name: string;
 }
 
-export const ImportTool = memo(function ImportTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ImportConfig>) {
+export const ImportTool = memo(function ImportTool({ program, updateProgram, reportOutput, reportView }: ToolProps<ImportProgram>) {
   const [result, setResult] = useState<ToolValue | null>(null);
 
-  const [name, updateName] = useAt(config, updateConfig, 'name');
+  const [name, updateName] = useAt(program, updateProgram, 'name');
 
   // TODO: all sorts of caching, error detection, etc
   // package search

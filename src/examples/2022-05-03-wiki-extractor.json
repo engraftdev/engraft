@@ -1,29 +1,29 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDhole279857",
           "label": "response"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "request",
-            "urlConfig": {
+            "urlProgram": {
               "toolName": "code",
               "modeName": "tool",
-              "subConfig": {
+              "subProgram": {
                 "toolName": "text",
                 "text": "https://en.wikipedia.org/w/api.php",
                 "subTools": {}
               }
             },
-            "paramsConfig": {
+            "paramsProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "{\n origin: '*',\n format: 'json',\n action: 'query',\n generator: 'random',\n grnnamespace: 0,\n prop: 'pageimages|extracts',\n exintro: true,\n rvprop: 'content',\n grnlimit: 5\n}",
@@ -35,16 +35,16 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDslicer681048",
           "label": "pages"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "extractor",
-            "inputConfig": {
+            "inputProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDhole279857",
@@ -83,16 +83,16 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDgrape419949",
           "label": "markdown pieces"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "map",
-            "inputConfig": {
+            "inputProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDslicer681048",
@@ -102,15 +102,15 @@
               "id": "IDjet873332",
               "label": "item"
             },
-            "perItemConfig": {
+            "perItemProgram": {
               "toolName": "code",
               "modeName": "tool",
-              "subConfig": {
+              "subProgram": {
                 "toolName": "markdown",
-                "sourceConfig": {
+                "sourceProgram": {
                   "toolName": "code",
                   "modeName": "tool",
-                  "subConfig": {
+                  "subProgram": {
                     "toolName": "text",
                     "text": "# IDpainter564219\n\nIDtalos285013",
                     "subTools": {
@@ -144,16 +144,16 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDstallion401711",
           "label": ""
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "markdown",
-            "sourceConfig": {
+            "sourceProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDgrape419949.join('\\n\\n')",

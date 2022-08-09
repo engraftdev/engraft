@@ -1,22 +1,22 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import ChalkEditor from "src/util/ChalkEditor";
 import { compileExpression } from "src/util/compile";
 import { useAt } from "src/util/state";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
 // TODO: Hacky headless reportOutput.
 
-export interface ChalkConfig {
+export interface ChalkProgram {
   toolName: 'chalk';
-  inputConfig: ToolConfig;
+  inputProgram: ToolProgram;
   code: string;
 }
-export const ChalkTool = memo(function ChalkTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ChalkConfig>) {
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+export const ChalkTool = memo(function ChalkTool({ program, updateProgram, reportOutput, reportView }: ToolProps<ChalkProgram>) {
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
-  const [code, updateCode] = useAt(config, updateConfig, 'code');
+  const [code, updateCode] = useAt(program, updateProgram, 'code');
 
   const output = useMemo(() => {
     try {
@@ -57,6 +57,6 @@ const defaultCode = `function (x) {
 }`
 registerTool(ChalkTool, 'chalk', {
   toolName: 'chalk',
-  inputConfig: codeConfigSetTo(''),
+  inputProgram: codeProgramSetTo(''),
   code: defaultCode
 });

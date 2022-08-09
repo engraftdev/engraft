@@ -1,32 +1,32 @@
 import { memo, useCallback, useEffect } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolView, VarConfig } from "src/tools-framework/tools";
+import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolView, Var } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { VarDefinition } from "src/view/Vars";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
-export interface LetConfig extends ToolConfig {
+export interface LetProgram extends ToolProgram {
   toolName: 'let';
-  bindingVar: VarConfig;
-  bindingConfig: ToolConfig;
-  bodyConfig: ToolConfig;
+  bindingVar: Var;
+  bindingProgram: ToolProgram;
+  bodyProgram: ToolProgram;
 }
 
-export const LetTool = memo(function LetTool({ config, updateConfig, reportOutput, reportView }: ToolProps<LetConfig>) {
-  const [bindingComponent, bindingView, bindingOutput] = useSubTool({config, updateConfig, subKey: 'bindingConfig'});
-  const [bodyComponent, bodyView, bodyOutput] = useSubTool({config, updateConfig, subKey: 'bodyConfig'});
+export const LetTool = memo(function LetTool({ program, updateProgram, reportOutput, reportView }: ToolProps<LetProgram>) {
+  const [bindingComponent, bindingView, bindingOutput] = useSubTool({program, updateProgram, subKey: 'bindingProgram'});
+  const [bodyComponent, bodyView, bodyOutput] = useSubTool({program, updateProgram, subKey: 'bodyProgram'});
 
   useEffect(() => {
     reportOutput(bodyOutput);
   }, [bodyOutput, reportOutput])
 
-  const [bindingVar, updateBindingVar] = useAt(config, updateConfig, 'bindingVar');
+  const [bindingVar, updateBindingVar] = useAt(program, updateProgram, 'bindingVar');
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <div className="xCol xGap10 xPad10">
       <div className="xRow xGap10">
         <b>let</b>
-        {<VarDefinition varConfig={bindingVar} updateVarConfig={updateBindingVar} autoFocus={autoFocus}/>}
+        {<VarDefinition var_={bindingVar} updateVar={updateBindingVar} autoFocus={autoFocus}/>}
       </div>
 
       <div className="xRow xGap10">
@@ -44,17 +44,17 @@ export const LetTool = memo(function LetTool({ config, updateConfig, reportOutpu
 
   return <>
     {bindingComponent}
-    {config.bindingVar ?
-      <ProvideVar config={config.bindingVar} value={bindingOutput || undefined}>
+    {program.bindingVar ?
+      <ProvideVarBinding var_={program.bindingVar} value={bindingOutput || undefined}>
         {bodyComponent}
-      </ProvideVar> :
+      </ProvideVarBinding> :
       bodyComponent
     }
   </>
 });
-registerTool<LetConfig>(LetTool, 'let', () => ({
+registerTool<LetProgram>(LetTool, 'let', () => ({
   toolName: 'let',
-  bindingVar: newVarConfig(),
-  bindingConfig: codeConfigSetTo(''),
-  bodyConfig: codeConfigSetTo(''),
+  bindingVar: newVar(),
+  bindingProgram: codeProgramSetTo(''),
+  bodyProgram: codeProgramSetTo(''),
 }));

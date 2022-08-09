@@ -13,7 +13,7 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
 import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
 import { memo, useCallback } from "react";
-import { PossibleVarInfos, Tool, ToolConfig, toolIndex, ToolValue, ToolView, VarInfos } from "src/tools-framework/tools";
+import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolProgram, ToolValue, ToolView, VarBindings } from "src/tools-framework/tools";
 import { updateKeys, Updater, useAt } from "src/util/state";
 import { refCode } from "./refsExtension";
 
@@ -57,7 +57,7 @@ export function toolCompletions(insertTool: (tool: Tool<any>) => string, replace
     return {
       from: word.from,
       options: [
-        ...Object.entries(toolIndex).map(([toolName, tool]) => ({
+        ...Object.entries(getFullToolIndex()).map(([toolName, tool]) => ({
           label: '/' + toolName,
           apply: (view: EditorView, completion: Completion, from: number, to: number) => {
             if (replaceWithTool && from === 0 && to === view.state.doc.length) {
@@ -79,7 +79,7 @@ export function toolCompletions(insertTool: (tool: Tool<any>) => string, replace
   }
 }
 
-export function refCompletions(envGetter?: () => VarInfos | undefined, possibleEnvGetter?: () => PossibleVarInfos | undefined): CompletionSource {
+export function refCompletions(envGetter?: () => VarBindings | undefined, possibleEnvGetter?: () => PossibleVarBindings | undefined): CompletionSource {
   return (completionContext: CompletionContext) => {
     const env = envGetter ? envGetter() || {} : {};
     const possibleEnv = possibleEnvGetter ? possibleEnvGetter() || {} : {};
@@ -92,13 +92,13 @@ export function refCompletions(envGetter?: () => VarInfos | undefined, possibleE
       from: word.from,
       options: [
         ...Object.values(env).map((varInfo) => ({
-          label: '@' + varInfo.config.label,
-          apply: refCode(varInfo.config.id),
+          label: '@' + varInfo.var_.label,
+          apply: refCode(varInfo.var_.id),
         })),
         ...Object.values(possibleEnv).map((possibleVarInfo) => ({
-          label: '@' + possibleVarInfo.config.label + '?',  // TODO: better signal that it's 'possible'
+          label: '@' + possibleVarInfo.var_.label + '?',  // TODO: better signal that it's 'possible'
           apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            let apply = refCode(possibleVarInfo.config.id);
+            let apply = refCode(possibleVarInfo.var_.id);
             possibleVarInfo.request();
             view.dispatch({
               changes: {from, to, insert: apply},
@@ -115,22 +115,23 @@ export function refCompletions(envGetter?: () => VarInfos | undefined, possibleE
 
 export interface SubToolProps {
   id: string,
-  subToolConfigs: {[id: string]: ToolConfig},
-  updateSubToolConfigs: Updater<{[id: string]: ToolConfig}>,
+  subToolPrograms: {[id: string]: ToolProgram},
+  updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>,
   updateOutputs: Updater<{[id: string]: ToolValue | null}>,
   updateViews: Updater<{[id: string]: ToolView | null}>,
 }
 
-export const SubTool = memo(function SubTool({id, subToolConfigs, updateSubToolConfigs, updateOutputs, updateViews}: SubToolProps) {
-  const [config, updateConfig] = useAt(subToolConfigs, updateSubToolConfigs, id);
+// TODO: how is this not a standard function? hmmmmmmm
+export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubToolPrograms, updateOutputs, updateViews}: SubToolProps) {
+  const [program, updateProgram] = useAt(subToolPrograms, updateSubToolPrograms, id);
 
   const reportOutput = useCallback((output: ToolValue | null) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
   const reportView = useCallback((view: ToolView | null) => updateKeys(updateViews, {[id]: view}), [id, updateViews]);
 
-  const Tool = toolIndex[config.toolName]
+  const Tool = lookUpTool(program.toolName);
   return <Tool
-    config={config}
-    updateConfig={updateConfig}
+    program={program}
+    updateProgram={updateProgram}
     reportOutput={reportOutput}
     reportView={reportView}
   />;

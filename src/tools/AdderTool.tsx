@@ -1,49 +1,48 @@
 import { memo, useCallback, useMemo } from "react";
-import { newVarConfig, registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
-export interface AdderConfig extends ToolConfig {
+export interface AdderProgram extends ToolProgram {
   toolName: 'adder';
-  aConfig: ToolConfig;
-  bConfig: ToolConfig;
+  xProgram: ToolProgram;
+  yProgram: ToolProgram;
 }
 
-export const AdderTool = memo(function AdderTool({ config, updateConfig, reportOutput, reportView }: ToolProps<AdderConfig>) {
-  const [aComponent, aView, aOutput] = useSubTool({config, updateConfig, subKey: 'aConfig'});
-  const [bComponent, bView, bOutput] = useSubTool({config, updateConfig, subKey: 'bConfig'});
+export const AdderTool = memo(function AdderTool({ program, updateProgram, reportOutput, reportView }: ToolProps<AdderProgram>) {
+  const [xComponent, xView, xOutput] = useSubTool({program, updateProgram, subKey: 'xProgram'});
+  const [yComponent, yView, yOutput] = useSubTool({program, updateProgram, subKey: 'yProgram'});
 
   const output = useMemo(() => {
-    if (aOutput && bOutput) {
-      return {toolValue: (aOutput.toolValue as any) + (bOutput.toolValue as any)};
+    if (xOutput && yOutput) {
+      return {toolValue: (xOutput.toolValue as any) + (yOutput.toolValue as any)};
     }
-  }, [aOutput, bOutput])
+  }, [xOutput, yOutput])
   useOutput(reportOutput, output);
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <div className="xCol xGap10 xPad10">
       <div className="xRow xGap10">
-        <b>a</b>
-        <ShowView view={aView} autoFocus={autoFocus} />
+        <b>x</b>
+        <ShowView view={xView} autoFocus={autoFocus} />
       </div>
 
       <div className="xRow xGap10">
-        <b>b</b>
-        <ShowView view={bView} />
+        <b>y</b>
+        <ShowView view={yView} />
       </div>
     </div>
-  ), [aView, bView]);
+  ), [xView, yView]);
   useView(reportView, view);
 
   return <>
-    {aComponent}
-    {bComponent}
+    {xComponent}
+    {yComponent}
   </>
 });
 
-registerTool<AdderConfig>(AdderTool, 'adder', () => ({
+registerTool<AdderProgram>(AdderTool, 'adder', () => ({
   toolName: 'adder',
-  bindingVar: newVarConfig(),
-  aConfig: codeConfigSetTo(''),
-  bConfig: codeConfigSetTo(''),
+  xProgram: codeProgramSetTo(''),
+  yProgram: codeProgramSetTo(''),
 }));

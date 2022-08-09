@@ -1,5 +1,5 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { EnvContext, newVarConfig, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "src/tools-framework/tools";
+import { EnvContext, newVar, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
@@ -7,17 +7,17 @@ import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { ValueFrame, ValueOfTool } from "src/view/Value";
-import { CodeConfig, codeConfigSetTo, summarizeCodeConfig } from "./CodeTool";
+import { CodeProgram, codeProgramSetTo, summarizeCodeProgram } from "./CodeTool";
 
-export interface ChainConfig {
+export interface ChainProgram {
   toolName: 'chain';
-  prevVar: VarConfig;
+  prevVar: Var;
   links: Link[];  // invariant: at least one link plz
 }
 
 interface Link {
   id: string,
-  config: ToolConfig,
+  program: ToolProgram,
   blocksWide: number,
   blocksHigh: number,
 }
@@ -26,10 +26,10 @@ const BLOCK_WIDTH = 50;
 const BLOCK_HEIGHT = 50;
 
 
-export const ChainTool = memo(function ChainTool(props: ToolProps<ChainConfig>) {
-  const { config, updateConfig, reportOutput, reportView } = props;
+export const ChainTool = memo(function ChainTool(props: ToolProps<ChainProgram>) {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [links, updateLinks] = useAt(config, updateConfig, 'links');
+  const [links, updateLinks] = useAt(program, updateProgram, 'links');
 
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -61,20 +61,20 @@ export const ChainTool = memo(function ChainTool(props: ToolProps<ChainConfig>) 
         outputs={outputs}
         updateOutputs={updateOutputs}
         updateViews={updateViews}
-        prevVar={config.prevVar}
+        prevVar={program.prevVar}
       />
     )}
   </>;
 });
-registerTool<ChainConfig>(ChainTool, 'chain', (defaultInput) => {
-  const prevVar = newVarConfig('prev');
+registerTool<ChainProgram>(ChainTool, 'chain', (defaultInput) => {
+  const prevVar = newVar('prev');
   return {
     toolName: 'chain',
     prevVar,
     links: [
       {
         id: newId(),
-        config: codeConfigSetTo(defaultInput || ''),
+        program: codeProgramSetTo(defaultInput || ''),
         blocksWide: 2,
         blocksHigh: 1,
       },
@@ -93,7 +93,7 @@ interface CellModelProps {
 
   updateViews: Updater<{[id: string]: ToolView | null}>;
 
-  prevVar: VarConfig;
+  prevVar: Var;
 }
 
 const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, updateOutputs, updateViews, prevVar}: CellModelProps) {
@@ -106,8 +106,8 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }, [id, links]);
 
   const [link, updateLink] = useAtIndex(links, updateLinks, i);
-  const [config, updateConfig] = useAt(link, updateLink, 'config');
-  const [component, view, output] = useTool({config, updateConfig})
+  const [program, updateProgram] = useAt(link, updateLink, 'program');
+  const [component, view, output] = useTool({program, updateProgram})
 
   useEffect(() => {
     updateViews(updateF({[id]: {$set: view}}));
@@ -127,11 +127,11 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }, [i, links, outputs])
   const prevVarContext = useMemo(() => {
     if (prevVal) {
-      const prevVarInfo = {
-        config: prevVar,
+      const prevVarBinding: VarBinding = {
+        var_: prevVar,
         value: prevVal,
       };
-      return {[prevVar.id]: prevVarInfo};
+      return {[prevVar.id]: prevVarBinding};
     } else {
       return undefined;
     }
@@ -146,13 +146,13 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }
 });
 
-interface ChainViewProps extends ToolProps<ChainConfig>, ToolViewProps {
+interface ChainViewProps extends ToolProps<ChainProgram>, ToolViewProps {
   outputs: {[id: string]: ToolValue | null};
   views: {[id: string]: ToolView | null}
 }
 
 const ChainView = memo(function ChainView(props: ChainViewProps) {
-  const {config, views} = props;
+  const {program, views} = props;
 
   const [selectedLinkId, setSelectedLinkId] = useState<string | undefined>(undefined);
   // TODO: come up with a better autofocus mechanism which lets us set selectedLinkId when the chain
@@ -166,7 +166,7 @@ const ChainView = memo(function ChainView(props: ChainViewProps) {
           overflowX: 'auto'
         }}
       >
-        {config.links.map((link, i) =>
+        {program.links.map((link, i) =>
           <LinkView
             {...props}
             key={link.id}
@@ -192,8 +192,8 @@ interface LinkProps extends ChainViewProps {
   setSelectedLinkId: Dispatch<SetStateAction<string | undefined>>;
 }
 
-const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLinkId, setSelectedLinkId}: LinkProps) {
-  const [links, updateLinks] = useAt(config, updateConfig, 'links');
+const LinkView = memo(function ({program, updateProgram, outputs, id, selectedLinkId, setSelectedLinkId}: LinkProps) {
+  const [links, updateLinks] = useAt(program, updateProgram, 'links');
   const linkIndex = links.findIndex((link) => link.id === id);
   const [link, updateLink] = useAtIndex(links, updateLinks, linkIndex);
 
@@ -207,7 +207,7 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
       let newLinks = oldLinks.slice();
       const newLink: Link = {
         id: newId(),
-        config: codeConfigSetTo(config.prevVar.id),
+        program: codeProgramSetTo(program.prevVar.id),
         blocksWide: link.blocksWide || 2,
         blocksHigh: link.blocksHigh || 1,
       };
@@ -219,7 +219,7 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
       return newLinks;
     });
     ev.stopPropagation();
-  }, [config.prevVar.id, link.blocksHigh, link.blocksWide, linkIndex, setSelectedLinkId, updateLinks]);
+  }, [program.prevVar.id, link.blocksHigh, link.blocksWide, linkIndex, setSelectedLinkId, updateLinks]);
 
   const onClickDelete = useCallback((ev: ReactMouseEvent) => {
     updateLinks((oldLinks) => {
@@ -275,7 +275,7 @@ const LinkView = memo(function ({config, updateConfig, outputs, id, selectedLink
         }}
       >
         <div className="xEllipsis" style={{marginLeft: 2}}>
-          {summarizeCodeConfig(link.config as CodeConfig)}
+          {summarizeCodeProgram(link.program as CodeProgram)}
         </div>
         <div className="xExpand" style={{minWidth: 6}}></div>
         { (isHovered && links.length > 1) &&

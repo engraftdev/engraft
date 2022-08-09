@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVarConfig, PossibleEnvContext, PossibleVarInfo, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, VarConfig, VarInfo } from "src/tools-framework/tools";
+import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
@@ -9,19 +9,19 @@ import { useDedupe, objEqWith, refEq } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { ValueOfTool } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
 
-export interface NotebookConfig extends ToolConfig {
+export interface NotebookProgram extends ToolProgram {
   toolName: 'notebook';
   cells: Cell[];
-  prevVar: VarConfig;
+  prevVar: Var;
   outputBelowInput?: boolean;
 }
 
 interface Cell {
-  var: VarConfig;  // empty label if unlabelled, natch
-  config: ToolConfig;
+  var_: Var;  // empty label if unlabelled, natch
+  program: ToolProgram;
   upstreamIds: {[id: string]: true};
   // pinning?
   // output?
@@ -29,15 +29,15 @@ interface Cell {
 
 const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
-export const NotebookTool = memo(function NotebookTool({ config, updateConfig, reportOutput, reportView }: ToolProps<NotebookConfig>) {
+export const NotebookTool = memo(function NotebookTool({ program, updateProgram, reportOutput, reportView }: ToolProps<NotebookProgram>) {
   // TODO: migration; not great
   useEffect(() => {
-    if (!config.prevVar) {
-      updateKeys(updateConfig, { prevVar: newVarConfig('prev') });
+    if (!program.prevVar) {
+      updateKeys(updateProgram, { prevVar: newVar('prev') });
     }
-  }, [config.prevVar, updateConfig])
+  }, [program.prevVar, updateProgram])
 
-  const [cells, updateCells] = useAt(config, updateConfig, 'cells');
+  const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
@@ -52,10 +52,10 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
   }, [updateOutputs])
 
   const smallestUnusedLabel = defaultCellLabels.find((label) =>
-    !cells.find((cell) => cell.var.label === label)
+    !cells.find((cell) => cell.var_.label === label)
   )!
 
-  const [outputBelowInput, updateOutputBelowInput] = useAt(config, updateConfig, 'outputBelowInput');
+  const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
   const onChangeOutputBelowInput = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
     updateOutputBelowInput(() => ev.target.checked);
   }, [updateOutputBelowInput]);
@@ -78,8 +78,8 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
           display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
         }}>
         {cells.map((cell, i) =>
-          <Fragment key={cell.var.id}>
-            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
+          <Fragment key={cell.var_.id}>
+            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
             <CellView cell={cell}
               // TODO: memoize these?
               updateCell={atIndex(updateCells, i)}
@@ -88,15 +88,15 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
                 newCells.splice(i, 1);
                 updateCells(() => newCells);
               }}
-              toolOutput={outputs[cell.var.id]} toolView={views[cell.var.id]}
+              toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
               outputBelowInput={outputBelowInput || false}
             />
           </Fragment>
         )}
-        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={config.prevVar}/>
+        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
       </div>
     </div>
-  ), [cells, config.prevVar, onChangeOutputBelowInput, outputBelowInput, outputs, smallestUnusedLabel, updateCells, views])
+  ), [cells, program.prevVar, onChangeOutputBelowInput, outputBelowInput, outputs, smallestUnusedLabel, updateCells, views])
   useView(reportView, view);
 
   const output = useMemo(() => {
@@ -105,7 +105,7 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
       return null;
     }
 
-    return outputs[lastCell.var.id];
+    return outputs[lastCell.var_.id];
   }, [cells, outputs])
   useOutput(reportOutput, output);
 
@@ -115,23 +115,23 @@ export const NotebookTool = memo(function NotebookTool({ config, updateConfig, r
 
   return <>{cells.map((cell) =>
     <CellModel
-      key={cell.var.id}
-      id={cell.var.id}
+      key={cell.var_.id}
+      id={cell.var_.id}
       cells={cells}
       updateCells={updateCells}
       outputs={outputs}
       reportView={reportCellView}
       reportOutput={reportCellOutput}
-      prevVar={config.prevVar}
+      prevVar={program.prevVar}
     />
   )}</>;
 })
-registerTool<NotebookConfig>(NotebookTool, 'notebook', (defaultInput) => ({
+registerTool<NotebookProgram>(NotebookTool, 'notebook', (defaultInput) => ({
   toolName: 'notebook',
   cells: [
-    { var: newVarConfig(defaultCellLabels[0]), config: codeConfigSetTo(defaultInput || ''), upstreamIds: {} }
+    { var_: newVar(defaultCellLabels[0]), program: codeProgramSetTo(defaultInput || ''), upstreamIds: {} }
   ],
-  prevVar: newVarConfig('prev')
+  prevVar: newVar('prev')
 }));
 
 
@@ -139,7 +139,7 @@ interface RowDividerProps {
   i: number;
   updateCells: Updater<Cell[]>;
   smallestUnusedLabel: string;
-  prevVar: VarConfig;
+  prevVar: Var;
 }
 
 const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel, prevVar}: RowDividerProps) {
@@ -149,8 +149,8 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
-        var: newVarConfig(smallestUnusedLabel),
-        config: codeConfigSetTo(i === 0 ? '' : prevVar.id),
+        var_: newVar(smallestUnusedLabel),
+        program: codeProgramSetTo(i === 0 ? '' : prevVar.id),
         upstreamIds: {},
       });
       return newCells;
@@ -191,12 +191,12 @@ interface CellModelProps {
   reportView: (id: string, view: ToolView | null) => void;
   reportOutput: (id: string, value: ToolValue | null) => void;
 
-  prevVar: VarConfig;
+  prevVar: Var;
 }
 
 const CellModel = memo(function CellModel({id, cells, updateCells, outputs, reportView, reportOutput, prevVar}: CellModelProps) {
   const i = useMemo(() => {
-    const i = cells.findIndex((cell) => cell.var.id === id);
+    const i = cells.findIndex((cell) => cell.var_.id === id);
     if (i === -1) {
       throw new Error("internal error: cell not found");
     }
@@ -204,9 +204,9 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cells, id]);
 
   const [cell, updateCell] = useAtIndex(cells, updateCells, i);
-  const [config, updateConfig] = useAt(cell, updateCell, 'config');
+  const [program, updateProgram] = useAt(cell, updateCell, 'program');
 
-  const [component, view, output] = useTool({ config, updateConfig })
+  const [component, view, output] = useTool({ program, updateProgram })
 
   useEffect(() => reportView(id, view), [id, reportView, view]);
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
@@ -214,45 +214,45 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   const prevVal: ToolValue | null | undefined = useMemo(() => {
     const prevCell: Cell | undefined = cells[i - 1];
     if (prevCell) {
-      return outputs[prevCell.var.id];
+      return outputs[prevCell.var_.id];
     }
   }, [cells, i, outputs])
   const prevVarContext = useMemo(() => {
     if (prevVal) {
-      const prevVarInfo = {
-        config: prevVar,
+      const prevVarBinding = {
+        var_: prevVar,
         value: prevVal,
       };
-      return {[prevVar.id]: prevVarInfo};
+      return {[prevVar.id]: prevVarBinding};
     } else {
       return undefined;
     }
   }, [prevVal, prevVar])
 
-  const newVarInfos = useDedupe(useMemo(() => {
-    let result: {[label: string]: VarInfo} = {...prevVarContext};
+  const newVarBindings = useDedupe(useMemo(() => {
+    let result: {[label: string]: VarBinding} = {...prevVarContext};
     cells.forEach((otherCell) => {
-      if (cell.upstreamIds[otherCell.var.id]) {
-        result[otherCell.var.id] = {config: otherCell.var, value: outputs[otherCell.var.id] || undefined};  // OH NO will this infinity?
+      if (cell.upstreamIds[otherCell.var_.id]) {
+        result[otherCell.var_.id] = {var_: otherCell.var_, value: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
   }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
-  const newPossibleVarInfos = useDedupe(useMemo(() => {
-    let result: {[label: string]: PossibleVarInfo} = {};
+  const newPossibleVarBindings = useDedupe(useMemo(() => {
+    let result: {[label: string]: PossibleVarBinding} = {};
     cells.forEach((otherCell) => {
-      if (otherCell !== cell && otherCell.var.label.length > 0) {
-        result[otherCell.var.id] = {config: otherCell.var, request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCell.var.id]: true})};
+      if (otherCell !== cell && otherCell.var_.label.length > 0) {
+        result[otherCell.var_.id] = {var_: otherCell.var_, request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCell.var_.id]: true})};
       }
     });
     return result;
   }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
 
 
-  return <AddObjToContext context={EnvContext} obj={newVarInfos}>
-    <AddObjToContext context={PossibleEnvContext} obj={newPossibleVarInfos}>
+  return <AddObjToContext context={EnvContext} obj={newVarBindings}>
+    <AddObjToContext context={PossibleEnvContext} obj={newPossibleVarBindings}>
       {component}
     </AddObjToContext>
   </AddObjToContext>;
@@ -274,7 +274,7 @@ interface CellViewProps {
 }
 
 const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell, outputBelowInput}: CellViewProps) {
-  const [varConfig, updateVarConfig] = useAt(cell, updateCell, 'var');
+  const [var_, updateVar] = useAt(cell, updateCell, 'var_');
 
   const alreadyDisplayed = toolOutput?.alreadyDisplayed;
 
@@ -283,7 +283,7 @@ const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput,
       <div className="xRow xGap10 xStickyTop10">
         <div className="xExpand"/>
         <div className="xClickable" style={{zoom: "60%"}} onClick={removeCell}>✖️</div>
-        <VarDefinition varConfig={varConfig} updateVarConfig={updateVarConfig}/>
+        <VarDefinition var_={var_} updateVar={updateVar}/>
         <div className="xLineHeight1">=</div>
       </div>
     </div>

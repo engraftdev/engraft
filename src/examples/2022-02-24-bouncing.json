@@ -1,15 +1,15 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDcollege900260",
           "label": "width"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "100",
@@ -18,11 +18,11 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDtoy988307",
           "label": "height"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "200",
@@ -31,17 +31,17 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDrutabaga632206",
           "label": "cell"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "world",
             "iterationsCount": 50,
-            "initConfig": {
+            "initProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "{\n x: rand() * IDcollege900260,\n y: rand() * IDtoy988307,\n vx: (rand() - 0.5) * 10,\n vy: (rand() - 0.5) * 10,\n}",
@@ -51,18 +51,18 @@
               "id": "IDthroat614100",
               "label": "state"
             },
-            "updateConfig": {
+            "upProgram": {
               "toolName": "code",
               "modeName": "tool",
-              "subConfig": {
+              "subProgram": {
                 "toolName": "notebook",
                 "cells": [
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDcurrency575654",
                       "label": "new pos"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "code",
                       "code": "{\n ...IDthroat614100,\n x: IDthroat614100.x + IDthroat614100.vx,\n y: IDthroat614100.y + IDthroat614100.vy,\n}",
@@ -71,11 +71,11 @@
                     "upstreamIds": {}
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDoccupation997063",
                       "label": "x bounce"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "code",
                       "code": "IDcurrency575654.x < 0 || IDcurrency575654.x > IDcollege900260",
@@ -86,11 +86,11 @@
                     }
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDbase350930",
                       "label": "y bounce"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "code",
                       "code": "IDcurrency575654.y < 0 || IDcurrency575654.y > IDtoy988307",
@@ -101,11 +101,11 @@
                     }
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDquokka636766",
                       "label": "cell"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "code",
                       "code": "{\n ...IDcurrency575654,\n vx: IDoccupation997063 ? -IDcurrency575654.vx : IDcurrency575654.vx,\n vy: IDbase350930 ? -IDcurrency575654.vy : IDcurrency575654.vy,\n}",
@@ -120,7 +120,7 @@
                 ]
               }
             },
-            "viewConfig": {
+            "viewProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"purple\"/>\n</svg>",

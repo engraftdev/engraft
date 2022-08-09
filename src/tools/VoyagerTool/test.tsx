@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import "tools/builtInTools";
 import * as libVoyager from "datavoyager";
-// import { VoyagerConfig as LibVoyagerConfig } from "datavoyager/build/models/config";
 
 import voyagerCss from './tools/VoyagerTool.css';
 

@@ -1,34 +1,31 @@
 import { memo, useRef, useState } from "react";
-import { VarConfig, VarInfo } from "src/tools-framework/tools";
+import { Var, VarBinding } from "src/tools-framework/tools";
 import { ControlledSpan } from "src/util/ControlledTextInput";
 import { updateKeys, Updater } from "src/util/state";
-import rectConnect from 'rect-connect';
 import { ObjectInspector } from "react-inspector";
-
-(window as any).rectConnect = rectConnect;
 
 
 interface VarDefinitionProps {
-  varConfig: VarConfig,
-  updateVarConfig?: Updater<VarConfig>,
+  var_: Var,
+  updateVar?: Updater<Var>,
   autoFocus?: boolean,
 }
 
-export const VarDefinition = memo(function VarDefinition({varConfig, updateVarConfig, autoFocus}: VarDefinitionProps) {
-  return <span className={`def-${varConfig.id}`}
+export const VarDefinition = memo(function VarDefinition({var_, updateVar, autoFocus}: VarDefinitionProps) {
+  return <span className={`def-${var_.id}`}
     style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', border: '1px solid gray', fontSize: '13px', minHeight: '13px'}}>
-    <ControlledSpan value={varConfig.label} onValue={(label) => updateVarConfig && updateKeys(updateVarConfig, {label})}
+    <ControlledSpan value={var_.label} onValue={(label) => updateVar && updateKeys(updateVar, {label})}
           style={{border: 'none', background: 'none'}} autoFocus={autoFocus}/>
-    {varConfig.label.length === 0 && <span style={{fontStyle: 'italic'}}></span>}
+    {var_.label.length === 0 && <span style={{fontStyle: 'italic'}}></span>}
   </span>
 });
 
 
 interface VarUseProps {
-  varInfo: VarInfo | undefined,
+  varBinding: VarBinding | undefined,
 }
 
-export const VarUse = memo(function VarUse({varInfo}: VarUseProps) {
+export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
   const spanRef = useRef<HTMLSpanElement>(null);
 
   const [inspected, setInspected] = useState(false);
@@ -39,21 +36,20 @@ export const VarUse = memo(function VarUse({varInfo}: VarUseProps) {
       ref={spanRef}
       style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', fontSize: '13px', cursor: 'pointer'}}
       onDoubleClick={() => {
-        if (!varInfo) { return; }
-        const def = document.querySelector(`.def-${varInfo.config.id}`);
+        if (!varBinding) { return; }
+        const def = document.querySelector(`.def-${varBinding.var_.id}`);
         if (!def) { return; }
         def.scrollIntoView();
       }}
       >
-      {varInfo?.config.label}
-      {varInfo?.config.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
+      {varBinding?.var_.label}
+      {varBinding?.var_.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
     </span>
-    {/* {inspected && <span>{JSON.stringify(varInfo.value?.toolValue)}</span>} */}
     {(() => {
       if (!inspected) { return; }
-      if (!varInfo) { return; }
-      if (varInfo.value) {
-        return <ObjectInspector data={varInfo.value.toolValue} />;
+      if (!varBinding) { return; }
+      if (varBinding.value) {
+        return <ObjectInspector data={varBinding.value.toolValue} />;
       } else {
         return <span style={{fontStyle: 'italic'}}>missing</span>;
       }

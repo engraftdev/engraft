@@ -1,18 +1,18 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDfemur853097",
           "label": "R"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "slider",
             "value": 213,
             "min": 0,
@@ -23,14 +23,14 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDantlion725869",
           "label": "G"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "slider",
             "value": 57,
             "min": 0,
@@ -41,14 +41,14 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDactress425504",
           "label": "B"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "slider",
             "value": 140,
             "min": 0,
@@ -59,14 +59,14 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDshoulder201958",
           "label": "color"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "text",
             "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
             "subTools": {}
@@ -79,11 +79,11 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDcondor527627",
           "label": "\ncell 1"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",

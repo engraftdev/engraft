@@ -1,29 +1,29 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDfemur853097",
           "label": "R"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "notebook",
             "cells": [
               {
-                "var": {
+                "var_": {
                   "id": "IDlamb821611",
                   "label": "cell 1"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "tool",
-                  "subConfig": {
+                  "subProgram": {
                     "toolName": "slider",
                     "value": 7,
                     "min": -10,
@@ -34,11 +34,11 @@
                 "upstreamIds": {}
               },
               {
-                "var": {
+                "var_": {
                   "id": "IDflame499401",
                   "label": "cell 2"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "code",
                   "code": "IDlamb821611*25",
@@ -56,25 +56,25 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDantlion725869",
           "label": "G"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "notebook",
             "cells": [
               {
-                "var": {
+                "var_": {
                   "id": "IDquince271504",
                   "label": "cell 1"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "tool",
-                  "subConfig": {
+                  "subProgram": {
                     "toolName": "slider",
                     "value": 9,
                     "min": -10,
@@ -85,11 +85,11 @@
                 "upstreamIds": {}
               },
               {
-                "var": {
+                "var_": {
                   "id": "IDclover042745",
                   "label": "cell 2"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "code",
                   "code": "IDquince271504*25",
@@ -105,25 +105,25 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDactress425504",
           "label": "B"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "notebook",
             "cells": [
               {
-                "var": {
+                "var_": {
                   "id": "IDgeranium519063",
                   "label": "cell 1"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "tool",
-                  "subConfig": {
+                  "subProgram": {
                     "toolName": "slider",
                     "value": 7,
                     "min": -10,
@@ -134,11 +134,11 @@
                 "upstreamIds": {}
               },
               {
-                "var": {
+                "var_": {
                   "id": "IDwaterlily933195",
                   "label": "cell 2"
                 },
-                "config": {
+                "program": {
                   "toolName": "code",
                   "modeName": "code",
                   "code": "IDgeranium519063*25",
@@ -154,14 +154,14 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDshoulder201958",
           "label": "color"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "text",
             "text": "rgb(IDfemur853097,IDantlion725869,IDactress425504)",
             "subTools": {
@@ -193,11 +193,11 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDcondor527627",
           "label": "swatch"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",

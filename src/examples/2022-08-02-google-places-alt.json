@@ -1,3 +1,5 @@
+
+
 {
   "toolName": "code",
   "modeName": "tool",
@@ -178,7 +180,7 @@
                         "id": "IDplatinum955409",
                         "type": "control",
                         "controlType": "checkbox",
-                        "name": "control 1",
+                        "name": "showOnMap",
                         "keyFuncCode": "(data) => data.formatted_address"
                       }
                     ],
@@ -244,6 +246,55 @@
           "defaultCode": "IDderby171590"
         },
         "upstreamIds": {
+          "IDleech543603": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDcyclone412875",
+          "label": "addresses"
+        },
+        "program": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "_.keys(_.pickBy(IDleech543603.controlValues.showOnMap))",
+          "subTools": {},
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {
+          "IDleech543603": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDpot217693",
+          "label": "map"
+        },
+        "program": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "<GoogleMap addresses={IDcyclone412875}/>",
+          "subTools": {},
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {
+          "IDcyclone412875": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDicicle100507",
+          "label": "cell 3"
+        },
+        "program": {
+          "toolName": "code",
+          "modeName": "code",
+          "code": "<>\n  {IDpot217693}\n  {IDleech543603.view}\n</>",
+          "subTools": {},
+          "defaultCode": "IDderby171590"
+        },
+        "upstreamIds": {
+          "IDpot217693": true,
           "IDleech543603": true
         }
       }

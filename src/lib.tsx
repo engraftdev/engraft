@@ -2,11 +2,11 @@ import _ from "lodash";
 import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import libCss from "./lib.css";
-import { EnvContext, ToolConfig, ToolValue, ToolView, VarInfo } from "./tools-framework/tools";
+import { EnvContext, ToolProgram, ToolValue, ToolView, VarBinding } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
 import './tools/builtInTools';
-import { codeConfigSetTo } from "./tools/CodeTool";
+import { codeProgramSetTo } from "./tools/CodeTool";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
@@ -27,24 +27,24 @@ import { VarDefinition } from "./view/Vars";
 interface EmbedComponentProps {
   reportOutput: Setter<ToolValue | null>;
   variables: {[name: string]: any} | undefined
-  initialConfigJson: string | undefined;
+  initialProgramJson: string | undefined;
 }
 
-export const EmbedComponent = memo(function EmbedComponent({variables, initialConfigJson, reportOutput}: EmbedComponentProps) {
-  const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(codeConfigSetTo(''));
+export const EmbedComponent = memo(function EmbedComponent({variables, initialProgramJson, reportOutput}: EmbedComponentProps) {
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(codeProgramSetTo(''));
   useEffect(() => {
-    if (!initialConfigJson) { return; }
+    if (!initialProgramJson) { return; }
     try {
-      const initialConfig: ToolConfig = JSON.parse(initialConfigJson);
-      updateConfig(() => initialConfig);
+      const initialProgram: ToolProgram = JSON.parse(initialProgramJson);
+      updateProgram(() => initialProgram);
     } catch {}
-  }, [initialConfigJson, updateConfig])
+  }, [initialProgramJson, updateProgram])
 
   const env = useMemo(() => {
-    let env: {[id: string]: VarInfo} = {};
+    let env: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {config: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
     });
     return env;
   }, [variables]);
@@ -63,13 +63,13 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialCo
     </div>
     <div>
       <EnvContext.Provider value={env}>
-        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+        <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
         try {
-          await navigator.clipboard.writeText(JSON.stringify(JSON.stringify(config)));
+          await navigator.clipboard.writeText(JSON.stringify(JSON.stringify(program)));
           setCopyPasteMessage('✅');
         } catch (e) {
           setCopyPasteMessage('❌' + (e instanceof Error ? ': ' + e.message : ''));
@@ -96,25 +96,25 @@ interface ObservableEmbedProps {
 
 export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, variables = {}, reportOutput}: ObservableEmbedProps) {
   const env = useMemo(() => {
-    let env: {[id: string]: VarInfo} = {};
+    let env: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {config: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
     });
     return env;
   }, [variables]);
 
-  const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(
-    configFromLocalStorage(localStorageKey) || codeConfigSetTo(defaultCodeFromVariables(variables))
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
+    programFromLocalStorage(localStorageKey) || codeProgramSetTo(defaultCodeFromVariables(variables))
   );
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(localStorageKey, JSON.stringify(config));
+      window.localStorage.setItem(localStorageKey, JSON.stringify(program));
     } catch (e) {
       console.warn("error saving to local storage", e);
     }
-  }, [config, localStorageKey])
+  }, [program, localStorageKey])
 
   const [output, setOutput] = useStateSetOnly<ToolValue | null>(null);
 
@@ -129,7 +129,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
         renderValue={(value) => <ObservableInspector value={value}/>}
       />
       <EnvContext.Provider value={env}>
-        <ToolWithView config={config} updateConfig={updateConfig} reportOutput={setOutput} autoFocus={true}/>
+        <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
       </EnvContext.Provider>
     </div>
   );
@@ -179,27 +179,27 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
   const stableVariables = useDedupe(variables, _.isEqual);
 
   const env = useMemo(() => {
-    let env: {[id: string]: VarInfo} = {};
+    let env: {[id: string]: VarBinding} = {};
     Object.entries(stableVariables).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {config: {id, label: name}, value: {toolValue: value}};
+      env[id] = {var_: {id, label: name}, value: {toolValue: value}};
     });
     return env;
   }, [stableVariables]);
 
-  const [config, updateConfig] = useStateUpdateOnly<ToolConfig>(
-    configFromLocalStorage(useLiveToolDemoKey) || codeConfigSetTo(defaultCodeFromVariables(variables))
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
+    programFromLocalStorage(useLiveToolDemoKey) || codeProgramSetTo(defaultCodeFromVariables(variables))
   );
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(useLiveToolDemoKey, JSON.stringify(config));
+      window.localStorage.setItem(useLiveToolDemoKey, JSON.stringify(program));
     } catch (e) {
       console.warn("error saving to local storage", e);
     }
-  }, [config])
+  }, [program])
 
-  const [component, view, output] = useTool({config, updateConfig});
+  const [component, view, output] = useTool({program, updateProgram});
 
   const [useDefault, setUseDefault] = useState(!hide);
   useEffect(() => {
@@ -238,10 +238,10 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
 
 const useLiveToolDemoKey = 'use-live-tool-demo';
 
-function configFromLocalStorage(key: string) {
-  const configJson = window.localStorage.getItem(key)
-  if (configJson) {
-    return JSON.parse(configJson);
+function programFromLocalStorage(key: string) {
+  const programJson = window.localStorage.getItem(key)
+  if (programJson) {
+    return JSON.parse(programJson);
   } else {
     return undefined;
   }
@@ -267,7 +267,7 @@ export const UseLiveToolRHS = memo(function UseLiveToolRHS(props: UseLiveToolRHS
           <h2>Input</h2>
           {Object.entries(variables).map(([name, value]) => {
             return <div key={name} className="xRow xAlignTop xGap10" style={{minHeight: 0}}>
-              <VarDefinition varConfig={{id: 'idunno', label: name}}/>
+              <VarDefinition var_={{id: 'idunno', label: name}}/>
               <div style={{lineHeight: 1}}>=</div>
               <div style={{minWidth: 0, minHeight: 0, height: '100%', flexGrow: 1}}>
                 {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, height: '100%', display: 'flex' }}> */}
@@ -362,7 +362,7 @@ export { default as ReactDOM } from 'react-dom';
 ////////////////
 
 export { EnvContext } from 'src/tools-framework/tools';
-export type { ToolConfig, ToolValue } from 'src/tools-framework/tools';
+export type { ToolProgram, ToolValue } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
-export { codeConfigSetTo } from 'src/tools/CodeTool';
+export { codeProgramSetTo } from 'src/tools/CodeTool';

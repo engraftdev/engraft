@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect } from "react";
 import { useDebounce } from "use-debounce";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
-import { codeConfigSetTo } from "src/tools/CodeTool";
-import { TextConfig } from "src/tools/TextTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
+import { TextProgram } from "src/tools/TextTool";
 import { RowToCol } from "src/util/RowToCol";
 
 const offlineDataContext = require.context('./offline-data', true, /\.\/(.*)\.json$/)
@@ -15,18 +15,18 @@ const offlineData = Object.fromEntries(
   ])
 );
 
-export interface RequestConfig extends ToolConfig {
+export interface RequestProgram extends ToolProgram {
   toolName: 'request';
-  urlConfig: ToolConfig;
-  paramsConfig: ToolConfig;
+  urlProgram: ToolProgram;
+  paramsProgram: ToolProgram;
   autoSend: boolean;
 }
 
-export const RequestTool = memo(function RequestTool({ config, updateConfig, reportOutput, reportView }: ToolProps<RequestConfig>) {
-  const [urlComponent, urlView, urlOutput] = useSubTool({config, updateConfig, subKey: 'urlConfig'});
-  const [paramsComponent, paramsView, paramsOutput] = useSubTool({config, updateConfig, subKey: 'paramsConfig'});
+export const RequestTool = memo(function RequestTool({ program, updateProgram, reportOutput, reportView }: ToolProps<RequestProgram>) {
+  const [urlComponent, urlView, urlOutput] = useSubTool({program, updateProgram, subKey: 'urlProgram'});
+  const [paramsComponent, paramsView, paramsOutput] = useSubTool({program, updateProgram, subKey: 'paramsProgram'});
 
-  const [autoSend, updateAutoSend] = useAt(config, updateConfig, 'autoSend');
+  const [autoSend, updateAutoSend] = useAt(program, updateProgram, 'autoSend');
 
   const send = useCallback(async () => {
     if (!urlOutput || typeof urlOutput.toolValue !== 'string') { return; }
@@ -87,16 +87,16 @@ const paramsDefault = `{
   exintro: true,
   grnlimit: 1
 }`
-registerTool<RequestConfig>(RequestTool, 'request', () => {
-  const textConfig: TextConfig = {
+registerTool<RequestProgram>(RequestTool, 'request', () => {
+  const textProgram: TextProgram = {
     toolName: 'text',
     text: 'https://en.wikipedia.org/w/api.php',
     subTools: {},
   };
   return {
     toolName: 'request',
-    urlConfig: codeConfigSetTo(textConfig),
-    paramsConfig: codeConfigSetTo(paramsDefault),
+    urlProgram: codeProgramSetTo(textProgram),
+    paramsProgram: codeProgramSetTo(paramsDefault),
     autoSend: true,
   }
 });

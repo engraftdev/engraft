@@ -1,15 +1,15 @@
 {
   "toolName": "code",
   "modeName": "tool",
-  "subConfig": {
+  "subProgram": {
     "toolName": "notebook",
     "cells": [
       {
-        "var": {
+        "var_": {
           "id": "IDgateway411437",
           "label": "terms"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "[\"Dali\", \"Picasso\", \"O'Keeffe\"]",
@@ -19,16 +19,16 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDfibula203751",
           "label": "per artist"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "map",
-            "inputConfig": {
+            "inputProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDnymphea196713",
@@ -39,32 +39,32 @@
               "id": "IDarcher577311",
               "label": "item"
             },
-            "perItemConfig": {
+            "perItemProgram": {
               "toolName": "code",
               "modeName": "tool",
-              "subConfig": {
+              "subProgram": {
                 "toolName": "notebook",
                 "cells": [
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDhose874537",
                       "label": "artist resp"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "tool",
-                      "subConfig": {
+                      "subProgram": {
                         "toolName": "request",
-                        "urlConfig": {
+                        "urlProgram": {
                           "toolName": "code",
                           "modeName": "tool",
-                          "subConfig": {
+                          "subProgram": {
                             "toolName": "text",
                             "text": "https://api.artic.edu/api/v1/artists/search",
                             "subTools": {}
                           }
                         },
-                        "paramsConfig": {
+                        "paramsProgram": {
                           "toolName": "code",
                           "modeName": "code",
                           "code": "{\n  q: IDarcher577311,\n  size: 1,\n}",
@@ -78,16 +78,16 @@
                     "upstreamIds": {}
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDpepper989487",
                       "label": "artist id"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "tool",
-                      "subConfig": {
+                      "subProgram": {
                         "toolName": "extractor",
-                        "inputConfig": {
+                        "inputProgram": {
                           "toolName": "code",
                           "modeName": "code",
                           "code": "IDhose874537",
@@ -113,25 +113,25 @@
                     }
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDearth121280",
                       "label": "artworks resp"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "tool",
-                      "subConfig": {
+                      "subProgram": {
                         "toolName": "request",
-                        "urlConfig": {
+                        "urlProgram": {
                           "toolName": "code",
                           "modeName": "tool",
-                          "subConfig": {
+                          "subProgram": {
                             "toolName": "text",
                             "text": "https://api.artic.edu/api/v1/artworks/search",
                             "subTools": {}
                           }
                         },
-                        "paramsConfig": {
+                        "paramsProgram": {
                           "toolName": "code",
                           "modeName": "code",
                           "code": "{\n  fields: 'date_end',\n  limit: 100,\n  page: 1,\n  params: {\n    query: {\n      term: {\n        artist_id: IDdresser344063\n      }\n    }\n  }\n}",
@@ -146,16 +146,16 @@
                     }
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDarcheology996674",
                       "label": "artworks years"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "tool",
-                      "subConfig": {
+                      "subProgram": {
                         "toolName": "extractor",
-                        "inputConfig": {
+                        "inputProgram": {
                           "toolName": "code",
                           "modeName": "code",
                           "code": "IDdresser344063",
@@ -181,16 +181,16 @@
                     "upstreamIds": {}
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDcoat018167",
                       "label": "artist name"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "tool",
-                      "subConfig": {
+                      "subProgram": {
                         "toolName": "extractor",
-                        "inputConfig": {
+                        "inputProgram": {
                           "toolName": "code",
                           "modeName": "code",
                           "code": "IDhose874537",
@@ -215,11 +215,11 @@
                     }
                   },
                   {
-                    "var": {
+                    "var_": {
                       "id": "IDleader359445",
                       "label": "cell 5"
                     },
-                    "config": {
+                    "program": {
                       "toolName": "code",
                       "modeName": "code",
                       "code": "IDarcheology996674.map((year) => ({\n  artist: IDcoat018167,\n  decade: Math.floor(year / 10) * 10 + \"s\"\n}))",
@@ -246,11 +246,11 @@
         "upstreamIds": {}
       },
       {
-        "var": {
+        "var_": {
           "id": "IDenemy044787",
           "label": "cell 2"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "code",
           "code": "IDfibula203751.flat()",
@@ -261,16 +261,16 @@
         }
       },
       {
-        "var": {
+        "var_": {
           "id": "IDflight230697",
           "label": "cell 3"
         },
-        "config": {
+        "program": {
           "toolName": "code",
           "modeName": "tool",
-          "subConfig": {
+          "subProgram": {
             "toolName": "voyager",
-            "inputConfig": {
+            "inputProgram": {
               "toolName": "code",
               "modeName": "code",
               "code": "IDnymphea196713",
@@ -297,7 +297,7 @@
                   "type": "nominal"
                 }
               },
-              "config": {
+              "program": {
                 "line": {
                   "point": true
                 },

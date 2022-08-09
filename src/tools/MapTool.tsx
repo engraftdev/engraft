@@ -1,25 +1,25 @@
 import { CSSProperties, memo, useCallback, useEffect, useMemo } from "react";
-import { newVarConfig, ProvideVar, registerTool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarConfig } from "src/tools-framework/tools";
+import { newVar, ProvideVarBinding, registerTool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, Var } from "src/tools-framework/tools";
 import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { Value } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
 
 
-export interface MapConfig extends ToolConfig {
+export interface MapProgram extends ToolProgram {
   toolName: 'map';
-  inputConfig: ToolConfig;
-  itemVar: VarConfig;
-  perItemConfig: ToolConfig;
+  inputProgram: ToolProgram;
+  itemVar: Var;
+  perItemProgram: ToolProgram;
 }
 
-export const MapTool = memo(function MapTool(props: ToolProps<MapConfig>) {
-  const { config, updateConfig, reportOutput, reportView } = props;
+export const MapTool = memo(function MapTool(props: ToolProps<MapProgram>) {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const inputArray = useMemo(() => {
     if (!inputOutput) { return null; }
@@ -35,10 +35,10 @@ export const MapTool = memo(function MapTool(props: ToolProps<MapConfig>) {
 
   const inputLength = inputArray?.length || 0;
 
-  const [perItemConfig, updatePerItemConfig] = useAt(config, updateConfig, 'perItemConfig');
+  const [perItemProgram, updatePerItemProgram] = useAt(program, updateProgram, 'perItemProgram');
 
   const [perItemComponents, perItemViews, perItemOutputs] = useTools(Object.fromEntries((inputArray || []).map((elem, i) => {
-    return [i, {config: perItemConfig, updateConfig: updatePerItemConfig}]
+    return [i, {program: perItemProgram, updateProgram: updatePerItemProgram}]
   })))
 
   const output = useMemo(() => {
@@ -59,33 +59,33 @@ export const MapTool = memo(function MapTool(props: ToolProps<MapConfig>) {
   return <>
     {inputComponent}
     {inputArray?.map((inputArrayElem, i) =>
-      <ProvideVar key={i} config={config.itemVar} value={inputArrayElem}>
+      <ProvideVarBinding key={i} var_={program.itemVar} value={inputArrayElem}>
         {perItemComponents[i]}
-      </ProvideVar>
+      </ProvideVarBinding>
     )}
   </>
 });
-registerTool<MapConfig>(MapTool, 'map', (defaultInput) => {
-  const itemVar = newVarConfig('item');
+registerTool<MapProgram>(MapTool, 'map', (defaultInput) => {
+  const itemVar = newVar('item');
   return {
     toolName: 'map',
-    inputConfig: codeConfigSetTo(defaultInput || ''),
+    inputProgram: codeProgramSetTo(defaultInput || ''),
     itemVar,
-    perItemConfig: codeConfigSetTo(itemVar.id),
+    perItemProgram: codeProgramSetTo(itemVar.id),
   };
 });
 
 
-interface MapToolViewProps extends ToolProps<MapConfig>, ToolViewProps {
+interface MapToolViewProps extends ToolProps<MapProgram>, ToolViewProps {
   inputView: ToolView | null;
   inputArray: ToolValue[] | null;
   perItemViews: PerTool<ToolView | null>;
 }
 
 const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
-  const { config, updateConfig, autoFocus, inputView, inputArray, perItemViews } = props;
+  const { program, updateProgram, autoFocus, inputView, inputArray, perItemViews } = props;
 
-  const [itemVarConfig, updateItemVarConfig] = useAt(config, updateConfig, 'itemVar');
+  const [itemVar, updateItemVar] = useAt(program, updateProgram, 'itemVar');
 
   const [highlightedIndex, setHighlightedIndex] = useStateSetOnly(0);
 
@@ -144,7 +144,7 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
           </div>
           <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
             <div className="xRow xAlignTop xGap10">
-              <VarDefinition varConfig={itemVarConfig} updateVarConfig={updateItemVarConfig}/>
+              <VarDefinition var_={itemVar} updateVar={updateItemVar}/>
               <div style={{lineHeight: 1}}>=</div>
               <div style={{minWidth: 0}}>
                 <Value value={inputArrayTruncated[highlightedIndex]?.toolValue}/>

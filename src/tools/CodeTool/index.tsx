@@ -6,7 +6,7 @@ import { EditorView } from '@codemirror/view';
 import React, { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarInfo, VarInfos } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, registerTool, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -21,38 +21,38 @@ import { ToolFrame } from "src/view/ToolFrame";
 import { VarUse } from "src/view/Vars";
 import { globals } from './globals';
 
-export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
+export type CodeProgram = CodeProgramCodeMode | CodeProgramToolMode;
 
-export interface CodeConfigShared {
+export interface CodeProgramShared {
   toolName: 'code',
   // defaultCode says that whoever made this CodeTool thought this would be a nice code for it.
   // * So, if we switch TO tool-mode, we will provide this as the default input for the tool.
   // * And if we switch FROM tool-mode, we will provide this as the default code again.
-  // * Q: Should this be defaultCode or defaultInputConfig?
+  // * Q: Should this be defaultCode or defaultInputProgram?
   defaultCode: string | undefined,
 }
 
-export interface CodeConfigCodeMode extends CodeConfigShared {
+export interface CodeProgramCodeMode extends CodeProgramShared {
   modeName: 'code',
   code: string,
-  subTools: {[id: string]: ToolConfig},
+  subTools: {[id: string]: ToolProgram},
 }
 
-export interface CodeConfigToolMode extends CodeConfigShared {
+export interface CodeProgramToolMode extends CodeProgramShared {
   modeName: 'tool',
-  subConfig: ToolConfig,
+  subProgram: ToolProgram,
 }
 
-export const CodeTool = memo(function CodeTool(props: ToolProps<CodeConfig>) {
-  const {config, updateConfig} = props;
+export const CodeTool = memo(function CodeTool(props: ToolProps<CodeProgram>) {
+  const {program, updateProgram} = props;
 
-  if (config.modeName === 'code') {
-    return <CodeToolCodeMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigCodeMode>} />;
+  if (program.modeName === 'code') {
+    return <CodeToolCodeMode {...props} program={program} updateProgram={updateProgram as Updater<CodeProgram, CodeProgramCodeMode>} />;
   } else {
-    return <CodeToolToolMode {...props} config={config} updateConfig={updateConfig as Updater<CodeConfig, CodeConfigToolMode>} />;
+    return <CodeToolToolMode {...props} program={program} updateProgram={updateProgram as Updater<CodeProgram, CodeProgramToolMode>} />;
   }
 })
-registerTool<CodeConfig>(CodeTool, 'code', (defaultCode) => ({
+registerTool<CodeProgram>(CodeTool, 'code', (defaultCode) => ({
   toolName: 'code',
   modeName: 'code',
   defaultCode,
@@ -61,30 +61,30 @@ registerTool<CodeConfig>(CodeTool, 'code', (defaultCode) => ({
 }));
 
 
-// Some notes about codeConfigSetTo:
+// Some notes about codeProgramSetTo:
 // * Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
 //   ToolFrame, and with it, the ability to switch out of the given tool into a different one.
-export function codeConfigSetTo(config: ToolConfig | string): CodeConfig {
-  // TODO: this is a hack, isn't it? (the config.toolName === 'code' part, I mean)
-  if (typeof config !== 'string' && config.toolName === 'code') {
-    return config as CodeConfig;
+export function codeProgramSetTo(program: ToolProgram | string): CodeProgram {
+  // TODO: this is a hack, isn't it? (the program.toolName === 'code' part, I mean)
+  if (typeof program !== 'string' && program.toolName === 'code') {
+    return program as CodeProgram;
   }
 
   return {
     toolName: 'code',
-    ...(typeof config === 'string' ?
-        { modeName: 'code', code: config, subTools: {}, defaultCode: config }:
-        { modeName: 'tool', subConfig: config, defaultCode: undefined }
+    ...(typeof program === 'string' ?
+        { modeName: 'code', code: program, subTools: {}, defaultCode: program }:
+        { modeName: 'tool', subProgram: program, defaultCode: undefined }
     )
   };
 }
 
 
-export function summarizeCodeConfig(config: CodeConfig): ReactNode {
-  if (config.modeName === 'code') {
-    return <pre>{config.code.replaceAll(refRE, '_')}</pre>;
+export function summarizeCodeProgram(program: CodeProgram): ReactNode {
+  if (program.modeName === 'code') {
+    return <pre>{program.code.replaceAll(refRE, '_')}</pre>;
   } else {
-    return config.subConfig.toolName;
+    return program.subProgram.toolName;
   }
 }
 
@@ -102,32 +102,32 @@ function transformCached(code: string) {
   return computed;
 }
 
-type CodeToolCodeModeProps = Replace<ToolProps<CodeConfig>, {
-  config: CodeConfigCodeMode,
-  updateConfig: Updater<CodeConfig, CodeConfigCodeMode>,
+type CodeToolCodeModeProps = Replace<ToolProps<CodeProgram>, {
+  program: CodeProgramCodeMode,
+  updateProgram: Updater<CodeProgram, CodeProgramCodeMode>,
 }>
 
 export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCodeModeProps) {
-  const { config, updateConfig, reportOutput, reportView} = props;
+  const { program, updateProgram, reportOutput, reportView} = props;
 
   const compiled = useMemo(() => {
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
-      let translated = transformCached("(" + config.code + ")").code!;
+      let translated = transformCached("(" + program.code + ")").code!;
       translated = translated.replace(/;$/, "");
       const result = compileExpression(translated);
       return result;
     } catch (e) {
-      // console.warn("error with", config.code)
+      // console.warn("error with", program.code)
       // console.warn(e);
     }
-  }, [config.code])
+  }, [program.code])
 
   // We have to use useContext here, not in the view – the view isn't inside tool context!
   const env = useContext(EnvContext)
   const possibleEnv = useContext(PossibleEnvContext)
 
-  const [subToolConfigs, updateSubToolConfigs] = useAt(config, updateConfig, 'subTools');
+  const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
@@ -151,7 +151,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
           setOutput({toolValue: compiled(scope)});
         }
       } catch (e) {
-        // console.warn("error with", config.code)
+        // console.warn("error with", program.code)
         console.warn(e);
         setOutput(null);
       }
@@ -164,46 +164,46 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   const view: ToolView = useCallback((viewProps) => (
     <CodeToolCodeModeView
       {...props} {...viewProps}
-      updateSubToolConfigs={updateSubToolConfigs}
+      updateSubToolPrograms={updateSubToolPrograms}
       views={views}
       env={env} possibleEnv={possibleEnv}
     />
-  ), [env, possibleEnv, props, updateSubToolConfigs, views])
+  ), [env, possibleEnv, props, updateSubToolPrograms, views])
   useView(reportView, view);
 
   return <>
-    {Object.entries(subToolConfigs).map(([id, subToolConfig]) =>
-      <SubTool key={id} id={id} subToolConfigs={subToolConfigs}
-               updateSubToolConfigs={updateSubToolConfigs} updateOutputs={updateOutputs} updateViews={updateViews} />
+    {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
+      <SubTool key={id} id={id} subToolPrograms={subToolPrograms}
+               updateSubToolPrograms={updateSubToolPrograms} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;
 });
 
 interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewProps {
-  updateSubToolConfigs: Updater<{[id: string]: ToolConfig}>;
+  updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>;
   views: {[id: string]: ToolView | null};
-  env: VarInfos;
-  possibleEnv: PossibleVarInfos;
+  env: VarBindings;
+  possibleEnv: PossibleVarBindings;
 }
 
 const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolCodeModeViewProps) {
-  const {config, updateConfig, autoFocus, updateSubToolConfigs, views, env, possibleEnv} = props;
+  const {program, updateProgram, autoFocus, updateSubToolPrograms, views, env, possibleEnv} = props;
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
   const envRef = useRefForCallback(env);
   const possibleEnvRef = useRefForCallback(possibleEnv);
   const extensions = useMemo(() => {
-    function insertTool(tool: Tool<ToolConfig>) {
+    function insertTool(tool: Tool<ToolProgram>) {
       const id = newId();
-      const newConfig = codeConfigSetTo(tool.defaultConfig());
-      updateKeys(updateSubToolConfigs, {[id]: newConfig});
+      const newProgram = codeProgramSetTo(tool.defaultProgram());
+      updateKeys(updateSubToolPrograms, {[id]: newProgram});
       // TODO: we never remove these! lol
       return id;
     };
-    function replaceWithTool(tool: Tool<ToolConfig>) {
-      // console.log('replaceWithTool', config.defaultInput, tool.defaultConfig(config.defaultInput));
-      updateConfig(() => ({toolName: 'code', modeName: 'tool', subConfig: tool.defaultConfig(config.defaultCode), defaultCode: config.defaultCode}))
+    function replaceWithTool(tool: Tool<ToolProgram>) {
+      // console.log('replaceWithTool', program.defaultInput, tool.defaultProgram(program.defaultInput));
+      updateProgram(() => ({toolName: 'code', modeName: 'tool', subProgram: tool.defaultProgram(program.defaultCode), defaultCode: program.defaultCode}))
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
@@ -222,7 +222,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
               const parsed = JSON.parse(text);
               if (parsed.toolName) {
                 // TODO: for now, we just replace – someday we should check about insertions
-                updateConfig(() => codeConfigSetTo(parsed));
+                updateProgram(() => codeProgramSetTo(parsed));
                 event.preventDefault();
               }
             } catch {
@@ -232,17 +232,17 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
         }
       }),
     ];
-  }, [config.defaultCode, envRef, possibleEnvRef, refSet, updateConfig, updateSubToolConfigs])
+  }, [program.defaultCode, envRef, possibleEnvRef, refSet, updateProgram, updateSubToolPrograms])
 
   const onChange = useCallback((value: string) => {
-    updateKeys(updateConfig, {code: value});
-  }, [updateConfig]);
+    updateKeys(updateProgram, {code: value});
+  }, [updateProgram]);
 
   const contents = <>
     <CodeMirror
       extensions={extensions}
       autoFocus={autoFocus}
-      text={config.code}
+      text={program.code}
       onChange={onChange}
     />
     {refs.map(([elem, {id}]) => {
@@ -251,7 +251,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
           <IsolateStyles style={{display: 'inline-block'}}>
             <ShowView view={views[id]} autoFocus={true}/>
           </IsolateStyles> :
-          <VarUse key={id} varInfo={env[id] as VarInfo | undefined} />,
+          <VarUse key={id} varBinding={env[id] as VarBinding | undefined} />,
         elem
       )
     })}
@@ -268,32 +268,32 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
 // TOOL MODE //
 ///////////////
 
-type CodeToolToolModeProps = Replace<ToolProps<CodeConfig>, {
-  config: CodeConfigToolMode,
-  updateConfig: Updater<CodeConfig, CodeConfigToolMode>,
+type CodeToolToolModeProps = Replace<ToolProps<CodeProgram>, {
+  program: CodeProgramToolMode,
+  updateProgram: Updater<CodeProgram, CodeProgramToolMode>,
 }>
 
-export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportOutput, reportView, updateConfig}: CodeToolToolModeProps) {
+export const CodeToolToolMode = memo(function CodeToolToolMode({ program, reportOutput, reportView, updateProgram}: CodeToolToolModeProps) {
 
-  const [component, toolView, output] = useSubTool({ config, updateConfig, subKey: 'subConfig' })
+  const [component, toolView, output] = useSubTool({ program, updateProgram, subKey: 'subProgram' })
 
   useOutput(reportOutput, output);
 
   const env = useContext(EnvContext);
   const possibleEnv = useContext(PossibleEnvContext);
 
-  const [subConfig, updateSubConfig] = useAt(config, updateConfig, 'subConfig');
+  const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
   const view: ToolView = useCallback(({autoFocus}) => (
     <ToolFrame
-      config={subConfig} updateConfig={updateSubConfig} env={env} possibleEnv={possibleEnv}
+      program={subProgram} updateProgram={updateSubProgram} env={env} possibleEnv={possibleEnv}
       onClose={() => {
-        updateConfig(() => ({
+        updateProgram(() => ({
           toolName: 'code',
           modeName: 'code',
-          code: config.defaultCode || '',
+          code: program.defaultCode || '',
           subTools: {},
-          defaultCode: config.defaultCode,
+          defaultCode: program.defaultCode,
         }));
       }}
     >
@@ -301,7 +301,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ config, reportO
         <ShowView view={toolView} autoFocus={autoFocus} />
       {/* </div> */}
     </ToolFrame>
-  ), [config, env, possibleEnv, subConfig, toolView, updateConfig, updateSubConfig]);
+  ), [program, env, possibleEnv, subProgram, toolView, updateProgram, updateSubProgram]);
   useView(reportView, view);
 
   return component;

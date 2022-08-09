@@ -14,7 +14,7 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper";
 import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { compileExpression } from "src/util/compile";
@@ -22,7 +22,7 @@ import { newId } from "src/util/id";
 import { Updater, useAt } from "src/util/state";
 import { SynthesisState, synthesizeGen } from "./synthesizer";
 import { Task } from "src/util/Task";
-import { codeConfigSetTo } from "src/tools/CodeTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
 
 
 
@@ -32,9 +32,9 @@ interface InOutPair {
   outCode: string,
 }
 
-export interface SynthesizerConfig extends ToolConfig {
+export interface SynthesizerProgram extends ToolProgram {
   toolName: 'synthesizer';
-  inputConfig: ToolConfig;
+  inputProgram: ToolProgram;
   code: string;
   inOutPairs: InOutPair[];
 }
@@ -137,23 +137,23 @@ export const InOutPairView = memo(function InOutPairView({pair, pairIdx, updateI
   </Fragment>
 })
 
-export const SynthesizerTool = memo(function SynthesizerTool({ config, updateConfig, reportOutput, reportView }: ToolProps<SynthesizerConfig>) {
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+export const SynthesizerTool = memo(function SynthesizerTool({ program, updateProgram, reportOutput, reportView }: ToolProps<SynthesizerProgram>) {
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
-  const [inOutPairs, updateInOutPairs] = useAt(config, updateConfig, 'inOutPairs');
-  const [code, updateCode] = useAt(config, updateConfig, 'code');
+  const [inOutPairs, updateInOutPairs] = useAt(program, updateProgram, 'inOutPairs');
+  const [code, updateCode] = useAt(program, updateProgram, 'code');
 
   const [synthesisTask, setSynthesisTask] = useState<Task<SynthesisState, String | undefined> | undefined>(undefined);
   const [progress, setProgress] = useState<SynthesisState["progress"] | undefined>(undefined);
 
   const func = useMemo(() => {
     try {
-      const compiled = compileExpression(config.code);
+      const compiled = compileExpression(program.code);
       return (input: any) => compiled({input});
     } catch {
 
     }
-  }, [config.code])
+  }, [program.code])
 
   const output = useMemo(() => {
     if (inputOutput && func) {
@@ -266,10 +266,10 @@ export const SynthesizerTool = memo(function SynthesizerTool({ config, updateCon
     {inputComponent}
   </>
 });
-registerTool<SynthesizerConfig>(SynthesizerTool, 'synthesizer', (defaultInput) => {
+registerTool<SynthesizerProgram>(SynthesizerTool, 'synthesizer', (defaultInput) => {
   return {
     toolName: 'synthesizer',
-    inputConfig: codeConfigSetTo(defaultInput || ''),
+    inputProgram: codeProgramSetTo(defaultInput || ''),
     code: 'input',
     inOutPairs: []
   };

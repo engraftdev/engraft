@@ -1,17 +1,17 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
 import { Setter, updaterToSetter, useAt, useStateSetOnly } from "src/util/state";
 import { SettableValue } from "src/view/SettableValue";
 
 
-export interface StateConfig extends ToolConfig {
+export interface StateProgram extends ToolProgram {
   toolName: 'state';
   initialValue: any;
 }
 
-export const StateTool = memo(function StateTool({ config, updateConfig, reportOutput, reportView }: ToolProps<StateConfig>) {
-  const [initialValue, updateInitialValue] = useAt(config, updateConfig, 'initialValue')
+export const StateTool = memo(function StateTool({ program, updateProgram, reportOutput, reportView }: ToolProps<StateProgram>) {
+  const [initialValue, updateInitialValue] = useAt(program, updateProgram, 'initialValue')
   const setInitialValue = useMemo(() => updaterToSetter(updateInitialValue), [updateInitialValue])
 
   const [stateValue, setStateValue] = useStateSetOnly(initialValue);
@@ -32,7 +32,7 @@ export const StateTool = memo(function StateTool({ config, updateConfig, reportO
 
   return null;
 });
-registerTool<StateConfig>(StateTool, 'state', () => ({
+registerTool<StateProgram>(StateTool, 'state', () => ({
   toolName: 'state',
   initialValue: undefined
 }));

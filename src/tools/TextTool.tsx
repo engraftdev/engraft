@@ -3,7 +3,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { EnvContext, PossibleEnvContext, PossibleVarInfos, registerTool, Tool, ToolConfig, ToolProps, ToolValue, ToolView, ToolViewProps, VarInfo, VarInfos } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, registerTool, Tool, ToolProgram, ToolProps, ToolValue, ToolView, ToolViewProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -15,18 +15,18 @@ import { useMemoObject } from "src/util/useMemoObject";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { VarUse } from "src/view/Vars";
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 
-export interface TextConfig {
+export interface TextProgram {
   toolName: 'text';
   text: string;
-  subTools: {[id: string]: ToolConfig};
+  subTools: {[id: string]: ToolProgram};
 }
 
-export const TextTool = memo(function TextTool(props: ToolProps<TextConfig>) {
-  const { config, updateConfig, reportOutput, reportView} = props;
+export const TextTool = memo(function TextTool(props: ToolProps<TextProgram>) {
+  const { program, updateProgram, reportOutput, reportView} = props;
 
-  const [subToolConfigs, updateSubToolConfigs] = useAt(config, updateConfig, 'subTools');
+  const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
 
   const env = useContext(EnvContext)
   const possibleEnv = useContext(PossibleEnvContext)
@@ -35,7 +35,7 @@ export const TextTool = memo(function TextTool(props: ToolProps<TextConfig>) {
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolValue | null}>({});
 
   const replacedText = useMemo(() => {
-    let result = config.text;
+    let result = program.text;
     const applyReplacement = ([k, v]: readonly [string, ToolValue | null]) => {
       let replacementText = '';
       if (v) {
@@ -50,7 +50,7 @@ export const TextTool = memo(function TextTool(props: ToolProps<TextConfig>) {
     Object.entries(env).map(([k, v]) => [k, v.value || null] as const).forEach(applyReplacement);
     Object.entries(outputs).forEach(applyReplacement);
     return result;
-  }, [config.text, env, outputs])
+  }, [program.text, env, outputs])
   const output = useMemoObject({toolValue: replacedText});
   useOutput(reportOutput, output);
 
@@ -65,9 +65,9 @@ export const TextTool = memo(function TextTool(props: ToolProps<TextConfig>) {
   useView(reportView, view);
 
   return <>
-    {Object.entries(subToolConfigs).map(([id, subToolConfig]) =>
-      <SubTool key={id} id={id} subToolConfigs={subToolConfigs}
-              updateSubToolConfigs={updateSubToolConfigs} updateOutputs={updateOutputs} updateViews={updateViews} />
+    {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
+      <SubTool key={id} id={id} subToolPrograms={subToolPrograms}
+              updateSubToolPrograms={updateSubToolPrograms} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;
 })
@@ -78,27 +78,27 @@ registerTool(TextTool, 'text', {
 });
 
 
-interface TextToolViewProps extends ToolProps<TextConfig>, ToolViewProps {
+interface TextToolViewProps extends ToolProps<TextProgram>, ToolViewProps {
   views: {[id: string]: ToolView | null};
-  env: VarInfos;
-  possibleEnv: PossibleVarInfos;
+  env: VarBindings;
+  possibleEnv: PossibleVarBindings;
 }
 
 const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
-  const { config, updateConfig, autoFocus, views, env, possibleEnv } = props;
+  const { program, updateProgram, autoFocus, views, env, possibleEnv } = props;
 
-  const [, updateSubToolConfigs] = useAt(config, updateConfig, 'subTools');
-  const [text, updateText] = useAt(config, updateConfig, 'text');
+  const [, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
+  const [text, updateText] = useAt(program, updateProgram, 'text');
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
   const envRef = useRefForCallback(env);
   const possibleEnvRef = useRefForCallback(possibleEnv);
   const extensions = useMemo(() => {
-    function insertTool(tool: Tool<ToolConfig>) {
+    function insertTool(tool: Tool<ToolProgram>) {
       const id = newId();
-      const newConfig = codeConfigSetTo(tool.defaultConfig());
-      updateKeys(updateSubToolConfigs, {[id]: newConfig});
+      const newProgram = codeProgramSetTo(tool.defaultProgram());
+      updateKeys(updateSubToolPrograms, {[id]: newProgram});
       // TODO: we never remove these! lol
       return id;
     };
@@ -107,7 +107,7 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
       refCompletions(() => envRef.current, () => possibleEnvRef.current)
     ];
     return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions}), EditorView.lineWrapping];
-  }, [envRef, possibleEnvRef, refSet, updateSubToolConfigs])
+  }, [envRef, possibleEnvRef, refSet, updateSubToolPrograms])
 
   const onChange = useCallback((value: string) => {
     updateText(() => value);
@@ -128,7 +128,7 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
           <IsolateStyles style={{display: 'inline-block'}}>
             <ShowView view={views[id]} autoFocus={true}/>
           </IsolateStyles> :
-          <VarUse varInfo={env[id] as VarInfo | undefined} />,
+          <VarUse varBinding={env[id] as VarBinding | undefined} />,
         elem
       )
     })}

@@ -4,21 +4,21 @@ import { registerTool, ToolProps, ToolView } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
 
-export interface ColorConfig {
+export interface ColorProgram {
   toolName: 'color';
   r: number;
   g: number;
   b: number;
 }
-export const ColorTool = memo(function ColorTool({ config, updateConfig, reportOutput, reportView }: ToolProps<ColorConfig>) {
-  const output = useMemoObject({toolValue: `rgb(${config.r}, ${config.g}, ${config.b})`});
+export const ColorTool = memo(function ColorTool({ program, updateProgram, reportOutput, reportView }: ToolProps<ColorProgram>) {
+  const output = useMemoObject({toolValue: `rgb(${program.r}, ${program.g}, ${program.b})`});
   useOutput(reportOutput, output);
 
   const view: ToolView = useCallback(() => (
     <div style={{padding: 10}}>
-      <RgbColorPicker color={config} onChange={(color) => updateConfig((old) => ({...old, ...color}))} style={{width: 150, height: 150}}/>
+      <RgbColorPicker color={program} onChange={(color) => updateProgram((old) => ({...old, ...color}))} style={{width: 150, height: 150}}/>
     </div>
-  ), [config, updateConfig]);
+  ), [program, updateProgram]);
   useView(reportView, view);
 
   return null;

@@ -1,35 +1,25 @@
-import { ReactNode, memo, useCallback } from "react";
-import { ToolConfig, VarInfos, PossibleVarInfos } from "src/tools-framework/tools";
+import { memo, ReactNode } from "react";
+import { PossibleVarBindings, ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
-import { Value } from "./Value";
-import { WindowPortal } from "src/util/WindowPortal";
-import { ValueEditable } from "./ValueEditable";
-import IsolateStyles from "./IsolateStyles";
-import { Menu, MenuMaker, WithContextMenu } from "src/util/WithContextMenu";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
+import { WindowPortal } from "src/util/WindowPortal";
+import IsolateStyles from "./IsolateStyles";
+import { Value } from "./Value";
+import { ValueEditable } from "./ValueEditable";
 
 
 export interface ToolFrameProps {
   children: ReactNode;
-  config: ToolConfig;
-  updateConfig?: Updater<ToolConfig>;
+  program: ToolProgram;
+  updateProgram?: Updater<ToolProgram>;
   onClose?: () => void;
-  env: VarInfos;
-  possibleEnv: PossibleVarInfos;
+  env: VarBindings;
+  possibleEnv: PossibleVarBindings;
 }
 
-export const ToolFrame = memo(function ToolFrame({children, config, updateConfig, onClose, env, possibleEnv}: ToolFrameProps) {
+export const ToolFrame = memo(function ToolFrame({children, program, updateProgram, onClose, env, possibleEnv}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
-
-  const menuMaker: MenuMaker = useCallback(() => {
-    return [
-      // { type: 'heading', heading: 'TOOL' },
-      { type: 'contents', contents: 'Copy config' },
-      { type: 'contents', contents: 'Show debug info' },
-      { type: 'contents', contents: 'Delete tool' },
-    ]
-  }, [])
 
   return <div
     className="ToolFrame xWidthFitContent"
@@ -46,14 +36,14 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
           paddingLeft: 2, paddingRight: 5, background: '#e4e4ff', borderBottomRightRadius: 5,
           userSelect: 'none', lineHeight: '15px',
         }}>
-          {config.toolName}
+          {program.toolName}
         </div>
 
         {/* TODO: Feedback for clicking 'cp' */}
         {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
         { isHovered && <>
           <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
-            onClick={() => {navigator.clipboard.writeText(JSON.stringify(config))}}
+            onClick={() => {navigator.clipboard.writeText(JSON.stringify(program))}}
           >cp</div>
           <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
             onClick={() => {updateShowInspector((i) => !i)}}
@@ -78,10 +68,10 @@ export const ToolFrame = memo(function ToolFrame({children, config, updateConfig
       }}
     >
       <IsolateStyles>
-        <h3>Config</h3>
-        { updateConfig ?
-          <ValueEditable value={config} updater={updateConfig}/> :
-          <Value value={config}/>
+        <h3>Program</h3>
+        { updateProgram ?
+          <ValueEditable value={program} updater={updateProgram}/> :
+          <Value value={program}/>
         }
         <h3>Env</h3>
         <Value value={env}/>

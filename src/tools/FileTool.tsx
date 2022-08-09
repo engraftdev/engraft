@@ -5,12 +5,12 @@ import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateKeys } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
 
-export interface FileConfig {
+export interface FileProgram {
   toolName: 'file';
   dataUrl: string | null;
 }
-export const FileTool = memo(function FileTool({ config, updateConfig, reportOutput, reportView }: ToolProps<FileConfig>) {
-  const output = useMemoObject({toolValue: config.dataUrl});
+export const FileTool = memo(function FileTool({ program, updateProgram, reportOutput, reportView }: ToolProps<FileProgram>) {
+  const output = useMemoObject({toolValue: program.dataUrl});
   useOutput(reportOutput, output);
 
   // TODO: questionable; easier to put this here, but it really belongs in a render component
@@ -18,20 +18,20 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
     const reader = new FileReader();
     reader.addEventListener("load", function () {
       if (typeof reader.result === 'string') {
-        updateKeys(updateConfig, {dataUrl: reader.result});
+        updateKeys(updateProgram, {dataUrl: reader.result});
       } else {
         console.error('problem reading file to data url', reader.result, reader.error);
       }
     }, false);
     reader.readAsDataURL(acceptedFiles[0]);  // todo: multiple / 0 files
-  }, [updateConfig]);
+  }, [updateProgram]);
 
   const view: ToolView = useCallback(() => (
     <Dropzone onDrop={onDrop}>
       {({getRootProps, getInputProps}) =>
         <div {...getRootProps({className: "root", style: {padding: 10}})}>
-          { config.dataUrl ?
-            <>{config.dataUrl.length} characters</> :
+          { program.dataUrl ?
+            <>{program.dataUrl.length} characters</> :
             <>
               <div>drop here, or click</div>
               <input {...getInputProps({className: "input"})}/>
@@ -41,7 +41,7 @@ export const FileTool = memo(function FileTool({ config, updateConfig, reportOut
         </div>
       }
     </Dropzone>
-  ), [config.dataUrl, onDrop]);
+  ), [program.dataUrl, onDrop]);
   useView(reportView, view);
 
   return null;

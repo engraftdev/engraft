@@ -1,29 +1,28 @@
-import { CreateVoyager, configureStore, renderVoyager, updateDataAction, datasetLoad, selectMainSpec, Action, buildSchema } from "datavoyager";
-import { memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { registerTool, ToolConfig, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { useAt } from "src/util/state";
-import { usePrevious } from "src/util/usePrevious";
-import { codeConfigSetTo } from "src/tools/CodeTool";
-import style from './style.css';
-import _ from "lodash";
-import { useRefForCallback } from "src/util/useRefForCallback";
+import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "datavoyager";
 import type { Schema } from "datavoyager/build/models";
+import _ from "lodash";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { registerTool, ToolProgram, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { codeProgramSetTo } from "src/tools/CodeTool";
+import { useAt } from "src/util/state";
 import { useDedupe } from "src/util/useDedupe";
+import { useRefForCallback } from "src/util/useRefForCallback";
+import style from './style.css';
 
 
 type Spec = ReturnType<typeof selectMainSpec>;
 
-export interface VoyagerConfig extends ToolConfig {
+export interface VoyagerProgram extends ToolProgram {
   toolName: 'voyager';
-  inputConfig: ToolConfig;
+  inputProgram: ToolProgram;
   spec: Spec | undefined;
 }
 
-export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerConfig>) {
-  const { config, updateConfig, reportOutput, reportView } = props;
+export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerProgram>) {
+  const { program, updateProgram, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({config, updateConfig, subKey: 'inputConfig'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const data = useMemo(() => {
     if (inputOutput) {
@@ -51,24 +50,24 @@ export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerCon
     {inputComponent}
   </>
 });
-registerTool<VoyagerConfig>(VoyagerTool, 'voyager', () => {
+registerTool<VoyagerProgram>(VoyagerTool, 'voyager', () => {
   return {
     toolName: 'voyager',
-    inputConfig: codeConfigSetTo(''),
+    inputProgram: codeProgramSetTo(''),
     spec: undefined,
   };
 });
 
 
-interface VoyagerToolViewProps extends ToolProps<VoyagerConfig>, ToolViewProps {
+interface VoyagerToolViewProps extends ToolProps<VoyagerProgram>, ToolViewProps {
   data: unknown;
   inputView: ToolView | null;
 }
 
 const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewProps) {
-  const { config, updateConfig, autoFocus, data, inputView } = props;
+  const { program, updateProgram, autoFocus, data, inputView } = props;
 
-  const [ spec, updateSpec ] = useAt(config, updateConfig, 'spec');
+  const [ spec, updateSpec ] = useAt(program, updateProgram, 'spec');
   const specRef = useRefForCallback(spec);
 
   const [ store, setStore ] = useState<ReturnType<typeof configureStore> | null>();

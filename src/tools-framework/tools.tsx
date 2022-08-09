@@ -9,7 +9,7 @@ export type ToolValue = {
   alreadyDisplayed?: boolean;
 };
 
-export interface ToolConfig {
+export interface ToolProgram {
   toolName: string;
 }
 
@@ -19,81 +19,95 @@ export interface ToolViewProps {
 
 export type ToolView = (props: ToolViewProps) => ReactElement<any, any> | null;
 
-export interface ToolProps<C extends ToolConfig> {
-  config: C;
-  updateConfig: Updater<C>;
+export interface ToolProps<P extends ToolProgram> {
+  program: P;
+  updateProgram: Updater<P>;
   reportOutput: Setter<ToolValue | null>;
   reportView: Setter<ToolView | null>;
 }
 
-export interface Tool<C extends ToolConfig> {
-  (props: ToolProps<C>): ReactElement<any, any> | null;
-  defaultConfig: (defaultCode?: string) => C;
+export interface Tool<P extends ToolProgram> {
+  (props: ToolProps<P>): ReactElement<any, any> | null;
+  defaultProgram: (defaultCode?: string) => P;
 }
 
-export let toolIndex: { [toolName: string]: Tool<any> } = {};
+let toolIndex: { [toolName: string]: Tool<any> } = {};
 
-export function registerTool<C extends ToolConfig>(
+export function registerTool<C extends ToolProgram>(
   func: (props: ToolProps<C>) => ReactElement<any, any> | null,
   toolName: C['toolName'],
-  defaultConfig: C | ((defaultCode?: string) => C)
+  defaultProgram: C | ((defaultCode?: string) => C)
 ) {
-  let defaultConfigFunc: () => C;
-  if (typeof defaultConfig === 'object') {
-    defaultConfigFunc = () => (defaultConfig as C);
+  let defaultProgramFunc: () => C;
+  if (typeof defaultProgram === 'object') {
+    defaultProgramFunc = () => (defaultProgram as C);
   } else {
-    defaultConfigFunc = defaultConfig;
+    defaultProgramFunc = defaultProgram;
   }
-  toolIndex[toolName] = Object.assign(func, { defaultConfig: defaultConfigFunc });
+  toolIndex[toolName] = Object.assign(func, { defaultProgram: defaultProgramFunc });
+}
+
+export function lookUpTool(toolName: string): Tool<any> {
+  const tool = toolIndex[toolName];
+  if (!tool) {
+    // TODO: return a "ToolNotFoundTool" instead of throwing
+    throw new Error(`No tool registered for ${toolName}`);
+  }
+  return tool;
+}
+
+// intentionally awkward name to remind you to prefer use of lookUpTool
+export function getFullToolIndex(): { [toolName: string]: Tool<any> } {
+  return toolIndex;
 }
 
 
 
-export interface VarInfo {
-  config: VarConfig;
+export interface VarBinding {
+  var_: Var;
   value?: ToolValue;
 }
 
-export type VarInfos = {[varId: string]: VarInfo};
+export type VarBindings = {[varId: string]: VarBinding};
 
-export const EnvContext = createContext<VarInfos>({});
+export const EnvContext = createContext<VarBindings>({});
 EnvContext.displayName = 'EnvContext';
 
 // TODO: figure out some names
 
-export interface PossibleVarInfo {
-  config: VarConfig;
+export interface PossibleVarBinding {
+  var_: Var;
   request: () => void;
 }
 
-export type PossibleVarInfos = {[varId: string]: PossibleVarInfo};
+export type PossibleVarBindings = {[varId: string]: PossibleVarBinding};
 
-export const PossibleEnvContext = createContext<PossibleVarInfos>({});
+export const PossibleEnvContext = createContext<PossibleVarBindings>({});
 PossibleEnvContext.displayName = 'PossibleEnvContext';
 
 
 
 
-export interface VarConfig {
+export interface Var {
   id: string;
   label: string;
 }
 
-export function newVarConfig(label = 'new var') {
+export function newVar(label = 'new var') {
   return {id: newId(), label};
 }
 
 
-export interface ProvideVarProps {
-  config: VarConfig;
+export interface ProvideVarBindingProps {
+  var_: Var;
   value?: ToolValue;
   children?: ReactNode | undefined,
 }
 
-export const ProvideVar = memo(function ProvideVar({config, value, children}: ProvideVarProps) {
-  const info = useMemoObject({config, value});
+export const ProvideVarBinding = memo(function ProvideVar({var_, value, children}: ProvideVarBindingProps) {
+  const info = useMemoObject({var_, value});
 
-  return <AddToContext context={EnvContext} k={config.id} v={info}>
+  return <AddToContext context={EnvContext} k={var_.id} v={info}>
     {children}
   </AddToContext>
 });

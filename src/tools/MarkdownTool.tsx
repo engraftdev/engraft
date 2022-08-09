@@ -1,18 +1,18 @@
 import { memo, useCallback, useMemo } from "react";
-import { registerTool, ToolConfig, toolIndex, ToolProps, ToolView } from "src/tools-framework/tools";
+import { registerTool, ToolProgram, ToolProps, ToolView, lookUpTool } from "src/tools-framework/tools";
 
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import MarkdownIt from 'markdown-it';
-import { codeConfigSetTo } from "./CodeTool";
+import { codeProgramSetTo } from "./CodeTool";
 import { useMemoObject } from "src/util/useMemoObject";
 
-export interface MarkdownConfig {
+export interface MarkdownProgram {
   toolName: 'markdown';
-  sourceConfig: ToolConfig;
+  sourceProgram: ToolProgram;
 }
 
-export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, reportView, reportOutput}: ToolProps<MarkdownConfig>) {
-  const [sourceComponent, sourceView, sourceOutput] = useSubTool({config, updateConfig, subKey: 'sourceConfig'})
+export const MarkdownTool = memo(function MarkdownTool({program, updateProgram, reportView, reportOutput}: ToolProps<MarkdownProgram>) {
+  const [sourceComponent, sourceView, sourceOutput] = useSubTool({program, updateProgram, subKey: 'sourceProgram'})
 
   const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
 
@@ -47,7 +47,7 @@ export const MarkdownTool = memo(function MarkdownTool({config, updateConfig, re
 
   return sourceComponent;
 })
-registerTool<MarkdownConfig>(MarkdownTool, 'markdown', () => ({
+registerTool<MarkdownProgram>(MarkdownTool, 'markdown', () => ({
   toolName: 'markdown',
-  sourceConfig: codeConfigSetTo(toolIndex['text'].defaultConfig()),
+  sourceProgram: codeProgramSetTo(lookUpTool('text').defaultProgram()),
 }));
