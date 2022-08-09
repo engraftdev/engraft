@@ -11,9 +11,9 @@ export function useView(reportView: Setter<ToolView | null>, view: ToolView) {
   }, [reportView, view])
 }
 
-export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolValue | null) {
+export function useOutput(reportOutput: Setter<ToolValue | null>, output: ToolValue | null | undefined) {
   useEffect(() => {
-    reportOutput(output);
+    reportOutput(output || null);
     return () => reportOutput(null);
   }, [reportOutput, output])
 }

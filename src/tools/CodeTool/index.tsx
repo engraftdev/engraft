@@ -11,8 +11,6 @@ import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/us
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
 import { compileExpression } from "src/util/compile";
-import { createElementFromReact } from "src/util/createElementFrom";
-import { DOM } from "src/util/DOM";
 import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
 import refsExtension, { refCode, refRE } from "src/util/refsExtension";
@@ -21,8 +19,7 @@ import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { ToolFrame } from "src/view/ToolFrame";
 import { VarUse } from "src/view/Vars";
-import update from 'immutability-helper';
-import { GoogleMap } from 'src/view/GoogleMap';
+import { globals } from './globals';
 
 export type CodeConfig = CodeConfigCodeMode | CodeConfigToolMode;
 
@@ -141,12 +138,8 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
       const scope = {
         ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.toolValue])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.toolValue])),
-        React,
-        rand,
-        createElementFromReact,
-        DOM,
-        update,
-        GoogleMap,
+        ...globals,
+        rand
       };
       try {
         const result = compiled(scope);

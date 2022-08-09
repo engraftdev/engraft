@@ -9,12 +9,15 @@ import style from './style.css';
 import _ from "lodash";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import type { Schema } from "datavoyager/build/models";
+import { useDedupe } from "src/util/useDedupe";
 
+
+type Spec = ReturnType<typeof selectMainSpec>;
 
 export interface VoyagerConfig extends ToolConfig {
   toolName: 'voyager';
   inputConfig: ToolConfig;
-  spec: unknown;
+  spec: Spec | undefined;
 }
 
 export const VoyagerTool = memo(function VoyagerTool(props: ToolProps<VoyagerConfig>) {
@@ -77,7 +80,7 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
 
   const toolToVoyagerState = useRef<'uninitialized' | 'pending' | 'done'>('uninitialized');
 
-  const prevSpecFromVoyagerRef = useRef<any>();
+  const [ rawSpecFromVoyager, setRawSpecFromVoyager ] = useState<Spec | undefined>();
 
   useEffect(() => {
     if (!store) { return; }
@@ -96,48 +99,48 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
     store.dispatch(action);
 
     const unsubscribe = store.subscribe(() => {
-      // console.log("STATE", store.getState());
-
-      const latestSpec = selectMainSpec(store.getState());
-
-      // reference checks aren't good enough; gah
-      if (_.isEqual(prevSpecFromVoyagerRef.current, latestSpec)) {
-        return;
-      }
-      prevSpecFromVoyagerRef.current = latestSpec;
-
-      console.log('spec in voyager changed!', latestSpec);
-
-      // Should we load this spec into our tool state?
-
-      // Not if we haven't done an initial load
-      if (toolToVoyagerState.current === 'uninitialized') {
-        console.log("  ignoring (haven't done initial load)")
-        return;
-      }
-
-      // Not if we have a pending change
-      if (toolToVoyagerState.current === 'pending') {
-        console.log("  ignoring (pending change)")
-
-        // Check if this is us catching up though
-        if (_.isEqual(latestSpec, specRef.current)) {
-          console.log("  just caught up to tool state!!!")
-          toolToVoyagerState.current = 'done';
-          return;
-        } else {
-          console.log("  hasn't caught up yet", latestSpec, "vs", specRef.current);
-        }
-
-        return;
-      }
-
-      // Otherwise, yeah, let's do it!
-      console.log("  not ignoring (real change from)", specRef.current)
-      updateSpec(() => selectMainSpec(store.getState()));
+      setRawSpecFromVoyager(selectMainSpec(store.getState()));
     });
     return unsubscribe;
-  }, [specRef, store, updateSpec])
+  }, [store, updateSpec])
+
+  const specFromVoyager = useDedupe(rawSpecFromVoyager, _.isEqual);
+
+  useEffect(() => {
+    if (!store) { return; }
+
+    const latestSpec = specFromVoyager;
+
+    console.log('spec in voyager changed!', latestSpec);
+
+    // Should we load this spec into our tool state?
+
+    // Not if we haven't done an initial load
+    if (toolToVoyagerState.current === 'uninitialized') {
+      console.log("  ignoring (haven't done initial load)")
+      return;
+    }
+
+    // Not if we have a pending change
+    if (toolToVoyagerState.current === 'pending') {
+      console.log("  ignoring (pending change)")
+
+      // Check if this is us catching up though
+      if (_.isEqual(latestSpec, specRef.current)) {
+        console.log("  just caught up to tool state!!!")
+        toolToVoyagerState.current = 'done';
+        return;
+      } else {
+        console.log("  hasn't caught up yet", latestSpec, "vs", specRef.current);
+      }
+
+      return;
+    }
+
+    // Otherwise, yeah, let's do it!
+    console.log("  not ignoring (real change from)", specRef.current)
+    updateSpec(() => selectMainSpec(store.getState()));
+  }, [specFromVoyager, specRef, store, updateSpec])
 
   useEffect(() => {
     if (!store) { return; }

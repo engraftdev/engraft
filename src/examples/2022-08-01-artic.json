@@ -222,7 +222,7 @@
                     "config": {
                       "toolName": "code",
                       "modeName": "code",
-                      "code": "IDarcheology996674.map((year) => ({\n  artist: IDcoat018167,\n  year: new Date(year, 0)\n}))",
+                      "code": "IDarcheology996674.map((year) => ({\n  artist: IDcoat018167,\n  decade: Math.floor(year / 10) * 10 + \"s\"\n}))",
                       "subTools": {},
                       "defaultCode": "IDdresser344063"
                     },
@@ -276,6 +276,35 @@
               "code": "IDnymphea196713",
               "subTools": {},
               "defaultCode": ""
+            },
+            "spec": {
+              "data": {
+                "name": "source"
+              },
+              "mark": "bar",
+              "encoding": {
+                "y": {
+                  "aggregate": "count",
+                  "field": "*",
+                  "type": "quantitative"
+                },
+                "x": {
+                  "field": "decade",
+                  "type": "nominal"
+                },
+                "color": {
+                  "field": "artist",
+                  "type": "nominal"
+                }
+              },
+              "config": {
+                "line": {
+                  "point": true
+                },
+                "scale": {
+                  "useUnaggregatedDomain": true
+                }
+              }
             }
           },
           "defaultCode": "IDnymphea196713"
