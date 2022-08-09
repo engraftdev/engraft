@@ -1,5 +1,5 @@
-import { CreateVoyager, Voyager } from "datavoyager";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { CreateVoyager, configureStore, renderVoyager, updateDataAction, datasetLoad, selectMainSpec, Action, buildSchema } from "datavoyager";
+import { memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { registerTool, ToolConfig, ToolProps, ToolView, ToolViewProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
@@ -8,6 +8,7 @@ import { codeConfigSetTo } from "src/tools/CodeTool";
 import style from './style.css';
 import _ from "lodash";
 import { useRefForCallback } from "src/util/useRefForCallback";
+import type { Schema } from "datavoyager/build/models";
 
 
 export interface VoyagerConfig extends ToolConfig {
@@ -64,66 +65,153 @@ interface VoyagerToolViewProps extends ToolProps<VoyagerConfig>, ToolViewProps {
 const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewProps) {
   const { config, updateConfig, autoFocus, data, inputView } = props;
 
-  const [container, setContainer] = useState<HTMLDivElement | null>();
-  const [voyagerInstance, setVoyagerInstance] = useState<Voyager | null>();
-
-  const [spec, updateSpec] = useAt(config, updateConfig, 'spec');
-
+  const [ spec, updateSpec ] = useAt(config, updateConfig, 'spec');
   const specRef = useRefForCallback(spec);
 
+  const [ store, setStore ] = useState<ReturnType<typeof configureStore> | null>();
   useEffect(() => {
-    if (container) {
-      const voyagerInstance = CreateVoyager(container, {
-        hideFooter: true,
-        hideHeader: true,
-        showDataSourceSelector: false,
-      }, undefined as any);
-      setVoyagerInstance(voyagerInstance);
-
-      const unsubscribe = voyagerInstance.onStateChange((state) => {
-        // Load info from instance into state
-        const newSpec = voyagerInstance.getSpec(false);
-        if (!_.isEqual(specRef.current, newSpec)) {
-          // console.log("loading info from instance into state", specRef.current, newSpec);
-          updateSpec(() => newSpec);
-        }
-      })
-
-      // TODO: is there a way to clean up? shrug
-      return () => {
-        unsubscribe();
-      }
+    if (!store) {
+      setStore(configureStore());
     }
-  }, [container, specRef, updateSpec]);
+  }, [store]);
 
-  // Load info from state into instance
-  const dataPrev = usePrevious(data, undefined);
-  const specPrev = usePrevious(spec, undefined);
+  const toolToVoyagerState = useRef<'uninitialized' | 'pending' | 'done'>('uninitialized');
+
+  const prevSpecFromVoyagerRef = useRef<any>();
+
   useEffect(() => {
-    if (!voyagerInstance) { return; }
+    if (!store) { return; }
 
-    try {
-      const dataChanged = _.isEqual(data, dataPrev) && data;
-      const specChanged = _.isEqual(spec, specPrev) && _.isEqual(spec, voyagerInstance.getSpec(false));
+    console.log("setting config");
+    const action: Action = {
+      type: 'SET_CONFIG',
+      payload: {
+        config: {
+          hideFooter: true,
+          hideHeader: true,
+          showDataSourceSelector: false,
+        }
+      }
+    };
+    store.dispatch(action);
 
-      if (dataChanged || specChanged) {
-        // console.log("loading info from state into instance");
-        if (spec) {
-          voyagerInstance.setSpec({...spec as any, data: {values: data}});
-          // Not sure why this is necessary, but it is:
-          voyagerInstance.updateConfig({
-            hideFooter: true,
-            hideHeader: true,
-            showDataSourceSelector: false,
-          })
+    const unsubscribe = store.subscribe(() => {
+      // console.log("STATE", store.getState());
+
+      const latestSpec = selectMainSpec(store.getState());
+
+      // reference checks aren't good enough; gah
+      if (_.isEqual(prevSpecFromVoyagerRef.current, latestSpec)) {
+        return;
+      }
+      prevSpecFromVoyagerRef.current = latestSpec;
+
+      console.log('spec in voyager changed!', latestSpec);
+
+      // Should we load this spec into our tool state?
+
+      // Not if we haven't done an initial load
+      if (toolToVoyagerState.current === 'uninitialized') {
+        console.log("  ignoring (haven't done initial load)")
+        return;
+      }
+
+      // Not if we have a pending change
+      if (toolToVoyagerState.current === 'pending') {
+        console.log("  ignoring (pending change)")
+
+        // Check if this is us catching up though
+        if (_.isEqual(latestSpec, specRef.current)) {
+          console.log("  just caught up to tool state!!!")
+          toolToVoyagerState.current = 'done';
+          return;
         } else {
-          voyagerInstance.updateData({values: data as any})
+          console.log("  hasn't caught up yet", latestSpec, "vs", specRef.current);
         }
+
+        return;
       }
-    } catch (e) {
-      console.error("VoyagerTool:", e);
+
+      // Otherwise, yeah, let's do it!
+      console.log("  not ignoring (real change from)", specRef.current)
+      updateSpec(() => selectMainSpec(store.getState()));
+    });
+    return unsubscribe;
+  }, [specRef, store, updateSpec])
+
+  useEffect(() => {
+    if (!store) { return; }
+
+    console.log("data outside voyager changed!", data);
+    console.log("DISPATCH data load stuff");
+
+    let valuesToLoad: any;
+    let schema: Schema;
+    try {
+      schema = buildSchema(data);
+      // if that succeeds...
+      valuesToLoad = data;
+    } catch {
+      // otherwise
+      valuesToLoad = [];
+      schema = buildSchema(valuesToLoad);
     }
-  }, [voyagerInstance, data, spec, dataPrev, specPrev])
+
+    const action: Action = {
+      type: 'DATASET_RECEIVE',
+      payload: {
+        name: undefined as any,
+        schema,
+        data: { values: valuesToLoad }
+      }
+    }
+    store.dispatch(action);
+  }, [data, store]);
+
+  useEffect(() => {
+    if (!store) { return; }
+
+    if (spec) {
+      console.log("spec outside voyager changed!", spec);
+
+      // Should we load this spec into our Voyager instance?
+
+      const shouldLoad = (() => {
+        // If this is our first load, then sure!
+        if (toolToVoyagerState.current === 'uninitialized') {
+          console.log("  not ignoring (first load)")
+          return true;
+        }
+
+        // Otherwise, see if we're just catching up to our Voyager instance
+        if (_.isEqual(spec, selectMainSpec(store.getState()))) {
+          console.log("  ignoring (catching up to Voyager instance)")
+          return false;
+        } else {
+          console.log("  not ignoring (real change)")
+          return true;
+        }
+      })();
+
+      if (shouldLoad) {
+        toolToVoyagerState.current = 'pending';
+        const action: Action = {
+          type: 'SPEC_LOAD',
+          payload: {
+            spec: spec as any,
+            keepWildcardMark: false
+          }
+        };
+        console.log("DISPATCH SPEC_LOAD");
+        store.dispatch(action);
+      }
+    } else {
+      // We don't have a spec to offer.
+      toolToVoyagerState.current = 'done';
+    }
+  }, [store, spec]);
+
+  if (!store) { return <div>loading</div>; }
 
   return (
     <div className="xCol" style={{padding: 10, minWidth: 1000}}>
@@ -132,8 +220,29 @@ const VoyagerToolView = memo(function VoyagerToolView (props: VoyagerToolViewPro
       </div>
       <div>
         <style>{style}</style>
-        <div ref={setContainer}/>
+        <Voyager store={store}/>
       </div>
     </div>
   );
+})
+
+
+// Wrapped version of renderVoyager from datavoyager
+
+type VoyagerProps = {
+  store: ReturnType<typeof configureStore>;
+}
+
+const Voyager = memo(function Voyager (props: VoyagerProps) {
+  const { store } = props;
+
+  const [ root, setRoot ] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (root) {
+      renderVoyager(root, store);
+    }
+  });
+
+  return <div ref={setRoot}/>
 })
