@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import libCss from "./lib.css";
-import { EnvContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding } from "./tools-framework/tools";
+import { EnvContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding, hasValue } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
 import { codeProgramSetTo } from "./builtin-tools/code";
@@ -234,7 +234,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
     </>);
   }, [component, defaultValue, env, hide, newRoot, origContainer, output, stableVariables, useDefault, view]);
 
-  return (!hide && useDefault) || !output ? defaultValue : output?.value;
+  return (!hide && useDefault) || !hasValue(output) ? defaultValue : output.value;
 }
 
 const useLiveToolDemoKey = 'use-live-tool-demo';

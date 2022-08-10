@@ -6,7 +6,7 @@ import { EditorView } from '@codemirror/view';
 import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -138,8 +138,8 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
     if (compiled) {
       const rand = seedrandom('live-compose 2022');
       const scope = {
-        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), v.value?.value])),
-        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), v?.value])),
+        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), valueOrUndefined(v.value)])),
+        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
         ...globals,
         rand
       };

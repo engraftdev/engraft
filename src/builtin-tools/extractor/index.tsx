@@ -1,5 +1,5 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { codeProgramSetTo } from "src/builtin-tools/code";
 import { newId } from "src/util/id";
@@ -46,7 +46,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   useOutput(reportOutput, useMemo(() => {
     // TODO: fix this; it should integrate results of patterns intelligently
-    if (!inputOutput || !mergedPatterns) {
+    if (!hasValue(inputOutput) || !mergedPatterns) {
       return null;
     }
     try {

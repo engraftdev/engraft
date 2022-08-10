@@ -1,6 +1,6 @@
 import { CSSProperties, ElementType, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolOutput } from "src/tools-framework/tools";
+import { ToolOutput, hasValue } from "src/tools-framework/tools";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
@@ -324,6 +324,8 @@ export type ToolValueBufferProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
 }
 
 export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue, style, ...props}: ToolValueBufferProps) {
+  // TODO: Adapt this for the age of ToolOutputError
+
   const [lastValue, setLastValue] = useStateSetOnly<ToolOutput | null>(null);
 
   useEffect(() => {
@@ -332,7 +334,7 @@ export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderV
     }
   }, [setLastValue, toolValue])
 
-  return lastValue ?
+  return hasValue(lastValue) ?
     <div style={{
       ...style,
       opacity: toolValue === null ? 0.3 : 1,

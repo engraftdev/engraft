@@ -3,7 +3,7 @@ import type { Schema } from "datavoyager/build/models";
 import _ from "lodash";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { codeProgramSetTo } from "src/builtin-tools/code";
-import { ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { useDedupe } from "src/util/useDedupe";
@@ -33,7 +33,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const data = useMemo(() => {
-    if (inputOutput) {
+    if (hasValue(inputOutput)) {
       const value = inputOutput.value;
       if (value instanceof Array) {
         if (value.length === 0 || value[0] instanceof Object) {

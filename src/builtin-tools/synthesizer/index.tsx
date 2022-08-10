@@ -15,7 +15,7 @@ import update from "immutability-helper";
 import _ from "lodash";
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
 import { codeProgramSetTo } from "src/builtin-tools/code";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { compileExpression } from "src/util/compile";
@@ -69,7 +69,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   }, [program.code])
 
   useOutput(reportOutput, useMemo(() => {
-    if (inputOutput && func) {
+    if (hasValue(inputOutput) && func) {
       try {
         return { value: func(inputOutput.value) };
       } catch {
@@ -80,7 +80,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const extraInOutPair: InOutPair = useMemo(() => {
     try {
-      if (inputOutput) {
+      if (hasValue(inputOutput)) {
         const inCode = JSON.stringify(inputOutput.value);
         if (!inOutPairs.some((pair) => pair.inCode === inCode) && func) {
           let outCode;

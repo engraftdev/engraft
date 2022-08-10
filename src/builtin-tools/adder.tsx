@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { codeProgramSetTo } from "./code";
 
@@ -22,7 +22,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [yComponent, yView, yOutput] = useSubTool({program, updateProgram, subKey: 'yProgram'});
 
   useOutput(reportOutput, useMemo(() => {
-    if (xOutput && yOutput) {
+    if (hasValue(xOutput) && hasValue(yOutput)) {
       return {value: (xOutput.value as any) + (yOutput.value as any)};
     }
   }, [xOutput, yOutput]));

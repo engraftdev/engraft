@@ -9,10 +9,27 @@ export type Tool<P extends ToolProgram = any> = {
   programFactory: ProgramFactory<P>;
 }
 
-export type ToolOutput = {
+export type ToolOutput = ToolOutputValue | ToolOutputError;
+export type ToolOutputValue = {
   value: unknown;
   alreadyDisplayed?: boolean;
 };
+export type ToolOutputError = {
+  error: string;
+};
+
+export function hasValue(output: ToolOutput | null | undefined): output is ToolOutputValue {
+  if (!output) { return false; }
+  return 'value' in output;
+}
+
+export function valueOrUndefined(output: ToolOutput | null | undefined): unknown {
+  if (hasValue(output)) {
+    return output.value;
+  } else {
+    return undefined;
+  }
+}
 
 export interface ToolProgram {
   toolName: string;

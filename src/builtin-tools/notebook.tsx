@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding } from "src/tools-framework/tools";
+import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
@@ -280,7 +280,7 @@ interface CellViewProps {
 const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell, outputBelowInput}: CellViewProps) {
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
 
-  const alreadyDisplayed = toolOutput?.alreadyDisplayed;
+  const alreadyDisplayed = hasValue(toolOutput) && toolOutput.alreadyDisplayed;
 
   return <>
     <div className="NotebookTool-CellView-cell-cell">

@@ -1,5 +1,5 @@
 import { CSSProperties, memo, useEffect, useMemo } from "react";
-import { newVar, ProgramFactory, ProvideVarBinding, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var } from "src/tools-framework/tools";
+import { hasValue, newVar, ProgramFactory, ProvideVarBinding, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
@@ -31,7 +31,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
   const inputArray = useMemo(() => {
-    if (!inputOutput) { return null; }
+    if (!hasValue(inputOutput)) { return null; }
 
     if (inputOutput.value instanceof Array) {
       return inputOutput.value.map((v) => ({value: v}));
@@ -51,7 +51,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   })))
 
   useOutput(reportOutput, useMemo(() => ({
-    value: range(inputLength).map((i) => perItemOutputs[i]?.value)
+    value: range(inputLength).map((i) => valueOrUndefined(perItemOutputs[i]))
   }), [inputLength, perItemOutputs]));
 
   useView(reportView, useMemo(() => ({
@@ -146,7 +146,7 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
               <VarDefinition var_={itemVar} updateVar={updateItemVar}/>
               <div style={{lineHeight: 1}}>=</div>
               <div style={{minWidth: 0}}>
-                <Value value={inputArrayTruncated[highlightedIndex]?.value}/>
+                <Value value={valueOrUndefined(inputArrayTruncated[highlightedIndex])}/>
               </div>
             </div>
             <div>

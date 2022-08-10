@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import { ToolOutput } from "src/tools-framework/tools";
+import { hasValue, ToolOutput } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { codeProgramSetTo } from "src/builtin-tools/code";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
@@ -23,7 +23,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
   const [entryOutput, setEntryOutput] = useStateSetOnly<ToolOutput | null>(null)
 
   const onClickSet = useCallback(() => {
-    if (entryOutput) {
+    if (hasValue(entryOutput)) {
       setValue(entryOutput.value);
     }
   }, [entryOutput, setValue]);

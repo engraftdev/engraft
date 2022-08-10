@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { CSSProperties, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
@@ -45,7 +45,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const rootNodeWithoutGhosts = useMemo(() => {
     try {
-      return renderElementToNode(rootElement, inputOutput?.value, '', false);
+      return renderElementToNode(rootElement, valueOrUndefined(inputOutput), '', false);
     } catch (e) {
       console.warn('error generating rootNodeWithoutGhosts', e);
       return null;
@@ -54,7 +54,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const rootNodeWithGhosts = useMemo(() => {
     try {
-      return renderElementToNode(rootElement, inputOutput?.value, '', true);
+      return renderElementToNode(rootElement, valueOrUndefined(inputOutput), '', true);
     } catch (e) {
       console.warn('error generating rootNodeWithGhosts', e);
       return null;
@@ -87,7 +87,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   }, [rootNodeWithoutGhosts, updateControlValues]);
 
   useOutput(reportOutput, useMemo(() => {
-    if (!inputOutput) return null;
+    if (!hasValue(inputOutput)) return null;
 
     try {
       const renderedNode = renderElementToNode(program.rootElement, inputOutput.value, '', false);
@@ -351,7 +351,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   const [styleOutput, setStyleOutput] = useStateSetOnly<ToolOutput | null>(null)
 
   useEffect(() => {
-    if (styleOutput?.value) {
+    if (hasValue(styleOutput)) {
       updateRootElement((rootElement) =>
         updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
           updateF({style: {$set: styleOutput.value as CSSProperties}})

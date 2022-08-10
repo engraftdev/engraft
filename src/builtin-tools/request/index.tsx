@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { codeProgramSetTo } from "src/builtin-tools/code";
 import { Program as TextProgram } from "src/builtin-tools/text";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";
@@ -45,7 +45,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [autoSend, updateAutoSend] = useAt(program, updateProgram, 'autoSend');
 
   const send = useCallback(async () => {
-    if (!urlOutput || typeof urlOutput.value !== 'string') { return; }
+    if (!hasValue(urlOutput) || typeof urlOutput.value !== 'string') { return; }
 
     if (offlineData[urlOutput.value]) {
       reportOutput({ value: offlineData[urlOutput.value] })
@@ -53,12 +53,12 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
 
     const url = new URL(urlOutput.value);
-    let params = paramsOutput?.value as object || {}
+    let params = valueOrUndefined(paramsOutput) as object || {}
     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, typeof v === 'string' ? v : JSON.stringify(v as any)))
     const resp = await fetch(url.toString());
     const data: unknown = await resp.json();
     reportOutput({value: data});
-  }, [paramsOutput?.value, reportOutput, urlOutput])
+  }, [paramsOutput, reportOutput, urlOutput])
 
   const [sendDebounced, sendDebouncedControl] = useDebounce(send, 1000)
 

@@ -3,7 +3,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -46,7 +46,7 @@ export const Component = memo((props: ToolProps<Program>) => {
     let result = program.text;
     const applyReplacement = ([k, v]: readonly [string, ToolOutput | null]) => {
       let replacementText = '';
-      if (v) {
+      if (hasValue(v)) {
         const toolValue = v.value;
         if (typeof toolValue === 'object' && toolValue) {
           replacementText = toolValue.toString();

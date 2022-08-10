@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import ChalkEditor from "src/util/ChalkEditor";
 import { compileExpression } from "src/util/compile";
@@ -34,11 +34,11 @@ export const Component = memo((props: ToolProps<Program>) => {
     try {
       const compiled = compileExpression(code);
       const f = compiled({}) as any;
-      return { value: f(inputOutput?.value) }
+      return { value: f(valueOrUndefined(inputOutput)) }
     } catch {
       return null;
     }
-  }, [code, inputOutput?.value]));
+  }, [code, inputOutput]));
 
   const setCode = useCallback((code: string) => {
     return updateCode(() => code);
@@ -54,10 +54,10 @@ export const Component = memo((props: ToolProps<Program>) => {
         <ChalkEditor
           code={code}
           setCode={setCode}
-          input={inputOutput?.value}
+          input={valueOrUndefined(inputOutput)}
         />
       </div>
-  }), [code, inputOutput?.value, inputView, setCode]));
+  }), [code, inputOutput, inputView, setCode]));
 
   return <>
     {inputComponent}

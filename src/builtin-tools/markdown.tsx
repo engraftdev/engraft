@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it';
-import { memo, useCallback, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { memo, useMemo } from "react";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
 import { codeProgramSetTo } from "./code";
@@ -25,12 +25,12 @@ export const Component = memo((props: ToolProps<Program>) => {
   const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
 
   useOutput(reportOutput, useMemoObject({
-    value: sourceOutput?.value,
+    value: valueOrUndefined(sourceOutput),
     alreadyDisplayed: true
   }));
 
   const htmlOrError = useMemo(() => {
-    if (!sourceOutput) {
+    if (!hasValue(sourceOutput)) {
       return {error: 'missing source'};
     }
     if (typeof(sourceOutput.value) !== 'string') {
