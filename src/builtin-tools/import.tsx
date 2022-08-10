@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { ProgramFactory, ToolOutput, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
-import ControlledTextInput from "src/util/ControlledTextInput";
+import { ControlledTextInput } from "src/util/ControlledTextInput";
 import { useAt } from "src/util/state";
 
 export type Program = {

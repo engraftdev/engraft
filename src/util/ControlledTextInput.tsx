@@ -1,11 +1,13 @@
-import React, { ChangeEvent, HTMLProps, memo, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, HTMLProps, memo, useCallback, useEffect, useRef, useState } from 'react';
+
+import ContentEditable from 'react-contenteditable';
 
 interface ControlledTextInputProps extends HTMLProps<HTMLInputElement> {
   value: string,
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ControlledTextInput = memo(function ControlledTextInput(props: ControlledTextInputProps) {
+export const ControlledTextInput = memo(function ControlledTextInput(props: ControlledTextInputProps) {
   const { value, onChange, ...rest } = props;
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLInputElement>(null);
@@ -24,7 +26,6 @@ const ControlledTextInput = memo(function ControlledTextInput(props: ControlledT
 
   return <input ref={ref} type='text' value={value} onChange={handleChange} {...rest} />;
 });
-export default ControlledTextInput;
 
 
 interface ControlledSpanProps extends HTMLProps<HTMLSpanElement> {
@@ -32,31 +33,15 @@ interface ControlledSpanProps extends HTMLProps<HTMLSpanElement> {
   onValue: (value: string) => void;
 }
 
-
 export const ControlledSpan = memo(function ControlledSpan(props: ControlledSpanProps) {
-  const { value, onValue, ...rest } = props;
-  const [cursor, setCursor] = useState<number | null>(null);
-  const ref = useRef<HTMLSpanElement>(null);
+  const { value, onValue, style, className } = props;
 
-  useEffect(() => {
-    const input = ref.current;
-    if (!input || !cursor) { return; }
-
-    var range = document.createRange()
-    var sel = window.getSelection()!
-
-    range.setStart(input.childNodes[0], cursor)
-    range.collapse(true)
-
-    sel.removeAllRanges()
-    sel.addRange(range)
-  }, [ref, cursor, value]);
-
-  const handleChange = (e: ChangeEvent<HTMLSpanElement>) => {
-    var sel = document.getSelection()!;
-    setCursor(sel.focusOffset);
-    onValue && onValue(e.target.innerText);
-  };
-
-  return <span ref={ref} contentEditable={true} onInput={handleChange} suppressContentEditableWarning={true} {...rest}>{value}</span>;
+  return <ContentEditable
+    html={value}
+    onChange={useCallback((e) => {
+      onValue(e.target.value);
+    } , [onValue])}
+    style={style}
+    className={className}
+  />;
 });
