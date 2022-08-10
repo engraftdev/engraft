@@ -6,7 +6,7 @@ import { ToolWithView } from './tools-framework/ToolWithView';
 import { Program as CodeProgram, codeProgramSetTo } from './builtin-tools/code';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
-import { ValueOfTool } from './view/Value';
+import { ToolOutputView } from './view/Value';
 import { builtinTools } from "./builtinTools";
 
 
@@ -71,7 +71,7 @@ const App = memo(function App() {
     </div>
     <br/>
     <br/>
-    {showOutput && <ValueOfTool toolValue={output} />}
+    {showOutput && <ToolOutputView toolValue={output} />}
     <br/>
     <br/>
     <br/>

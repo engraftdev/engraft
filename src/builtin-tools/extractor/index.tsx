@@ -9,7 +9,7 @@ import { Use } from "src/util/Use";
 import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
-import { pathString, ValueCustomizations, ValueOfTool } from "src/view/Value";
+import { pathString, ValueCustomizations, ToolOutputView } from "src/view/Value";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
 
 interface PatternWithId {
@@ -394,7 +394,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <div style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ValueOfTool toolValue={inputOutput} customizations={customizations} />
+          <ToolOutputView toolValue={inputOutput} customizations={customizations} />
         </ExtractorContext.Provider>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { newId } from "src/util/id";
 import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
-import { ValueFrame, ValueOfTool } from "src/view/Value";
+import { ValueFrame, ToolOutputView } from "src/view/Value";
 import { codeProgramSetTo, Program as CodeProgram, summarizeCodeProgram } from "./code";
 
 export interface Program {
@@ -261,7 +261,7 @@ const LinkView = memo(function ({program, updateProgram, outputs, id, selectedLi
       }}
     >
       <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', margin: 4 }}>
-        <ValueOfTool toolValue={outputs[link.id]}/>
+        <ToolOutputView toolValue={outputs[link.id]}/>
       </ValueFrame>
       <div
         className="ChainTool-link-bar xRow xClickable"

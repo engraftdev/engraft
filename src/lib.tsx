@@ -11,7 +11,7 @@ import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
 import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
-import { ToolValueBuffer, Value, ValueOfTool } from "./view/Value";
+import { ToolValueBuffer, Value, ToolOutputView } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
 import { builtinTools } from "./builtinTools";
 
@@ -60,7 +60,7 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
 
   return <div>
     <div style={{padding: 5}}>
-      <ValueOfTool toolValue={output}/>
+      <ToolOutputView toolValue={output}/>
     </div>
     <div>
       <EnvContext.Provider value={env}>
@@ -287,7 +287,7 @@ export const UseLiveToolRHS = memo(function UseLiveToolRHS(props: UseLiveToolRHS
         <div style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
           <h2>Output</h2>
           {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', alignSelf: 'stretch' }} innerStyle={{ flexGrow: 1 }}> */}
-            <ValueOfTool toolValue={output}/>
+            <ToolOutputView toolValue={output}/>
           {/* </ValueFrame> */}
           { defaultValue !== undefined &&
             <div className="xRow xGap10" style={{marginTop: 10}}>
@@ -363,7 +363,7 @@ export { default as ReactDOM } from 'react-dom';
 ////////////////
 
 export { EnvContext } from 'src/tools-framework/tools';
-export type { ToolProgram, ToolOutput as ToolValue } from 'src/tools-framework/tools';
+export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
 export { codeProgramSetTo } from 'src/builtin-tools/code';

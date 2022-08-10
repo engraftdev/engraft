@@ -7,7 +7,7 @@ import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly
 import { Use } from "src/util/Use";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
-import { ValueOfTool } from "src/view/Value";
+import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./code";
 
@@ -299,7 +299,7 @@ const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput,
     { !alreadyDisplayed &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
         <div className="xStickyTop10">
-          <ValueOfTool toolValue={toolOutput}/>
+          <ToolOutputView toolValue={toolOutput}/>
         </div>
       </div>
     }

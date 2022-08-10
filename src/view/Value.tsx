@@ -1,6 +1,6 @@
 import { CSSProperties, ElementType, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolOutput, hasValue } from "src/tools-framework/tools";
+import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/tools-framework/tools";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
@@ -305,43 +305,55 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
 
 
-export type ValueOfToolProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
+export type ToolOutputViewProps = {
   toolValue: ToolOutput | null;
   customizations?: ValueCustomizations;
 }
 
-// TODO: awful naming huh?
-export const ValueOfTool = memo(function ValueOfTool({toolValue, customizations, style, ...props}: ValueOfToolProps) {
+export const ToolOutputView = memo(function ToolValue({toolValue, customizations}: ToolOutputViewProps) {
   return <ToolValueBuffer
     toolValue={toolValue}
     renderValue={(value) => <Value value={value} customizations={customizations}/>}
   />;
 });
 
-export type ToolValueBufferProps = Omit<HTMLProps<HTMLDivElement>, 'ref'> & {
+export type ToolValueBufferProps = {
   toolValue: ToolOutput | null;
   renderValue: (value: any) => ReactNode;
 }
 
-export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue, style, ...props}: ToolValueBufferProps) {
-  // TODO: Adapt this for the age of ToolOutputError
-
-  const [lastValue, setLastValue] = useStateSetOnly<ToolOutput | null>(null);
+export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue}: ToolValueBufferProps) {
+  const [lastOutputValue, setLastOutputValue] = useStateSetOnly<ToolOutputValue | null>(null);
 
   useEffect(() => {
-    if (toolValue) {
-      setLastValue(toolValue);
+    if (hasValue(toolValue)) {
+      setLastOutputValue(toolValue);
     }
-  }, [setLastValue, toolValue])
+  }, [setLastOutputValue, toolValue])
 
-  return hasValue(lastValue) ?
-    <div style={{
-      ...style,
-      opacity: toolValue === null ? 0.3 : 1,
-    }} {...props}>
-      {renderValue(lastValue.value)}
-    </div> :
-    <div style={{fontSize: 13, fontStyle: 'italic'}}>
-      no output yet
-    </div>;
+  const valueView =
+    hasValue(lastOutputValue)
+    ? <div style={{
+        opacity: hasValue(toolValue) ? 1 : 0.3,
+      }}>
+        {renderValue(lastOutputValue.value)}
+      </div>
+    : <div style={{fontSize: 13, fontStyle: 'italic'}}>
+        no value yet
+      </div>;
+
+  return <div>
+    {valueView}
+    {hasError(toolValue) &&
+      <div title={toolValue.error}>⚠️</div>
+      // <div style={{
+      //   ...style,
+      //   opacity: 0.7,
+      //   color: "#a00",
+      //   fontSize: 13,
+      // }} {...props}>
+      //   {toolValue.error}
+      // </div>
+    }
+  </div>
 });

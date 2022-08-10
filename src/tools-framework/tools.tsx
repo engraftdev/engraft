@@ -31,6 +31,11 @@ export function valueOrUndefined(output: ToolOutput | null | undefined): unknown
   }
 }
 
+export function hasError(output: ToolOutput | null | undefined): output is ToolOutputError {
+  if (!output) { return false; }
+  return 'error' in output;
+}
+
 export interface ToolProgram {
   toolName: string;
 }

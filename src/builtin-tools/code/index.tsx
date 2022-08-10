@@ -119,8 +119,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
       const result = compileExpression(translated);
       return result;
     } catch (e) {
-      // console.warn("error with", program.code)
-      // console.warn(e);
+      return {error: (e as any).toString()};
     }
   }, [program.code])
 
@@ -132,10 +131,12 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
 
-  // TODO: should this be useMemo?
+  // TODO: should this be useMemo? issues with async, huh?
   const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
   useEffect(() => {
-    if (compiled) {
+    if ('error' in compiled) {
+      setOutput({error: compiled.error});
+    } else {
       const rand = seedrandom('live-compose 2022');
       const scope = {
         ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), valueOrUndefined(v.value)])),
@@ -154,11 +155,9 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         }
       } catch (e) {
         // console.warn("error with", program.code)
-        console.warn(e);
-        setOutput(null);
+        // console.warn(e);
+        setOutput({error: (e as any).toString()});
       }
-    } else {
-      setOutput(null);
     }
   }, [compiled, env, outputs, setOutput])
   useOutput(reportOutput, output);
