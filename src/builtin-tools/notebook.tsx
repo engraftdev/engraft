@@ -40,13 +40,6 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
 
-  // TODO: migration; not great
-  useEffect(() => {
-    if (!program.prevVar) {
-      updateKeys(updateProgram, { prevVar: newVar('prev') });
-    }
-  }, [program.prevVar, updateProgram])
-
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
