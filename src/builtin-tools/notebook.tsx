@@ -3,10 +3,12 @@ import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "re
 import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
+import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
+import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./code";
@@ -54,54 +56,9 @@ export const Component = memo((props: ToolProps<Program>) => {
     updateKeys(updateOutputs, {[id]: output})
   }, [updateOutputs])
 
-  const smallestUnusedLabel = defaultCellLabels.find((label) =>
-    !cells.find((cell) => cell.var_.label === label)
-  )!
-
-  const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
-  const onChangeOutputBelowInput = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
-    updateOutputBelowInput(() => ev.target.checked);
-  }, [updateOutputBelowInput]);
-
   useView(reportView, useMemo(() => ({
-    render: () =>
-      <div className="NotebookTool xPad10">
-        {/* TODO: figure out where to put 'output below input' */}
-        <div style={{display: 'none'}}>
-          <label>
-            <input
-              type="checkbox"
-              checked={outputBelowInput}
-              onChange={onChangeOutputBelowInput}
-              style={{marginRight: 5}}
-            />
-            output below input
-          </label>
-        </div>
-        <div className="xChildrenMinWidth0"
-          style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
-          }}>
-          {cells.map((cell, i) =>
-            <Fragment key={cell.var_.id}>
-              <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
-              <CellView cell={cell}
-                // TODO: memoize these?
-                updateCell={atIndex(updateCells, i)}
-                removeCell={() => {
-                  const newCells = [...cells];
-                  newCells.splice(i, 1);
-                  updateCells(() => newCells);
-                }}
-                toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
-                outputBelowInput={outputBelowInput || false}
-              />
-            </Fragment>
-          )}
-          <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
-        </div>
-      </div>
-  }), [cells, onChangeOutputBelowInput, outputBelowInput, outputs, program.prevVar, smallestUnusedLabel, updateCells, views]));
+    render: () => <View {...props} outputs={outputs} views={views} />
+  }), [outputs, props, views]));
 
   useOutput(reportOutput, useMemo(() => {
     const lastCell = cells[cells.length - 1] as Cell | null;
@@ -131,6 +88,80 @@ export const Component = memo((props: ToolProps<Program>) => {
 
 const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
 
+
+type ViewProps = ToolProps<Program> & {
+  outputs: {[id: string]: ToolOutput | null},
+  views: {[id: string]: ToolView | null},
+}
+
+const View = memo((props: ViewProps) => {
+  const { program, updateProgram, views, outputs } = props;
+
+  const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
+  const onChangeOutputBelowInput = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+    updateOutputBelowInput(() => ev.target.checked);
+  }, [updateOutputBelowInput]);
+
+  const [cells, updateCells] = useAt(program, updateProgram, 'cells');
+
+  const smallestUnusedLabel = defaultCellLabels.find((label) =>
+    !cells.find((cell) => cell.var_.label === label)
+  )!
+
+  const notebookMenuMaker: MenuMaker = useCallback((closeMenu) => <>
+    <MyContextMenuHeading>Notebook</MyContextMenuHeading>
+    <div className="MenuItem">
+      <input type="checkbox" checked={outputBelowInput} onChange={(ev) => updateOutputBelowInput(() => ev.target.checked)}/> Output below input
+    </div>
+  </>, [outputBelowInput, updateOutputBelowInput]);
+
+  const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
+    <MyContextMenu>
+      {notebookMenuMaker(closeMenu)}
+    </MyContextMenu>
+  , [notebookMenuMaker]));
+
+  return (
+    <div className="NotebookTool xPad10" onContextMenu={openMenu}>
+      { menuNode }
+      {/* TODO: figure out where to put 'output below input' */}
+      <div style={{display: 'none'}}>
+        <label>
+          <input
+            type="checkbox"
+            checked={outputBelowInput}
+            onChange={onChangeOutputBelowInput}
+            style={{marginRight: 5}}
+          />
+          output below input
+        </label>
+      </div>
+      <div className="xChildrenMinWidth0"
+        style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
+        }}>
+        {cells.map((cell, i) =>
+          <Fragment key={cell.var_.id}>
+            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+            <CellView cell={cell}
+              // TODO: memoize these?
+              updateCell={atIndex(updateCells, i)}
+              removeCell={() => {
+                const newCells = [...cells];
+                newCells.splice(i, 1);
+                updateCells(() => newCells);
+              }}
+              toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
+              notebookMenuMaker={notebookMenuMaker}
+              outputBelowInput={outputBelowInput || false}
+            />
+          </Fragment>
+        )}
+        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+      </div>
+    </div>
+  );
+})
 
 interface RowDividerProps {
   i: number;
@@ -267,30 +298,49 @@ interface CellViewProps {
 
   removeCell: () => void;
 
+  notebookMenuMaker: MenuMaker;
+
   outputBelowInput: boolean;
 }
 
-const CellView = memo(function CellView({cell, updateCell, toolView, toolOutput, removeCell, outputBelowInput}: CellViewProps) {
+const CellView = memo(function CellView(props: CellViewProps) {
+  const {cell, updateCell, toolView, toolOutput, removeCell, notebookMenuMaker, outputBelowInput} = props;
+
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
 
   const alreadyDisplayed = hasValue(toolOutput) && toolOutput.alreadyDisplayed;
 
+  const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
+    <MyContextMenu>
+      <MyContextMenuHeading>Cell</MyContextMenuHeading>
+      <button
+        onClick={() => {
+          removeCell();
+          closeMenu();
+        }}
+      >
+        Delete
+      </button>
+      {notebookMenuMaker(closeMenu)}
+    </MyContextMenu>
+  , [notebookMenuMaker, removeCell]));
+
   return <>
-    <div className="NotebookTool-CellView-cell-cell">
+    {menuNode}
+    <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
       <div className="xRow xGap10 xStickyTop10">
         <div className="xExpand"/>
-        <div className="xClickable" style={{zoom: "60%"}} onClick={removeCell}>✖️</div>
         <VarDefinition var_={var_} updateVar={updateVar}/>
         <div className="xLineHeight1">=</div>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
+    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
       <div className="xStickyTop10">
         <ShowView view={toolView}/>
       </div>
     </div>
     { !alreadyDisplayed &&
-      <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}>
+      <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
         <div className="xStickyTop10">
           <ToolOutputView toolValue={toolOutput}/>
         </div>

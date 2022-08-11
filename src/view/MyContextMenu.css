@@ -1,0 +1,28 @@
+.MyContextMenu {
+  z-index: 100;
+  background-color: #fffa;
+  backdrop-filter: blur(10px);
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 10px;
+  color: #373a3c;
+  font-size: 16px;
+  margin: 2px 0 0;
+  min-width: 160px;
+  outline: none;
+  padding: 10px;
+  text-align: left;
+  /* transition: opacity 250ms ease !important; */
+}
+
+
+.MyContextMenu-divider {
+  border-bottom: 1px solid rgba(0,0,0,.15);
+  cursor: inherit;
+  margin-bottom: 3px;
+  padding: 2px 0;
+}
+
+.MyContextMenu-divider:first-child {
+  margin-top: -3px;
+}
