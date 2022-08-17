@@ -1,4 +1,5 @@
 import { memo, ReactNode } from "react";
+import { cN } from "src/deps";
 import { PossibleVarBindings, ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
@@ -11,6 +12,7 @@ import { ValueEditable } from "./ValueEditable";
 
 export interface ToolFrameProps {
   children: ReactNode;
+  expand?: boolean;
   program: ToolProgram;
   updateProgram?: Updater<ToolProgram>;
   onClose?: () => void;
@@ -18,11 +20,13 @@ export interface ToolFrameProps {
   possibleVarBindings: PossibleVarBindings;
 }
 
-export const ToolFrame = memo(function ToolFrame({children, program, updateProgram, onClose, varBindings, possibleVarBindings}: ToolFrameProps) {
+export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
+  const {children, expand, program, updateProgram, onClose, varBindings, possibleVarBindings} = props;
+
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div
-    className="ToolFrame xWidthFitContent"
+    className={cN("ToolFrame", {xWidthFitContent: !expand})}
     style={{
       border: '1px solid #c4c4ff', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
       height: '100%', maxWidth: '100%',

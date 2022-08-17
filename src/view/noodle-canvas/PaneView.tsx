@@ -3,28 +3,30 @@ import { updateF } from "src/util/updateF";
 import { useRefForCallback } from "src/util/useRefForCallback";
 
 
-import { Pane, roundTo } from "./model";
+import { Pane, PaneGeo, roundTo } from "./model";
 import { PaneResizers } from "./PaneResizers";
 
 export type PaneViewProps = {
   pane: Pane,
-  updatePaneById: (id: string, f: (old: Pane) => Pane) => void,
+  updatePaneGeoById: (id: string, f: (old: PaneGeo) => PaneGeo) => void,
+  minWidth?: number,
+  minHeight?: number,
 }
 
 export const PaneView = memo(function Pane(props: PaneViewProps) {
-  const { pane, updatePaneById } = props;
-  const paneRef = useRefForCallback(pane);
+  const { pane, updatePaneGeoById } = props;
+  const geoRef = useRefForCallback(pane.geo);
 
   const onMouseDownDrag = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
     startEvent.stopPropagation();
     startEvent.preventDefault();
 
-    const startPane = paneRef.current;
+    const startGeo = geoRef.current;
 
     const onMousemove = (currentEvent: MouseEvent) => {
-      const newX = roundTo(startPane.x + currentEvent.clientX - startEvent.clientX, 16);
-      const newY = roundTo(startPane.y + currentEvent.clientY - startEvent.clientY, 16);
-      updatePaneById(pane.id, updateF({
+      const newX = roundTo(startGeo.x + currentEvent.clientX - startEvent.clientX, 16);
+      const newY = roundTo(startGeo.y + currentEvent.clientY - startEvent.clientY, 16);
+      updatePaneGeoById(pane.id, updateF({
         x: {$set: newX}, y: {$set: newY},
       }));
     }
@@ -36,7 +38,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
     document.addEventListener('mousemove', onMousemove);
     document.addEventListener('mouseup', onMouseup);
     document.body.classList.add('cursor-grabbing');
-  }, [pane.id, paneRef, updatePaneById]);
+  }, [geoRef, pane.id, updatePaneGeoById]);
 
   return (
     <div
@@ -45,13 +47,13 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: `translate(${pane.x}px, ${pane.y}px)`,
+        transform: `translate(${pane.geo.x}px, ${pane.geo.y}px)`,
       }}
     >
       <div
         style={{
-          width: pane.width,
-          height: pane.height,
+          width: pane.geo.width,
+          height: pane.geo.height,
           backgroundColor: 'rgb(255, 255, 255)',
           borderRadius: '0.25rem',
           boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)'
@@ -75,10 +77,18 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
               display: 'flex',
               alignItems: 'center',
               cursor: 'grab',
+              flexShrink: 0,
             }}
             onMouseDown={onMouseDownDrag}
           >
-            {pane.id}
+            {pane.heading}
+          </div>
+          <div
+            style={{
+              overflow: 'hidden',
+            }}
+          >
+            {pane.children}
           </div>
         </div>
       </div>

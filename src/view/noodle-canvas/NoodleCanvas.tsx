@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Pane } from "./model";
+import { Pane, PaneGeo } from "./model";
 import { PaneView } from "./PaneView";
 
 // todo:
@@ -15,24 +15,22 @@ import { PaneView } from "./PaneView";
 
 export type NoodleCanvasProps = {
   panes: Pane[],
-  updatePaneById: (id: string, f: (old: Pane) => Pane) => void,
+  updatePaneGeoById: (id: string, f: (old: PaneGeo) => PaneGeo) => void,
+  minWidth?: number,
+  minHeight?: number,
 }
 
 export const NoodleCanvas = memo(function NoodleCanvas(props: NoodleCanvasProps) {
-  const { panes, updatePaneById } = props;
+  const { panes, updatePaneGeoById, minWidth, minHeight } = props;
 
   return (
     <div
       style={{
         backgroundColor: 'rgb(240, 240, 240)',
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        overflow: 'hidden',
       }}
     >
-      <style>
-        {['grabbing', 'ew-resize', 'ns-resize', 'nesw-resize', 'nwse-resize'].map(cursor =>
-          `.cursor-${cursor} * { cursor: ${cursor} !important; }`
-        )}
-      </style>
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         backgroundImage: 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAkSURBVHgB7cNBCQAwDASwY/4FnbuVqugngaTt3znyAgAAABwbwdUGUUuAs94AAAAASUVORK5CYII=)',
@@ -41,8 +39,11 @@ export const NoodleCanvas = memo(function NoodleCanvas(props: NoodleCanvasProps)
       }} />
       {panes.map(pane =>
         <PaneView
+          key={pane.id}
           pane={pane}
-          updatePaneById={updatePaneById}
+          updatePaneGeoById={updatePaneGeoById}
+          minWidth={minWidth}
+          minHeight={minHeight}
         />
       )}
     </div>

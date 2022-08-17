@@ -41,7 +41,8 @@ export interface ToolProgram {
 }
 
 export interface ToolViewRenderProps {
-  autoFocus?: boolean
+  autoFocus?: boolean,
+  expand?: boolean,
 }
 
 export type ToolView = {

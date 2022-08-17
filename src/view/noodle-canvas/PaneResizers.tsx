@@ -1,53 +1,55 @@
-import { memo, useState, useCallback, CSSProperties } from "react";
+import { memo, useMemo, useState, useCallback, CSSProperties } from "react";
+import { update } from "src/deps";
+import { drag } from "src/util/drag";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { useRefForCallback } from "src/util/useRefForCallback";
-import { roundTo } from "./model";
+import { PaneGeo, roundTo } from "./model";
 import { PaneViewProps } from "./PaneView";
 
+function dragLeft (startGeo: PaneGeo, deltaX: number, minWidth?: number): (old: PaneGeo) => PaneGeo {
+  const startRight = startGeo.x + startGeo.width;
+  const newX = roundTo(startGeo.x + deltaX, 16);
+  const newWidth = Math.max(startRight - newX, minWidth || 0);
+  const actualNewX = startRight - newWidth;
+  return updateF({
+    x: {$set: actualNewX}, width: {$set: newWidth},
+  });
+}
+
 export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
-  const { pane, updatePaneById } = props;
-  const paneRef = useRefForCallback(pane);
+  const { pane, updatePaneGeoById, minWidth, minHeight } = props;
+  const geoRef = useRefForCallback(pane.geo);
 
   const [draggingL, setDraggingL] = useState(false);
   const [draggingR, setDraggingR] = useState(false);
   const [draggingB, setDraggingB] = useState(false);
 
-  const onMouseDownResizerLeft = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
-
-    const startPane = paneRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newX = roundTo(startPane.x + currentEvent.clientX - startEvent.clientX, 16);
-      const newWidth = startPane.width + startPane.x - newX;
-      updatePaneById(pane.id, updateF({
-        x: {$set: newX}, width: {$set: newWidth},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-ew-resize');
+  const onMouseDownResizerLeft = useMemo(() => drag({
+    init() {
+      setDraggingL(true);
+      return {startGeo: geoRef.current};
+    },
+    move({startGeo}) {
+      updatePaneGeoById(pane.id,
+        dragLeft(startGeo, this.event.clientX - this.startEvent.clientX, minWidth)
+      );
+    },
+    done() {
       setDraggingL(false);
-
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-ew-resize');
-    setDraggingL(true);
-  }, [pane.id, paneRef, updatePaneById]);
+    },
+    keepCursor: true,
+  }), [geoRef, minWidth, pane.id, updatePaneGeoById]);
 
   const onMouseDownResizerRight = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
     startEvent.stopPropagation();
     startEvent.preventDefault();
 
-    const startPane = paneRef.current;
+    const startGeo = geoRef.current;
 
     const onMousemove = (currentEvent: MouseEvent) => {
-      const newWidth = roundTo(startPane.width + currentEvent.clientX - startEvent.clientX, 16);
-      updatePaneById(pane.id, updateF({
+      const newWidth = Math.max(roundTo(startGeo.width + currentEvent.clientX - startEvent.clientX, 16), minWidth || 0);
+      updatePaneGeoById(pane.id, updateF({
         width: {$set: newWidth},
       }));
     }
@@ -61,17 +63,17 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
     document.addEventListener('mouseup', onMouseup);
     document.body.classList.add('cursor-ew-resize');
     setDraggingR(true);
-  }, [pane.id, paneRef, updatePaneById]);
+  }, [geoRef, minWidth, pane.id, updatePaneGeoById]);
 
   const onMouseDownResizerBottom = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
     startEvent.stopPropagation();
     startEvent.preventDefault();
 
-    const startPane = paneRef.current;
+    const startGeo = geoRef.current;
 
     const onMousemove = (currentEvent: MouseEvent) => {
-      const newHeight = roundTo(startPane.height + currentEvent.clientY - startEvent.clientY, 16);
-      updatePaneById(pane.id, updateF({
+      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
+      updatePaneGeoById(pane.id, updateF({
         height: {$set: newHeight},
       }));
     }
@@ -85,19 +87,19 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
     document.addEventListener('mouseup', onMouseup);
     document.body.classList.add('cursor-ns-resize');
     setDraggingB(true);
-  }, [pane.id, paneRef, updatePaneById]);
+  }, [geoRef, minHeight, pane.id, updatePaneGeoById]);
 
   const onMouseDownResizerBottomLeft = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
     startEvent.stopPropagation();
     startEvent.preventDefault();
 
-    const startPane = paneRef.current;
+    const startGeo = geoRef.current;
 
     const onMousemove = (currentEvent: MouseEvent) => {
-      const newX = roundTo(startPane.x + currentEvent.clientX - startEvent.clientX, 16);
-      const newWidth = startPane.width + startPane.x - newX;
-      const newHeight = roundTo(startPane.height + currentEvent.clientY - startEvent.clientY, 16);
-      updatePaneById(pane.id, updateF({
+      const newX = roundTo(startGeo.x + currentEvent.clientX - startEvent.clientX, 16);
+      const newWidth = Math.max(startGeo.width + startGeo.x - newX, minWidth || 0);
+      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
+      updatePaneGeoById(pane.id, updateF({
         x: {$set: newX}, width: {$set: newWidth}, height: {$set: newHeight},
       }));
     }
@@ -113,18 +115,18 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
     document.body.classList.add('cursor-nesw-resize');
     setDraggingB(true);
     setDraggingL(true);
-  }, [pane.id, paneRef, updatePaneById]);
+  }, [geoRef, minHeight, minWidth, pane.id, updatePaneGeoById]);
 
   const onMouseDownResizerBottomRight = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
     startEvent.stopPropagation();
     startEvent.preventDefault();
 
-    const startPane = paneRef.current;
+    const startGeo = geoRef.current;
 
     const onMousemove = (currentEvent: MouseEvent) => {
-      const newWidth = roundTo(startPane.width + currentEvent.clientX - startEvent.clientX, 16);
-      const newHeight = roundTo(startPane.height + currentEvent.clientY - startEvent.clientY, 16);
-      updatePaneById(pane.id, updateF({
+      const newWidth = Math.max(roundTo(startGeo.width + currentEvent.clientX - startEvent.clientX, 16), minWidth || 0);
+      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
+      updatePaneGeoById(pane.id, updateF({
         width: {$set: newWidth}, height: {$set: newHeight},
       }));
     }
@@ -140,7 +142,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
     document.body.classList.add('cursor-nwse-resize');
     setDraggingB(true);
     setDraggingR(true);
-  }, [pane.id, paneRef, updatePaneById]);
+  }, [geoRef, minHeight, minWidth, pane.id, updatePaneGeoById]);
 
   const [refL, hoveredL] = useHover();
   const [refR, hoveredR] = useHover();

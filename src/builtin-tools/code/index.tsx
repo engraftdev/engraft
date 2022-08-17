@@ -6,6 +6,7 @@ import { EditorView } from '@codemirror/view';
 import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
+import { cN } from 'src/deps';
 import { VarBindingsContext, PossibleVarBindingsContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
@@ -188,7 +189,7 @@ interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewRende
 }
 
 const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolCodeModeViewProps) {
-  const {program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindings} = props;
+  const {expand, program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindings} = props;
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
@@ -258,9 +259,14 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     })}
   </>
 
-  return <div className="xWidthFitContent" style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', boxSizing: 'border-box', maxWidth: '100%'}}>
-    {contents}
-  </div>;
+  return (
+    <div
+      className={cN('CodeToolCodeModeView', {xWidthFitContent: !expand})}
+      style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', boxSizing: 'border-box', maxWidth: '100%'}}
+    >
+      {contents}
+    </div>
+  );
 });
 
 
@@ -286,8 +292,9 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ program, report
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
   useView(reportView, useMemo(() => ({
-    render: ({autoFocus}) =>
+    render: ({autoFocus, expand}) =>
       <ToolFrame
+        expand={expand}
         program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings} possibleVarBindings={possibleVarBindings}
         onClose={() => {
           updateProgram(() => ({
