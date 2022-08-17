@@ -1,148 +1,82 @@
-import { memo, useMemo, useState, useCallback, CSSProperties } from "react";
-import { update } from "src/deps";
-import { drag } from "src/util/drag";
+import { CSSProperties, memo, useMemo, useState } from "react";
+import { combineDrags, startDrag, someDrag } from "src/util/drag";
+import { Updater } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import { PaneGeo, roundTo } from "./model";
-import { PaneViewProps } from "./PaneView";
 
-function dragLeft (startGeo: PaneGeo, deltaX: number, minWidth?: number): (old: PaneGeo) => PaneGeo {
-  const startRight = startGeo.x + startGeo.width;
-  const newX = roundTo(startGeo.x + deltaX, 16);
-  const newWidth = Math.max(startRight - newX, minWidth || 0);
-  const actualNewX = startRight - newWidth;
-  return updateF({
-    x: {$set: actualNewX}, width: {$set: newWidth},
-  });
+export type PaneResizersProps = {
+  geo: PaneGeo,
+  updateGeo: Updater<PaneGeo>,
+  minWidth?: number,
+  minHeight?: number,
 }
 
-export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
-  const { pane, updatePaneGeoById, minWidth, minHeight } = props;
-  const geoRef = useRefForCallback(pane.geo);
+export const PaneResizers = memo(function PaneResizers(props: PaneResizersProps) {
+  const { geo, updateGeo, minWidth, minHeight } = props;
+  const geoRef = useRefForCallback(geo);
 
   const [draggingL, setDraggingL] = useState(false);
   const [draggingR, setDraggingR] = useState(false);
   const [draggingB, setDraggingB] = useState(false);
 
-  const onMouseDownResizerLeft = useMemo(() => drag({
+  const leftDrag = useMemo(() => someDrag({
     init() {
       setDraggingL(true);
       return {startGeo: geoRef.current};
     },
     move({startGeo}) {
-      updatePaneGeoById(pane.id,
-        dragLeft(startGeo, this.event.clientX - this.startEvent.clientX, minWidth)
-      );
+      const deltaX = this.event.clientX - this.startEvent.clientX;
+      const startRight = startGeo.x + startGeo.width;
+      const newX = roundTo(startGeo.x + deltaX, 16);
+      const newWidth = Math.max(startRight - newX, minWidth || 0);
+      const actualNewX = startRight - newWidth;
+      updateGeo(updateF({ x: {$set: actualNewX}, width: {$set: newWidth} }));
     },
     done() {
       setDraggingL(false);
     },
     keepCursor: true,
-  }), [geoRef, minWidth, pane.id, updatePaneGeoById]);
+  }), [geoRef, minWidth, updateGeo]);
 
-  const onMouseDownResizerRight = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
-
-    const startGeo = geoRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newWidth = Math.max(roundTo(startGeo.width + currentEvent.clientX - startEvent.clientX, 16), minWidth || 0);
-      updatePaneGeoById(pane.id, updateF({
-        width: {$set: newWidth},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-ew-resize');
+  const rightDrag = useMemo(() => someDrag({
+    init() {
+      setDraggingR(true);
+      return {startGeo: geoRef.current};
+    },
+    move({startGeo}) {
+      const deltaX = this.event.clientX - this.startEvent.clientX;
+      const newWidth = Math.max(roundTo(startGeo.width + deltaX, 16), minWidth || 0);
+      updateGeo(updateF({ width: {$set: newWidth} }));
+    },
+    done() {
       setDraggingR(false);
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-ew-resize');
-    setDraggingR(true);
-  }, [geoRef, minWidth, pane.id, updatePaneGeoById]);
+    },
+    keepCursor: true,
+  }), [geoRef, minWidth, updateGeo]);
 
-  const onMouseDownResizerBottom = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
-
-    const startGeo = geoRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
-      updatePaneGeoById(pane.id, updateF({
-        height: {$set: newHeight},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-ns-resize');
+  const bottomDrag = useMemo(() => someDrag({
+    init() {
+      setDraggingB(true);
+      return {startGeo: geoRef.current};
+    },
+    move({startGeo}) {
+      const deltaY = this.event.clientY - this.startEvent.clientY;
+      const newHeight = Math.max(roundTo(startGeo.height + deltaY, 16), minHeight || 0);
+      updateGeo(updateF({ height: {$set: newHeight} }));
+    },
+    done() {
       setDraggingB(false);
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-ns-resize');
-    setDraggingB(true);
-  }, [geoRef, minHeight, pane.id, updatePaneGeoById]);
+    },
+    keepCursor: true,
+  }), [geoRef, minHeight, updateGeo]);
 
-  const onMouseDownResizerBottomLeft = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
-
-    const startGeo = geoRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newX = roundTo(startGeo.x + currentEvent.clientX - startEvent.clientX, 16);
-      const newWidth = Math.max(startGeo.width + startGeo.x - newX, minWidth || 0);
-      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
-      updatePaneGeoById(pane.id, updateF({
-        x: {$set: newX}, width: {$set: newWidth}, height: {$set: newHeight},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-nesw-resize');
-      setDraggingB(false);
-      setDraggingL(false);
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-nesw-resize');
-    setDraggingB(true);
-    setDraggingL(true);
-  }, [geoRef, minHeight, minWidth, pane.id, updatePaneGeoById]);
-
-  const onMouseDownResizerBottomRight = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
-
-    const startGeo = geoRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newWidth = Math.max(roundTo(startGeo.width + currentEvent.clientX - startEvent.clientX, 16), minWidth || 0);
-      const newHeight = Math.max(roundTo(startGeo.height + currentEvent.clientY - startEvent.clientY, 16), minHeight || 0);
-      updatePaneGeoById(pane.id, updateF({
-        width: {$set: newWidth}, height: {$set: newHeight},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-nwse-resize');
-      setDraggingB(false);
-      setDraggingR(false);
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-nwse-resize');
-    setDraggingB(true);
-    setDraggingR(true);
-  }, [geoRef, minHeight, minWidth, pane.id, updatePaneGeoById]);
+  const onMouseDownLeft = useMemo(() => startDrag(leftDrag), [leftDrag]);
+  const onMouseDownRight = useMemo(() => startDrag(rightDrag), [rightDrag]);
+  const onMouseDownBottom = useMemo(() => startDrag(bottomDrag), [bottomDrag]);
+  const onMouseDownBottomLeft = useMemo(() => startDrag(combineDrags(bottomDrag, leftDrag)), [bottomDrag, leftDrag]);
+  const onMouseDownBottomRight = useMemo(() => startDrag(combineDrags(bottomDrag, rightDrag)), [bottomDrag, rightDrag]);
 
   const [refL, hoveredL] = useHover();
   const [refR, hoveredR] = useHover();
@@ -189,7 +123,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
         bottom: 0,
         cursor: 'ew-resize',
       }}
-      onMouseDown={onMouseDownResizerLeft}
+      onMouseDown={onMouseDownLeft}
     >
       <div
         className="resizer-left-highlight"
@@ -215,7 +149,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
         bottom: 0,
         cursor: 'ew-resize',
       }}
-      onMouseDown={onMouseDownResizerRight}
+      onMouseDown={onMouseDownRight}
     >
       <div
         className="resizer-right-highlight"
@@ -241,7 +175,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
         bottom: '-0.5rem',
         cursor: 'ns-resize',
       }}
-      onMouseDown={onMouseDownResizerBottom}
+      onMouseDown={onMouseDownBottom}
     >
       <div
         className="resizer-bottom-highlight"
@@ -267,7 +201,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
         bottom: '-0.5rem',
         cursor: 'nesw-resize',
       }}
-      onMouseDown={onMouseDownResizerBottomLeft}
+      onMouseDown={onMouseDownBottomLeft}
     />
     <div
       ref={refBR}
@@ -280,7 +214,7 @@ export const PaneResizers = memo(function PaneResizers(props: PaneViewProps) {
         bottom: '-0.5rem',
         cursor: 'nwse-resize',
       }}
-      onMouseDown={onMouseDownResizerBottomRight}
+      onMouseDown={onMouseDownBottomRight}
     />
   </>;
 })

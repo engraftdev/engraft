@@ -1,4 +1,4 @@
-type DragProps<T> = {
+export type Drag<T> = {
   init(): T,
   move(this: MoveThis, state: T): void,
   done(state: T): void,
@@ -11,7 +11,7 @@ type MoveThis = {
   startEvent: React.MouseEvent,
 }
 
-export function drag<T>(props: DragProps<T>) {
+export function startDrag<T>(props: Drag<T>) {
   const {init, move, done, cursor, keepCursor} = props;
 
   if (cursor && keepCursor) {
@@ -49,6 +49,33 @@ export function drag<T>(props: DragProps<T>) {
     }
   };
 };
+
+export function someDrag <T>(drag: Drag<T>) {
+  return drag;
+}
+
+export function combineDrags <T, U>(drag1: Drag<T>, drag2: Drag<U>): Drag<T & U> {
+  return {
+    init() {
+      return {
+        ...drag1.init(),
+        ...drag2.init(),
+      };
+    },
+    move(this: MoveThis, state: T & U) {
+      drag1.move.call(this, state);
+      drag2.move.call(this, state);
+    },
+    done(state: T & U) {
+      drag1.done(state);
+      drag2.done(state);
+    }
+  };
+}
+
+
+
+// managing cursor stylesheet
 
 let cursorStyleAdded = false;
 function addCursorStyle() {

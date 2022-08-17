@@ -1,4 +1,5 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
+import { startDrag } from "src/util/drag";
 import { updateF } from "src/util/updateF";
 import { useRefForCallback } from "src/util/useRefForCallback";
 
@@ -14,31 +15,25 @@ export type PaneViewProps = {
 }
 
 export const PaneView = memo(function Pane(props: PaneViewProps) {
-  const { pane, updatePaneGeoById } = props;
+  const { pane, updatePaneGeoById, minWidth, minHeight } = props;
   const geoRef = useRefForCallback(pane.geo);
 
-  const onMouseDownDrag = useCallback((startEvent: React.MouseEvent<HTMLDivElement>) => {
-    startEvent.stopPropagation();
-    startEvent.preventDefault();
+  const updateGeo = useCallback((f: (old: PaneGeo) => PaneGeo) => {
+    updatePaneGeoById(pane.id, f);
+  }, [updatePaneGeoById, pane.id]);
 
-    const startGeo = geoRef.current;
-
-    const onMousemove = (currentEvent: MouseEvent) => {
-      const newX = roundTo(startGeo.x + currentEvent.clientX - startEvent.clientX, 16);
-      const newY = roundTo(startGeo.y + currentEvent.clientY - startEvent.clientY, 16);
-      updatePaneGeoById(pane.id, updateF({
-        x: {$set: newX}, y: {$set: newY},
-      }));
-    }
-    const onMouseup = (e: MouseEvent) => {
-      document.removeEventListener('mousemove', onMousemove);
-      document.removeEventListener('mouseup', onMouseup);
-      document.body.classList.remove('cursor-grabbing');
-    }
-    document.addEventListener('mousemove', onMousemove);
-    document.addEventListener('mouseup', onMouseup);
-    document.body.classList.add('cursor-grabbing');
-  }, [geoRef, pane.id, updatePaneGeoById]);
+  const onMouseDownDrag = useMemo(() => startDrag({
+    init() {
+      return {startGeo: geoRef.current};
+    },
+    move({startGeo}) {
+      const newX = roundTo(startGeo.x + this.event.clientX - this.startEvent.clientX, 16);
+      const newY = roundTo(startGeo.y + this.event.clientY - this.startEvent.clientY, 16);
+      updateGeo(updateF({ x: {$set: newX}, y: {$set: newY} }));
+    },
+    done() {},
+    cursor: "grabbing",
+  }), [geoRef, updateGeo]);
 
   return (
     <div
@@ -59,7 +54,12 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
           boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)'
         }}
       >
-        <PaneResizers {...props} />
+        <PaneResizers
+          geo={pane.geo}
+          updateGeo={updateGeo}
+          minWidth={minWidth}
+          minHeight={minHeight}
+        />
         <div
           style={{
             display: 'flex',
