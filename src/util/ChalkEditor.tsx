@@ -1,26 +1,18 @@
 import CodeMirror from './CodeMirror';
 
-import {keymap, highlightSpecialChars, drawSelection, dropCursor, WidgetType, EditorView, Decoration } from "@codemirror/view"
-import {EditorState} from "@codemirror/state"
-import {history, historyKeymap} from "@codemirror/history"
-import {foldKeymap} from "@codemirror/fold"
-import {indentOnInput} from "@codemirror/language"
-import {defaultKeymap, indentWithTab} from "@codemirror/commands"
-import {bracketMatching} from "@codemirror/matchbrackets"
-import {closeBrackets, closeBracketsKeymap} from "@codemirror/closebrackets"
-import {searchKeymap, highlightSelectionMatches} from "@codemirror/search"
-import {autocompletion, completionKeymap} from "@codemirror/autocomplete"
-import {commentKeymap} from "@codemirror/comment"
-import {rectangularSelection} from "@codemirror/rectangular-selection"
-import {defaultHighlightStyle} from "@codemirror/highlight"
-import {lintKeymap} from "@codemirror/lint"
-import {lineNumbers, highlightActiveLineGutter} from "@codemirror/gutter"
-import {javascript} from "@codemirror/lang-javascript"
-import { useEffect, useMemo, useRef, useState, Dispatch } from 'react';
-import { Callbacks, instrumentCode } from './instrumentation';
-import { compileExpression } from './compile';
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import { javascript } from "@codemirror/lang-javascript";
+import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, syntaxHighlighting } from "@codemirror/language";
+import { lintKeymap } from "@codemirror/lint";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { EditorState, RangeSet, Range } from "@codemirror/state";
+import { Decoration, drawSelection, dropCursor, EditorView, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection, WidgetType } from "@codemirror/view";
 import inspect from 'object-inspect';
-import { Range, RangeSet } from "@codemirror/rangeset";
+import { Dispatch, useEffect, useMemo, useRef, useState } from 'react';
+import { compileExpression } from './compile';
+import { Callbacks, instrumentCode } from './instrumentation';
+
 
 
 ////////////////////////////
@@ -146,7 +138,7 @@ export const basicExtensions = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  defaultHighlightStyle.fallback,
+  syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
   bracketMatching(),
   closeBrackets(),
   autocompletion(),
@@ -160,7 +152,6 @@ export const basicExtensions = [
     ...searchKeymap,
     ...historyKeymap,
     ...foldKeymap,
-    ...commentKeymap,
     ...completionKeymap,
     ...lintKeymap,
     indentWithTab,

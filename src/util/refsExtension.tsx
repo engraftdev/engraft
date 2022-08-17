@@ -1,6 +1,5 @@
-import { EditorSelection, EditorState, Extension, StateField, TransactionSpec, Text } from "@codemirror/state";
+import { EditorSelection, EditorState, Extension, StateField, TransactionSpec, Text, RangeSet } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
-import { RangeSet } from "@codemirror/rangeset";
 import PortalSet from "./PortalSet";
 import PortalWidget from "./PortalWidget";
 import { idRegExp } from "./id";

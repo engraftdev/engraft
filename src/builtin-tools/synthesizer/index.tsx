@@ -1,28 +1,22 @@
-import { completionKeymap } from "@codemirror/autocomplete";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
-import { defaultKeymap } from "@codemirror/commands";
-import { commentKeymap } from "@codemirror/comment";
-import { foldKeymap } from "@codemirror/fold";
-import { defaultHighlightStyle } from "@codemirror/highlight";
-import { history, historyKeymap } from "@codemirror/history";
-import { javascript } from "@codemirror/lang-javascript";
-import { indentOnInput } from "@codemirror/language";
-import { lintKeymap } from "@codemirror/lint";
-import { bracketMatching } from "@codemirror/matchbrackets";
-import { EditorState } from "@codemirror/state";
-import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codemirror/view";
-import update from "immutability-helper";
-import _ from "lodash";
-import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react";
-import { codeProgramSetTo } from "src/builtin-tools/code";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import CodeMirror from "src/util/CodeMirror";
-import { compileExpression } from "src/util/compile";
-import { newId } from "src/util/id";
-import { Updater, useAt } from "src/util/state";
-import { Task } from "src/util/Task";
-import { SynthesisState, synthesizeGen } from "./synthesizer";
+import { closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete"
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
+import { javascript } from "@codemirror/lang-javascript"
+import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, syntaxHighlighting } from "@codemirror/language"
+import { lintKeymap } from "@codemirror/lint"
+import { EditorState } from "@codemirror/state"
+import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codemirror/view"
+import update from "immutability-helper"
+import _ from "lodash"
+import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
+import { codeProgramSetTo } from "src/builtin-tools/code"
+import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools"
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool"
+import CodeMirror from "src/util/CodeMirror"
+import { compileExpression } from "src/util/compile"
+import { newId } from "src/util/id"
+import { Updater, useAt } from "src/util/state"
+import { Task } from "src/util/Task"
+import { SynthesisState, synthesizeGen } from "./synthesizer"
 
 
 
@@ -188,7 +182,7 @@ export const codeMirrorExtensions = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  defaultHighlightStyle.fallback,
+  syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
   bracketMatching(),
   closeBrackets(),
   keymap.of([
@@ -196,7 +190,6 @@ export const codeMirrorExtensions = [
     ...defaultKeymap,
     ...historyKeymap,
     ...foldKeymap,
-    ...commentKeymap,
     ...completionKeymap,
     ...lintKeymap
   ]),

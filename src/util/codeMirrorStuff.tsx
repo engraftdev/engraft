@@ -1,21 +1,19 @@
-import { autocompletion, Completion, CompletionContext, completionKeymap, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
-import { defaultKeymap } from "@codemirror/commands";
-import { commentKeymap } from "@codemirror/comment";
-import { foldKeymap } from "@codemirror/fold";
-import { defaultHighlightStyle } from "@codemirror/highlight";
-import { history, historyKeymap } from "@codemirror/history";
-import { indentOnInput } from "@codemirror/language";
-import { lintKeymap } from "@codemirror/lint";
-import { bracketMatching } from "@codemirror/matchbrackets";
-import { rectangularSelection } from "@codemirror/rectangular-selection";
-import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { EditorState } from "@codemirror/state";
-import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap } from "@codemirror/view";
-import { memo, useCallback } from "react";
-import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolProgram, ToolOutput, ToolView, VarBindings } from "src/tools-framework/tools";
-import { updateKeys, Updater, useAt } from "src/util/state";
-import { refCode } from "./refsExtension";
+
+
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete"
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
+import { bracketMatching, defaultHighlightStyle, syntaxHighlighting, foldKeymap, indentOnInput } from "@codemirror/language"
+import { lintKeymap } from "@codemirror/lint"
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
+import { EditorState } from "@codemirror/state"
+import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection } from "@codemirror/view"
+import { memo, useCallback } from "react"
+import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
+import { updateKeys, Updater, useAt } from "src/util/state"
+import { refCode } from "./refsExtension"
+
+
+import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
 
 
 export const setup = [
@@ -28,7 +26,7 @@ export const setup = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  defaultHighlightStyle.fallback,
+  syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
   bracketMatching(),
   closeBrackets(),
   autocompletion(),
@@ -41,7 +39,6 @@ export const setup = [
     ...searchKeymap,
     ...historyKeymap,
     ...foldKeymap,
-    ...commentKeymap,
     ...completionKeymap,
     ...lintKeymap
   ]),
