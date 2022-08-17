@@ -1,11 +1,11 @@
 import _ from "lodash";
-import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { VarBindingsContext, newVar, PossibleVarBindingsContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding, hasValue } from "src/tools-framework/tools";
+import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
+import { VarBindingsContext, hasValue, newVar, PossibleVarBindingsContext, PossibleVarBinding, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
-import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
+import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
@@ -98,10 +98,6 @@ const View = memo((props: ViewProps) => {
   const { program, updateProgram, views, outputs } = props;
 
   const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
-  const onChangeOutputBelowInput = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
-    updateOutputBelowInput(() => ev.target.checked);
-  }, [updateOutputBelowInput]);
-
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const smallestUnusedLabel = defaultCellLabels.find((label) =>
@@ -124,18 +120,6 @@ const View = memo((props: ViewProps) => {
   return (
     <div className="NotebookTool xPad10" onContextMenu={openMenu}>
       { menuNode }
-      {/* TODO: figure out where to put 'output below input' */}
-      <div style={{display: 'none'}}>
-        <label>
-          <input
-            type="checkbox"
-            checked={outputBelowInput}
-            onChange={onChangeOutputBelowInput}
-            style={{marginRight: 5}}
-          />
-          output below input
-        </label>
-      </div>
       <div className="xChildrenMinWidth0"
         style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
