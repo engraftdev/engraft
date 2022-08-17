@@ -9,12 +9,14 @@ import { useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
-import { Pane, PaneGeo } from "src/view/noodle-canvas/model";
+import { Pane, PaneGeo, roundTo } from "src/view/noodle-canvas/model";
 import { NoodleCanvas } from "src/view/noodle-canvas/NoodleCanvas";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./code";
 import update from "immutability-helper";
+import { startDrag } from "src/util/drag";
+import { updateF } from "src/util/updateF";
 
 
 export type Program = {
@@ -129,8 +131,21 @@ const View = memo((props: ViewProps) => {
     })
   }, [updateCells])
 
+  const onMouseDownResizer = useMemo(() => startDrag({
+    init() {
+      return {startWidth: program.width, startHeight: program.height};
+    },
+    move({startWidth, startHeight}) {
+      const newWidth = roundTo(startWidth + this.event.clientX - this.startEvent.clientX, 16);
+      const newHeight = roundTo(startHeight + this.event.clientY - this.startEvent.clientY, 16);
+      updateProgram(updateF({ width: {$set: newWidth}, height: {$set: newHeight} }));
+    },
+    done() {},
+    keepCursor: true,
+  }), [program.width, program.height, updateProgram]);
+
   return (
-    <div className="NotebookTool xPad10" style={{width: program.width, height: program.height}}>
+    <div className="NotebookCanvasTool" style={{width: program.width + 1, height: program.height + 1}}>
       <NoodleCanvas
         panes={cells.map((cell, i) => ({
           id: cell.var_.id,
@@ -156,7 +171,10 @@ const View = memo((props: ViewProps) => {
         minWidth={16 * 12}
         minHeight={16 * 4}
       />
-      <div style={{position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, background: 'blue'}} />
+      <div
+        style={{position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, cursor: 'nwse-resize'}}
+        onMouseDown={onMouseDownResizer}
+      />
     </div>
   );
 })

@@ -3,7 +3,7 @@ export type Drag<T> = {
   move(this: MoveThis, state: T): void,
   done(state: T): void,
   keepCursor?: boolean,
-  cursor?: string,
+  cursor?: CursorValue,
 }
 
 type MoveThis = {
@@ -28,7 +28,7 @@ export function startDrag<T>(props: Drag<T>) {
 
     let cursorToUse = cursor;
     if (keepCursor) {
-      cursorToUse = getComputedStyle(startEvent.currentTarget).cursor;
+      cursorToUse = getComputedStyle(startEvent.currentTarget).cursor as any;
     }
 
     const onMousemove = (event: MouseEvent) => {
@@ -77,19 +77,7 @@ export function combineDrags <T, U>(drag1: Drag<T>, drag2: Drag<U>): Drag<T & U>
 
 // managing cursor stylesheet
 
-let cursorStyleAdded = false;
-function addCursorStyle() {
-  if (cursorStyleAdded) { return; }
-  cursorStyleAdded = true;
-
-  const style = document.createElement('style');
-  style.innerHTML = cursorValues.map(cursor =>
-    `.cursor-${cursor} * { cursor: ${cursor} !important; }`
-  ).join('\n');
-  document.head.appendChild(style);
-}
-
-const cursorValues = [
+enum CursorValueEnum {
   'alias',
   'all-scroll',
   'auto',
@@ -126,4 +114,17 @@ const cursorValues = [
   'wait',
   'zoom-in',
   'zoom-out',
-]
+}
+type CursorValue = keyof typeof CursorValueEnum;
+
+let cursorStyleAdded = false;
+function addCursorStyle() {
+  if (cursorStyleAdded) { return; }
+  cursorStyleAdded = true;
+
+  const style = document.createElement('style');
+  style.innerHTML = Object.values(CursorValueEnum).map(cursor =>
+    `.cursor-${cursor} * { cursor: ${cursor} !important; }`
+  ).join('\n');
+  document.head.appendChild(style);
+}
