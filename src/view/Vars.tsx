@@ -12,12 +12,14 @@ interface VarDefinitionProps {
 }
 
 export const VarDefinition = memo(function VarDefinition({var_, updateVar, autoFocus}: VarDefinitionProps) {
-  return <span className={`def-${var_.id}`}
-    style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', border: '1px solid gray', fontSize: '13px', minHeight: '13px'}}>
+  return <div
+    className={`def-${var_.id}`}
+    style={{ display: 'inline-block', backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', border: '1px solid gray', fontSize: '13px', minHeight: '13px'}}
+  >
     <ControlledSpan value={var_.label} onValue={(label) => updateVar && updateKeys(updateVar, {label})}
           style={{border: 'none', background: 'none'}} autoFocus={autoFocus}/>
     {var_.label.length === 0 && <span style={{fontStyle: 'italic'}}></span>}
-  </span>
+  </div>
 });
 
 

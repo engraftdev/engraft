@@ -38,17 +38,18 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
   return (
     <div
       key={pane.id}
+      className="PaneView"
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        transform: `translate(${pane.geo.x}px, ${pane.geo.y}px)`,
+        top: pane.geo.y,  // used to use `transform` cuz Natto does, but that breaks CM tooltips
+        left: pane.geo.x,
       }}
     >
       <div
+        className="PaneView-sizer"
         style={{
-          width: pane.geo.width,
-          height: pane.geo.height,
+          width: pane.geo.width + 1,
+          height: pane.geo.height + 1,
           backgroundColor: 'rgb(255, 255, 255)',
           borderRadius: '0.25rem',
           boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)'
@@ -61,21 +62,20 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
           minHeight={minHeight}
         />
         <div
+          className="PaneView-content"
           style={{
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
+            overflow: "hidden",
           }}
         >
           <div
+            className="PaneView-heading"
             style={{
               height: '2rem',
               backgroundColor: 'rgb(240, 240, 240)',
               borderRadius: '0.25rem 0.25rem 0 0',
-              paddingLeft: '0.5rem',
-              paddingRight: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
               cursor: 'grab',
               flexShrink: 0,
             }}
@@ -84,8 +84,11 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
             {pane.heading}
           </div>
           <div
+            className="PaneView-children-wrapper"
             style={{
-              overflow: 'hidden',
+              // overflow: 'hidden',  // disabled for CodeMirror popups
+              flexGrow: 1,
+              minHeight: 0,
             }}
           >
             {pane.children}

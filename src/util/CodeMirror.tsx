@@ -1,6 +1,7 @@
 import { EditorState, Extension, StateEffect } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { CSSProperties, memo, useEffect, useMemo, useRef, useState } from "react"
+import useInterval from './useInterval';
 
 export interface MyCodeMirrorProps {
   extensions: Extension[];
@@ -61,6 +62,12 @@ const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onCha
       }
     }
   });
+
+  useInterval(() => {
+    if (viewRef.current) {
+      viewRef.current.requestMeasure();
+    }
+  }, 100);
 
   // TODO:
   // ok this REALLY SUCKS but apparently if you nest code inside of two layers of notebooks...

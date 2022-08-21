@@ -28,7 +28,7 @@ export const NoodleCanvas = memo(function NoodleCanvas(props: NoodleCanvasProps)
       style={{
         backgroundColor: 'rgb(240, 240, 240)',
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        overflow: 'hidden',
+        overflow: 'hidden', // transform: 'scale(0.5)',
       }}
     >
       <div style={{

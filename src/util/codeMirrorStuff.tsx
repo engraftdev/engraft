@@ -6,7 +6,7 @@ import { bracketMatching, defaultHighlightStyle, syntaxHighlighting, foldKeymap,
 import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import { EditorState } from "@codemirror/state"
-import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection } from "@codemirror/view"
+import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
 import { memo, useCallback } from "react"
 import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
 import { updateKeys, Updater, useAt } from "src/util/state"
@@ -22,9 +22,9 @@ export const setup = [
   highlightSpecialChars(),
   history(),
   // foldGutter(),
-  drawSelection(),
+  // drawSelection(),    // note: disable this to allow CSS scaling
   dropCursor(),
-  EditorState.allowMultipleSelections.of(true),
+  // EditorState.allowMultipleSelections.of(true),  // note: disable this to allow CSS scaling
   indentOnInput(),
   syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
   bracketMatching(),
@@ -42,6 +42,7 @@ export const setup = [
     ...completionKeymap,
     ...lintKeymap
   ]),
+  tooltips({ position: 'absolute', parent: document.body }),  // fixes layout of autocomplete tooltip in notebook-canvas
 ]
 
 

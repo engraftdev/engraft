@@ -43,16 +43,16 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
         program: codeProgramSetTo(defaultInput || ''),
         upstreamIds: {},
         geo: {
-          x: 16,
-          y: 16,
+          x: 16 * 3,
+          y: 16 * 2,
           width: 16 * 16,
           height: 16 * 12,
         },
       }
     ],
     prevVar: newVar('prev'),
-    width: 120 * 3,
-    height: 120 * 2,
+    width: 16 * 24,
+    height: 16 * 20,
   };
 }
 
@@ -144,17 +144,52 @@ const View = memo((props: ViewProps) => {
     keepCursor: true,
   }), [program.width, program.height, updateProgram]);
 
+  const onClickNewCell = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateCells((oldCells) => {
+      const newCell = {
+        var_: newVar(smallestUnusedLabel),
+        program: codeProgramSetTo(''),
+        upstreamIds: {},
+        geo: {
+          x: 16 * 3,
+          y: 16 * 2,
+          width: 16 * 16,
+          height: 16 * 12,
+        },
+      };
+      return [...oldCells, newCell];
+    });
+  }, [smallestUnusedLabel, updateCells]);
+
   return (
-    <div className="NotebookCanvasTool" style={{width: program.width + 1, height: program.height + 1}}>
+    <div className="NotebookCanvasTool" style={{position: 'relative', width: program.width + 1, height: program.height + 1}}>
       <NoodleCanvas
         panes={cells.map((cell, i) => ({
           id: cell.var_.id,
           geo: cell.geo,
           heading:
-            <VarDefinition
-              var_={cell.var_}
-              updateVar={at(atIndex<Cell>(updateCells, i), 'var_')}
-            />,
+            <div
+              className="NotebookCanvasTool-heading"
+              style={{
+                height: '100%',
+                paddingLeft: '0.5rem',
+                paddingRight: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onContextMenu={}
+            >
+              <div
+                style={{display: 'inline-block', cursor: 'initial'}}
+                onMouseDown={(ev) => ev.stopPropagation()}
+              >
+                <VarDefinition
+                  var_={cell.var_}
+                  updateVar={at(atIndex<Cell>(updateCells, i), 'var_')}
+                />
+              </div>
+            </div>,
           children:
             <CellView cell={cell}
               // TODO: memoize these?
@@ -168,13 +203,19 @@ const View = memo((props: ViewProps) => {
             />,
         }))}
         updatePaneGeoById={updatePaneGeoById}
-        minWidth={16 * 12}
+        minWidth={16 * 6}
         minHeight={16 * 4}
       />
       <div
         style={{position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, cursor: 'nwse-resize'}}
         onMouseDown={onMouseDownResizer}
       />
+      <button
+        style={{position: 'absolute', top: 10, left: 10, width: 30, height: 30, border: 'none', borderRadius: '50%', backgroundColor: '#ddd', cursor: 'pointer'}}
+        onClick={onClickNewCell}
+      >
+        +
+      </button>
     </div>
   );
 })
@@ -291,15 +332,15 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </MyContextMenu>
   , [removeCell]));
 
-  return <>
+  return <div className="NotebookCanvasTool-CellView" onContextMenu={openMenu} style={{height: '100%'}}>
     {menuNode}
-    <div className="NotebookTool-CellView-tool-cell xCol" onContextMenu={openMenu}>
+    <div className="NotebookCanvasTool-CellView-tool-cell xCol" style={{background: 'rgb(251, 251, 251)'}}>
       <ShowView view={toolView} expand={true}/>
     </div>
     { !alreadyDisplayed &&
-      <div className="NotebookTool-CellView-output-cell" onContextMenu={openMenu} style={{padding: 5}}>
+      <div className="NotebookCanvasTool-CellView-output-cell" style={{padding: 5}}>
         <ToolOutputView toolValue={toolOutput}/>
       </div>
     }
-  </>
+  </div>
 });

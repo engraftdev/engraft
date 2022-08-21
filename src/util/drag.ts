@@ -69,7 +69,9 @@ export function combineDrags <T, U>(drag1: Drag<T>, drag2: Drag<U>): Drag<T & U>
     done(state: T & U) {
       drag1.done(state);
       drag2.done(state);
-    }
+    },
+    keepCursor: drag1.keepCursor || drag2.keepCursor,
+    cursor: drag1.cursor || drag2.cursor,
   };
 }
 
