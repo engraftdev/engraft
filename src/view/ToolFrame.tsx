@@ -14,11 +14,11 @@ export interface ToolFrameProps {
   program: ToolProgram;
   updateProgram?: Updater<ToolProgram>;
   onClose?: () => void;
-  env: VarBindings;
-  possibleEnv: PossibleVarBindings;
+  varBindings: VarBindings;
+  possibleVarBindings: PossibleVarBindings;
 }
 
-export const ToolFrame = memo(function ToolFrame({children, program, updateProgram, onClose, env, possibleEnv}: ToolFrameProps) {
+export const ToolFrame = memo(function ToolFrame({children, program, updateProgram, onClose, varBindings, possibleVarBindings}: ToolFrameProps) {
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
   return <div
@@ -73,10 +73,10 @@ export const ToolFrame = memo(function ToolFrame({children, program, updateProgr
           <ValueEditable value={program} updater={updateProgram}/> :
           <Value value={program}/>
         }
-        <h3>Env</h3>
-        <Value value={env}/>
-        <h3>Possible env</h3>
-        <Value value={possibleEnv}/>
+        <h3>Variable bindings</h3>
+        <Value value={varBindings}/>
+        <h3>Possible variable bindings</h3>
+        <Value value={possibleVarBindings}/>
       </IsolateStyles>
     </WindowPortal>}
   </div>;

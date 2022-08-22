@@ -1,5 +1,5 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { EnvContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, Var, VarBinding } from "src/tools-framework/tools";
+import { VarBindingsContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, Var, VarBinding } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
@@ -137,7 +137,7 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
   }, [prevVal, prevVar])
 
   if (prevVarContext) {
-    return <AddObjToContext context={EnvContext} obj={prevVarContext}>
+    return <AddObjToContext context={VarBindingsContext} obj={prevVarContext}>
       {component}
     </AddObjToContext>;
   } else {

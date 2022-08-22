@@ -6,7 +6,7 @@ import { EditorView } from '@codemirror/view';
 import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, valueOrUndefined } from "src/tools-framework/tools";
+import { VarBindingsContext, PossibleVarBindingsContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -124,8 +124,8 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   }, [program.code])
 
   // We have to use useContext here, not in the view – the view isn't inside tool context!
-  const env = useContext(EnvContext)
-  const possibleEnv = useContext(PossibleEnvContext)
+  const varBindings = useContext(VarBindingsContext)
+  const possibleVarBindings = useContext(PossibleVarBindingsContext)
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -139,7 +139,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
     } else {
       const rand = seedrandom('live-compose 2022');
       const scope = {
-        ...Object.fromEntries(Object.entries(env).map(([k, v]) => [refCode(k), valueOrUndefined(v.value)])),
+        ...Object.fromEntries(Object.entries(varBindings).map(([k, v]) => [refCode(k), valueOrUndefined(v.value)])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
         ...globals,
         rand
@@ -159,7 +159,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         setOutput({error: (e as any).toString()});
       }
     }
-  }, [compiled, env, outputs, setOutput])
+  }, [compiled, varBindings, outputs, setOutput])
   useOutput(reportOutput, output);
 
   useView(reportView, useMemo(() => ({
@@ -168,9 +168,9 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         {...props} {...viewProps}
         updateSubToolPrograms={updateSubToolPrograms}
         views={views}
-        env={env} possibleEnv={possibleEnv}
+        varBindings={varBindings} possibleVarBindings={possibleVarBindings}
       />
-  }), [env, possibleEnv, props, updateSubToolPrograms, views]));
+  }), [varBindings, possibleVarBindings, props, updateSubToolPrograms, views]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -183,17 +183,17 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
 interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewRenderProps {
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>;
   views: {[id: string]: ToolView | null};
-  env: VarBindings;
-  possibleEnv: PossibleVarBindings;
+  varBindings: VarBindings;
+  possibleVarBindings: PossibleVarBindings;
 }
 
 const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolCodeModeViewProps) {
-  const {program, updateProgram, autoFocus, updateSubToolPrograms, views, env, possibleEnv} = props;
+  const {program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindings} = props;
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
-  const envRef = useRefForCallback(env);
-  const possibleEnvRef = useRefForCallback(possibleEnv);
+  const varBindingsRef = useRefForCallback(varBindings);
+  const possibleVarBindingsRef = useRefForCallback(possibleVarBindings);
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = newId();
@@ -208,7 +208,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
-      refCompletions(() => envRef.current, () => possibleEnvRef.current),
+      refCompletions(() => varBindingsRef.current, () => possibleVarBindingsRef.current),
     ];
     return [
       ...setup,
@@ -233,7 +233,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
         }
       }),
     ];
-  }, [program.defaultCode, envRef, possibleEnvRef, refSet, updateProgram, updateSubToolPrograms])
+  }, [program.defaultCode, varBindingsRef, possibleVarBindingsRef, refSet, updateProgram, updateSubToolPrograms])
 
   const onChange = useCallback((value: string) => {
     updateKeys(updateProgram, {code: value});
@@ -252,7 +252,7 @@ const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolC
           <IsolateStyles style={{display: 'inline-block'}}>
             <ShowView view={views[id]} autoFocus={true}/>
           </IsolateStyles> :
-          <VarUse key={id} varBinding={env[id] as VarBinding | undefined} />,
+          <VarUse key={id} varBinding={varBindings[id] as VarBinding | undefined} />,
         elem
       )
     })}
@@ -280,15 +280,15 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ program, report
 
   useOutput(reportOutput, output);
 
-  const env = useContext(EnvContext);
-  const possibleEnv = useContext(PossibleEnvContext);
+  const varBindings = useContext(VarBindingsContext);
+  const possibleVarBindings = useContext(PossibleVarBindingsContext);
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
   useView(reportView, useMemo(() => ({
     render: ({autoFocus}) =>
       <ToolFrame
-        program={subProgram} updateProgram={updateSubProgram} env={env} possibleEnv={possibleEnv}
+        program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings} possibleVarBindings={possibleVarBindings}
         onClose={() => {
           updateProgram(() => ({
             toolName: 'code',
@@ -303,7 +303,7 @@ export const CodeToolToolMode = memo(function CodeToolToolMode({ program, report
           <ShowView view={toolView} autoFocus={autoFocus} />
         {/* </div> */}
       </ToolFrame>
-  }), [program, env, possibleEnv, subProgram, toolView, updateProgram, updateSubProgram]));
+  }), [program, varBindings, possibleVarBindings, subProgram, toolView, updateProgram, updateSubProgram]));
 
   return component;
 });

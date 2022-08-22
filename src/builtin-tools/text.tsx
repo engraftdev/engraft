@@ -3,7 +3,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { EnvContext, PossibleEnvContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, hasValue } from "src/tools-framework/tools";
+import { VarBindingsContext, PossibleVarBindingsContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -36,8 +36,8 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
 
-  const env = useContext(EnvContext)
-  const possibleEnv = useContext(PossibleEnvContext)
+  const varBindings = useContext(VarBindingsContext)
+  const possibleVarBindings = useContext(PossibleVarBindingsContext)
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
@@ -55,10 +55,10 @@ export const Component = memo((props: ToolProps<Program>) => {
       }
       result = result.replaceAll(refCode(k), replacementText);
     }
-    Object.entries(env).map(([k, v]) => [k, v.value || null] as const).forEach(applyReplacement);
+    Object.entries(varBindings).map(([k, v]) => [k, v.value || null] as const).forEach(applyReplacement);
     Object.entries(outputs).forEach(applyReplacement);
     return result;
-  }, [program.text, env, outputs])
+  }, [program.text, varBindings, outputs])
 
   useOutput(reportOutput, useMemoObject({
     value: replacedText
@@ -69,10 +69,10 @@ export const Component = memo((props: ToolProps<Program>) => {
       <TextToolView
         {...props} {...viewProps}
         views={views}
-        env={env}
-        possibleEnv={possibleEnv}
+        varBindings={varBindings}
+        possibleVarBindings={possibleVarBindings}
       />
-  }), [env, possibleEnv, props, views]));
+  }), [varBindings, possibleVarBindings, props, views]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -85,20 +85,20 @@ export const Component = memo((props: ToolProps<Program>) => {
 
 interface TextToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   views: {[id: string]: ToolView | null};
-  env: VarBindings;
-  possibleEnv: PossibleVarBindings;
+  varBindings: VarBindings;
+  possibleVarBindings: PossibleVarBindings;
 }
 
 const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
-  const { program, updateProgram, autoFocus, views, env, possibleEnv } = props;
+  const { program, updateProgram, autoFocus, views, varBindings, possibleVarBindings } = props;
 
   const [, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [text, updateText] = useAt(program, updateProgram, 'text');
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
-  const envRef = useRefForCallback(env);
-  const possibleEnvRef = useRefForCallback(possibleEnv);
+  const varBindingsRef = useRefForCallback(varBindings);
+  const possibleVarBindingsRef = useRefForCallback(possibleVarBindings);
   const extensions = useMemo(() => {
     function insertTool(tool: Tool<ToolProgram>) {
       const id = newId();
@@ -109,10 +109,10 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
     };
     const completions = [
       toolCompletions(insertTool),
-      refCompletions(() => envRef.current, () => possibleEnvRef.current)
+      refCompletions(() => varBindingsRef.current, () => possibleVarBindingsRef.current)
     ];
     return [...setup, refsExtension(refSet), markdown(), autocompletion({override: completions}), EditorView.lineWrapping];
-  }, [envRef, possibleEnvRef, refSet, updateSubToolPrograms])
+  }, [varBindingsRef, possibleVarBindingsRef, refSet, updateSubToolPrograms])
 
   const onChange = useCallback((value: string) => {
     updateText(() => value);
@@ -133,7 +133,7 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
           <IsolateStyles style={{display: 'inline-block'}}>
             <ShowView view={views[id]} autoFocus={true}/>
           </IsolateStyles> :
-          <VarUse varBinding={env[id] as VarBinding | undefined} />,
+          <VarUse varBinding={varBindings[id] as VarBinding | undefined} />,
         elem
       )
     })}

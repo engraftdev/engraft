@@ -1,7 +1,7 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import appCss from './App.css';
 import { examples } from './examples/examples';
-import { EnvContext, registerTool, ToolProgram, ToolOutput, VarBinding } from './tools-framework/tools';
+import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
 import { Program as CodeProgram, codeProgramSetTo } from './builtin-tools/code';
 import range from './util/range';
@@ -65,9 +65,9 @@ const App = memo(function App() {
       {appCss}
     </style>
     <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
-      <EnvContext.Provider value={context}>
+      <VarBindingsContext.Provider value={context}>
         <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </EnvContext.Provider>
+      </VarBindingsContext.Provider>
     </div>
     <br/>
     <br/>

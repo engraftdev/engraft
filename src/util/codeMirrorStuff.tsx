@@ -79,10 +79,10 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
   }
 }
 
-export function refCompletions(envGetter?: () => VarBindings | undefined, possibleEnvGetter?: () => PossibleVarBindings | undefined): CompletionSource {
+export function refCompletions(varBindingsGetter?: () => VarBindings | undefined, possibleVarBindingsGetter?: () => PossibleVarBindings | undefined): CompletionSource {
   return (completionContext: CompletionContext) => {
-    const env = envGetter ? envGetter() || {} : {};
-    const possibleEnv = possibleEnvGetter ? possibleEnvGetter() || {} : {};
+    const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
+    const possibleVarBindings = possibleVarBindingsGetter ? possibleVarBindingsGetter() || {} : {};
 
     let word = completionContext.matchBefore(/@?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
@@ -91,11 +91,11 @@ export function refCompletions(envGetter?: () => VarBindings | undefined, possib
     return {
       from: word.from,
       options: [
-        ...Object.values(env).map((varInfo) => ({
+        ...Object.values(varBindings).map((varInfo) => ({
           label: '@' + varInfo.var_.label,
           apply: refCode(varInfo.var_.id),
         })),
-        ...Object.values(possibleEnv).map((possibleVarInfo) => ({
+        ...Object.values(possibleVarBindings).map((possibleVarInfo) => ({
           label: '@' + possibleVarInfo.var_.label + '?',  // TODO: better signal that it's 'possible'
           apply: (view: EditorView, completion: Completion, from: number, to: number) => {
             let apply = refCode(possibleVarInfo.var_.id);

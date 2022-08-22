@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import libCss from "./lib.css";
-import { EnvContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding, hasValue } from "./tools-framework/tools";
+import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding, hasValue } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
 import { codeProgramSetTo } from "./builtin-tools/code";
@@ -41,13 +41,13 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
     } catch {}
   }, [initialProgramJson, updateProgram])
 
-  const env = useMemo(() => {
-    let env: {[id: string]: VarBinding} = {};
+  const varBindings = useMemo(() => {
+    let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
     });
-    return env;
+    return varBindings;
   }, [variables]);
 
   const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
@@ -63,9 +63,9 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
       <ToolOutputView toolValue={output}/>
     </div>
     <div>
-      <EnvContext.Provider value={env}>
+      <VarBindingsContext.Provider value={varBindings}>
         <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </EnvContext.Provider>
+      </VarBindingsContext.Provider>
     </div>
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
@@ -96,13 +96,13 @@ interface ObservableEmbedProps {
 }
 
 export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, variables = {}, reportOutput}: ObservableEmbedProps) {
-  const env = useMemo(() => {
-    let env: {[id: string]: VarBinding} = {};
+  const varBindings = useMemo(() => {
+    let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
     });
-    return env;
+    return varBindings;
   }, [variables]);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
@@ -129,9 +129,9 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
         toolValue={output}
         renderValue={(value) => <ObservableInspector value={value}/>}
       />
-      <EnvContext.Provider value={env}>
+      <VarBindingsContext.Provider value={varBindings}>
         <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </EnvContext.Provider>
+      </VarBindingsContext.Provider>
     </div>
   );
 });
@@ -179,13 +179,13 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
 
   const stableVariables = useDedupe(variables, _.isEqual);
 
-  const env = useMemo(() => {
-    let env: {[id: string]: VarBinding} = {};
+  const varBindings = useMemo(() => {
+    let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(stableVariables).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      env[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
     });
-    return env;
+    return varBindings;
   }, [stableVariables]);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
@@ -211,9 +211,9 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
 
   useEffect(() => {
     newRoot.render(<>
-      <EnvContext.Provider value={env}>
+      <VarBindingsContext.Provider value={varBindings}>
         {component}
-      </EnvContext.Provider>
+      </VarBindingsContext.Provider>
       {!hide &&
         <Split
           left={
@@ -232,7 +232,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
         />
       }
     </>);
-  }, [component, defaultValue, env, hide, newRoot, origContainer, output, stableVariables, useDefault, view]);
+  }, [component, defaultValue, varBindings, hide, newRoot, origContainer, output, stableVariables, useDefault, view]);
 
   return (!hide && useDefault) || !hasValue(output) ? defaultValue : output.value;
 }
@@ -362,7 +362,7 @@ export { default as ReactDOM } from 'react-dom';
 // Re-exports //
 ////////////////
 
-export { EnvContext } from 'src/tools-framework/tools';
+export { VarBindingsContext } from 'src/tools-framework/tools';
 export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';

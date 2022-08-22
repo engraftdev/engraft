@@ -100,8 +100,8 @@ export interface VarBinding {
 
 export type VarBindings = {[varId: string]: VarBinding};
 
-export const EnvContext = createContext<VarBindings>({});
-EnvContext.displayName = 'EnvContext';
+export const VarBindingsContext = createContext<VarBindings>({});
+VarBindingsContext.displayName = 'VarBindingsContext';
 
 // TODO: figure out some names
 
@@ -112,8 +112,8 @@ export interface PossibleVarBinding {
 
 export type PossibleVarBindings = {[varId: string]: PossibleVarBinding};
 
-export const PossibleEnvContext = createContext<PossibleVarBindings>({});
-PossibleEnvContext.displayName = 'PossibleEnvContext';
+export const PossibleVarBindingsContext = createContext<PossibleVarBindings>({});
+PossibleVarBindingsContext.displayName = 'PossibleVarBindingsContext';
 
 
 
@@ -137,7 +137,7 @@ export interface ProvideVarBindingProps {
 export const ProvideVarBinding = memo(function ProvideVar({var_, value, children}: ProvideVarBindingProps) {
   const info = useMemoObject({var_, value});
 
-  return <AddToContext context={EnvContext} k={var_.id} v={info}>
+  return <AddToContext context={VarBindingsContext} k={var_.id} v={info}>
     {children}
   </AddToContext>
 });

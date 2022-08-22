@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ChangeEvent, Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding, hasValue } from "src/tools-framework/tools";
+import { VarBindingsContext, newVar, PossibleVarBindingsContext, PossibleVarBinding, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, Var, VarBinding, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
@@ -279,8 +279,8 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
 
 
-  return <AddObjToContext context={EnvContext} obj={newVarBindings}>
-    <AddObjToContext context={PossibleEnvContext} obj={newPossibleVarBindings}>
+  return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
+    <AddObjToContext context={PossibleVarBindingsContext} obj={newPossibleVarBindings}>
       {component}
     </AddObjToContext>
   </AddObjToContext>;
