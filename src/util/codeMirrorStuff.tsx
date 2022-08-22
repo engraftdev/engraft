@@ -91,15 +91,15 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
     return {
       from: word.from,
       options: [
-        ...Object.values(varBindings).map((varInfo) => ({
-          label: '@' + varInfo.var_.label,
-          apply: refCode(varInfo.var_.id),
+        ...Object.values(varBindings).map((varBinding) => ({
+          label: '@' + varBinding.var_.label,
+          apply: refCode(varBinding.var_.id),
         })),
-        ...Object.values(possibleVarBindings).map((possibleVarInfo) => ({
-          label: '@' + possibleVarInfo.var_.label + '?',  // TODO: better signal that it's 'possible'
+        ...Object.values(possibleVarBindings).map((possibleVarBinding) => ({
+          label: '@' + possibleVarBinding.var_.label + '?',  // TODO: better signal that it's 'possible'
           apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            let apply = refCode(possibleVarInfo.var_.id);
-            possibleVarInfo.request();
+            let apply = refCode(possibleVarBinding.var_.id);
+            possibleVarBinding.request();
             view.dispatch({
               changes: {from, to, insert: apply},
               selection: {anchor: from + apply.length},

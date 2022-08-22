@@ -21,8 +21,8 @@ const localStorageKey = 'live-compose-v1';
 
 const defaultProgram: CodeProgram = codeProgramSetTo('');
 
-function varInfoObject(varInfos: VarBinding[]) {
-  return Object.fromEntries(varInfos.map((varInfo) => [varInfo.var_.id, varInfo]));
+function varBindingsObject(varBindings: VarBinding[]) {
+  return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
 }
 
 const App = memo(function App() {
@@ -31,7 +31,7 @@ const App = memo(function App() {
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);
   const [programIsFromLocalStorage, setIsProgramFromLocalStorage] = useState(false);
 
-  const context = useMemo(() => varInfoObject([
+  const context = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
     {var_: {id: 'IDarray000000', label: 'array'}, value: {value: [1, 2, 3]}},
     {var_: {id: 'IDrange000000', label: 'range'}, value: {value: range}},

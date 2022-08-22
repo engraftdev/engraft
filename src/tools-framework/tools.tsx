@@ -135,9 +135,9 @@ export interface ProvideVarBindingProps {
 }
 
 export const ProvideVarBinding = memo(function ProvideVar({var_, value, children}: ProvideVarBindingProps) {
-  const info = useMemoObject({var_, value});
+  const varBinding = useMemoObject({var_, value});
 
-  return <AddToContext context={VarBindingsContext} k={var_.id} v={info}>
+  return <AddToContext context={VarBindingsContext} k={var_.id} v={varBinding}>
     {children}
   </AddToContext>
 });
