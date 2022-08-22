@@ -45,15 +45,19 @@ export const Component = memo((props: ToolProps<Program>) => {
   const replacedText = useMemo(() => {
     let result = program.text;
     const applyReplacement = ([k, v]: readonly [string, ToolOutput | null]) => {
-      let replacementText = '';
-      if (hasValue(v)) {
-        const toolValue = v.value;
-        if (typeof toolValue === 'object' && toolValue) {
-          replacementText = toolValue.toString();
+      try {
+        let replacementText = '';
+        if (hasValue(v)) {
+          const toolValue = v.value;
+          if (typeof toolValue === 'object' && toolValue) {
+            replacementText = toolValue.toString();
+          }
+          replacementText = "" + toolValue;
         }
-        replacementText = "" + toolValue;
+        result = result.replaceAll(refCode(k), replacementText);
+      } catch {
+        // ignore
       }
-      result = result.replaceAll(refCode(k), replacementText);
     }
     Object.entries(varBindings).map(([k, v]) => [k, v.value || null] as const).forEach(applyReplacement);
     Object.entries(outputs).forEach(applyReplacement);
