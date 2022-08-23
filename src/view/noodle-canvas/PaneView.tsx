@@ -12,10 +12,11 @@ export type PaneViewProps = {
   updatePaneGeoById: (id: string, f: (old: PaneGeo) => PaneGeo) => void,
   minWidth?: number,
   minHeight?: number,
+  scale: number,
 }
 
 export const PaneView = memo(function Pane(props: PaneViewProps) {
-  const { pane, updatePaneGeoById, minWidth, minHeight } = props;
+  const { pane, updatePaneGeoById, minWidth, minHeight, scale } = props;
   const geoRef = useRefForCallback(pane.geo);
 
   const updateGeo = useCallback((f: (old: PaneGeo) => PaneGeo) => {
@@ -27,13 +28,13 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
       return {startGeo: geoRef.current};
     },
     move({startGeo}) {
-      const newX = roundTo(startGeo.x + this.event.clientX - this.startEvent.clientX, 16);
-      const newY = roundTo(startGeo.y + this.event.clientY - this.startEvent.clientY, 16);
+      const newX = roundTo(startGeo.x + this.startDeltaX / scale, 16);
+      const newY = roundTo(startGeo.y + this.startDeltaY / scale, 16);
       updateGeo(updateF({ x: {$set: newX}, y: {$set: newY} }));
     },
     done() {},
     cursor: "grabbing",
-  }), [geoRef, updateGeo]);
+  }), [geoRef, scale, updateGeo]);
 
   return (
     <div
@@ -60,6 +61,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
           updateGeo={updateGeo}
           minWidth={minWidth}
           minHeight={minHeight}
+          scale={scale}
         />
         <div
           className="PaneView-content"

@@ -167,14 +167,10 @@ const View = memo((props: ViewProps) => {
           id: cell.var_.id,
           geo: cell.geo,
           children: ({onMouseDownDragPane}) =>
-            <CellView cell={cell}
-              // TODO: memoize these?
-              updateCell={atIndex(updateCells, i)}
-              removeCell={() => {
-                const newCells = [...cells];
-                newCells.splice(i, 1);
-                updateCells(() => newCells);
-              }}
+            <CellView
+              idx={i}
+              cell={cell}
+              updateCells={updateCells}
               toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
               onMouseDownDragPane={onMouseDownDragPane}
             />,
@@ -268,7 +264,6 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
     return result;
   }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
 
-
   return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
     <AddObjToContext context={PossibleVarBindingsContext} obj={newPossibleVarBindings}>
       {component}
@@ -280,19 +275,29 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
 
 
 interface CellViewProps {
+  idx: number;
+
   cell: Cell;
-  updateCell: Updater<Cell>;
+  updateCells: Updater<Cell[]>;
 
   toolOutput: ToolOutput | null,
   toolView: ToolView | null,
-
-  removeCell: () => void,
 
   onMouseDownDragPane: (startEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {cell, updateCell, toolView, toolOutput, removeCell, onMouseDownDragPane} = props;
+  const {idx, cell, updateCells, toolView, toolOutput, onMouseDownDragPane} = props;
+
+  const updateCell = useMemo(() => atIndex(updateCells, idx), [idx, updateCells]);
+
+  const removeCell = useCallback(() => {
+    updateCells((oldCells) => {
+      const newCells = [...oldCells];
+      newCells.splice(idx, 1);
+      return newCells;
+    });
+  } , [updateCells, idx]);
 
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
 

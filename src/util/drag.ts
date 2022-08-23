@@ -9,6 +9,8 @@ export type Drag<T> = {
 type MoveThis = {
   event: MouseEvent,
   startEvent: React.MouseEvent,
+  startDeltaX: number,
+  startDeltaY: number,
 }
 
 export function startDrag<T>(props: Drag<T>) {
@@ -32,7 +34,14 @@ export function startDrag<T>(props: Drag<T>) {
     }
 
     const onMousemove = (event: MouseEvent) => {
-      move.call({event, startEvent}, state)
+      move.call(
+        {
+          event, startEvent,
+          startDeltaX: event.clientX - startEvent.clientX,
+          startDeltaY: event.clientY - startEvent.clientY,
+        },
+        state
+      );
     }
     const onMouseup = (e: MouseEvent) => {
       document.removeEventListener('mousemove', onMousemove);
@@ -62,11 +71,11 @@ export function combineDrags <T, U>(drag1: Drag<T>, drag2: Drag<U>): Drag<T & U>
         ...drag2.init(),
       };
     },
-    move(this: MoveThis, state: T & U) {
+    move(this, state) {
       drag1.move.call(this, state);
       drag2.move.call(this, state);
     },
-    done(state: T & U) {
+    done(state) {
       drag1.done(state);
       drag2.done(state);
     },

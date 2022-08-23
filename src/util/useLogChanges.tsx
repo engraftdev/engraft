@@ -4,11 +4,11 @@ import { usePrevious } from "./usePrevious";
 // Just call:
 //   useLogChanges({someVar, someOtherVar, ...})
 
-export function useLogChanges(values: any) {
+export function useLogChanges(values: any, label?: string) {
   const prevValues = usePrevious(values, null);
   for (const key in values) {
     if (prevValues && values[key] !== prevValues[key]) {
-      console.log(`${key}: ${prevValues[key]} → ${values[key]}`);
+      console.log(`${label ? `(${label}) ` : ''}${key}: ${prevValues[key]} → ${values[key]}`);
     }
   }
 }
