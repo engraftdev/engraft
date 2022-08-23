@@ -3,7 +3,7 @@ import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from '@codemirror/view';
-import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
+import { memo, MutableRefObject, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
 import { cN } from 'src/deps';
@@ -127,6 +127,7 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
   // We have to use useContext here, not in the view – the view isn't inside tool context!
   const varBindings = useContext(VarBindingsContext)
   const possibleVarBindings = useContext(PossibleVarBindingsContext)
+  const possibleVarBindingsRef = useRefForCallback(possibleVarBindings);
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -169,9 +170,9 @@ export const CodeToolCodeMode = memo(function CodeToolCodeMode(props: CodeToolCo
         {...props} {...viewProps}
         updateSubToolPrograms={updateSubToolPrograms}
         views={views}
-        varBindings={varBindings} possibleVarBindings={possibleVarBindings}
+        varBindings={varBindings} possibleVarBindingsRef={possibleVarBindingsRef}
       />
-  }), [varBindings, possibleVarBindings, props, updateSubToolPrograms, views]));
+  }), [props, updateSubToolPrograms, views, varBindings, possibleVarBindingsRef]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -185,16 +186,15 @@ interface CodeToolCodeModeViewProps extends CodeToolCodeModeProps, ToolViewRende
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>;
   views: {[id: string]: ToolView | null};
   varBindings: VarBindings;
-  possibleVarBindings: PossibleVarBindings;
+  possibleVarBindingsRef: MutableRefObject<PossibleVarBindings>;
 }
 
 const CodeToolCodeModeView = memo(function CodeToolCodeModeView(props: CodeToolCodeModeViewProps) {
-  const {expand, program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindings} = props;
+  const {expand, program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindingsRef} = props;
+  const varBindingsRef = useRefForCallback(varBindings);
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
-  const varBindingsRef = useRefForCallback(varBindings);
-  const possibleVarBindingsRef = useRefForCallback(possibleVarBindings);
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = newId();
