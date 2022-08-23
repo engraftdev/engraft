@@ -2,18 +2,17 @@
 
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
-import { bracketMatching, defaultHighlightStyle, syntaxHighlighting, foldKeymap, indentOnInput } from "@codemirror/language"
+import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, syntaxHighlighting } from "@codemirror/language"
 import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
-import { EditorState } from "@codemirror/state"
-import { drawSelection, dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
+import { dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
 import { memo, useCallback } from "react"
 import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
 import { updateKeys, Updater, useAt } from "src/util/state"
 import { refCode } from "./refsExtension"
 
 
-import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
+import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete"
 
 
 export const setup = [
