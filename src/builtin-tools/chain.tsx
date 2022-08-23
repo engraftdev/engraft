@@ -7,7 +7,7 @@ import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { ValueFrame, ToolOutputView } from "src/view/Value";
-import { codeProgramSetTo, Program as CodeProgram, summarizeCodeProgram } from "./code";
+import { slotSetTo, summarizeSlotProgram } from "./slot";
 
 export interface Program {
   toolName: 'chain';
@@ -30,7 +30,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     links: [
       {
         id: newId(),
-        program: codeProgramSetTo(defaultCode || ''),
+        program: slotSetTo(defaultCode || ''),
         blocksWide: 2,
         blocksHigh: 1,
       },
@@ -206,7 +206,7 @@ const LinkView = memo(function ({program, updateProgram, outputs, id, selectedLi
       let newLinks = oldLinks.slice();
       const newLink: Link = {
         id: newId(),
-        program: codeProgramSetTo(program.prevVar.id),
+        program: slotSetTo(program.prevVar.id),
         blocksWide: link.blocksWide || 2,
         blocksHigh: link.blocksHigh || 1,
       };
@@ -274,7 +274,7 @@ const LinkView = memo(function ({program, updateProgram, outputs, id, selectedLi
         }}
       >
         <div className="xEllipsis" style={{marginLeft: 2}}>
-          {summarizeCodeProgram(link.program as CodeProgram)}
+          {summarizeSlotProgram(link.program as any)}
         </div>
         <div className="xExpand" style={{minWidth: 6}}></div>
         { (isHovered && links.length > 1) &&

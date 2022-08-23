@@ -4,7 +4,7 @@ import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/us
 import ChalkEditor from "src/util/ChalkEditor";
 import { compileExpression } from "src/util/compile";
 import { useAt } from "src/util/state";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 // TODO: Hacky headless reportOutput.
 
@@ -16,7 +16,7 @@ export interface Program {
 
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'chalk',
-  inputProgram: codeProgramSetTo(''),
+  inputProgram: slotSetTo(''),
   code: defaultCode,
 });
 const defaultCode = `function (x) {

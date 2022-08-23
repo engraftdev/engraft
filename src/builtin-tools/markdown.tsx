@@ -3,7 +3,7 @@ import { memo, useMemo } from "react";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 import { programFactory as textProgramFactory } from "./text";
 
 export type Program = {
@@ -14,7 +14,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'markdown',
   // TODO: idk if I like this "textProgramFactory" import
-  sourceProgram: codeProgramSetTo(textProgramFactory()),
+  sourceProgram: slotSetTo(textProgramFactory()),
 });
 
 export const Component = memo((props: ToolProps<Program>) => {

@@ -5,7 +5,7 @@ import libCss from "./lib.css";
 import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding, hasValue } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
-import { codeProgramSetTo } from "./builtin-tools/code";
+import { slotSetTo } from "./builtin-tools/slot";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
@@ -32,7 +32,7 @@ interface EmbedComponentProps {
 }
 
 export const EmbedComponent = memo(function EmbedComponent({variables, initialProgramJson, reportOutput}: EmbedComponentProps) {
-  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(codeProgramSetTo(''));
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(slotSetTo(''));
   useEffect(() => {
     if (!initialProgramJson) { return; }
     try {
@@ -106,7 +106,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
   }, [variables]);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
-    programFromLocalStorage(localStorageKey) || codeProgramSetTo(defaultCodeFromVariables(variables))
+    programFromLocalStorage(localStorageKey) || slotSetTo(defaultCodeFromVariables(variables))
   );
 
   useEffect(() => {
@@ -189,7 +189,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
   }, [stableVariables]);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(
-    programFromLocalStorage(useLiveToolDemoKey) || codeProgramSetTo(defaultCodeFromVariables(variables))
+    programFromLocalStorage(useLiveToolDemoKey) || slotSetTo(defaultCodeFromVariables(variables))
   );
 
   useEffect(() => {
@@ -366,4 +366,4 @@ export { VarBindingsContext } from 'src/tools-framework/tools';
 export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
-export { codeProgramSetTo } from 'src/builtin-tools/code';
+export { slotSetTo } from 'src/builtin-tools/slot';

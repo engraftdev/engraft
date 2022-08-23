@@ -15,7 +15,7 @@ import { useMemoObject } from "src/util/useMemoObject";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { VarUse } from "src/view/Vars";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 export interface Program {
   toolName: 'text';
@@ -106,7 +106,7 @@ const TextToolView = memo(function TextToolView(props: TextToolViewProps) {
   const extensions = useMemo(() => {
     function insertTool(tool: Tool<ToolProgram>) {
       const id = newId();
-      const newProgram = codeProgramSetTo(tool.programFactory());
+      const newProgram = slotSetTo(tool.programFactory());
       updateKeys(updateSubToolPrograms, {[id]: newProgram});
       // TODO: we never remove these! lol
       return id;

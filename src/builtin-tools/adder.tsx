@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 export type Program = {
   toolName: 'adder';
@@ -11,8 +11,8 @@ export type Program = {
 
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'adder',
-  xProgram: codeProgramSetTo(''),
-  yProgram: codeProgramSetTo(''),
+  xProgram: slotSetTo(''),
+  yProgram: slotSetTo(''),
 });
 
 export const Component = memo((props: ToolProps<Program>) => {

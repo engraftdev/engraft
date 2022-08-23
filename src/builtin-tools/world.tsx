@@ -3,7 +3,7 @@ import { memo, useEffect, useMemo } from "react";
 import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 export interface Program {
   toolName: 'world';
@@ -19,10 +19,10 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   return {
     toolName: 'world',
     iterationsCount: 20,
-    initProgram: codeProgramSetTo('{}'),
+    initProgram: slotSetTo('{}'),
     stateVar,
-    upProgram: codeProgramSetTo(stateVar.id),
-    viewProgram: codeProgramSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+    upProgram: slotSetTo(stateVar.id),
+    viewProgram: slotSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
   };
 };
 

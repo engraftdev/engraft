@@ -3,7 +3,7 @@ import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, Var 
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 export type Program = {
   toolName: 'let';
@@ -16,8 +16,8 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   return {
     toolName: 'let',
     bindingVar: newVar(),
-    bindingProgram: codeProgramSetTo(''),
-    bodyProgram: codeProgramSetTo(''),
+    bindingProgram: slotSetTo(''),
+    bodyProgram: slotSetTo(''),
   }
 };
 

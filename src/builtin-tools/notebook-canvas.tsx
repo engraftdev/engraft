@@ -16,7 +16,7 @@ import { PaneGeo, roundTo } from "src/view/noodle-canvas/model";
 import { NoodleCanvas } from "src/view/noodle-canvas/NoodleCanvas";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 
 export type Program = {
@@ -41,7 +41,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
     cells: [
       {
         var_: newVar(defaultCellLabels[0]),
-        program: codeProgramSetTo(defaultInput || ''),
+        program: slotSetTo(defaultInput || ''),
         upstreamIds: {},
         geo: {
           x: 16 * 3,
@@ -151,7 +151,7 @@ const View = memo((props: ViewProps) => {
     updateCells((oldCells) => {
       const newCell = {
         var_: newVar(smallestUnusedLabel),
-        program: codeProgramSetTo(''),
+        program: slotSetTo(''),
         upstreamIds: {},
         geo: {
           x: 16 * 3,

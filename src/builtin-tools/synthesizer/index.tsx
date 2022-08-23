@@ -8,7 +8,7 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import { codeProgramSetTo } from "src/builtin-tools/code"
+import { slotSetTo } from "src/builtin-tools/slot"
 import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools"
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool"
 import CodeMirror from "src/util/CodeMirror"
@@ -36,7 +36,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
     toolName: 'synthesizer',
-    inputProgram: codeProgramSetTo(defaultCode || ''),
+    inputProgram: slotSetTo(defaultCode || ''),
     code: 'input',
     inOutPairs: []
   };

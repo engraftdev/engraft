@@ -11,7 +11,7 @@ import useHover from "src/util/useHover";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 
 export type Program = {
@@ -33,7 +33,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
-      { var_: newVar(defaultCellLabels[0]), program: codeProgramSetTo(defaultInput || ''), upstreamIds: {} }
+      { var_: newVar(defaultCellLabels[0]), program: slotSetTo(defaultInput || ''), upstreamIds: {} }
     ],
     prevVar: newVar('prev')
   };
@@ -165,7 +165,7 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
-        program: codeProgramSetTo(i === 0 ? '' : prevVar.id),
+        program: slotSetTo(i === 0 ? '' : prevVar.id),
         upstreamIds: {},
       });
       return newCells;

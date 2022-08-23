@@ -3,7 +3,7 @@ import appCss from './App.css';
 import { examples } from './examples/examples';
 import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, VarBinding } from './tools-framework/tools';
 import { ToolWithView } from './tools-framework/ToolWithView';
-import { Program as CodeProgram, codeProgramSetTo } from './builtin-tools/code';
+import { slotSetTo } from './builtin-tools/slot';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ToolOutputView } from './view/Value';
@@ -19,7 +19,7 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultProgram: CodeProgram = codeProgramSetTo('');
+const defaultProgram = slotSetTo('');
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));

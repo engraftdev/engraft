@@ -8,7 +8,7 @@ import { findAllNested, findNested, getById, newId, updateById } from "src/util/
 import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
-import { codeProgramSetTo } from "../code";
+import { slotSetTo } from "../slot";
 import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
 
 import builtinStyles from './builtin.css';
@@ -22,7 +22,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
     toolName: 'interface',
-    inputProgram: codeProgramSetTo(defaultCode || ''),
+    inputProgram: slotSetTo(defaultCode || ''),
     rootElement: {
       id: 'root',
       type: 'element',
@@ -347,7 +347,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     );
   }, [element.id, updateRootElement]);
 
-  const [styleProgram, updateStyleProgram] = useStateUpdateOnly(codeProgramSetTo(JSON.stringify(element.style)));
+  const [styleProgram, updateStyleProgram] = useStateUpdateOnly(slotSetTo(JSON.stringify(element.style)));
   const [styleOutput, setStyleOutput] = useStateSetOnly<ToolOutput | null>(null)
 
   useEffect(() => {

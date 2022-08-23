@@ -1,7 +1,7 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, hasValue } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { codeProgramSetTo } from "src/builtin-tools/code";
+import { slotSetTo } from "src/builtin-tools/slot";
 import { newId } from "src/util/id";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";
@@ -27,7 +27,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultInputCode?: string) => {
   return {
     toolName: 'extractor',
-    inputProgram: codeProgramSetTo(defaultInputCode || ''),
+    inputProgram: slotSetTo(defaultInputCode || ''),
     patternsWithIds: [],
     minimized: false,
   };

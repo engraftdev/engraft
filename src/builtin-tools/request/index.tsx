@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { codeProgramSetTo } from "src/builtin-tools/code";
+import { slotSetTo } from "src/builtin-tools/slot";
 import { Program as TextProgram } from "src/builtin-tools/text";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
@@ -30,8 +30,8 @@ export const programFactory: ProgramFactory<Program> = () => {
   };
   return {
     toolName: 'request',
-    urlProgram: codeProgramSetTo(textProgram),
-    paramsProgram: codeProgramSetTo(paramsDefault),
+    urlProgram: slotSetTo(textProgram),
+    paramsProgram: slotSetTo(paramsDefault),
     autoSend: true,
   }
 };

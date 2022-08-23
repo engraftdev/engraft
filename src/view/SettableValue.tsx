@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { hasValue, ToolOutput } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
-import { codeProgramSetTo } from "src/builtin-tools/code";
+import { slotSetTo } from "src/builtin-tools/slot";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
 
@@ -19,7 +19,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
 
-  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(codeProgramSetTo(''))
+  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(slotSetTo(''))
   const [entryOutput, setEntryOutput] = useStateSetOnly<ToolOutput | null>(null)
 
   const onClickSet = useCallback(() => {

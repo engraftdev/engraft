@@ -5,7 +5,7 @@ import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { Value } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
-import { codeProgramSetTo } from "./code";
+import { slotSetTo } from "./slot";
 
 
 export type Program = {
@@ -19,9 +19,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   const itemVar = newVar('item');
   return {
     toolName: 'map',
-    inputProgram: codeProgramSetTo(defaultCode || ''),
+    inputProgram: slotSetTo(defaultCode || ''),
     itemVar,
-    perItemProgram: codeProgramSetTo(itemVar.id)
+    perItemProgram: slotSetTo(itemVar.id)
   };
 };
 

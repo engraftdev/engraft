@@ -2,7 +2,7 @@ import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } fr
 import type { Schema } from "datavoyager/build/models";
 import _ from "lodash";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { codeProgramSetTo } from "src/builtin-tools/code";
+import { slotSetTo } from "src/builtin-tools/slot";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
@@ -22,7 +22,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
     toolName: 'voyager',
-    inputProgram: codeProgramSetTo(defaultCode || ''),
+    inputProgram: slotSetTo(defaultCode || ''),
     spec: undefined,
   };
 }
