@@ -1,10 +1,12 @@
 import update from "immutability-helper";
 import _ from "lodash";
+import React from "react";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { startDrag } from "src/util/drag";
+import { ErrorBoundary } from "src/util/ErrorBoundary";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -30,6 +32,7 @@ type Cell = {
   program: ToolProgram,
   upstreamIds: {[id: string]: true},
   geo: PaneGeo,
+  showOutputOnly: boolean,
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultInput) => {
@@ -46,6 +49,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
           width: 16 * 16,
           height: 16 * 12,
         },
+        showOutputOnly: false,
       }
     ],
     prevVar: newVar('prev'),
@@ -155,6 +159,7 @@ const View = memo((props: ViewProps) => {
           width: 16 * 16,
           height: 16 * 12,
         },
+        showOutputOnly: false,
       };
       return [...oldCells, newCell];
     });
@@ -300,22 +305,44 @@ const CellView = memo(function CellView(props: CellViewProps) {
   } , [updateCells, idx]);
 
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
+  const [showOutputOnly, updateShowOutputOnly] = useAt(cell, updateCell, 'showOutputOnly');
 
   const alreadyDisplayed = hasValue(toolOutput) && toolOutput.alreadyDisplayed;
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
       <MyContextMenuHeading>Cell</MyContextMenuHeading>
-      <button
-        onClick={() => {
-          removeCell();
-          closeMenu();
-        }}
-      >
-        Delete
-      </button>
+      <div>
+        <button
+          onClick={() => {
+            removeCell();
+            closeMenu();
+          }}
+        >
+          Delete
+        </button>
+      </div>
+      <div>
+        <input type="checkbox" checked={showOutputOnly} onChange={(ev) => updateShowOutputOnly(() => ev.target.checked)}/> Show output only
+      </div>
     </MyContextMenu>
-  , [removeCell]));
+  , [showOutputOnly, removeCell, updateShowOutputOnly]));
+
+  if (showOutputOnly) {
+    return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} onMouseDown={onMouseDownDragPane} style={{height: '100%'}}>
+      {menuNode}
+      {(() => {
+        // TODO: this seems like a pattern
+        if (hasValue(toolOutput)) {
+          const maybeElement = toolOutput.value as {} | null | undefined;
+          if (React.isValidElement(maybeElement)) {
+            return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
+          }
+        }
+        return <ToolOutputView toolValue={toolOutput}/>;
+      })()}
+    </div>;
+  }
 
   return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} style={{height: '100%'}}>
     {menuNode}
