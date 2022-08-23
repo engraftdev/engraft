@@ -1,5 +1,3 @@
-
-
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, syntaxHighlighting } from "@codemirror/language"
@@ -10,8 +8,6 @@ import { memo, useCallback } from "react"
 import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
 import { updateKeys, Updater, useAt } from "src/util/state"
 import { refCode } from "./refsExtension"
-
-
 import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete"
 
 
@@ -78,13 +74,14 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
 
 export function refCompletions(varBindingsGetter?: () => VarBindings | undefined, possibleVarBindingsGetter?: () => PossibleVarBindings | undefined): CompletionSource {
   return (completionContext: CompletionContext) => {
-    const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
-    const possibleVarBindings = possibleVarBindingsGetter ? possibleVarBindingsGetter() || {} : {};
-
     let word = completionContext.matchBefore(/@?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
       return null
     }
+
+    const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
+    const possibleVarBindings = possibleVarBindingsGetter ? possibleVarBindingsGetter() || {} : {};
+
     return {
       from: word.from,
       options: [

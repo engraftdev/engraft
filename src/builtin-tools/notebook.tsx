@@ -86,8 +86,11 @@ export const Component = memo((props: ToolProps<Program>) => {
   )}</>;
 })
 
-const defaultCellLabels = _.range(1, 1000).map((n) => `cell ${n}`);
-
+const letters = _.range(65, 91).map((n) => String.fromCharCode(n));
+const defaultCellLabels = [
+  ...letters,
+  ...letters.flatMap((a) => letters.map((b) => a + b)),
+];
 
 type ViewProps = ToolProps<Program> & {
   outputs: {[id: string]: ToolOutput | null},
@@ -313,10 +316,9 @@ const CellView = memo(function CellView(props: CellViewProps) {
   return <>
     {menuNode}
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
-      <div className="xRow xGap10 xStickyTop10">
+      <div className="xRow xStickyTop10" style={{marginTop: 4}}>
         <div className="xExpand"/>
         <VarDefinition var_={var_} updateVar={updateVar}/>
-        <div className="xLineHeight1">=</div>
       </div>
     </div>
     <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>

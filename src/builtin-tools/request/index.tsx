@@ -99,7 +99,7 @@ const paramsDefault = `{
   action: 'query',
   generator: 'random',
   grnnamespace: 0,
-  prop: 'pageimages|extracts',
+  prop: 'extracts',
   exintro: true,
   grnlimit: 1
 }`
