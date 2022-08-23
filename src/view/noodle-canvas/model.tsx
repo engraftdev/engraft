@@ -10,8 +10,7 @@ export type PaneGeo = {
 export type Pane = {
   id: string,
   geo: PaneGeo,
-  heading?: ReactNode,
-  children?: ReactNode,
+  children: (props: {onMouseDownDragPane: (startEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => void}) => ReactNode,
 }
 
 export function roundTo(n: number, step: number) {

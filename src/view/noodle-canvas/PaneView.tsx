@@ -22,7 +22,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
     updatePaneGeoById(pane.id, f);
   }, [updatePaneGeoById, pane.id]);
 
-  const onMouseDownDrag = useMemo(() => startDrag({
+  const onMouseDownDragPane = useMemo(() => startDrag({
     init() {
       return {startGeo: geoRef.current};
     },
@@ -71,19 +71,6 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
           }}
         >
           <div
-            className="PaneView-heading"
-            style={{
-              height: '2rem',
-              backgroundColor: 'rgb(240, 240, 240)',
-              borderRadius: '0.25rem 0.25rem 0 0',
-              cursor: 'grab',
-              flexShrink: 0,
-            }}
-            onMouseDown={onMouseDownDrag}
-          >
-            {pane.heading}
-          </div>
-          <div
             className="PaneView-children-wrapper"
             style={{
               // overflow: 'hidden',  // disabled for CodeMirror popups
@@ -91,7 +78,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
               minHeight: 0,
             }}
           >
-            {pane.children}
+            {pane.children({onMouseDownDragPane})}
           </div>
         </div>
       </div>

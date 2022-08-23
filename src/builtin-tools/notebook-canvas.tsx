@@ -1,22 +1,20 @@
+import update from "immutability-helper";
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { EnvContext, hasValue, newVar, PossibleEnvContext, PossibleVarBinding, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding } from "src/tools-framework/tools";
+import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
+import { startDrag } from "src/util/drag";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
-import { Use } from "src/util/Use";
+import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
-import useHover from "src/util/useHover";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
-import { Pane, PaneGeo, roundTo } from "src/view/noodle-canvas/model";
+import { PaneGeo, roundTo } from "src/view/noodle-canvas/model";
 import { NoodleCanvas } from "src/view/noodle-canvas/NoodleCanvas";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { codeProgramSetTo } from "./code";
-import update from "immutability-helper";
-import { startDrag } from "src/util/drag";
-import { updateF } from "src/util/updateF";
 
 
 export type Program = {
@@ -168,29 +166,7 @@ const View = memo((props: ViewProps) => {
         panes={cells.map((cell, i) => ({
           id: cell.var_.id,
           geo: cell.geo,
-          heading:
-            <div
-              className="NotebookCanvasTool-heading"
-              style={{
-                height: '100%',
-                paddingLeft: '0.5rem',
-                paddingRight: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              onContextMenu={}
-            >
-              <div
-                style={{display: 'inline-block', cursor: 'initial'}}
-                onMouseDown={(ev) => ev.stopPropagation()}
-              >
-                <VarDefinition
-                  var_={cell.var_}
-                  updateVar={at(atIndex<Cell>(updateCells, i), 'var_')}
-                />
-              </div>
-            </div>,
-          children:
+          children: ({onMouseDownDragPane}) =>
             <CellView cell={cell}
               // TODO: memoize these?
               updateCell={atIndex(updateCells, i)}
@@ -200,6 +176,7 @@ const View = memo((props: ViewProps) => {
                 updateCells(() => newCells);
               }}
               toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
+              onMouseDownDragPane={onMouseDownDragPane}
             />,
         }))}
         updatePaneGeoById={updatePaneGeoById}
@@ -291,8 +268,8 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
 
 
-  return <AddObjToContext context={EnvContext} obj={newVarBindings}>
-    <AddObjToContext context={PossibleEnvContext} obj={newPossibleVarBindings}>
+  return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
+    <AddObjToContext context={PossibleVarBindingsContext} obj={newPossibleVarBindings}>
       {component}
     </AddObjToContext>
   </AddObjToContext>;
@@ -308,11 +285,13 @@ interface CellViewProps {
   toolOutput: ToolOutput | null,
   toolView: ToolView | null,
 
-  removeCell: () => void;
+  removeCell: () => void,
+
+  onMouseDownDragPane: (startEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {cell, updateCell, toolView, toolOutput, removeCell} = props;
+  const {cell, updateCell, toolView, toolOutput, removeCell, onMouseDownDragPane} = props;
 
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
 
@@ -332,13 +311,43 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </MyContextMenu>
   , [removeCell]));
 
-  return <div className="NotebookCanvasTool-CellView" onContextMenu={openMenu} style={{height: '100%'}}>
+  return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} style={{height: '100%'}}>
     {menuNode}
-    <div className="NotebookCanvasTool-CellView-tool-cell xCol" style={{background: 'rgb(251, 251, 251)'}}>
+    <div
+      className="PaneView-heading"
+      style={{
+        height: '2rem',
+        backgroundColor: 'rgb(240, 240, 240)',
+        borderRadius: '0.25rem 0.25rem 0 0',
+        cursor: 'grab',
+        flexShrink: 0,
+      }}
+      onMouseDown={onMouseDownDragPane}
+    >
+      <div
+        className="NotebookCanvasTool-CellView-heading"
+        style={{
+          height: '100%',
+          paddingLeft: '0.5rem',
+          paddingRight: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <div
+          style={{display: 'inline-block', cursor: 'initial'}}
+          onMouseDown={(ev) => ev.stopPropagation()}
+        >
+          <VarDefinition var_={var_} updateVar={updateVar} />
+        </div>
+      </div>
+    </div>
+
+    <div className="NotebookCanvasTool-CellView-tool xCol" style={{background: 'rgb(251, 251, 251)', minHeight: 0}}>
       <ShowView view={toolView} expand={true}/>
     </div>
     { !alreadyDisplayed &&
-      <div className="NotebookCanvasTool-CellView-output-cell" style={{padding: 5}}>
+      <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 32, flexShrink: 1000000}}>
         <ToolOutputView toolValue={toolOutput}/>
       </div>
     }
