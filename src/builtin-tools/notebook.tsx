@@ -252,6 +252,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
+  // TODO: useDedupe doesn't work here!
   const newPossibleVarBindings = useDedupe(useMemo(() => {
     let result: {[label: string]: PossibleVarBinding} = {};
     cells.forEach((otherCell) => {
