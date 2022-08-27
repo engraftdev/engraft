@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,7 +10,7 @@
           "label": "word"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDreport359691.get",
           "subTools": {}
@@ -25,12 +25,12 @@
           "label": "response"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "request",
             "urlProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "text",
@@ -39,7 +39,7 @@
               }
             },
             "paramsProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "",
               "subTools": {}
@@ -57,12 +57,12 @@
           "label": "per POS"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "map",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDpyroraptor110749",
               "subTools": {}
@@ -72,7 +72,7 @@
               "label": "item"
             },
             "perItemProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDrainbow180100[1].syn",
               "subTools": {}
@@ -89,7 +89,7 @@
           "label": "all POS"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDbracket986524.flat()",
           "subTools": {}
@@ -104,7 +104,7 @@
           "label": "word state"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "state",
@@ -119,7 +119,7 @@
           "label": ""
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "<div>\n <h2>Synonyms of {IDreport359691.get}</h2>\n {IDlist469273.map(pos =>\n <div>\n <button onClick={() => IDreport359691.set(pos)}>\n {pos}\n </button>\n </div>)}\n</div>",
           "subTools": {}

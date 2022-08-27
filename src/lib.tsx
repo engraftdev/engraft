@@ -362,7 +362,7 @@ export { default as ReactDOM } from 'react-dom';
 // Re-exports //
 ////////////////
 
-export { VarBindingsContext } from 'src/tools-framework/tools';
+export { VarBindingsContext, hasValue, hasError } from 'src/tools-framework/tools';
 export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';

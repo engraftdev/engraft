@@ -334,7 +334,11 @@ const CellView = memo(function CellView(props: CellViewProps) {
       {(() => {
         // TODO: this seems like a pattern
         if (hasValue(toolOutput)) {
-          const maybeElement = toolOutput.value as {} | null | undefined;
+          let maybeElement = toolOutput.value as object | null | undefined;
+          // TODO: extra hack for interface-tool... should think through this
+          if (maybeElement && typeof maybeElement === 'object' && 'view' in maybeElement) {
+            maybeElement = (maybeElement as any).view;
+          };
           if (React.isValidElement(maybeElement)) {
             return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
           }

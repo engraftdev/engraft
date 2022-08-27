@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,12 +10,12 @@
           "label": "response"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "request",
             "urlProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "text",
@@ -24,7 +24,7 @@
               }
             },
             "paramsProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "{\n origin: '*',\n format: 'json',\n action: 'query',\n generator: 'random',\n grnnamespace: 0,\n prop: 'pageimages|extracts',\n exintro: true,\n rvprop: 'content',\n grnlimit: 5\n}",
               "subTools": {}
@@ -40,12 +40,12 @@
           "label": "pages"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "extractor",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDhole279857",
               "subTools": {},
@@ -88,12 +88,12 @@
           "label": "markdown pieces"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "map",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDslicer681048",
               "subTools": {}
@@ -103,31 +103,31 @@
               "label": "item"
             },
             "perItemProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "markdown",
                 "sourceProgram": {
-                  "toolName": "code",
+                  "toolName": "slot",
                   "modeName": "tool",
                   "subProgram": {
                     "toolName": "text",
                     "text": "# IDpainter564219\n\nIDtalos285013",
                     "subTools": {
                       "IDpainter564219": {
-                        "toolName": "code",
+                        "toolName": "slot",
                         "modeName": "code",
                         "code": "IDjet873332.title",
                         "subTools": {}
                       },
                       "IDcondor751779": {
-                        "toolName": "code",
+                        "toolName": "slot",
                         "modeName": "code",
                         "code": "IDjet873332.thumbnail.source",
                         "subTools": {}
                       },
                       "IDtalos285013": {
-                        "toolName": "code",
+                        "toolName": "slot",
                         "modeName": "code",
                         "code": "IDjet873332.extract",
                         "subTools": {}
@@ -149,12 +149,12 @@
           "label": ""
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "markdown",
             "sourceProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDgrape419949.join('\\n\\n')",
               "subTools": {}

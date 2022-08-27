@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,7 +10,7 @@
           "label": "R"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "slider",
@@ -28,7 +28,7 @@
           "label": "G"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "slider",
@@ -46,7 +46,7 @@
           "label": "B"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "slider",
@@ -64,7 +64,7 @@
           "label": "color"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "text",
@@ -84,7 +84,7 @@
           "label": "\ncell 1"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "<div style={{width: 100, height: 100, backgroundColor: IDshoulder201958}}/>",
           "subTools": {}

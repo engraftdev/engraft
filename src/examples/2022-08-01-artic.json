@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,7 +10,7 @@
           "label": "terms"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "[\"Dali\", \"Picasso\", \"O'Keeffe\"]",
           "subTools": {},
@@ -24,12 +24,12 @@
           "label": "per artist"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "map",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDnymphea196713",
               "subTools": {},
@@ -40,7 +40,7 @@
               "label": "item"
             },
             "perItemProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "notebook",
@@ -51,12 +51,12 @@
                       "label": "artist resp"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "tool",
                       "subProgram": {
                         "toolName": "request",
                         "urlProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "tool",
                           "subProgram": {
                             "toolName": "text",
@@ -65,7 +65,7 @@
                           }
                         },
                         "paramsProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "code",
                           "code": "{\n  q: IDarcher577311,\n  size: 1,\n}",
                           "subTools": {},
@@ -83,12 +83,12 @@
                       "label": "artist id"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "tool",
                       "subProgram": {
                         "toolName": "extractor",
                         "inputProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "code",
                           "code": "IDhose874537",
                           "subTools": {},
@@ -118,12 +118,12 @@
                       "label": "artworks resp"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "tool",
                       "subProgram": {
                         "toolName": "request",
                         "urlProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "tool",
                           "subProgram": {
                             "toolName": "text",
@@ -132,7 +132,7 @@
                           }
                         },
                         "paramsProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "code",
                           "code": "{\n  fields: 'date_end',\n  limit: 100,\n  page: 1,\n  params: {\n    query: {\n      term: {\n        artist_id: IDdresser344063\n      }\n    }\n  }\n}",
                           "subTools": {},
@@ -151,12 +151,12 @@
                       "label": "artworks years"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "tool",
                       "subProgram": {
                         "toolName": "extractor",
                         "inputProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "code",
                           "code": "IDdresser344063",
                           "subTools": {},
@@ -186,12 +186,12 @@
                       "label": "artist name"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "tool",
                       "subProgram": {
                         "toolName": "extractor",
                         "inputProgram": {
-                          "toolName": "code",
+                          "toolName": "slot",
                           "modeName": "code",
                           "code": "IDhose874537",
                           "subTools": {},
@@ -220,7 +220,7 @@
                       "label": "cell 5"
                     },
                     "program": {
-                      "toolName": "code",
+                      "toolName": "slot",
                       "modeName": "code",
                       "code": "IDarcheology996674.map((year) => ({\n  artist: IDcoat018167,\n  decade: Math.floor(year / 10) * 10 + \"s\"\n}))",
                       "subTools": {},
@@ -251,7 +251,7 @@
           "label": "cell 2"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDfibula203751.flat()",
           "subTools": {}
@@ -266,12 +266,12 @@
           "label": "cell 3"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "voyager",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDnymphea196713",
               "subTools": {},

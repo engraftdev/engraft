@@ -15,7 +15,7 @@ import update from 'immutability-helper';
 // tricky q: should scope be part of the node? (that's how the interface presents it, but
 //   internally, it's more coherent to think of them separately)
 
-export type InterfaceElement = {
+export type FormatterElement = {
   id: string,
   scope?: string,
 } & (
@@ -24,10 +24,10 @@ export type InterfaceElement = {
     tag: string,
     style: CSSProperties,
     className: string,
-    children: InterfaceElement[],
+    children: FormatterElement[],
   } | {
     type: 'for-each',
-    item: InterfaceElement,
+    item: FormatterElement,
   } | {
     type: 'text',
     rawHtml: boolean,
@@ -39,26 +39,26 @@ export type InterfaceElement = {
   }
 )
 
-export type InterfaceElementOf<T> = InterfaceElement & { type: T };
+export type FormatterElementOf<T> = FormatterElement & { type: T };
 
-export type InterfaceNode = {
+export type FormatterNode = {
   id: string,
   innerData: any,
-  element: InterfaceElement,
-  children: InterfaceNode[],
+  element: FormatterElement,
+  children: FormatterNode[],
   ghostInfo: GhostInfo | undefined,
   controlKey?: string,
 }
 
 // this says "this node is a ghost; here's how to realize it"
 export type GhostInfo = {
-  realize: (rootElement: InterfaceElement) => InterfaceElement,
+  realize: (rootElement: FormatterElement) => FormatterElement,
 }
 
-export function renderElementToNode(element: InterfaceElement, data: any, parentId: string, useGhosts: boolean, ghostInfo?: GhostInfo | undefined): InterfaceNode {
+export function renderElementToNode(element: FormatterElement, data: any, parentId: string, useGhosts: boolean, ghostInfo?: GhostInfo | undefined): FormatterNode {
   const innerData = element.scope ? data[element.scope] : data;
 
-  let node: InterfaceNode = {
+  let node: FormatterNode = {
     id: hashId(parentId, element.id),
     innerData,
     element,
@@ -76,9 +76,9 @@ export function renderElementToNode(element: InterfaceElement, data: any, parent
       if (useGhosts) {
         const ghostElements = makeGhostElements(node.element, innerData, node.id);
         const ghostNodes = ghostElements.map((ghostElement) => {
-          const realizeChild = (rootElement: InterfaceElement) => {
+          const realizeChild = (rootElement: FormatterElement) => {
             const updatedUpToParent = ghostInfo ? ghostInfo.realize(rootElement) : rootElement;
-            return updateById<InterfaceElementOf<'element'>>(updatedUpToParent, node.element.id,
+            return updateById<FormatterElementOf<'element'>>(updatedUpToParent, node.element.id,
               updateF({children: {$push: [ghostElement]}})
             );
           };
@@ -109,10 +109,10 @@ export function renderElementToNode(element: InterfaceElement, data: any, parent
   return node;
 }
 
-function makeGhostElements(element: InterfaceElement, innerData: any, id: string): InterfaceElement[] {
+function makeGhostElements(element: FormatterElement, innerData: any, id: string): FormatterElement[] {
   if (typeof innerData === 'string' || typeof innerData === 'number') {
     if (!isTextShown(element, false)) {
-      const ghostElement: InterfaceElement = {
+      const ghostElement: FormatterElement = {
         type: 'text',
         id: hashId(id, 'text'),
         rawHtml: false,
@@ -121,7 +121,7 @@ function makeGhostElements(element: InterfaceElement, innerData: any, id: string
     }
   } else if (Array.isArray(innerData)) {
     if (!isArrayShown(element, false)) {
-      const ghostElement: InterfaceElement = {
+      const ghostElement: FormatterElement = {
         type: 'for-each',
         id: hashId(id, 'for-each'),
         item: {
@@ -141,7 +141,7 @@ function makeGhostElements(element: InterfaceElement, innerData: any, id: string
       Object.keys(innerData)
       .filter((key) => !keysAlreadyShown.has(key))
       .map((key) => {
-        const ghostElement: InterfaceElement = {
+        const ghostElement: FormatterElement = {
           scope: key,
           type: 'element',
           tag: 'div',
@@ -160,7 +160,7 @@ function makeGhostElements(element: InterfaceElement, innerData: any, id: string
 }
 
 // asking the question: is the array being passed in here getting for-eached?
-function isArrayShown(element: InterfaceElement, preScope: boolean): boolean {
+function isArrayShown(element: FormatterElement, preScope: boolean): boolean {
   if (preScope && element.scope) {
     return false;
   }
@@ -175,7 +175,7 @@ function isArrayShown(element: InterfaceElement, preScope: boolean): boolean {
   }
 }
 
-function isTextShown(element: InterfaceElement, preScope: boolean): boolean {
+function isTextShown(element: FormatterElement, preScope: boolean): boolean {
   if (preScope && element.scope) {
     return false;
   }
@@ -190,7 +190,7 @@ function isTextShown(element: InterfaceElement, preScope: boolean): boolean {
   }
 }
 
-function keysShown(element: InterfaceElement, preScope: boolean): Set<string> {
+function keysShown(element: FormatterElement, preScope: boolean): Set<string> {
   if (preScope && element.scope) {
     return new Set([element.scope]);
   }
@@ -212,7 +212,7 @@ function keysShown(element: InterfaceElement, preScope: boolean): Set<string> {
 // * VIEW STUFF *
 // **************
 
-export type InterfaceContextInfo = {
+export type FormatterContextInfo = {
   controlValues: ControlValues,
   updateControlValues: Updater<ControlValues>,
 } & (
@@ -226,7 +226,7 @@ export type InterfaceContextInfo = {
   }
 );
 
-export const InterfaceContext = createContext<InterfaceContextInfo>({
+export const FormatterContext = createContext<FormatterContextInfo>({
   controlValues: {},
   updateControlValues: () => {},
   editMode: false,
@@ -236,17 +236,17 @@ export const InterfaceContext = createContext<InterfaceContextInfo>({
 export type ControlValues = {
   [name: string]: {
     [key: string]: any,
-  }
+  },
 }
 
 
-export interface InterfaceNodeViewProps {
-  node: InterfaceNode,
+export type FormatterNodeViewProps = {
+  node: FormatterNode,
 }
 
-export const InterfaceNodeView = memo(function InterfaceNodeView(props: InterfaceNodeViewProps) {
+export const FormatterNodeView = memo(function FormatterNodeView(props: FormatterNodeViewProps) {
   const { node } = props;
-  const context = useContext(InterfaceContext);
+  const context = useContext(FormatterContext);
 
   const { element, ghostInfo } = node;
 
@@ -258,14 +258,14 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
       inner = (
         <Tag style={element.style} className={element.className}>
           {node.children.map((child, i) =>
-            <InterfaceNodeView key={i} node={child}/>
+            <FormatterNodeView key={i} node={child}/>
           )}
         </Tag>
       );
       break;
     case 'for-each':
       inner = node.children.map((child, i) =>
-        <InterfaceNodeView key={i} node={child}/>
+        <FormatterNodeView key={i} node={child}/>
       );
       break;
     case 'text':
@@ -323,7 +323,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
 
     return (
       <div
-        className="InterfaceNodeView-editbox"
+        className="FormatterNodeView-editbox"
         style={{
           padding: 2,
           margin: 2,
@@ -333,7 +333,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
         }}
       >
         <div
-          className="InterfaceNodeView-editbox-border"
+          className="FormatterNodeView-editbox-border"
           style={{
             position: 'absolute',
             top: 0,
@@ -349,7 +349,7 @@ export const InterfaceNodeView = memo(function InterfaceNodeView(props: Interfac
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div
             ref={hoverRef}
-            className="InterfaceNodeView-editbox-label"
+            className="FormatterNodeView-editbox-label"
             style={{
               position: 'absolute', top: -5, left: 2, fontSize: 8,
               color: isSelected ? '#44f' : isHovered ? "#000" : "#aaa",

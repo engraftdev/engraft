@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,12 +10,12 @@
           "label": "cell 1"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "request",
             "urlProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "text",
@@ -24,7 +24,7 @@
               }
             },
             "paramsProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "{\n  key: 'AIzaSyB41l6-ZZrqZt2ZnyFPeJjC_2EzqZ6qaRI',\n  query: 'pizza',\n}",
               "subTools": {},
@@ -42,7 +42,7 @@
           "label": "cell 6"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "update(IDderby171590, {results: (r) => r.slice(0, 5)})",
           "subTools": {},
@@ -56,12 +56,12 @@
           "label": "cell 2"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "extractor",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDderby171590",
               "subTools": {},
@@ -108,15 +108,15 @@
       {
         "var_": {
           "id": "IDleech543603",
-          "label": "interface"
+          "label": "formatter"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
-            "toolName": "interface",
+            "toolName": "formatter",
             "inputProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "code",
               "code": "IDderby171590",
               "subTools": {},
@@ -198,7 +198,7 @@
           "label": "cell 7"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDleech543603.view",
           "subTools": {},
@@ -214,17 +214,17 @@
           "label": "cell 4"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDleech543603.controlValues",
           "subTools": {
             "IDreward009040": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
-                "toolName": "interface",
+                "toolName": "formatter",
                 "inputProgram": {
-                  "toolName": "code",
+                  "toolName": "slot",
                   "modeName": "code",
                   "code": "",
                   "subTools": {},

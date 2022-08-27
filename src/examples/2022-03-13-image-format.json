@@ -1,5 +1,5 @@
 {
-  "toolName": "code",
+  "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
     "toolName": "notebook",
@@ -10,12 +10,12 @@
           "label": "image url"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDmunchkin797641",
           "subTools": {
             "IDtulip591284": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "file",
@@ -23,7 +23,7 @@
               }
             },
             "IDmunchkin797641": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "file",
@@ -42,7 +42,7 @@
           "label": "image elem"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "createElementFromReact(<img src={IDzircon169419}/>)",
           "subTools": {}
@@ -57,7 +57,7 @@
           "label": "cell 1"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDabrosaurus864582.width",
           "subTools": {}
@@ -72,7 +72,7 @@
           "label": "cell 2"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "IDabrosaurus864582.height",
           "subTools": {}
@@ -87,12 +87,12 @@
           "label": "cell 4"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
             "toolName": "markdown",
             "sourceProgram": {
-              "toolName": "code",
+              "toolName": "slot",
               "modeName": "tool",
               "subProgram": {
                 "toolName": "text",
@@ -111,7 +111,7 @@
           "label": "final width"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "Math.max(IDabrosaurus864582.width, IDabrosaurus864582.height / (4/3))",
           "subTools": {}
@@ -126,7 +126,7 @@
           "label": "final height"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "Math.max(IDabrosaurus864582.height, IDabrosaurus864582.width / 2)",
           "subTools": {}
@@ -141,7 +141,7 @@
           "label": "final"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "<svg\n  width={IDefraasia612494}\n  height={IDmailman661263}\n  style={{background: 'white'}}\n>\n  <image\n    width={IDefraasia612494}\n    height={IDmailman661263}\n    href={IDzircon169419}\n  />\n</svg>",
           "subTools": {}
@@ -159,7 +159,7 @@
           "label": "final elem"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "createElementFromReact(IDice816993)",
           "subTools": {}
@@ -174,7 +174,7 @@
           "label": "cell 5"
         },
         "program": {
-          "toolName": "code",
+          "toolName": "slot",
           "modeName": "code",
           "code": "new Promise((resolve) => {\n  console.log(\"hi\");\n  const svg_xml = (new XMLSerializer()).serializeToString(IDinfinity110372);\n  var img = new Image();\n  img.src = \"data:image/svg+xml;base64,\" + btoa(svg_xml);\n  img.onload = function() {\n    const canvas = document.createElement('canvas');\n    canvas.width = img.width;\n    canvas.height = img.height;\n    const ctx = canvas.getContext('2d');\n    ctx.drawImage(img, 0, 0);\n    resolve(<img src={canvas.toDataURL()} />)\n  }\n})",
           "subTools": {}

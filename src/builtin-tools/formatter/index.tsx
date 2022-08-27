@@ -9,19 +9,19 @@ import { Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/st
 import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
 import { slotSetTo } from "../slot";
-import { ControlValues, InterfaceContext, InterfaceElement, InterfaceElementOf, InterfaceNode, InterfaceNodeView, renderElementToNode } from "./interface";
+import { ControlValues, FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
 
 import builtinStyles from './builtin.css';
 
 export type Program = {
-  toolName: 'interface';
+  toolName: 'formatter';
   inputProgram: ToolProgram;
-  rootElement: InterfaceElement;
+  rootElement: FormatterElement;
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
-    toolName: 'interface',
+    toolName: 'formatter',
     inputProgram: slotSetTo(defaultCode || ''),
     rootElement: {
       id: 'root',
@@ -72,9 +72,9 @@ export const Component = memo((props: ToolProps<Program>) => {
       if (obj && typeof obj === 'object' && (obj as any).element?.type === 'control') {
         return true;
       }
-    }) as InterfaceNode[];
+    }) as FormatterNode[];
     for (const node of controlNodes) {
-      const element = node.element as InterfaceElement & {type: 'control'};
+      const element = node.element as FormatterElement & {type: 'control'};
       if (!defaultValues[element.name]) {
         defaultValues[element.name] = {};
       }
@@ -92,10 +92,10 @@ export const Component = memo((props: ToolProps<Program>) => {
     try {
       const renderedNode = renderElementToNode(program.rootElement, inputOutput.value, '', false);
       const view = (
-        <InterfaceContext.Provider value={{ controlValues, updateControlValues, editMode: false }} >
+        <FormatterContext.Provider value={{ controlValues, updateControlValues, editMode: false }} >
           <style>{builtinStyles}</style>
-          <InterfaceNodeView node={renderedNode}/>
-        </InterfaceContext.Provider>
+          <FormatterNodeView node={renderedNode}/>
+        </FormatterContext.Provider>
       );
 
       return {
@@ -103,7 +103,6 @@ export const Component = memo((props: ToolProps<Program>) => {
           view,
           controlValues,
         },
-        alreadyDisplayed: true
       };
     } catch (e) {
       console.warn('error generating output', e);
@@ -113,14 +112,13 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   useView(reportView, useMemo(() => ({
     render: (viewProps) =>
-      <InterfaceToolView
+      <View
         {...props} {...viewProps}
         inputView={inputView} inputOutput={inputOutput}
         rootNodeWithGhosts={rootNodeWithGhosts}
-        rootNodeWithoutGhosts={rootNodeWithoutGhosts}
         controlValues={controlValues} updateControlValues={updateControlValues}
       />
-  }), [props, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues]));
+  }), [props, inputView, inputOutput, rootNodeWithGhosts, controlValues, updateControlValues]));
 
   return <>
     {inputComponent}
@@ -164,17 +162,16 @@ function matchShape(data: any, shape: any): any {
   return data;
 }
 
-interface InterfaceToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
-  inputView: ToolView | null;
-  inputOutput: ToolOutput | null;
-  rootNodeWithGhosts: InterfaceNode | null;
-  rootNodeWithoutGhosts: InterfaceNode | null;
-  controlValues: ControlValues;
-  updateControlValues: Updater<ControlValues>;
+type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
+  inputView: ToolView | null,
+  inputOutput: ToolOutput | null,
+  rootNodeWithGhosts: FormatterNode | null,
+  controlValues: ControlValues,
+  updateControlValues: Updater<ControlValues>,
 }
 
-const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolViewProps) {
-  const { program, updateProgram, autoFocus, inputView, inputOutput, rootNodeWithGhosts, rootNodeWithoutGhosts, controlValues, updateControlValues } = props;
+const View = memo(function FormatterToolView(props: ViewProps) {
+  const { program, updateProgram, autoFocus, inputView, inputOutput, rootNodeWithGhosts, controlValues, updateControlValues } = props;
 
   const [ selectedNodeId, setSelectedNodeId ] = useState<string | null>(null);
 
@@ -213,9 +210,9 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
               flex: 1,
             }}
           >
-            <b>edit view</b>
+            {/* <b>edit view</b> */}
             { rootNodeWithGhosts
-              ? <InterfaceContext.Provider
+              ? <FormatterContext.Provider
                   value={{
                     controlValues, updateControlValues,
                     editMode: true,
@@ -224,28 +221,8 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
                   }}
                 >
                   <style>{builtinStyles}</style>
-                  <InterfaceNodeView node={rootNodeWithGhosts}/>
-                </InterfaceContext.Provider>
-              : <span>error</span>
-            }
-          </div>
-          <div
-            className="xCol xGap10"
-            style={{
-              flex: 1,
-            }}
-          >
-            <b>run view</b>
-            { rootNodeWithoutGhosts
-              ? <InterfaceContext.Provider
-                  value={{
-                    controlValues, updateControlValues,
-                    editMode: false,
-                  }}
-                >
-                  <style>{builtinStyles}</style>
-                  <InterfaceNodeView node={rootNodeWithoutGhosts}/>
-                </InterfaceContext.Provider>
+                  <FormatterNodeView node={rootNodeWithGhosts}/>
+                </FormatterContext.Provider>
               : <span>error</span>
             }
           </div>
@@ -256,29 +233,29 @@ const InterfaceToolView = memo(function InterfaceToolView(props: InterfaceToolVi
 })
 
 
-interface SelectionInspectorProps {
+type SelectionInspectorProps = {
   selectedNodeId: string,
-  rootElement: InterfaceElement,
-  updateRootElement: Updater<InterfaceElement>,
-  rootNode: InterfaceNode,
+  rootElement: FormatterElement,
+  updateRootElement: Updater<FormatterElement>,
+  rootNode: FormatterNode,
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
   const { selectedNodeId, updateRootElement, rootNode, rootElement } = props;
 
-  const node: InterfaceNode | undefined = getById(rootNode, selectedNodeId);
+  const node: FormatterNode | undefined = getById(rootNode, selectedNodeId);
 
   const onClickInsertBelowCheckbox = useCallback(() => {
     const parentElement = findNested(rootElement, (obj) => {
       if (obj && typeof obj === 'object' && 'children' in obj) {
         return (obj as any).children.some((child: any) => child.id === node!.element.id);
       }
-    }) as InterfaceElementOf<'element'> | undefined;
+    }) as FormatterElementOf<'element'> | undefined;
     if (!parentElement) {
       throw new Error("parent not found");
     }
     const idx = parentElement.children.indexOf(node!.element);
-    const checkboxElement: InterfaceElement = {
+    const checkboxElement: FormatterElement = {
       id: newId(),
       type: 'control',
       controlType: 'checkbox',
@@ -286,7 +263,7 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
       keyFuncCode: '(data) => "key"',
     };
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'element'>>(rootElement, parentElement.id,
+      updateById<FormatterElementOf<'element'>>(rootElement, parentElement.id,
         updateF({children: {$splice: [[idx+1, 0, checkboxElement]]}})
       )
     );
@@ -330,10 +307,10 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
   )
 });
 
-const SelectionInspectorForElement = memo(function SelectionInspectorForElement(props: SelectionInspectorProps & { node: InterfaceNode }) {
+const SelectionInspectorForElement = memo(function SelectionInspectorForElement(props: SelectionInspectorProps & { node: FormatterNode }) {
   const { updateRootElement, node } = props;
 
-  const element = node.element as InterfaceElementOf<'element'>;
+  const element = node.element as FormatterElementOf<'element'>;
 
   const onChangeTag = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     // TODO: lol, three different meanings to 'update' here...
@@ -341,7 +318,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
     // 2. pure function which takes an input and returns an output
     // 3. pure function which returns a function
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
+      updateById<FormatterElementOf<'element'>>(rootElement, element.id,
         updateF({tag: {$set: e.target.value}})
       )
     );
@@ -353,7 +330,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   useEffect(() => {
     if (hasValue(styleOutput)) {
       updateRootElement((rootElement) =>
-        updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
+        updateById<FormatterElementOf<'element'>>(rootElement, element.id,
           updateF({style: {$set: styleOutput.value as CSSProperties}})
         )
       );
@@ -362,7 +339,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
 
   const onChangeClasses = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'element'>>(rootElement, element.id,
+      updateById<FormatterElementOf<'element'>>(rootElement, element.id,
         updateF({className: {$set: e.target.value}})
       )
     );
@@ -386,14 +363,14 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
 });
 
 
-const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps & { node: InterfaceNode }) {
+const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps & { node: FormatterNode }) {
   const { updateRootElement, node } = props;
 
-  const element = node.element as InterfaceElement & { type: 'text' };
+  const element = node.element as FormatterElement & { type: 'text' };
 
   const onChangeRawHtml = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'text'>>(rootElement, element.id,
+      updateById<FormatterElementOf<'text'>>(rootElement, element.id,
         updateF({rawHtml: {$set: e.target.checked}})
       )
     );
@@ -408,14 +385,14 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
 });
 
 
-const SelectionInspectorForControl = memo(function SelectionInspectorForControl(props: SelectionInspectorProps & { node: InterfaceNode }) {
+const SelectionInspectorForControl = memo(function SelectionInspectorForControl(props: SelectionInspectorProps & { node: FormatterNode }) {
   const { updateRootElement, node } = props;
 
-  const element = node.element as InterfaceElement & { type: 'control' };
+  const element = node.element as FormatterElement & { type: 'control' };
 
   const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'control'>>(rootElement, element.id,
+      updateById<FormatterElementOf<'control'>>(rootElement, element.id,
         updateF({name: {$set: e.target.value}})
       )
     );
@@ -423,7 +400,7 @@ const SelectionInspectorForControl = memo(function SelectionInspectorForControl(
 
   const onChangeKeyFuncCode = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     updateRootElement((rootElement) =>
-      updateById<InterfaceElementOf<'control'>>(rootElement, element.id,
+      updateById<FormatterElementOf<'control'>>(rootElement, element.id,
         updateF({keyFuncCode: {$set: e.target.value}})
       )
     );
