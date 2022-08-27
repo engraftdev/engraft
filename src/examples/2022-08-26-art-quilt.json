@@ -1,0 +1,177 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDdedication614366",
+          "label": "query state"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "state",
+            "initialValue": "abstract"
+          },
+          "defaultCode": ""
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDmoss180576",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "request",
+            "urlProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "text",
+                "text": "https://api.artic.edu/api/v1/artworks/search",
+                "subTools": {}
+              }
+            },
+            "paramsProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{\n  q: IDdedication614366.get,\n  limit: 25,\n  fields: 'date_end,title,image_id,artist_title',\n}",
+              "subTools": {},
+              "defaultCode": "{\n  origin: '*',\n  format: 'json',\n  action: 'query',\n  generator: 'random',\n  grnnamespace: 0,\n  prop: 'extracts',\n  exintro: true,\n  grnlimit: 1\n}"
+            },
+            "autoSend": true
+          },
+          "defaultCode": ""
+        },
+        "upstreamIds": {
+          "IDdedication614366": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDquiver443634",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "map",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDnymphea196713.data",
+              "subTools": {},
+              "defaultCode": "IDnymphea196713"
+            },
+            "itemVar": {
+              "id": "IDinnocent917260",
+              "label": "item"
+            },
+            "perItemProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDsupply254947",
+                      "label": "image url"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "tool",
+                      "subProgram": {
+                        "toolName": "text",
+                        "text": "https://www.artic.edu/iiif/2/IDchalk868211/full/843,/0/default.jpg",
+                        "subTools": {
+                          "IDchalk868211": {
+                            "toolName": "slot",
+                            "modeName": "code",
+                            "code": "IDinnocent917260.image_id",
+                            "subTools": {}
+                          }
+                        }
+                      },
+                      "defaultCode": "IDinnocent917260"
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var_": {
+                      "id": "IDgrapple572268",
+                      "label": "image"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "<img\n  src={IDsupply254947}\n  width={200}\n  style={{display: 'block'}}\n/>",
+                      "subTools": {},
+                      "defaultCode": "IDsoccer562054"
+                    },
+                    "upstreamIds": {
+                      "IDsupply254947": true
+                    }
+                  },
+                  {
+                    "var_": {
+                      "id": "IDmailman650528",
+                      "label": "composite"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "<div style={{\n  position: 'relative',\n}}>\n  {IDgrapple572268}\n  <div style={{\n    position: 'absolute', left: 5, top: 5,\n    color: 'white',\n    padding: 5, backdropFilter: 'blur(2px)',\n  }}>\n    {IDinnocent917260.artist_title}\n  </div>\n  <div style={{\n    position: 'absolute', right: 5, bottom: 5,\n    color: 'white',\n    padding: 5, backdropFilter: 'blur(2px)',\n    textAlign: 'right',\n  }}>\n    {IDinnocent917260.title}\n  </div>\n</div>",
+                      "subTools": {},
+                      "defaultCode": "IDsoccer562054"
+                    },
+                    "upstreamIds": {
+                      "IDgrapple572268": true
+                    }
+                  }
+                ],
+                "prevVar": {
+                  "id": "IDsoccer562054",
+                  "label": "prev"
+                }
+              },
+              "defaultCode": "IDinnocent917260"
+            }
+          },
+          "defaultCode": "IDnymphea196713"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDgarment366430",
+          "label": "E"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<>\n  <input value={IDdedication614366.get} onInput={(e) => IDdedication614366.set(e.target.value)}/>\n  <div style={{height:600, width: 1000, display: 'flex', flexDirection: 'column', flexWrap: 'wrap'}}>{IDnymphea196713}</div>\n</>",
+          "subTools": {},
+          "defaultCode": "IDnymphea196713"
+        },
+        "upstreamIds": {
+          "IDdedication614366": true
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDnymphea196713",
+      "label": "prev"
+    },
+    "outputBelowInput": true
+  },
+  "defaultCode": ""
+}

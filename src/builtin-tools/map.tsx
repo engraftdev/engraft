@@ -140,6 +140,9 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
                 </div>
               </div>
             })}
+            {inputArray && inputArray.length > maxItemsDisplayed &&
+              <div style={{padding: 3, paddingLeft: 8}}>⋯</div>
+            }
           </div>
           <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
             <div className="xRow xAlignTop xGap10">
