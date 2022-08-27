@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useMemo } from "react";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { lookUpTool, ToolProgram, ToolOutput, ToolView, ToolViewRenderProps } from "./tools";
 
-export function useView(reportView: Setter<ToolView | null>, view: ToolView) {
+export function useView(reportView: Setter<ToolView | null>, view: ToolView | null) {
   useEffect(() => {
     reportView(view);
     return () => reportView(null);
