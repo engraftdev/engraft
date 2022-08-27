@@ -127,7 +127,7 @@
             "viewProgram": {
               "toolName": "slot",
               "modeName": "code",
-              "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"purple\"/>\n</svg>",
+              "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"red\"/>\n <line x1={IDthroat614100.x} y1={IDthroat614100.y}\n       x2={IDthroat614100.x + IDthroat614100.vx * 2} y2={IDthroat614100.y + IDthroat614100.vy * 2}\n       stroke='black' strokeWidth={2} />\n</svg>",
               "subTools": {}
             }
           }
@@ -136,6 +136,70 @@
           "IDcollege900260": true,
           "IDtoy988307": true
         }
+      },
+      {
+        "var_": {
+          "id": "IDcobweb896185",
+          "label": "graph"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "disabler",
+            "enabledProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "checkbox",
+                "checked": false
+              }
+            },
+            "actualProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "voyager",
+                "inputProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDposition216966",
+                  "subTools": {},
+                  "defaultCode": "IDposition216966"
+                },
+                "spec": {
+                  "data": {
+                    "name": "source"
+                  },
+                  "mark": "point",
+                  "encoding": {
+                    "x": {
+                      "field": "i",
+                      "type": "quantitative",
+                      "scale": {}
+                    },
+                    "y": {
+                      "field": "x",
+                      "type": "quantitative",
+                      "scale": {}
+                    }
+                  },
+                  "config": {
+                    "line": {
+                      "point": true
+                    },
+                    "scale": {
+                      "useUnaggregatedDomain": true
+                    }
+                  }
+                }
+              },
+              "defaultCode": "IDposition216966"
+            }
+          },
+          "defaultCode": "IDposition216966"
+        },
+        "upstreamIds": {}
       }
     ],
     "prevVar": {

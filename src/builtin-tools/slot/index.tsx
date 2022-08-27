@@ -68,7 +68,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 // Some notes about slotSetTo:
 // * Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
 //   ToolFrame, and with it, the ability to switch out of the given tool into a different one.
-export function slotSetTo(program: ToolProgram | string): Program {
+export function slotSetTo<P extends ToolProgram | string>(program: P): Program {
   // TODO: this is a hack, isn't it? (the program.toolName === 'slot' part, I mean)
   if (typeof program !== 'string' && program.toolName === 'slot') {
     return program as Program;
