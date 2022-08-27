@@ -108,20 +108,23 @@ export function useTools<C extends ToolProgram>(tools: {[key: string]: UseToolPr
   const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
 
   useEffect(() => {
+    console.log("cleaner running");
     updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, tools));
     updateViews((oldViews) => cleanUpOldProperties(oldViews, tools));
   }, [tools, updateOutputs, updateViews])
 
-  const components = Object.fromEntries(Object.entries(tools).map(([keyName, {program, updateProgram}]) => {
-    return [keyName, <ToolAt
-      key={keyName}
-      keyName={keyName}
-      program={program}
-      updateProgram={updateProgram as unknown as Updater<ToolProgram>}
-      updateOutputs={updateOutputs}
-      updateViews={updateViews}
-    />]
-  }))
+  const components = useMemo(() =>
+    Object.fromEntries(Object.entries(tools).map(([keyName, {program, updateProgram}]) => {
+      return [keyName, <ToolAt
+        key={keyName}
+        keyName={keyName}
+        program={program}
+        updateProgram={updateProgram as unknown as Updater<ToolProgram>}
+        updateOutputs={updateOutputs}
+        updateViews={updateViews}
+      />]
+    }))
+  , [tools, updateOutputs, updateViews]);
 
   const viewsObj = useMemo(() => views.toObject(), [views])
   const outputsObj = useMemo(() => outputs.toObject(), [outputs])

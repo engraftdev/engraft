@@ -39,7 +39,7 @@
           "toolName": "slot",
           "modeName": "tool",
           "subProgram": {
-            "toolName": "world",
+            "toolName": "simulation",
             "iterationsCount": 50,
             "initProgram": {
               "toolName": "slot",
