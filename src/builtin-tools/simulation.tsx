@@ -27,7 +27,12 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   };
 };
 
+// (window as any).count = 0;
+
 export const Component = memo((props: ToolProps<Program>) => {
+  // (window as any).count++;
+  // console.log("render simulation", (window as any).count);
+
   const { program, updateProgram, reportOutput, reportView } = props;
 
   const [initComponent, initView, initOutput] = useSubTool({program, updateProgram, subKey: 'initProgram'})
@@ -35,8 +40,8 @@ export const Component = memo((props: ToolProps<Program>) => {
   const { iterationsCount } = program;
 
   const iterations = useMemo(() => {
-    return _.range(program.iterationsCount)
-  }, [program.iterationsCount])
+    return _.range(iterationsCount)
+  }, [iterationsCount])
 
   const [upProgram, updateUpProgram] = useAt(program, updateProgram, 'upProgram');
 
@@ -67,41 +72,39 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   useView(reportView, useMemo(() => ({
     render: ({autoFocus}) =>
-      <div className="xRow xGap10" style={{padding: 10}}>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: 10,
-          // background: 'linear-gradient(to bottom right, rgba(93,157,185,0.05), rgba(243,50,139,0.05))'
-          }}>
-          <div style={{textAlign: 'right', fontWeight: 'bold'}}>step</div>
-          <div>
-            <input
-              type="range"
-              value={highlightedIndex}
-              onChange={(ev) => setHighlightedIndex(+ev.target.value)}
-              min={0} max={iterationsCount - 1} step={1}/>
-            {' '}
-            <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
-            {/* /
-            <div>max</div> <input
-              type="range"
-              value={iterationsCount}
-              onChange={(ev) => updateIterationsCount(() => +ev.target.value)}
-              min={0} max={100} step={1}/>
-            {' '}
-            <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{iterationsCount}</div> */}
-          </div>
-          <div style={{textAlign: 'right', fontWeight: 'bold'}}>init</div>
-          <div>
+      <div className="xCol xGap10" style={{padding: 10}}>
+        <div className="init-rows xRow xGap10">
+          <div className="xRow xGap10">
+            <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>init</div>
             <ShowView view={initView} autoFocus={autoFocus} />
           </div>
-          <div style={{textAlign: 'right', fontWeight: 'bold'}}>update</div>
-          <div style={{display: 'flex', flexDirection: 'column'}}>
-            <ShowView view={upViews[highlightedIndex]} />
-          </div>
-          <div style={{textAlign: 'right', fontWeight: 'bold'}}>view</div>
-          <ShowView view={viewView} />
         </div>
-        <ToolOutputView toolOutput={viewOutput} displayReactElementsDirectly={true}/>
+        <hr style={{width: '100%'}}/>
+        <div className="xRow xGap10">
+          <div className="step-rows xCol xGap10">
+            <div className="xRow xGap10">
+            <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>step</div>
+              <div>
+                <input
+                  type="range"
+                  value={highlightedIndex}
+                  onChange={(ev) => setHighlightedIndex(+ev.target.value)}
+                  min={0} max={iterationsCount - 1} step={1}/>
+                {' '}
+                <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{highlightedIndex}</div>
+              </div>
+            </div>
+            <div className="xRow xGap10">
+              <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>view</div>
+              <ShowView view={viewView} />
+            </div>
+            <div className="xRow xGap10">
+              <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>update</div>
+              <ShowView view={upViews[highlightedIndex]} />
+            </div>
+          </div>
+          <ToolOutputView toolOutput={viewOutput} displayReactElementsDirectly={true}/>
+        </div>
       </div>
   }), [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewOutput, viewView]));
 
