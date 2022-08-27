@@ -394,7 +394,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <div style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ToolOutputView toolValue={inputOutput} customizations={customizations} />
+          <ToolOutputView toolOutput={inputOutput} customizations={customizations} />
         </ExtractorContext.Provider>
       </div>
     </div>

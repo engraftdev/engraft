@@ -6,7 +6,6 @@ import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, Progr
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { startDrag } from "src/util/drag";
-import { ErrorBoundary } from "src/util/ErrorBoundary";
 import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -331,20 +330,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
   if (showOutputOnly) {
     return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} onMouseDown={onMouseDownDragPane} style={{height: '100%'}}>
       {menuNode}
-      {(() => {
-        // TODO: this seems like a pattern
-        if (hasValue(toolOutput)) {
-          let maybeElement = toolOutput.value as object | null | undefined;
-          // TODO: extra hack for interface-tool... should think through this
-          if (maybeElement && typeof maybeElement === 'object' && 'view' in maybeElement) {
-            maybeElement = (maybeElement as any).view;
-          };
-          if (React.isValidElement(maybeElement)) {
-            return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
-          }
-        }
-        return <ToolOutputView toolValue={toolOutput}/>;
-      })()}
+      <ToolOutputView toolOutput={toolOutput} displayReactElementsDirectly={true}/>
     </div>;
   }
 
@@ -385,7 +371,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </div>
     { !alreadyDisplayed &&
       <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 32, flexShrink: 1000000}}>
-        <ToolOutputView toolValue={toolOutput}/>
+        <ToolOutputView toolOutput={toolOutput}/>
       </div>
     }
   </div>

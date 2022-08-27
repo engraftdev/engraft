@@ -1,4 +1,4 @@
-import { CSSProperties, ElementType, HTMLProps, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
+import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
 import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/tools-framework/tools";
 import { count } from "src/util/count";
@@ -306,23 +306,37 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
 
 export type ToolOutputViewProps = {
-  toolValue: ToolOutput | null;
+  toolOutput: ToolOutput | null;
   customizations?: ValueCustomizations;
+  displayReactElementsDirectly?: boolean;
 }
 
-export const ToolOutputView = memo(function ToolValue({toolValue, customizations}: ToolOutputViewProps) {
-  return <ToolValueBuffer
-    toolValue={toolValue}
-    renderValue={(value) => <Value value={value} customizations={customizations}/>}
+export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
+  const {toolOutput, customizations, displayReactElementsDirectly} = props;
+  return <ToolOutputBuffer
+    toolOutput={toolOutput}
+    renderValue={(value) => {
+      if (displayReactElementsDirectly && hasValue(toolOutput)) {
+        let maybeElement = toolOutput.value as object | null | undefined;
+        // TODO: extra hack for formatter-tool... should think through this
+        if (maybeElement && typeof maybeElement === 'object' && 'view' in maybeElement) {
+          maybeElement = (maybeElement as any).view;
+        };
+        if (isValidElement(maybeElement)) {
+          return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
+        }
+      }
+      return <Value value={value} customizations={customizations}/>;
+    }}
   />;
 });
 
-export type ToolValueBufferProps = {
-  toolValue: ToolOutput | null;
+export type ToolOutputBufferProps = {
+  toolOutput: ToolOutput | null;
   renderValue: (value: any) => ReactNode;
 }
 
-export const ToolValueBuffer = memo(function ToolValueBuffer({toolValue, renderValue}: ToolValueBufferProps) {
+export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolValue, renderValue}: ToolOutputBufferProps) {
   const [lastOutputValue, setLastOutputValue] = useStateSetOnly<ToolOutputValue | null>(null);
 
   useEffect(() => {

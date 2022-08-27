@@ -71,7 +71,7 @@ const App = memo(function App() {
     </div>
     <br/>
     <br/>
-    {showOutput && <ToolOutputView toolValue={output} />}
+    {showOutput && <ToolOutputView toolOutput={output} />}
     <br/>
     <br/>
     <br/>

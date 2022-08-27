@@ -261,7 +261,7 @@ const LinkView = memo(function ({program, updateProgram, outputs, id, selectedLi
       }}
     >
       <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', margin: 4 }}>
-        <ToolOutputView toolValue={outputs[link.id]}/>
+        <ToolOutputView toolOutput={outputs[link.id]}/>
       </ValueFrame>
       <div
         className="ChainTool-link-bar xRow xClickable"

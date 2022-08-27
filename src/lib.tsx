@@ -11,7 +11,7 @@ import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
 import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
-import { ToolValueBuffer, Value, ToolOutputView } from "./view/Value";
+import { ToolOutputBuffer, Value, ToolOutputView } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
 import { builtinTools } from "./builtinTools";
 
@@ -60,7 +60,7 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
 
   return <div>
     <div style={{padding: 5}}>
-      <ToolOutputView toolValue={output}/>
+      <ToolOutputView toolOutput={output}/>
     </div>
     <div>
       <VarBindingsContext.Provider value={varBindings}>
@@ -125,8 +125,8 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
 
   return (
     <div style={{marginBottom: 10}}>
-      <ToolValueBuffer
-        toolValue={output}
+      <ToolOutputBuffer
+        toolOutput={output}
         renderValue={(value) => <ObservableInspector value={value}/>}
       />
       <VarBindingsContext.Provider value={varBindings}>
@@ -287,7 +287,7 @@ export const UseLiveToolRHS = memo(function UseLiveToolRHS(props: UseLiveToolRHS
         <div style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
           <h2>Output</h2>
           {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', alignSelf: 'stretch' }} innerStyle={{ flexGrow: 1 }}> */}
-            <ToolOutputView toolValue={output}/>
+            <ToolOutputView toolOutput={output}/>
           {/* </ValueFrame> */}
           { defaultValue !== undefined &&
             <div className="xRow xGap10" style={{marginTop: 10}}>
