@@ -3,6 +3,7 @@ import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from '@codemirror/view';
+import _ from 'lodash';
 import { memo, MutableRefObject, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
@@ -16,6 +17,7 @@ import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
 import refsExtension, { refCode, refRE } from "src/util/refsExtension";
 import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
+import { useDedupe } from 'src/util/useDedupe';
 import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { ToolFrame } from "src/view/ToolFrame";
@@ -162,7 +164,7 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
       }
     }
   }, [compiled, varBindings, outputs, setOutput])
-  useOutput(reportOutput, output);
+  useOutput(reportOutput, useDedupe(output, _.isEqual));
 
   useView(reportView, useMemo(() => ({
     render: (viewProps) =>
