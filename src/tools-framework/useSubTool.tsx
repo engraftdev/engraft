@@ -1,6 +1,7 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
+import { arrEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import { lookUpTool, ToolProgram, ToolOutput, ToolView, ToolViewRenderProps } from "./tools";
 
 export function useView(reportView: Setter<ToolView | null>, view: ToolView | null) {
@@ -93,25 +94,28 @@ export type UseToolsReturn = [
   outputs: PerTool<ToolOutput | null>,
 ]
 
-function cleanUpOldProperties<T, U>(oldA: PerToolInternal<T>, newB: PerTool<U>) {
-  let newA = oldA;
-  oldA.forEach((_, key) => {
-    if (!(key in newB)) {
-      newA = newA.delete(key);
+// TODO: use object rather than array of keys?
+function cleanUpOldProperties<T>(oldObject: PerToolInternal<T>, newKeys: string[]) {
+  let newObject = oldObject;
+  oldObject.forEach((_, key) => {
+    if (!newKeys.includes(key)) {
+      newObject = newObject.delete(key);
     }
   })
-  return newA;
+  return newObject;
 }
 
 export function useTools<C extends ToolProgram>(tools: {[key: string]: UseToolProps<C>}): UseToolsReturn {
   const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolOutput | null>>(Immutable.Map())
   const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
 
+  const toolKeys = useDedupe(useMemo(() => Object.keys(tools), [tools]), arrEqWith(refEq));
+
   useEffect(() => {
     console.log("cleaner running");
-    updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, tools));
-    updateViews((oldViews) => cleanUpOldProperties(oldViews, tools));
-  }, [tools, updateOutputs, updateViews])
+    updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, toolKeys));
+    updateViews((oldViews) => cleanUpOldProperties(oldViews, toolKeys));
+  }, [toolKeys, updateOutputs, updateViews])
 
   const components = useMemo(() =>
     Object.fromEntries(Object.entries(tools).map(([keyName, {program, updateProgram}]) => {
