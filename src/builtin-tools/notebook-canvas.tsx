@@ -257,16 +257,29 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
-  // TODO: useDedupe doesn't work here!
-  const newPossibleVarBindings = useDedupe(useMemo(() => {
-    let result: {[label: string]: PossibleVarBinding} = {};
+
+  // We can't useDedupe newPossibleVarBindings directly, because it has request callbacks.
+  // So we useDedupe its dependency, otherCellVars.
+  // Works! But it's tricky. Wish I had more mindless patterns here.
+  const otherCellVars = useDedupe(useMemo(() => {
+    let result: Var[] = [];
     cells.forEach((otherCell) => {
       if (otherCell !== cell && otherCell.var_.label.length > 0) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCell.var_.id]: true})};
+        result.push(otherCell.var_);
       }
     });
     return result;
-  }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
+  }, [cell, cells]), objEqWith(refEq));
+  const newPossibleVarBindings = useMemo(() => {
+    let result: {[label: string]: PossibleVarBinding} = {};
+    otherCellVars.forEach((otherCellVar) => {
+      result[otherCellVar.id] = {
+        var_: otherCellVar,
+        request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCellVar.id]: true})
+      };
+    });
+    return result;
+  }, [otherCellVars, updateCell]);
 
   return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
     <AddObjToContext context={PossibleVarBindingsContext} obj={newPossibleVarBindings}>

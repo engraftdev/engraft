@@ -293,26 +293,28 @@ const ToolMode = memo(function ToolMode({ program, reportOutput, reportView, upd
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
+  const onCloseFrame = useCallback(() => {
+    updateProgram(() => ({
+      toolName: 'slot',
+      modeName: 'code',
+      code: program.defaultCode || '',
+      subTools: {},
+      defaultCode: program.defaultCode,
+    }));
+  }, [program.defaultCode, updateProgram]);
+
   useView(reportView, useMemo(() => ({
     render: ({autoFocus, expand}) =>
       <ToolFrame
         expand={expand}
         program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings} possibleVarBindings={possibleVarBindings}
-        onClose={() => {
-          updateProgram(() => ({
-            toolName: 'slot',
-            modeName: 'code',
-            code: program.defaultCode || '',
-            subTools: {},
-            defaultCode: program.defaultCode,
-          }));
-        }}
+        onClose={onCloseFrame}
       >
         {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
           <ShowView view={toolView} autoFocus={autoFocus} />
         {/* </div> */}
       </ToolFrame>
-  }), [program, varBindings, possibleVarBindings, subProgram, toolView, updateProgram, updateSubProgram]));
+  }), [subProgram, updateSubProgram, varBindings, possibleVarBindings, onCloseFrame, toolView]));
 
   return component;
 });

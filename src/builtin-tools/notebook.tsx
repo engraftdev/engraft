@@ -1,9 +1,10 @@
 import _ from "lodash";
 import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { VarBindingsContext, hasValue, newVar, PossibleVarBindingsContext, PossibleVarBinding, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding } from "src/tools-framework/tools";
+import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
-import { at, atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { at, atIndices, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { updateF } from "src/util/updateF";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
@@ -120,6 +121,11 @@ const View = memo((props: ViewProps) => {
     </MyContextMenu>
   , [notebookMenuMaker]));
 
+  const cellUpdaters = useMemo(() => atIndices(updateCells, cells.length), [cells.length, updateCells]);
+  const cellRemovers = useMemo(() => _.range(cells.length).map((i) => () => {
+    updateCells(updateF({$splice: [[i, 1]]}))
+  }), [cells.length, updateCells]);
+
   return (
     <div className="NotebookTool xPad10" onContextMenu={openMenu}>
       { menuNode }
@@ -131,13 +137,8 @@ const View = memo((props: ViewProps) => {
           <Fragment key={cell.var_.id}>
             <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
             <CellView cell={cell}
-              // TODO: memoize these?
-              updateCell={atIndex(updateCells, i)}
-              removeCell={() => {
-                const newCells = [...cells];
-                newCells.splice(i, 1);
-                updateCells(() => newCells);
-              }}
+              updateCell={cellUpdaters[i]}
+              removeCell={cellRemovers[i]}
               toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
               outputBelowInput={outputBelowInput || false}
@@ -255,16 +256,29 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
-  // TODO: useDedupe doesn't work here!
-  const newPossibleVarBindings = useDedupe(useMemo(() => {
-    let result: {[label: string]: PossibleVarBinding} = {};
+
+  // We can't useDedupe newPossibleVarBindings directly, because it has request callbacks.
+  // So we useDedupe its dependency, otherCellVars.
+  // Works! But it's tricky. Wish I had more mindless patterns here.
+  const otherCellVars = useDedupe(useMemo(() => {
+    let result: Var[] = [];
     cells.forEach((otherCell) => {
       if (otherCell !== cell && otherCell.var_.label.length > 0) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCell.var_.id]: true})};
+        result.push(otherCell.var_);
       }
     });
     return result;
-  }, [cell, cells, updateCell]), objEqWith(objEqWith(refEq)))
+  }, [cell, cells]), objEqWith(refEq));
+  const newPossibleVarBindings = useMemo(() => {
+    let result: {[label: string]: PossibleVarBinding} = {};
+    otherCellVars.forEach((otherCellVar) => {
+      result[otherCellVar.id] = {
+        var_: otherCellVar,
+        request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCellVar.id]: true})
+      };
+    });
+    return result;
+  }, [otherCellVars, updateCell]);
 
 
   return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>

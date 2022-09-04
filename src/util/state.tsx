@@ -75,3 +75,11 @@ export function useAtIndex<T>(ts: T[], updateTs: Updater<T[]>, index: number): [
   const updateT = useUpdateAtIndex(updateTs, index);
   return [ts[index], updateT];
 }
+
+export function atIndexZip<T>(ts: T[], updateTs: Updater<T[]>): [T, Updater<T>][] {
+  return ts.map((t, i) => [t, atIndex(updateTs, i)]);
+}
+
+export function atIndices<T>(update: Updater<T[]>, length: number): Updater<T>[] {
+  return Array.from({length}, (_, i) => atIndex(update, i));
+}
