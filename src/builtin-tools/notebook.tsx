@@ -3,8 +3,7 @@ import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
 import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
-import { at, atIndices, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
-import { updateF } from "src/util/updateF";
+import { at, atIndices, removers, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
@@ -122,9 +121,7 @@ const View = memo((props: ViewProps) => {
   , [notebookMenuMaker]));
 
   const cellUpdaters = useMemo(() => atIndices(updateCells, cells.length), [cells.length, updateCells]);
-  const cellRemovers = useMemo(() => _.range(cells.length).map((i) => () => {
-    updateCells(updateF({$splice: [[i, 1]]}))
-  }), [cells.length, updateCells]);
+  const cellRemovers = useMemo(() => removers(updateCells, cells.length), [cells.length, updateCells]);
 
   return (
     <div className="NotebookTool xPad10" onContextMenu={openMenu}>

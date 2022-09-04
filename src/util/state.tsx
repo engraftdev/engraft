@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { updateF } from './updateF';
 
 
 export type Replace<T, U> = Omit<T, keyof U> & U;
@@ -82,4 +83,14 @@ export function atIndexZip<T>(ts: T[], updateTs: Updater<T[]>): [T, Updater<T>][
 
 export function atIndices<T>(update: Updater<T[]>, length: number): Updater<T>[] {
   return Array.from({length}, (_, i) => atIndex(update, i));
+}
+
+export function remover(updateArray: Updater<any[]>, index: number) {
+  return () => {
+    updateArray(updateF({$splice: [[index, 1]]}));
+  };
+}
+
+export function removers(updateArray: Updater<any[]>, length: number) {
+  return Array.from({length}, (_, i) => remover(updateArray, i));
 }
