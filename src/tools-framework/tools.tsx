@@ -96,6 +96,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
+  // TODO: this should be called 'output', not 'value'... or it should actually be a value
   value?: ToolOutput;
 }
 
