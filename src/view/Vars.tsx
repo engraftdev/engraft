@@ -44,7 +44,7 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
         def.scrollIntoView();
       }}
       >
-      {varBinding?.var_.label}
+      {varBinding && <span dangerouslySetInnerHTML={{__html: varBinding.var_.label}}/>}
       {varBinding?.var_.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
     </span>
     {(() => {
