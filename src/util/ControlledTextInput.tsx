@@ -1,6 +1,7 @@
 import React, { ChangeEvent, HTMLProps, memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import ContentEditable from 'react-contenteditable';
+// TODO: look carefully at https://github.com/lovasoa/react-contenteditable/issues/161
 
 interface ControlledTextInputProps extends HTMLProps<HTMLInputElement> {
   value: string,
