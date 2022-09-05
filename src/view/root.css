@@ -68,7 +68,7 @@ pre {
   align-items: flex-start;
 }
 .xRow.xAlignBottom {
-  align-items: flex-start;
+  align-items: flex-end;
 }
 .xRow.xAlignVCenter {
   align-items: center;

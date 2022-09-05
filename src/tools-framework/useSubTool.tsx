@@ -112,7 +112,7 @@ export function useTools<C extends ToolProgram>(tools: {[key: string]: UseToolPr
   const toolKeys = useDedupe(useMemo(() => Object.keys(tools), [tools]), arrEqWith(refEq));
 
   useEffect(() => {
-    console.log("cleaner running");
+    // console.log("cleaner running");
     updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, toolKeys));
     updateViews((oldViews) => cleanUpOldProperties(oldViews, toolKeys));
   }, [toolKeys, updateOutputs, updateViews])

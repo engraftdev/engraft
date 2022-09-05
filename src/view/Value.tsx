@@ -11,6 +11,7 @@ import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
 import { format } from "isoformat";
+import { isProbablyFunctionThing } from "src/builtin-tools/function";
 
 export interface ValueFrameProps {
   children?: ReactNode | undefined;
@@ -101,6 +102,15 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   // SPECIAL CASES
+
+  // TODO: special-case hack which needs some generalization
+  if (isProbablyFunctionThing(value)) {
+    return wrapInline(
+      <div style={{background: '#e4e4e4', padding: 3, borderRadius: 3, fontSize: 13, color: '#0008'}}>
+        function thing
+      </div>
+    );
+  }
 
   const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {

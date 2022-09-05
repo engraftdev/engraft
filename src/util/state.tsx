@@ -85,6 +85,12 @@ export function atIndices<T>(update: Updater<T[]>, length: number): Updater<T>[]
   return Array.from({length}, (_, i) => atIndex(update, i));
 }
 
+export function atAllIndices<T>(update: Updater<T[]>): Updater<T> {
+  return (f: (oldT: T) => T) => {
+    update((oldTs) => oldTs.map(f));
+  };
+}
+
 export function remover(updateArray: Updater<any[]>, index: number) {
   return () => {
     updateArray(updateF({$splice: [[index, 1]]}));
