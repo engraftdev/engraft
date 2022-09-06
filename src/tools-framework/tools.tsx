@@ -67,8 +67,7 @@ let toolIndex: { [toolName: string]: Tool } = {};
 export function lookUpTool(toolName: string): Tool<any> {
   const tool = toolIndex[toolName];
   if (!tool) {
-    // TODO: return a "ToolNotFoundTool" instead of throwing
-    throw new Error(`No tool registered for ${toolName}`);
+    return toolIndex['not-found'];
   }
   return tool;
 }
