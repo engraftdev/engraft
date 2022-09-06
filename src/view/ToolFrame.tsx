@@ -1,4 +1,4 @@
-import { memo, ReactNode } from "react";
+import { CSSProperties, memo, ReactNode } from "react";
 import { cN } from "src/deps";
 import { PossibleVarBindings, ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
@@ -32,8 +32,18 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
       height: '100%', maxWidth: '100%', overflow: 'hidden',
     }}
   >
-    <Use hook={useHover} children={([hoverRef, isHovered]) =>
-      <div ref={hoverRef} className="ToolFrame-bar" style={{height: 15, fontSize: 13, color: '#0008', display: 'flex'}}>
+    <Use hook={useHover} children={([hoverRef, isHovered]) => {
+      const buttonStyle: CSSProperties = {
+        background: '#e4e4ff',
+        borderRadius: 7,
+        width: 14, height: 14,
+        fontSize: 10, lineHeight: '14px',
+        textAlign: 'center', alignSelf: 'center',
+        cursor: 'pointer',
+        marginLeft: 3
+      };
+
+      return <div ref={hoverRef} className="ToolFrame-bar" style={{height: 15, fontSize: 13, color: '#0008', display: 'flex'}}>
 
         <div style={{
           // paddingLeft: 5, paddingRight: 2, background: '#e4e4ff', borderBottomLeftRadius: 5
@@ -46,14 +56,14 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         {/* TODO: Feedback for clicking 'cp' */}
         {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
         { isHovered && <>
-          <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+          <div style={buttonStyle}
             onClick={() => {navigator.clipboard.writeText(JSON.stringify(program))}}
           >cp</div>
-          <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+          <div style={buttonStyle}
             onClick={() => {updateShowInspector((i) => !i)}}
           >i</div>
           {onClose &&
-            <div style={{background: '#e4e4ff', borderRadius: 7, width: 14, height: 14, fontSize: 10, lineHeight: '14px', textAlign: 'center', alignSelf: 'center', cursor: 'pointer', marginLeft: 3}}
+            <div style={buttonStyle}
               onClick={onClose}
             >×</div>
           }
@@ -61,7 +71,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
 
         <div style={{flexGrow: 1, minWidth: 6}}></div>
       </div>
-    }/>
+    }}/>
     <div style={{minHeight: 0, overflow: 'hidden'}}>
       {children}
     </div>
