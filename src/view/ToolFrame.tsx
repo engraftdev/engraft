@@ -72,7 +72,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         <div style={{flexGrow: 1, minWidth: 6}}></div>
       </div>
     }}/>
-    <div style={{minHeight: 0, overflow: 'hidden'}}>
+    <div style={{minHeight: 0}}>
       {children}
     </div>
     {showInspector && <WindowPortal

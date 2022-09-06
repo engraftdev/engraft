@@ -124,7 +124,7 @@ const View = memo((props: ViewProps) => {
   const cellRemovers = useMemo(() => removers(updateCells, cells.length), [cells.length, updateCells]);
 
   return (
-    <div className="NotebookTool xPad10" onContextMenu={openMenu}>
+    <div className="NotebookTool xPadH10" onContextMenu={openMenu}>
       { menuNode }
       <div className="xChildrenMinWidth0"
         style={{

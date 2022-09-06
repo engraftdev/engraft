@@ -138,6 +138,11 @@ pre {
   padding: 10px;
 }
 
+.xPadH10 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 .xStickyTop10 {
   position: sticky;
   top: 10px;
