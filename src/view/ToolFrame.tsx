@@ -29,7 +29,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
     className={cN("ToolFrame", {xWidthFitContent: !expand})}
     style={{
       border: '1px solid #c4c4ff', position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
-      height: '100%', maxWidth: '100%', overflow: 'hidden',
+      height: '100%', maxWidth: '100%',
     }}
   >
     <Use hook={useHover} children={([hoverRef, isHovered]) => {

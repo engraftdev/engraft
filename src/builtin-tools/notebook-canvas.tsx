@@ -165,7 +165,10 @@ const View = memo((props: ViewProps) => {
   }, [smallestUnusedLabel, updateCells]);
 
   return (
-    <div className="NotebookCanvasTool" style={{position: 'relative', width: program.width + 1, height: program.height + 1}}>
+    <div
+      className="NotebookCanvasTool"
+      style={{position: 'relative', width: program.width + 1, height: program.height + 1, overflow: 'hidden'}}
+    >
       <NoodleCanvas
         panes={cells.map((cell, i) => ({
           id: cell.var_.id,
