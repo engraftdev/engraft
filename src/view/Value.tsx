@@ -157,7 +157,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
     return wrapInline(
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
         {/* TODO: needs some work */}
-        {Number(value.toFixed(3))}
+        {Number(value.toFixed(3)).toString()}
       </div>
     );
   }
