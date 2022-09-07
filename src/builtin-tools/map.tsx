@@ -104,11 +104,8 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
     <div className="xCol xGap10 xPad10">
       <div className="MapTool-top xRow xGap10">
         <b>input</b> <ShowView view={inputView} autoFocus={autoFocus} />
-      </div>
-
-      {inputArrayTruncated &&
-        <>
-          <div className="MapTool-indices xRow">
+        {inputArrayTruncated &&
+          <div className="MapTool-indices xRow" style={{alignSelf: 'flex-end'}}>
             {inputArrayTruncated.map((elem, i) => {
               let background = 'none';
               let trapezoid: CSSProperties = {};
@@ -121,7 +118,7 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
                     borderLeft: '10px solid transparent',
                     marginLeft: -10,
                   },
-                  ...i < maxItemsDisplayed - 1 && {
+                  ...i < inputArrayTruncated!.length - 1 && {
                     borderRight: '10px solid transparent',
                     marginRight: -10,
                   },
@@ -144,6 +141,12 @@ const MapToolView = memo(function MapToolView(props: MapToolViewProps) {
               <div style={{padding: 3, paddingLeft: 8}}>⋯</div>
             }
           </div>
+        }
+      </div>
+
+      {inputArrayTruncated &&
+        <>
+
           <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
             <div className="xRow xAlignTop xGap10">
               <VarDefinition var_={itemVar} updateVar={updateItemVar}/>
