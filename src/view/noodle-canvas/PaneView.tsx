@@ -51,9 +51,11 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
         style={{
           width: pane.geo.width + 1,
           height: pane.geo.height + 1,
-          backgroundColor: 'rgb(255, 255, 255)',
           borderRadius: '0.25rem',
-          boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)'
+          ...!pane.transparent && {
+            backgroundColor: 'rgb(255, 255, 255)',
+            boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)',
+          },
         }}
       >
         <PaneResizers

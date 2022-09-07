@@ -1,0 +1,265 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDcollege900260",
+          "label": "width"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "100",
+          "subTools": {}
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDtoy988307",
+          "label": "height"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "200",
+          "subTools": {}
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDrutabaga632206",
+          "label": "cell"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simulation",
+            "iterationsCount": 50,
+            "initProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{\n x: rand() * IDcollege900260,\n y: rand() * IDtoy988307,\n vx: (rand() - 0.5) * 10,\n vy: (rand() - 0.5) * 10,\n}",
+              "subTools": {}
+            },
+            "stateVar": {
+              "id": "IDthroat614100",
+              "label": "state"
+            },
+            "upProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook-canvas",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDeggplant096578",
+                      "label": "bounced"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "{\n  ...IDkoala810732,\n  vx: IDmarch870083 ? -IDkoala810732.vx : IDkoala810732.vx,\n  vy: IDmine573974 ? -IDkoala810732.vy : IDkoala810732.vy,\n}",
+                      "subTools": {},
+                      "defaultCode": ""
+                    },
+                    "upstreamIds": {
+                      "IDkoala810732": true,
+                      "IDmarch870083": true,
+                      "IDmine573974": true
+                    },
+                    "geo": {
+                      "x": 48,
+                      "y": 272,
+                      "width": 368,
+                      "height": 224
+                    },
+                    "showOutputOnly": false
+                  },
+                  {
+                    "var_": {
+                      "id": "IDkoala810732",
+                      "label": "moved"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "{\n ...IDthroat614100,\n x: IDthroat614100.x + IDthroat614100.vx,\n y: IDthroat614100.y + IDthroat614100.vy,\n}",
+                      "subTools": {},
+                      "defaultCode": ""
+                    },
+                    "upstreamIds": {},
+                    "geo": {
+                      "x": 48,
+                      "y": 16,
+                      "width": 208,
+                      "height": 240
+                    },
+                    "showOutputOnly": false
+                  },
+                  {
+                    "var_": {
+                      "id": "IDmarch870083",
+                      "label": "x bounce?"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDkoala810732.x < 0 || IDkoala810732.x > IDcollege900260",
+                      "subTools": {},
+                      "defaultCode": ""
+                    },
+                    "upstreamIds": {
+                      "IDkoala810732": true
+                    },
+                    "geo": {
+                      "x": 272,
+                      "y": 80,
+                      "width": 288,
+                      "height": 80
+                    },
+                    "showOutputOnly": false
+                  },
+                  {
+                    "var_": {
+                      "id": "IDmine573974",
+                      "label": "y bounce?"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDkoala810732.y < 0 || IDkoala810732.y > IDtoy988307",
+                      "subTools": {},
+                      "defaultCode": ""
+                    },
+                    "upstreamIds": {
+                      "IDkoala810732": true
+                    },
+                    "geo": {
+                      "x": 272,
+                      "y": 176,
+                      "width": 288,
+                      "height": 80
+                    },
+                    "showOutputOnly": false
+                  },
+                  {
+                    "var_": {
+                      "id": "IDnest026535",
+                      "label": "cell 1"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "<h2 style={{transform: 'rotate(3deg)'}}>\n  check for bounces!\n</h2>",
+                      "subTools": {},
+                      "defaultCode": ""
+                    },
+                    "upstreamIds": {},
+                    "geo": {
+                      "x": 304,
+                      "y": 32,
+                      "width": 256,
+                      "height": 64
+                    },
+                    "showOutputOnly": true
+                  }
+                ],
+                "prevVar": {
+                  "id": "IDmarquess115942",
+                  "label": "prev"
+                },
+                "width": 576,
+                "height": 512
+              }
+            },
+            "viewProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "<svg width={IDcollege900260} height={IDtoy988307} style={{border: '1px solid black'}}>\n <circle cx={IDthroat614100.x} cy={IDthroat614100.y} r={10} fill=\"red\"/>\n <line x1={IDthroat614100.x} y1={IDthroat614100.y}\n       x2={IDthroat614100.x + IDthroat614100.vx * 2} y2={IDthroat614100.y + IDthroat614100.vy * 2}\n       stroke='black' strokeWidth={2} />\n</svg>",
+              "subTools": {}
+            }
+          }
+        },
+        "upstreamIds": {
+          "IDcollege900260": true,
+          "IDtoy988307": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDcobweb896185",
+          "label": "graph"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "disabler",
+            "enabledProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "checkbox",
+                "checked": false
+              }
+            },
+            "actualProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "voyager",
+                "inputProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDposition216966",
+                  "subTools": {},
+                  "defaultCode": "IDposition216966"
+                },
+                "spec": {
+                  "data": {
+                    "name": "source"
+                  },
+                  "mark": "point",
+                  "encoding": {
+                    "x": {
+                      "field": "i",
+                      "type": "quantitative",
+                      "scale": {}
+                    },
+                    "y": {
+                      "field": "x",
+                      "type": "quantitative",
+                      "scale": {}
+                    }
+                  },
+                  "config": {
+                    "line": {
+                      "point": true
+                    },
+                    "scale": {
+                      "useUnaggregatedDomain": true
+                    }
+                  }
+                }
+              },
+              "defaultCode": "IDposition216966"
+            }
+          },
+          "defaultCode": "IDposition216966"
+        },
+        "upstreamIds": {}
+      }
+    ],
+    "prevVar": {
+      "id": "IDposition216966",
+      "label": "prev"
+    }
+  }
+}

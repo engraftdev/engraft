@@ -79,11 +79,11 @@ export const Component = memo((props: ToolProps<Program>) => {
   }), [outputs, props, views]));
 
   useOutput(reportOutput, useMemo(() => {
-    const lastCell = cells[cells.length - 1] as Cell | null;
-    if (!lastCell) {
+    const firstCell = cells[0] as Cell | null;
+    if (!firstCell) {
       return null;
     }
-    return outputs[lastCell.var_.id];
+    return outputs[firstCell.var_.id];
   }, [cells, outputs]));
 
   // const newBindings = useMemo(() => {
@@ -181,6 +181,7 @@ const View = memo((props: ViewProps) => {
               toolOutput={outputs[cell.var_.id]} toolView={views[cell.var_.id]}
               onMouseDownDragPane={onMouseDownDragPane}
             />,
+          transparent: cell.showOutputOnly,
         }))}
         updatePaneGeoById={updatePaneGeoById}
         minWidth={16 * 6}
@@ -319,6 +320,16 @@ const CellView = memo(function CellView(props: CellViewProps) {
     });
   } , [updateCells, idx]);
 
+  const makeCellOutput = useCallback(() => {
+    updateCells((oldCells) => {
+      const newCells = [...oldCells];
+      newCells.splice(idx, 1);
+      newCells.splice(0, 0, oldCells[idx]);
+      return newCells;
+    });
+  } , [updateCells, idx]);
+
+
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
   const [showOutputOnly, updateShowOutputOnly] = useAt(cell, updateCell, 'showOutputOnly');
 
@@ -327,6 +338,16 @@ const CellView = memo(function CellView(props: CellViewProps) {
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
       <MyContextMenuHeading>Cell</MyContextMenuHeading>
+      <div>
+        <button
+          onClick={() => {
+            makeCellOutput();
+            closeMenu();
+          }}
+        >
+          Make output
+        </button>
+      </div>
       <div>
         <button
           onClick={() => {
@@ -341,7 +362,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
         <input type="checkbox" checked={showOutputOnly} onChange={(ev) => updateShowOutputOnly(() => ev.target.checked)}/> Show output only
       </div>
     </MyContextMenu>
-  , [showOutputOnly, removeCell, updateShowOutputOnly]));
+  , [showOutputOnly, makeCellOutput, removeCell, updateShowOutputOnly]));
 
   if (showOutputOnly) {
     return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} onMouseDown={onMouseDownDragPane} style={{height: '100%'}}>
@@ -379,6 +400,10 @@ const CellView = memo(function CellView(props: CellViewProps) {
         >
           <VarDefinition var_={var_} updateVar={updateVar} />
         </div>
+        <div style={{flexGrow: 1}}/>
+        <div style={{color: "#aaa"}}>
+          {idx === 0 && "★"}
+        </div>
       </div>
     </div>
 
@@ -386,7 +411,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       <ShowView view={toolView} expand={true}/>
     </div>
     { !alreadyDisplayed &&
-      <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 32, flexShrink: 1000000}}>
+      <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 6, flexShrink: 1000000}}>
         <ToolOutputView toolOutput={toolOutput}/>
       </div>
     }
