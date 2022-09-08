@@ -26,6 +26,10 @@ function varBindingsObject(varBindings: VarBinding[]) {
 }
 
 const App = memo(function App() {
+  useEffect(() => {
+    document.title = "Engraft";
+  }, []);
+
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);

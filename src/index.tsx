@@ -16,7 +16,7 @@ root.render(
     <HashRouter>
       <Routes>
         <Route path="/" element={<App/>}/>
-        <Route path="/synonyms" element={<TestSynonyms/>}/>
+        <Route path="/synonymizer" element={<TestSynonyms/>}/>
         <Route path="/sync" element={<TestSync/>}/>
       </Routes>
     </HashRouter>

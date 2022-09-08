@@ -5,6 +5,10 @@ import { useLiveTool } from './lib';
 import testSynonymsCss from './TestSynonyms.css';
 
 function App() {
+  useEffect(() => {
+    document.title = "Synonymizer";
+  }, []);
+
   // set by input field
   const [input, setInput] = useState('');
 
