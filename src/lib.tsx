@@ -367,3 +367,4 @@ export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
 export { slotSetTo } from 'src/builtin-tools/slot';
+export { ToolOutputView } from "./view/Value";
