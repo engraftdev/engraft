@@ -1,0 +1,181 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDlook074424",
+          "label": "end angle"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "360",
+          "subTools": {},
+          "defaultCode": ""
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDwildflower660609",
+          "label": "repetitions"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "6",
+          "subTools": {},
+          "defaultCode": "IDgigantspinosaurus586095"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDalbatross619032",
+          "label": "input"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "html(`\n<svg width=\"432\" height=\"381\" viewBox=\"0 0 432 381\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" style=\"width:20; height:20; overflow: visible\">\n<path d=\"M215.938 380C359.558 265.227 435.216 201.411 430.672 89.167C424.815 -55.4791 215.938 -9.67799 215.938 123.25\" stroke=\"black\" stroke-width=\"20\"/>\n<path d=\"M215.938 380C72.3189 265.227 -3.33925 201.411 1.20511 89.167C7.06132 -55.4791 215.938 -9.67799 215.938 123.25\" stroke=\"black\" stroke-width=\"20\"/>\n</svg>\n`)",
+          "subTools": {},
+          "defaultCode": "IDgigantspinosaurus586095"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDgiganotosaurus552273",
+          "label": "rotate"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "(elem, angle) => {\n  return <div\n    className=\"rotator\"\n    style={{display:'inline-block',\n      transform:`rotate(${angle}deg)`,\n           transformOrigin: 'center', padding: 3}}\n  >\n    {elem}\n  </div>\n}",
+          "subTools": {},
+          "defaultCode": "IDgigantspinosaurus586095"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDagreement738383",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "notebook",
+            "cells": [
+              {
+                "var_": {
+                  "id": "IDspy711213",
+                  "label": "angle"
+                },
+                "program": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDlook074424 / IDwildflower660609",
+                  "subTools": {},
+                  "defaultCode": "IDgigantspinosaurus586095"
+                },
+                "upstreamIds": {}
+              },
+              {
+                "var_": {
+                  "id": "IDlist832788",
+                  "label": "output"
+                },
+                "program": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "map",
+                    "inputProgram": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "_.range(0, 360, IDspy711213)",
+                      "subTools": {},
+                      "defaultCode": "IDlord699410"
+                    },
+                    "itemVar": {
+                      "id": "IDemu685115",
+                      "label": "item"
+                    },
+                    "perItemProgram": {
+                      "toolName": "slot",
+                      "modeName": "tool",
+                      "subProgram": {
+                        "toolName": "notebook",
+                        "cells": [
+                          {
+                            "var_": {
+                              "id": "IDsweater639747",
+                              "label": "A"
+                            },
+                            "program": {
+                              "toolName": "slot",
+                              "modeName": "code",
+                              "code": "IDalbatross619032",
+                              "subTools": {},
+                              "defaultCode": "IDemu685115"
+                            },
+                            "upstreamIds": {}
+                          },
+                          {
+                            "var_": {
+                              "id": "IDfind584832",
+                              "label": "B"
+                            },
+                            "program": {
+                              "toolName": "slot",
+                              "modeName": "code",
+                              "code": "IDgiganotosaurus552273(IDalbatross619032, IDemu685115)",
+                              "subTools": {},
+                              "defaultCode": "IDsomersault641317"
+                            },
+                            "upstreamIds": {}
+                          }
+                        ],
+                        "prevVar": {
+                          "id": "IDsomersault641317",
+                          "label": "prev"
+                        }
+                      },
+                      "defaultCode": "IDemu685115"
+                    }
+                  },
+                  "defaultCode": "IDlord699410"
+                },
+                "upstreamIds": {
+                  "IDspy711213": true
+                }
+              }
+            ],
+            "prevVar": {
+              "id": "IDlord699410",
+              "label": "prev"
+            }
+          },
+          "defaultCode": "IDgigantspinosaurus586095"
+        },
+        "upstreamIds": {
+          "IDlook074424": true,
+          "IDwildflower660609": true,
+          "IDalbatross619032": true,
+          "IDgiganotosaurus552273": true
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDgigantspinosaurus586095",
+      "label": "prev"
+    },
+    "outputBelowInput": true
+  },
+  "defaultCode": ""
+}

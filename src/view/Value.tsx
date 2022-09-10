@@ -13,6 +13,9 @@ import { inlineBlock } from "./styles";
 import { format } from "isoformat";
 import { isProbablyFunctionThing } from "src/builtin-tools/function";
 
+// HACK for Cuttle mockup
+const UNFRAME_REACT_ELEMENTS = false;
+
 export interface ValueFrameProps {
   children?: ReactNode | undefined;
   type?: string;
@@ -115,9 +118,11 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   const maybeElement = value as {} | null | undefined;
   if (isValidElement(maybeElement)) {
     return wrapInline(
-      <ValueFrame type='react element'>
-        <ErrorBoundary>{maybeElement}</ErrorBoundary>
-      </ValueFrame>
+      UNFRAME_REACT_ELEMENTS
+      ? <ErrorBoundary>{maybeElement}</ErrorBoundary>
+      : <ValueFrame type='react element'>
+          <ErrorBoundary>{maybeElement}</ErrorBoundary>
+        </ValueFrame>
     );
   }
 
