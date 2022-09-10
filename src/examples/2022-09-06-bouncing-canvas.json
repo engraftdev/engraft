@@ -157,7 +157,7 @@
                     "program": {
                       "toolName": "slot",
                       "modeName": "code",
-                      "code": "<h2 style={{transform: 'rotate(3deg)'}}>\n  check for bounces!\n</h2>",
+                      "code": "<h2 style={{transform: 'rotate(3deg)', fontWeight: '300'}}>\n  check for bounces!\n</h2>",
                       "subTools": {},
                       "defaultCode": ""
                     },
