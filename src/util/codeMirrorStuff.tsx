@@ -50,23 +50,25 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
     return {
       from: word.from,
       options: [
-        ...Object.entries(getFullToolIndex()).map(([toolName, tool]) => ({
-          label: '/' + toolName,
-          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            if (replaceWithTool && from === 0 && to === view.state.doc.length) {
-              replaceWithTool(tool);
-            } else {
-              const id = insertTool(tool);
-              const completionText = refCode(id);
-              view.dispatch({
-                changes: {from, to, insert: completionText},
-                selection: {anchor: from + completionText.length},
-                userEvent: "input.complete",
-                annotations: pickedCompletion.of(completion)
-              });
+        ...Object.entries(getFullToolIndex())
+          .filter(([_, tool]) => !tool.isInternal)
+          .map(([toolName, tool]) => ({
+            label: '/' + toolName,
+            apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+              if (replaceWithTool && from === 0 && to === view.state.doc.length) {
+                replaceWithTool(tool);
+              } else {
+                const id = insertTool(tool);
+                const completionText = refCode(id);
+                view.dispatch({
+                  changes: {from, to, insert: completionText},
+                  selection: {anchor: from + completionText.length},
+                  userEvent: "input.complete",
+                  annotations: pickedCompletion.of(completion)
+                });
+              }
             }
-          }
-        })),
+          })),
       ]
     }
   }

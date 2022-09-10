@@ -26,3 +26,5 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   return <></>;
 });
+
+export const isInternal = true;

@@ -7,6 +7,7 @@ import { useMemoObject } from "src/util/useMemoObject";
 export type Tool<P extends ToolProgram = any> = {
   Component: ToolComponent<P>;
   programFactory: ProgramFactory<P>;
+  isInternal?: boolean;
 }
 
 export type ToolOutput = ToolOutputValue | ToolOutputError;
@@ -67,7 +68,7 @@ let toolIndex: { [toolName: string]: Tool } = {};
 export function lookUpTool(toolName: string): Tool<any> {
   const tool = toolIndex[toolName];
   if (!tool) {
-    return toolIndex['not-found'];
+    return toolIndex['-not-found'];
   }
   return tool;
 }
