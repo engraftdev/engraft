@@ -13,6 +13,7 @@ import { inlineBlock } from "./styles";
 import { format } from "isoformat";
 import { isProbablyFunctionThing } from "src/builtin-tools/function";
 import Diagram from "src/util/Diagram";
+import { hasProperty } from "src/util/hasProperty";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -117,7 +118,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   // TODO: an EVEN MORE special-case hack
-  if (typeof value === 'object' && (value as any).isDiagram) {
+  if (hasProperty(value, 'isDiagram') && value.isDiagram) {
     return wrapInline(
       <Diagram width={130} height={130} diagram={value} />
     );
