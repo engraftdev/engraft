@@ -1,6 +1,7 @@
 import update from 'immutability-helper';
 import React from "react";
 import { createElementFromReact } from "src/util/createElementFrom";
+import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
 
@@ -14,6 +15,7 @@ export const globals = {
   update,
   GoogleMap,
   html,
+  Diagram,
 }
 
 

@@ -1,0 +1,145 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDmitten257719",
+          "label": "vector"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "{\n  x: IDdream426141,\n  y: IDticket404091,\n}",
+          "subTools": {
+            "IDdream426141": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "slider",
+                "value": 6,
+                "min": -10,
+                "max": 10,
+                "step": 1
+              }
+            },
+            "IDticket404091": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "slider",
+                "value": 4,
+                "min": -10,
+                "max": 10,
+                "step": 1
+              }
+            }
+          },
+          "defaultCode": ""
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDgolf534706",
+          "label": "shaft"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.path({\n  points: [\n    {x: 0, y: 0},\n    IDmitten257719\n  ],\n})",
+          "subTools": {},
+          "defaultCode": "IDengine785529"
+        },
+        "upstreamIds": {
+          "IDmitten257719": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDgrass908907",
+          "label": "head color"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "color",
+            "r": 250,
+            "g": 100,
+            "b": 100
+          },
+          "defaultCode": "IDengine785529"
+        },
+        "upstreamIds": {}
+      },
+      {
+        "var_": {
+          "id": "IDlemur777943",
+          "label": "horizontal head"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.path({\n  points: [\n    {x: 0, y: -1},\n    {x: 0, y: 1},\n    {x: 3, y: 0}\n  ],\n  fillColor: IDgrass908907,\n  strokeColor: null\n})",
+          "subTools": {
+            "IDcyclamen888575": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "color",
+                "r": 237,
+                "g": 88,
+                "b": 88
+              }
+            }
+          },
+          "defaultCode": "IDengine785529"
+        },
+        "upstreamIds": {
+          "IDgrass908907": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDboron895514",
+          "label": "positioned head"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.translate(\n  Diagram.rotate(\n    IDlemur777943,\n    Math.atan2(IDmitten257719.y, IDmitten257719.x) * 180 / Math.PI\n  ),\n  IDmitten257719\n)",
+          "subTools": {},
+          "defaultCode": "IDengine785529"
+        },
+        "upstreamIds": {
+          "IDlemur777943": true,
+          "IDmitten257719": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDpeace135602",
+          "label": "full arrow"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.group({\n  children: [IDgolf534706, IDboron895514]\n})",
+          "subTools": {},
+          "defaultCode": "IDengine785529"
+        },
+        "upstreamIds": {
+          "IDgolf534706": true,
+          "IDboron895514": true
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDengine785529",
+      "label": "prev"
+    }
+  }
+}

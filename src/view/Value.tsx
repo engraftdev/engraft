@@ -12,6 +12,7 @@ import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
 import { format } from "isoformat";
 import { isProbablyFunctionThing } from "src/builtin-tools/function";
+import Diagram from "src/util/Diagram";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -112,6 +113,13 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
       <div style={{background: '#e4e4e4', padding: 3, borderRadius: 3, fontSize: 13, color: '#0008'}}>
         function thing
       </div>
+    );
+  }
+
+  // TODO: an EVEN MORE special-case hack
+  if (typeof value === 'object' && (value as any).isDiagram) {
+    return wrapInline(
+      <Diagram width={130} height={130} diagram={value} />
     );
   }
 
