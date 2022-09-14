@@ -63,9 +63,11 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
   }, [functionThing, program, updateProgram]);
 
+  // const [bodyView, setBodyView] = useStateSetOnly<ToolView | null>(null);
+
   useView(reportView, useMemo(() => ({
     render: () =>
-      <div className="xRow xAlignBottom xGap10 xPadH10">
+      <div className="xCol xGap10 xPadH10">
         <div className="xRow xGap10">
           <table>
             <tbody>
@@ -90,8 +92,9 @@ export const Component = memo((props: ToolProps<Program>) => {
             </tbody>
           </table>
         </div>
+        {/* <ShowView view={bodyView} /> */}
       </div>
-  }), [functionThing, functionView, inputViews]));
+  }), [functionThing?.program.vars, functionView, inputViews]));
 
   return <>
     {functionComponent}
@@ -101,7 +104,11 @@ export const Component = memo((props: ToolProps<Program>) => {
       </React.Fragment>
     )}
     {functionThing &&
-      <FunctionThingComponent functionThing={functionThing} inputs={inputOutputs} reportOutput={reportOutput} />
+      <FunctionThingComponent
+        functionThing={functionThing} inputs={inputOutputs}
+        reportOutput={reportOutput}
+        // reportView={setBodyView}
+      />
     }
   </>
 });
