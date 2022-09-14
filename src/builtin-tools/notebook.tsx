@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import { hasValue, newVar, PossibleVarBinding, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
+import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
-import { at, atIndices, removers, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { atIndices, removers, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
@@ -24,7 +24,6 @@ export type Program = {
 interface Cell {
   var_: Var;  // empty label if unlabelled, natch
   program: ToolProgram;
-  upstreamIds: {[id: string]: true};
   // pinning?
   // output?
 }
@@ -33,7 +32,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
-      { var_: newVar(defaultCellLabels[0]), program: slotSetTo(defaultInput || ''), upstreamIds: {} }
+      { var_: newVar(defaultCellLabels[0]), program: slotSetTo(defaultInput || '') }
     ],
     prevVar: newVar('prev')
   };
@@ -164,7 +163,6 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
         program: slotSetTo(i === 0 ? '' : prevVar.id),
-        upstreamIds: {},
       });
       return newCells;
     })
@@ -245,43 +243,18 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   const newVarBindings = useDedupe(useMemo(() => {
     let result: {[label: string]: VarBinding} = {...prevVarContext};
     cells.forEach((otherCell) => {
-      if (cell.upstreamIds[otherCell.var_.id]) {
+      if (otherCell.var_.id !== cell.var_.id) {
         result[otherCell.var_.id] = {var_: otherCell.var_, value: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
-  }, [cell.upstreamIds, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
+  }, [cell.var_.id, cells, outputs, prevVarContext]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
 
-  // We can't useDedupe newPossibleVarBindings directly, because it has request callbacks.
-  // So we useDedupe its dependency, otherCellVars.
-  // Works! But it's tricky. Wish I had more mindless patterns here.
-  const otherCellVars = useDedupe(useMemo(() => {
-    let result: Var[] = [];
-    cells.forEach((otherCell) => {
-      if (otherCell !== cell && otherCell.var_.label.length > 0) {
-        result.push(otherCell.var_);
-      }
-    });
-    return result;
-  }, [cell, cells]), objEqWith(refEq));
-  const newPossibleVarBindings = useMemo(() => {
-    let result: {[label: string]: PossibleVarBinding} = {};
-    otherCellVars.forEach((otherCellVar) => {
-      result[otherCellVar.id] = {
-        var_: otherCellVar,
-        request: () => updateKeys(at(updateCell, 'upstreamIds'), {[otherCellVar.id]: true})
-      };
-    });
-    return result;
-  }, [otherCellVars, updateCell]);
-
 
   return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
-    <AddObjToContext context={PossibleVarBindingsContext} obj={newPossibleVarBindings}>
-      {component}
-    </AddObjToContext>
+    {component}
   </AddObjToContext>;
 });
 

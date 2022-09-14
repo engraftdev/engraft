@@ -4,11 +4,11 @@ import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from '@codemirror/view';
 import _ from 'lodash';
-import { memo, MutableRefObject, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
+import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
 import { cN } from 'src/deps';
-import { VarBindingsContext, PossibleVarBindingsContext, PossibleVarBindings, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, valueOrUndefined } from "src/tools-framework/tools";
+import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -128,8 +128,6 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
 
   // We have to use useContext here, not in the view – the view isn't inside tool context!
   const varBindings = useContext(VarBindingsContext)
-  const possibleVarBindings = useContext(PossibleVarBindingsContext)
-  const possibleVarBindingsRef = useRefForCallback(possibleVarBindings);
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -172,9 +170,9 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
         {...props} {...viewProps}
         updateSubToolPrograms={updateSubToolPrograms}
         views={views}
-        varBindings={varBindings} possibleVarBindingsRef={possibleVarBindingsRef}
+        varBindings={varBindings}
       />
-  }), [props, updateSubToolPrograms, views, varBindings, possibleVarBindingsRef]));
+  }), [props, updateSubToolPrograms, views, varBindings]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
@@ -188,11 +186,10 @@ interface CodeModeViewProps extends CodeModeProps, ToolViewRenderProps {
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>;
   views: {[id: string]: ToolView | null};
   varBindings: VarBindings;
-  possibleVarBindingsRef: MutableRefObject<PossibleVarBindings>;
 }
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {expand, program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings, possibleVarBindingsRef} = props;
+  const {expand, program, updateProgram, autoFocus, updateSubToolPrograms, views, varBindings} = props;
   const varBindingsRef = useRefForCallback(varBindings);
 
   const [refSet, refs] = usePortalSet<{id: string}>();
@@ -211,7 +208,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     };
     const completions = [
       toolCompletions(insertTool, replaceWithTool),
-      refCompletions(() => varBindingsRef.current, () => possibleVarBindingsRef.current),
+      refCompletions(() => varBindingsRef.current),
     ];
     return [
       ...setup,
@@ -236,7 +233,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         }
       }),
     ];
-  }, [program.defaultCode, varBindingsRef, possibleVarBindingsRef, refSet, updateProgram, updateSubToolPrograms])
+  }, [program.defaultCode, varBindingsRef, refSet, updateProgram, updateSubToolPrograms])
 
   const onChange = useCallback((value: string) => {
     updateKeys(updateProgram, {code: value});
@@ -289,7 +286,6 @@ const ToolMode = memo(function ToolMode({ program, reportOutput, reportView, upd
   useOutput(reportOutput, output);
 
   const varBindings = useContext(VarBindingsContext);
-  const possibleVarBindings = useContext(PossibleVarBindingsContext);
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
@@ -307,14 +303,14 @@ const ToolMode = memo(function ToolMode({ program, reportOutput, reportView, upd
     render: ({autoFocus, expand}) =>
       <ToolFrame
         expand={expand}
-        program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings} possibleVarBindings={possibleVarBindings}
+        program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
         onClose={onCloseFrame}
       >
         {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
           <ShowView view={toolView} autoFocus={autoFocus} />
         {/* </div> */}
       </ToolFrame>
-  }), [subProgram, updateSubProgram, varBindings, possibleVarBindings, onCloseFrame, toolView]));
+  }), [subProgram, updateSubProgram, varBindings, onCloseFrame, toolView]));
 
   return component;
 });

@@ -1,6 +1,6 @@
 import { CSSProperties, memo, ReactNode } from "react";
 import { cN } from "src/deps";
-import { PossibleVarBindings, ToolProgram, VarBindings } from "src/tools-framework/tools";
+import { ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
@@ -17,11 +17,10 @@ export interface ToolFrameProps {
   updateProgram?: Updater<ToolProgram>;
   onClose?: () => void;
   varBindings: VarBindings;
-  possibleVarBindings: PossibleVarBindings;
 }
 
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
-  const {children, expand, program, updateProgram, onClose, varBindings, possibleVarBindings} = props;
+  const {children, expand, program, updateProgram, onClose, varBindings} = props;
 
   const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
 
@@ -89,8 +88,6 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         }
         <h3>Variable bindings</h3>
         <Value value={varBindings}/>
-        <h3>Possible variable bindings</h3>
-        <Value value={possibleVarBindings}/>
       </IsolateStyles>
     </WindowPortal>}
   </div>;

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { memo, ReactElement, useCallback, useContext, useEffect, useMemo } from "react";
-import { lookUpTool, newVar, PossibleVarBindings, PossibleVarBindingsContext, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
+import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
 import { PerTool, ShowView, useOutput, useTools, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
@@ -57,17 +57,15 @@ export const Component = memo((props: ToolProps<Program>) => {
   );
 
   const closureVarBindings = useContext(VarBindingsContext);
-  const closurePossibleVarBindings = useContext(PossibleVarBindingsContext);
 
   useOutput(reportOutput, useMemo(() => {
     const functionThing: FunctionThing = {
       program,
       updateProgram,
       closureVarBindings,
-      closurePossibleVarBindings,
     };
     return {value: functionThing};
-  }, [closurePossibleVarBindings, closureVarBindings, program, updateProgram]));
+  }, [closureVarBindings, program, updateProgram]));
 
   useView(reportView, useMemo(() => ({
     render: (renderProps) =>
@@ -311,7 +309,6 @@ export type FunctionThing = {
   program: Program,
   updateProgram: Updater<Program>,
   closureVarBindings: VarBindings,
-  closurePossibleVarBindings: PossibleVarBindings,
 }
 
 export function isProbablyFunctionThing(thing: unknown): thing is FunctionThing {
@@ -327,7 +324,7 @@ type FunctionThingComponentProps = {
 
 export const FunctionThingComponent = memo((props: FunctionThingComponentProps) => {
   const { functionThing, inputs, reportOutput, reportView } = props;
-  const { program, updateProgram, closureVarBindings, closurePossibleVarBindings } = functionThing;
+  const { program, updateProgram, closureVarBindings } = functionThing;
 
   const inputVarBindings = useMemo(() =>
     Object.fromEntries(program.vars.map((var_) => [var_.id, {var_, value: inputs[var_.id] || undefined}]))
@@ -341,13 +338,11 @@ export const FunctionThingComponent = memo((props: FunctionThingComponentProps) 
   const Tool = lookUpTool(toolName);
 
   return <VarBindingsContext.Provider value={varBindings}>
-    <PossibleVarBindingsContext.Provider value={closurePossibleVarBindings}>
-      <Tool.Component
-        program={program.bodyProgram}
-        updateProgram={updateProgram}
-        reportOutput={reportOutput}
-        reportView={reportView || noOp}
-      />
-    </PossibleVarBindingsContext.Provider>
+    <Tool.Component
+      program={program.bodyProgram}
+      updateProgram={updateProgram}
+      reportOutput={reportOutput}
+      reportView={reportView || noOp}
+    />
   </VarBindingsContext.Provider>;
 });

@@ -5,7 +5,7 @@ import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import { dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
 import { memo, useCallback } from "react"
-import { getFullToolIndex, lookUpTool, PossibleVarBindings, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
+import { getFullToolIndex, lookUpTool, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/tools-framework/tools"
 import { updateKeys, Updater, useAt } from "src/util/state"
 import { refCode } from "./refsExtension"
 import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete"
@@ -74,7 +74,7 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
   }
 }
 
-export function refCompletions(varBindingsGetter?: () => VarBindings | undefined, possibleVarBindingsGetter?: () => PossibleVarBindings | undefined): CompletionSource {
+export function refCompletions(varBindingsGetter?: () => VarBindings | undefined): CompletionSource {
   return (completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/@?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
@@ -82,29 +82,13 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
     }
 
     const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
-    const possibleVarBindings = possibleVarBindingsGetter ? possibleVarBindingsGetter() || {} : {};
 
     return {
       from: word.from,
-      options: [
-        ...Object.values(varBindings).map((varBinding) => ({
-          label: '@' + varBinding.var_.label,
-          apply: refCode(varBinding.var_.id),
-        })),
-        ...Object.values(possibleVarBindings).map((possibleVarBinding) => ({
-          label: '@' + possibleVarBinding.var_.label + '?',  // TODO: better signal that it's 'possible'
-          apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-            let apply = refCode(possibleVarBinding.var_.id);
-            possibleVarBinding.request();
-            view.dispatch({
-              changes: {from, to, insert: apply},
-              selection: {anchor: from + apply.length},
-              userEvent: "input.complete",
-              annotations: pickedCompletion.of(completion)
-            });
-          }
-        })),
-      ]
+      options: Object.values(varBindings).map((varBinding) => ({
+        label: '@' + varBinding.var_.label,
+        apply: refCode(varBinding.var_.id),
+      })),
     }
   };
 }

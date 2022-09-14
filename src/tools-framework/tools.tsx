@@ -105,18 +105,6 @@ export type VarBindings = {[varId: string]: VarBinding};
 export const VarBindingsContext = createContext<VarBindings>({});
 VarBindingsContext.displayName = 'VarBindingsContext';
 
-// TODO: figure out some names
-
-export interface PossibleVarBinding {
-  var_: Var;
-  request: () => void;
-}
-
-export type PossibleVarBindings = {[varId: string]: PossibleVarBinding};
-
-export const PossibleVarBindingsContext = createContext<PossibleVarBindings>({});
-PossibleVarBindingsContext.displayName = 'PossibleVarBindingsContext';
-
 
 
 
