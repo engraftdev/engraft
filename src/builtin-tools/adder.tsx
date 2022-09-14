@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { slotSetTo } from "./slot";
 
 export type Program = {
@@ -32,12 +32,12 @@ export const Component = memo((props: ToolProps<Program>) => {
       <div className="xCol xGap10 xPad10">
         <div className="xRow xGap10">
           <b>x</b>
-          <ShowView view={xView} />
+          {xView && xView.render({})}
         </div>
 
         <div className="xRow xGap10">
           <b>y</b>
-          <ShowView view={yView} />
+          {yView && yView.render({})}
         </div>
       </div>
   }), [xView, yView]));
