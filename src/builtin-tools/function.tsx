@@ -4,6 +4,7 @@ import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps,
 import { PerTool, ShowView, useOutput, useTools, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
+import { noOp } from "src/util/noOp";
 import { atAllIndices, atIndexZip, removers, Updater, useAt } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -75,7 +76,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   }), [program.activeSettingId, bodyOutputs, bodyViews, props]));
 
   return <>
-    {settings.map((setting) => <SettingModel vars={program.vars} setting={setting} bodyComponent={bodyComponents[setting.id]} />)}
+    {settings.map((setting) => <SettingModel key={setting.id} vars={program.vars} setting={setting} bodyComponent={bodyComponents[setting.id]} />)}
   </>;
 });
 
@@ -337,9 +338,9 @@ export const FunctionThingComponent = memo((props: FunctionThingComponentProps) 
   return <VarBindingsContext.Provider value={varBindings}>
     <Tool.Component
       program={program.bodyProgram}
-      updateProgram={() => {}}
+      updateProgram={noOp}
       reportOutput={reportOutput}
-      reportView={() => {}}
+      reportView={noOp}
     />
   </VarBindingsContext.Provider>;
 });

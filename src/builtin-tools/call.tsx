@@ -30,37 +30,42 @@ export const Component = memo((props: ToolProps<Program>) => {
     return functionOutput.value;
   }, [functionOutput]);
 
-  const [_inputPrograms, updateInputPrograms] = useAt(program, updateProgram, 'inputPrograms');
+  const [inputPrograms, updateInputPrograms] = useAt(program, updateProgram, 'inputPrograms');
 
   // manage running inputs
   const [inputComponents, inputViews, inputOutputs] = useTools(
     useMemo(() =>
-      _.mapValues(program.inputPrograms, (inputProgram, varId) =>
+      _.mapValues(inputPrograms, (inputProgram, varId) =>
         ({program: inputProgram, updateProgram: at(updateInputPrograms, varId)})
       )
-    , [program.inputPrograms, updateInputPrograms])
+    , [inputPrograms, updateInputPrograms])
   );
 
   useEffect(() => {
     if (!functionThing) { return; }
     const varIds = functionThing.program.vars.map(v => v.id);
-    const newInputPrograms = {...program.inputPrograms};
+    let newInputPrograms = {...program.inputPrograms};
+    let changed = false;
     for (const varId of Object.keys(newInputPrograms)) {
       if (!varIds.includes(varId)) {
         delete newInputPrograms[varId];
+        changed = true;
       }
     }
     for (const varId of varIds) {
       if (!newInputPrograms[varId]) {
         newInputPrograms[varId] = slotSetTo('');
+        changed = true;
       }
     }
-    updateProgram(updateF({inputPrograms: {$set: newInputPrograms}}));
+    if (changed) {
+      updateProgram(updateF({inputPrograms: {$set: newInputPrograms}}));
+    }
   }, [functionThing, program, updateProgram]);
 
   useView(reportView, useMemo(() => ({
     render: () =>
-      <div className="xRow xAlignBottom xGap10 xPad10">
+      <div className="xRow xAlignBottom xGap10 xPadH10">
         <div className="xRow xGap10">
           <table>
             <tbody>
