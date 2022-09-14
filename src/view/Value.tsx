@@ -111,8 +111,8 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   // TODO: special-case hack which needs some generalization
   if (isProbablyFunctionThing(value)) {
     return wrapInline(
-      <div style={{background: '#e4e4e4', padding: 3, borderRadius: 3, fontSize: 13, color: '#0008'}}>
-        function thing
+      <div style={{background: '#e4e4e4', padding: 5, borderRadius: 5, fontSize: 13, color: '#0008'}}>
+        function
       </div>
     );
   }

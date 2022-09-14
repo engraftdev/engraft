@@ -1,0 +1,142 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDviolet816216",
+          "label": "initials func"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "function",
+            "vars": [
+              {
+                "id": "IDrice879612",
+                "label": "name"
+              }
+            ],
+            "settings": [
+              {
+                "id": "IDcyclone752854",
+                "values": [
+                  "David Attenborough"
+                ]
+              },
+              {
+                "id": "IDavocado684427",
+                "values": [
+                  "George Washington Carver"
+                ]
+              }
+            ],
+            "activeSettingId": "IDcyclone752854",
+            "bodyProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDpirate042892",
+                      "label": "parts"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDrice879612.split(' ')",
+                      "subTools": {},
+                      "defaultCode": "IDrice879612"
+                    },
+                    "upstreamIds": {}
+                  },
+                  {
+                    "var_": {
+                      "id": "IDbell079004",
+                      "label": "initials"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDcabin635168.map(w => w[0])",
+                      "subTools": {},
+                      "defaultCode": "IDcabin635168"
+                    },
+                    "upstreamIds": {
+                      "IDpirate042892": true
+                    }
+                  },
+                  {
+                    "var_": {
+                      "id": "IDcadet679389",
+                      "label": "A"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDcabin635168.join('')",
+                      "subTools": {},
+                      "defaultCode": "IDcabin635168"
+                    },
+                    "upstreamIds": {}
+                  }
+                ],
+                "prevVar": {
+                  "id": "IDcabin635168",
+                  "label": "prev"
+                }
+              },
+              "defaultCode": "IDrice879612"
+            }
+          },
+          "defaultCode": ""
+        },
+        "upstreamIds": {
+          "IDspear430859": true
+        }
+      },
+      {
+        "var_": {
+          "id": "IDartichoke879028",
+          "label": "a call"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "call",
+            "functionProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDviolet816216",
+              "subTools": {},
+              "defaultCode": ""
+            },
+            "inputPrograms": {
+              "IDrice879612": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "\"Miles Davis\"",
+                "subTools": {},
+                "defaultCode": ""
+              }
+            }
+          },
+          "defaultCode": "IDdonkey391224"
+        },
+        "upstreamIds": {
+          "IDviolet816216": true
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDdonkey391224",
+      "label": "prev"
+    }
+  }
+}
