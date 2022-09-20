@@ -115,6 +115,10 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
   const { program, updateProgram, reportOutput, reportView} = props;
 
   const compiled = useMemo(() => {
+    if (program.code === '') {
+      return null;
+    }
+
     try {
       // TODO: better treatment of non-expression code (multiple lines w/return, etc)
       let translated = transformCached("(" + program.code + ")").code!;
@@ -136,6 +140,11 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
   // TODO: should this be useMemo? issues with async, huh?
   const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
   useEffect(() => {
+    if (compiled === null) {
+      setOutput(null);
+      return;
+    }
+
     if ('error' in compiled) {
       setOutput({error: compiled.error});
     } else {
