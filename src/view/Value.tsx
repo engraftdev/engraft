@@ -1,4 +1,4 @@
-import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useEffect, useState } from "react";
+import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
 import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/tools-framework/tools";
 import { count } from "src/util/count";
@@ -380,18 +380,48 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolV
         no value yet
       </div>;
 
-  return <div>
+  return <div className="xCol xGap10 xAlignLeft">
     {valueView}
-    {hasError(toolValue) &&
-      <div title={toolValue.error}>⚠️</div>
-      // <div style={{
-      //   ...style,
-      //   opacity: 0.7,
-      //   color: "#a00",
-      //   fontSize: 13,
-      // }} {...props}>
-      //   {toolValue.error}
-      // </div>
-    }
+    {hasError(toolValue) && <ErrorView error={toolValue.error} />}
   </div>
+});
+
+export type ErrorProps = {
+  error: string;
+}
+
+export const ErrorView = memo(function ErrorView(props: ErrorProps) {
+  const {error} = props;
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleIsExpanded = useCallback(() => {
+    setIsExpanded(!isExpanded);
+  }, [setIsExpanded, isExpanded]);
+
+  return  <div
+    style={{
+      display: 'inline-block',
+      fontSize: '13px',
+      background: 'rgba(255, 0, 0, 0.05)',
+      padding: 5,
+      borderRadius: 3,
+      color: 'rgba(255, 100, 100, 0.8)',
+      maxWidth: '100px',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      cursor: 'pointer',
+      // border: '1px solid rgba(255, 0, 0, 0.2)',
+      ...isExpanded && {
+        maxWidth: 'none',
+        overflow: 'visible',
+        whiteSpace: 'pre-wrap',
+      },
+    }}
+    onClick={toggleIsExpanded}
+    title={error}
+  >
+    ⚠️ {error}
+  </div>;
 });
