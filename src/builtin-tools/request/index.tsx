@@ -68,6 +68,8 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
   }, [autoSend, sendDebounced])
 
+  const isPending = sendDebouncedControl.isPending();
+
   useView(reportView, useMemo(() => ({
     render: ({autoFocus}) =>
       <div className="xCol xGap10 xPad10 xWidthFitContent">
@@ -80,13 +82,13 @@ export const Component = memo((props: ToolProps<Program>) => {
         <div className="xRow">
           <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
           {autoSend ?
-            sendDebouncedControl.isPending() ? 'about to auto-send' : 'auto-send on' :
+            isPending ? 'about to auto-send' : 'auto-send on' :
             'auto-send off'}
           <div className="xExpand" />
           <button onClick={send}>send now</button>
         </div>
       </div>
-  }), [urlView, paramsView, autoSend, sendDebouncedControl, send, updateAutoSend]));
+  }), [urlView, paramsView, autoSend, isPending, send, updateAutoSend]));
 
   return <>
     {urlComponent}
