@@ -24,7 +24,6 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
   const [hoverRef, isHovered, elem] = useHover();
 
   const onClick = useCallback((ev: MouseEvent) => {
-    console.log("onClick")
     if (!updater) { return false; }
     ev.preventDefault();
     let defaultStr: string | undefined = undefined;
@@ -32,13 +31,12 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
       defaultStr = JSON.stringify(value);
     } catch { }
     // TODO: pop up in correct window
-    console.log(elem, elem?.ownerDocument, elem?.ownerDocument.defaultView === window);
     const win = elem?.ownerDocument.defaultView || window;
     const newValueStr = win.prompt("New value JSON", defaultStr);
     if (newValueStr !== null) {
       try {
         const newValue = JSON.parse(newValueStr);
-        atPath(updater, path)((old) => { console.log("was", old); return newValue });
+        atPath(updater, path)(() => newValue);
       } catch { }
     }
     return false;
