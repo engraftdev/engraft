@@ -14,14 +14,14 @@ export const Component = memo((props: ToolProps<Program>) => {
   const { reportOutput, reportView } = props;
 
   const { toolName } = props.program;
-  const message = `⚠️ Tool not found: ${toolName}`;
+  const message = `ToolNotFoundError: ${toolName}`;
 
   useOutput(reportOutput, useMemo(() => ({
     error: message
   }), [message]));
 
   useView(reportView, useMemo(() => ({
-    render: () => <div>{message}</div>
+    render: () => <div className="xPad10">{message}</div>
   }), [message]));
 
   return <></>;

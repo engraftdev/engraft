@@ -68,7 +68,7 @@ let toolIndex: { [toolName: string]: Tool } = {};
 export function lookUpTool(toolName: string): Tool<any> {
   const tool = toolIndex[toolName];
   if (!tool) {
-    return toolIndex['-not-found'];
+    return toolIndex['not-found'];
   }
   return tool;
 }
