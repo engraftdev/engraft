@@ -1,7 +1,7 @@
 import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
 import { at, atIndex, Updater } from "src/util/state";
 import useHover from "src/util/useHover";
-import { pathString, SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
+import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
 
 const ValueEditableContext = createContext<Updater<any> | undefined>(undefined);
 
@@ -44,7 +44,6 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
 
   return <div
     ref={hoverRef}
-    title={pathString(path)}
     style={{
       userSelect: 'none',  // todo
       minWidth: 0,

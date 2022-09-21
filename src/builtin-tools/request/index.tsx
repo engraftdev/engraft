@@ -126,7 +126,7 @@ const View = memo((props: ViewProps) => {
     <RowToCol minRowWidth={200} className="xGap10">
       <b>params</b> <ShowView view={paramsView}/>
     </RowToCol>
-    <div className="xRow">
+    <div className="xRow xGap10">
       <input type='checkbox' checked={autoSend} onChange={(ev) => updateAutoSend(() => ev.target.checked)}/>
       {autoSend ?
         isPending ? 'about to auto-send' : 'auto-send on' :

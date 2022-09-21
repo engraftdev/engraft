@@ -1,7 +1,7 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, hasValue } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { slotSetTo } from "src/builtin-tools/slot";
+import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";
 import { RowToCol } from "src/util/RowToCol";
 import { useAt } from "src/util/state";
@@ -9,7 +9,7 @@ import { Use } from "src/util/Use";
 import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
-import { pathString, ValueCustomizations, ToolOutputView } from "src/view/Value";
+import { ToolOutputView, ValueCustomizations } from "src/view/Value";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
 
 interface PatternWithId {
@@ -150,7 +150,6 @@ export const SubValueHandle = memo(function SubValueHandle({path, children}: Sub
   return <Use hook={useHover} children={([hoverRef, isHovered]) =>
     <div
       ref={hoverRef}
-      title={pathString(path)}
       style={{
         userSelect: 'none',  // todo
         minWidth: 0,

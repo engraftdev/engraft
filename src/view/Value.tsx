@@ -64,7 +64,7 @@ export interface SubValueHandleProps {
 }
 
 export const SubValueHandleDefault = memo(function SubValueHandleDefault({path, children}: SubValueHandleProps) {
-  return <div title={pathString(path)} style={{minWidth: 0}}>
+  return <div style={{minWidth: 0}}>
     {children}
   </div>
 })
@@ -256,7 +256,6 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
                 <div
                   className='prefix-with-key'
                   style={{...inlineBlock(), ...valueFont, marginRight: 5, whiteSpace: 'nowrap'}}
-                  title={pathString([...path, key])}
                 >
                   {key}:
                 </div>
@@ -421,7 +420,6 @@ export const ErrorView = memo(function ErrorView(props: ErrorProps) {
       },
     }}
     onClick={toggleIsExpanded}
-    title={error}
   >
     ⚠️ {error}
   </div>;
