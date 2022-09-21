@@ -75,7 +75,7 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
   }, [paramsOutput, reportOutput, setResponse, urlOutput])
 
-  const [sendDebounced, sendDebouncedControl] = useDebounce(send, 1000)
+  const [sendDebounced, sendDebouncedControl] = useDebounce(send, 200)
 
   useEffect(() => {
     if (program.autoSend) {
