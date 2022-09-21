@@ -86,7 +86,7 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
     return {
       from: word.from,
       options: Object.values(varBindings).map((varBinding) => ({
-        label: '@' + varBinding.var_.label,
+        label: varBinding.var_.autoCompleteLabel || varBinding.var_.label,
         apply: refCode(varBinding.var_.id),
       })),
     }

@@ -17,7 +17,7 @@ import { slotSetTo } from "./slot";
 export type Program = {
   toolName: 'notebook';
   cells: Cell[];
-  prevVar: Var;
+  prevVar: Var;  // this should just be an id, because we're generating new prevVars for each cell now
   outputBelowInput?: boolean;
 }
 
@@ -228,17 +228,24 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
       return outputs[prevCell.var_.id];
     }
   }, [cells, i, outputs])
+  const prevLabel: string | undefined = useMemo(() => {
+    const prevCell: Cell | undefined = cells[i - 1];
+    if (prevCell) {
+      return prevCell.var_.label;
+    }
+  }, [cells, i])
   const prevVarContext = useMemo(() => {
-    if (prevVal) {
+    if (prevVal && prevLabel) {
+      const labelledPrevVar: Var = {...prevVar, label: `↑ <i>${prevLabel}</i>`, autoCompleteLabel: '↑ prev'};
       const prevVarBinding = {
-        var_: prevVar,
+        var_: labelledPrevVar,
         value: prevVal,
       };
       return {[prevVar.id]: prevVarBinding};
     } else {
       return undefined;
     }
-  }, [prevVal, prevVar])
+  }, [prevLabel, prevVal, prevVar])
 
   const newVarBindings = useDedupe(useMemo(() => {
     let result: {[label: string]: VarBinding} = {...prevVarContext};

@@ -111,6 +111,7 @@ VarBindingsContext.displayName = 'VarBindingsContext';
 export interface Var {
   id: string;
   label: string;
+  autoCompleteLabel?: string;
 }
 
 export function newVar(label = 'new var') {
