@@ -52,7 +52,7 @@ export const Component = memo((props: ToolProps<Program>) => {
     setResponse(null);
 
     // TODO: what should happen to output when a request is pending?
-    reportOutput(null);
+    // reportOutput(null);
 
     if (!hasValue(urlOutput) || typeof urlOutput.value !== 'string') { return; }
 
