@@ -373,6 +373,7 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolV
     hasValue(lastOutputValue)
     ? <div style={{
         opacity: hasValue(toolValue) ? 1 : 0.3,
+        maxWidth: '100%',
       }}>
         {renderValue(lastOutputValue.value)}
       </div>
