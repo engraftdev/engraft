@@ -50,7 +50,12 @@ export const Component = memo((props: ToolProps<Program>) => {
       return null;
     }
     try {
-      return { value: mergedPatterns(inputOutput.value) };
+      let value = mergedPatterns(inputOutput.value);
+      if (Array.isArray(value)) {
+        // TODO: not sure what this behavior should be in general
+        value = value.flat(Infinity);
+      }
+      return { value };
     } catch (e) {
       console.warn(e);
       return null;
