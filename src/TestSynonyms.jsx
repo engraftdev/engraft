@@ -26,7 +26,7 @@ function App() {
   }, [word])
 
   // set by TBD processing
-  let synonyms = ["I", "don't", "know"];
+  let synonyms = ["synonyms", "not", "extracted", "yet"];
   // let synonyms = useLiveTool({response}, { defaultValue: [], hide: false});
 
   return (
