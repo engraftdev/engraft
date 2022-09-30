@@ -111,11 +111,11 @@ export const Component = memo((props: ToolProps<Program>) => {
   return <>
     {initComponent}
     {iterations.map((inputArrayElem, i) =>
-      <ProvideVarBinding key={i} var_={program.stateVar} value={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
+      <ProvideVarBinding key={i} var_={program.stateVar} output={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
         {upComponents[i]}
       </ProvideVarBinding>
     )}
-    <ProvideVarBinding var_={program.stateVar} value={(upOutputs[highlightedIndex]) || undefined}>
+    <ProvideVarBinding var_={program.stateVar} output={(upOutputs[highlightedIndex]) || undefined}>
       {viewComponent}
     </ProvideVarBinding>
   </>

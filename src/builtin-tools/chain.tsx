@@ -118,23 +118,23 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
     return () => updateOutputs(updateF({$unset: [id]}));
   }, [id, output, updateOutputs])
 
-  const prevVal: ToolOutput | null | undefined = useMemo(() => {
+  const prevOutput: ToolOutput | null | undefined = useMemo(() => {
     const prevLink: Link | undefined = links[i - 1];
     if (prevLink) {
       return outputs[prevLink.id];
     }
   }, [i, links, outputs])
   const prevVarContext = useMemo(() => {
-    if (prevVal) {
+    if (prevOutput) {
       const prevVarBinding: VarBinding = {
         var_: prevVar,
-        value: prevVal,
+        output: prevOutput,
       };
       return {[prevVar.id]: prevVarBinding};
     } else {
       return undefined;
     }
-  }, [prevVal, prevVar])
+  }, [prevOutput, prevVar])
 
   if (prevVarContext) {
     return <AddObjToContext context={VarBindingsContext} obj={prevVarContext}>

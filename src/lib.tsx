@@ -45,7 +45,7 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
     let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, output: {value: value}};
     });
     return varBindings;
   }, [variables]);
@@ -100,7 +100,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
     let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(variables || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, output: {value: value}};
     });
     return varBindings;
   }, [variables]);
@@ -183,7 +183,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
     let varBindings: {[id: string]: VarBinding} = {};
     Object.entries(stableVariables).forEach(([name, value]) => {
       const id = `ID${name}000000`;
-      varBindings[id] = {var_: {id, label: name}, value: {value: value}};
+      varBindings[id] = {var_: {id, label: name}, output: {value: value}};
     });
     return varBindings;
   }, [stableVariables]);

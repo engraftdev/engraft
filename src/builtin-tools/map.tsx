@@ -67,7 +67,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   return <>
     {inputComponent}
     {inputArray?.map((inputArrayElem, i) =>
-      <ProvideVarBinding key={i} var_={program.itemVar} value={inputArrayElem}>
+      <ProvideVarBinding key={i} var_={program.itemVar} output={inputArrayElem}>
         {perItemComponents[i]}
       </ProvideVarBinding>
     )}

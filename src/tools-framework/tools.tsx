@@ -96,8 +96,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  // TODO: this should be called 'output', not 'value'... or it should actually be a value
-  value?: ToolOutput;
+  output?: ToolOutput;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};
@@ -121,12 +120,12 @@ export function newVar(label = 'new var') {
 
 export interface ProvideVarBindingProps {
   var_: Var;
-  value?: ToolOutput;
+  output?: ToolOutput;
   children?: ReactNode | undefined,
 }
 
-export const ProvideVarBinding = memo(function ProvideVar({var_, value, children}: ProvideVarBindingProps) {
-  const varBinding = useMemoObject({var_, value});
+export const ProvideVarBinding = memo(function ProvideVar({var_, output, children}: ProvideVarBindingProps) {
+  const varBinding = useMemoObject({var_, output});
 
   return <AddToContext context={VarBindingsContext} k={var_.id} v={varBinding}>
     {children}

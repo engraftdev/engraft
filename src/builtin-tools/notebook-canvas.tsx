@@ -250,7 +250,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
     let result: {[label: string]: VarBinding} = {...prevVarContext};
     cells.forEach((otherCell) => {
       if (otherCell.var_.id !== cell.var_.id) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, value: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
+        result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;

@@ -50,8 +50,8 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
     {(() => {
       if (!inspected) { return; }
       if (!varBinding) { return; }
-      if (hasValue(varBinding.value)) {
-        return <ObjectInspector data={varBinding.value.value} />;
+      if (hasValue(varBinding.output)) {
+        return <ObjectInspector data={varBinding.output.value} />;
       } else {
         return <span style={{fontStyle: 'italic'}}>missing</span>;
       }

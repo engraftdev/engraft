@@ -53,7 +53,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   return <>
     {bindingComponent}
     {program.bindingVar ?
-      <ProvideVarBinding var_={program.bindingVar} value={bindingOutput || undefined}>
+      <ProvideVarBinding var_={program.bindingVar} output={bindingOutput || undefined}>
         {bodyComponent}
       </ProvideVarBinding> :
       bodyComponent

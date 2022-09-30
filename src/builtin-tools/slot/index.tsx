@@ -150,7 +150,7 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
     } else {
       const rand = seedrandom('live-compose 2022');
       const scope = {
-        ...Object.fromEntries(Object.entries(varBindings).map(([k, v]) => [refCode(k), valueOrUndefined(v.value)])),
+        ...Object.fromEntries(Object.entries(varBindings).map(([k, v]) => [refCode(k), valueOrUndefined(v.output)])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
         ...globals,
         rand

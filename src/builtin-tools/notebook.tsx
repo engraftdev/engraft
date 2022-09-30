@@ -222,7 +222,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
   useEffect(() => reportView(id, view), [id, reportView, view]);
   useEffect(() => reportOutput(id, output), [id, output, reportOutput]);
 
-  const prevVal: ToolOutput | null | undefined = useMemo(() => {
+  const prevOutput: ToolOutput | null | undefined = useMemo(() => {
     const prevCell: Cell | undefined = cells[i - 1];
     if (prevCell) {
       return outputs[prevCell.var_.id];
@@ -235,23 +235,23 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
     }
   }, [cells, i])
   const prevVarContext = useMemo(() => {
-    if (prevVal && prevLabel) {
+    if (prevOutput && prevLabel) {
       const labelledPrevVar: Var = {...prevVar, label: `↑ <i>${prevLabel}</i>`, autoCompleteLabel: '↑ prev'};
       const prevVarBinding = {
         var_: labelledPrevVar,
-        value: prevVal,
+        value: prevOutput,
       };
       return {[prevVar.id]: prevVarBinding};
     } else {
       return undefined;
     }
-  }, [prevLabel, prevVal, prevVar])
+  }, [prevLabel, prevOutput, prevVar])
 
   const newVarBindings = useDedupe(useMemo(() => {
     let result: {[label: string]: VarBinding} = {...prevVarContext};
     cells.forEach((otherCell) => {
       if (otherCell.var_.id !== cell.var_.id) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, value: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
+        result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
