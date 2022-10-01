@@ -58,10 +58,6 @@ export const Component = memo((props: ToolProps<Program>) => {
     return outputs[lastCell.var_.id];
   }, [cells, outputs]));
 
-  // const newBindings = useMemo(() => {
-  //   return {};
-  // }, []);
-
   return <>{cells.map((cell) =>
     <CellModel
       key={cell.var_.id}
@@ -208,21 +204,20 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
   const [cell, updateCell] = useAtIndex(cells, updateCells, i);
   const [cellProgram, updateCellProgram] = useAt(cell, updateCell, 'program');
 
-  const prevOutput: ToolOutput | null | undefined = useMemo(() => {
-    const prevCell: Cell | undefined = cells[i - 1];
-    if (prevCell) {
-      return outputs[prevCell.var_.id];
-    }
-  }, [cells, i, outputs])
-  const prevLabel: string | undefined = useMemo(() => {
-    const prevCell: Cell | undefined = cells[i - 1];
-    if (prevCell) {
-      return prevCell.var_.label;
-    }
-  }, [cells, i])
+  let prevOutput: ToolOutput | null | undefined = undefined;
+  let prevLabel: string | undefined = undefined;
+  const prevCell: Cell | undefined = cells[i - 1];
+  if (prevCell) {
+    prevOutput = outputs[prevCell.var_.id];
+    prevLabel = prevCell.var_.label;
+  }
   const prevVarContext = useMemo(() => {
     if (prevOutput && prevLabel) {
-      const labelledPrevVar: Var = {...prevVar, label: `↑ <i>${prevLabel}</i>`, autoCompleteLabel: '↑ prev'};
+      const labelledPrevVar: Var = {
+        ...prevVar,
+        label: `↑ <i>${prevLabel}</i>`,
+        autoCompleteLabel: '↑ prev'
+      };
       const prevVarBinding = {
         var_: labelledPrevVar,
         output: prevOutput,
