@@ -39,9 +39,8 @@ export function mathSetup(schema: Schema) {
   return [
     mathPlugin,
     keymap({
-        "Mod-Space" : insertMathCmd(schema.nodes.math_inline),
-        // modify the default keymap chain for backspace
-        "Backspace": chainCommands(deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
+      "Mod-Space" : insertMathCmd(schema.nodes.math_inline),
+      "Backspace": chainCommands(deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
     }),
     inputRules({ rules: [
       makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline),

@@ -1,4 +1,3 @@
-import { insertMathCmd, makeBlockMathInputRule, makeInlineMathInputRule, mathBackspaceCmd, mathPlugin, mathSerializer, REGEX_BLOCK_MATH_DOLLARS, REGEX_INLINE_MATH_DOLLARS } from "@benrbray/prosemirror-math";
 import { exampleSetup } from "prosemirror-example-setup";
 import prosemirrorMenuCSS from "prosemirror-menu/style/menu.css";
 import { Node, Schema } from "prosemirror-model";
@@ -72,7 +71,6 @@ export const View = memo((props: ViewProps) => {
     });
     const view = new EditorView(div, {
       state,
-      clipboardTextSerializer: (slice) => { return mathSerializer.serializeSlice(slice) },
     });
 
     return () => {
