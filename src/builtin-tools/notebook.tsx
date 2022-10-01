@@ -1,14 +1,13 @@
-import _ from "lodash";
-import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
+import { Fragment, memo, useCallback, useMemo } from "react";
 import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
-import { ShowView, ToolInSet, ToolSet, useOutput, useTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
-import { atIndices, removers, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { atIndices, removers, Updater, useAt, useAtIndex } from "src/util/state";
+import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
-import { useMaxRenders } from "src/util/useMaxRenders";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
@@ -33,7 +32,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
-      { var_: newVar(defaultCellLabels[0]), program: slotSetTo(defaultInput || '') }
+      { var_: newVar(alphaLabels[0]), program: slotSetTo(defaultInput || '') }
     ],
     prevVar: newVar('prev')
   };
@@ -71,12 +70,6 @@ export const Component = memo((props: ToolProps<Program>) => {
   )}</>;
 })
 
-const letters = _.range(65, 91).map((n) => String.fromCharCode(n));
-const defaultCellLabels = [
-  ...letters,
-  ...letters.flatMap((a) => letters.map((b) => a + b)),
-];
-
 type ViewProps = ToolProps<Program> & {
   outputs: {[id: string]: ToolOutput | null},
   views: {[id: string]: ToolView | null},
@@ -88,9 +81,7 @@ const View = memo((props: ViewProps) => {
   const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
-  const smallestUnusedLabel = defaultCellLabels.find((label) =>
-    !cells.find((cell) => cell.var_.label === label)
-  )!
+  const smallestUnusedLabel = unusedLabel(alphaLabels, cells.map(cell => cell.var_.label)) || 'ZZZ';
 
   const notebookMenuMaker: MenuMaker = useCallback((closeMenu) => <>
     <MyContextMenuHeading>Notebook</MyContextMenuHeading>

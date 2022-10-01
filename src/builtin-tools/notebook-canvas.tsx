@@ -1,11 +1,12 @@
 import update from "immutability-helper";
 import _ from "lodash";
-import React, { memo, useCallback, useEffect, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
-import { ShowView, ToolInSet, ToolSet, useOutput, useTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { startDrag } from "src/util/drag";
-import { atIndex, updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
+import { atIndex, Updater, useAt, useAtIndex } from "src/util/state";
+import { unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
@@ -99,9 +100,7 @@ const View = memo((props: ViewProps) => {
 
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
-  const smallestUnusedLabel = defaultCellLabels.find((label) =>
-    !cells.find((cell) => cell.var_.label === label)
-  )!
+  const smallestUnusedLabel = unusedLabel(defaultCellLabels, cells.map(cell => cell.var_.label));
 
   const updatePaneGeoById = useCallback((id: string, f: (old: PaneGeo) => PaneGeo): void => {
     updateCells((oldCells) => {

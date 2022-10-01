@@ -121,6 +121,7 @@ const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInS
   const { updateOutputs, updateViews } = toolSet;
 
   const reportOutput = useCallback((output: ToolOutput | null) => {
+    // console.log("reporting output", keyInSet, output);
     if (output === null) {
       return updateOutputs((oldOutputs) => oldOutputs.delete(keyInSet));
     } else {
@@ -128,6 +129,7 @@ const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInS
     }
   }, [keyInSet, updateOutputs])
   const reportView = useCallback((view: ToolView | null) => {
+    // console.log("reporting view", keyInSet, view);
     if (view === null) {
       return updateViews((oldViews) => oldViews.delete(keyInSet));
     } else {
