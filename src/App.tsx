@@ -8,6 +8,7 @@ import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ToolOutputView } from './view/Value';
 import { builtinTools } from "./builtinTools";
+import { ErrorBoundary } from 'react-error-boundary';
 
 
 
@@ -69,9 +70,24 @@ const App = memo(function App() {
       {appCss}
     </style>
     <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
-      <VarBindingsContext.Provider value={context}>
-        <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </VarBindingsContext.Provider>
+      <ErrorBoundary fallbackRender={(props) => {
+        return <div>
+          <h1>error!</h1>
+          <pre>{props.error.message}</pre>
+          <pre>{props.error.stack}</pre>
+          <button onClick={() => {
+            updateProgram(() => defaultProgram);
+            props.resetErrorBoundary();
+          }}>reset</button>
+          <button onClick={() => {
+            props.resetErrorBoundary();
+          }}>redraw</button>
+        </div>
+      }}>
+        <VarBindingsContext.Provider value={context}>
+          <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
+        </VarBindingsContext.Provider>
+      </ErrorBoundary>
     </div>
     <br/>
     <br/>

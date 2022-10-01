@@ -1,6 +1,6 @@
 import { CSSProperties, memo, useEffect, useMemo } from "react";
 import { hasValue, newVar, ProgramFactory, ProvideVarBinding, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
-import { PerTool, ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
+import { PerTool, ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { Value } from "src/view/Value";
@@ -46,9 +46,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [perItemProgram, updatePerItemProgram] = useAt(program, updateProgram, 'perItemProgram');
 
-  const [perItemComponents, perItemViews, perItemOutputs] = useTools(Object.fromEntries((inputArray || []).map((elem, i) => {
-    return [i, {program: perItemProgram, updateProgram: updatePerItemProgram}]
-  })))
+  const [perItemToolSet, perItemOutputs, perItemViews] = useToolSet();
 
   useOutput(reportOutput, useMemo(() => ({
     value: range(inputLength).map((i) => valueOrUndefined(perItemOutputs[i]))
@@ -68,7 +66,7 @@ export const Component = memo((props: ToolProps<Program>) => {
     {inputComponent}
     {inputArray?.map((inputArrayElem, i) =>
       <ProvideVarBinding key={i} var_={program.itemVar} output={inputArrayElem}>
-        {perItemComponents[i]}
+        <ToolInSet toolSet={perItemToolSet} keyInSet={`${i}`} program={perItemProgram} updateProgram={updatePerItemProgram} />
       </ProvideVarBinding>
     )}
   </>

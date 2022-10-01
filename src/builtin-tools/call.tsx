@@ -1,8 +1,7 @@
-import _ from "lodash";
-import React, { memo, useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
-import { ShowView, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
-import { at, useAt } from "src/util/state";
+import { ShowView, ToolInSet, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { at, useAt, useAts } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { FunctionThingComponent, isProbablyFunctionThing } from "./function";
 import { slotSetTo } from "./slot";
@@ -31,15 +30,9 @@ export const Component = memo((props: ToolProps<Program>) => {
   }, [functionOutput]);
 
   const [inputPrograms, updateInputPrograms] = useAt(program, updateProgram, 'inputPrograms');
+  const inputProgramAts = useAts(inputPrograms, updateInputPrograms);
 
-  // manage running inputs
-  const [inputComponents, inputViews, inputOutputs] = useTools(
-    useMemo(() =>
-      _.mapValues(inputPrograms, (inputProgram, varId) =>
-        ({program: inputProgram, updateProgram: at(updateInputPrograms, varId)})
-      )
-    , [inputPrograms, updateInputPrograms])
-  );
+  const [inputToolSet, inputOutputs, inputViews] = useToolSet();
 
   useEffect(() => {
     if (!functionThing) { return; }
@@ -98,10 +91,8 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   return <>
     {functionComponent}
-    {Object.entries(inputComponents).map(([varId, inputComponent]) =>
-      <React.Fragment key={varId}>
-        {inputComponent}
-      </React.Fragment>
+    {Object.entries(inputProgramAts).map(([varId, [inputProgram, updateInputProgram]]) =>
+      <ToolInSet key={varId} toolSet={inputToolSet} keyInSet={varId} program={inputProgram} updateProgram={updateInputProgram} />
     )}
     {functionThing &&
       <FunctionThingComponent

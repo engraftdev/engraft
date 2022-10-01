@@ -238,7 +238,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
     if (prevVal) {
       const prevVarBinding = {
         var_: prevVar,
-        value: prevVal,
+        output: prevVal,
       };
       return {[prevVar.id]: prevVarBinding};
     } else {

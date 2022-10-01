@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { memo, useEffect, useMemo } from "react";
 import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
-import { ShowView, useOutput, useSubTool, useTools, useView } from "src/tools-framework/useSubTool";
+import { ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { ToolOutputView } from "src/view/Value";
 import { slotSetTo } from "./slot";
@@ -39,18 +39,9 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const { iterationsCount } = program;
 
-  const iterations = useMemo(() => {
-    return _.range(iterationsCount)
-  }, [iterationsCount])
-
   const [upProgram, updateUpProgram] = useAt(program, updateProgram, 'upProgram');
 
-  const upToolInfos = useMemo(() =>
-    Object.fromEntries(iterations.map((elem, i) => {
-      return [i, {program: upProgram, updateProgram: updateUpProgram}]
-    }))
-  , [iterations, upProgram, updateUpProgram]);
-  const [upComponents, upViews, upOutputs] = useTools(upToolInfos);
+  const [upToolSet, upOutputs, upViews] = useToolSet();
 
   const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram'})
 
@@ -110,9 +101,9 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   return <>
     {initComponent}
-    {iterations.map((inputArrayElem, i) =>
+    {_.range(iterationsCount).map((inputArrayElem, i) =>
       <ProvideVarBinding key={i} var_={program.stateVar} output={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
-        {upComponents[i]}
+        <ToolInSet toolSet={upToolSet} keyInSet={`${i}`} program={upProgram} updateProgram={updateUpProgram}/>
       </ProvideVarBinding>
     )}
     <ProvideVarBinding var_={program.stateVar} output={(upOutputs[highlightedIndex]) || undefined}>

@@ -8,6 +8,7 @@ import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
+import { useMaxRenders } from "src/util/useMaxRenders";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
@@ -239,7 +240,7 @@ const CellModel = memo(function CellModel({id, cells, updateCells, outputs, repo
       const labelledPrevVar: Var = {...prevVar, label: `↑ <i>${prevLabel}</i>`, autoCompleteLabel: '↑ prev'};
       const prevVarBinding = {
         var_: labelledPrevVar,
-        value: prevOutput,
+        output: prevOutput,
       };
       return {[prevVar.id]: prevVarBinding};
     } else {

@@ -96,7 +96,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  output?: ToolOutput;
+  output: ToolOutput | undefined;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};
@@ -120,7 +120,7 @@ export function newVar(label = 'new var') {
 
 export interface ProvideVarBindingProps {
   var_: Var;
-  output?: ToolOutput;
+  output: ToolOutput | undefined;
   children?: ReactNode | undefined,
 }
 

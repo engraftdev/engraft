@@ -1,14 +1,13 @@
 import _ from "lodash";
-import { memo, ReactElement, useCallback, useContext, useEffect, useMemo } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo } from "react";
 import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
-import { PerTool, ShowView, useOutput, useTools, useView } from "src/tools-framework/useSubTool";
+import { PerTool, ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
 import { noOp } from "src/util/noOp";
 import { atAllIndices, atIndexZip, removers, Updater, useAt } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
-import { arrEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { SettableValue } from "src/view/SettableValue";
 import { ToolOutputView } from "src/view/Value";
@@ -43,18 +42,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;
   const { settings } = program;
-
-  const [ bodyProgram, updateBodyProgram ] = useAt(program, updateProgram, 'bodyProgram');
-
-  const settingIds = useDedupe(useMemo(() => settings.map((s) => s.id), [settings]), arrEqWith(refEq));
-
-  const [bodyComponents, bodyViews, bodyOutputs] = useTools(
-    useMemo(() =>
-      Object.fromEntries(settingIds.map((settingId) =>
-        [settingId, {program: bodyProgram, updateProgram: updateBodyProgram}]
-      )),
-    [bodyProgram, settingIds, updateBodyProgram])
-  );
+  const [bodyToolSet, bodyOutputs, bodyViews] = useToolSet();
 
   const closureVarBindings = useContext(VarBindingsContext);
 
@@ -77,27 +65,32 @@ export const Component = memo((props: ToolProps<Program>) => {
   }), [program.activeSettingId, bodyOutputs, bodyViews, props]));
 
   return <>
-    {settings.map((setting) => <SettingModel key={setting.id} vars={program.vars} setting={setting} bodyComponent={bodyComponents[setting.id]} />)}
+    {settings.map((setting) => <SettingModel
+      {...props}
+      key={setting.id}
+      setting={setting}
+      bodyToolSet={bodyToolSet}
+    />)}
   </>;
 });
 
-type SettingModelProps = {
-  vars: Var[],
+type SettingModelProps = ToolProps<Program> & {
   setting: Setting,
-  bodyComponent: ReactElement,
+  bodyToolSet: ToolSet,
 }
 
 export const SettingModel = memo((props: SettingModelProps) => {
-  const { vars, setting, bodyComponent } = props;
+  const { program, updateProgram, setting, bodyToolSet } = props;
+  const [ bodyProgram, updateBodyProgram ] = useAt(program, updateProgram, 'bodyProgram');
 
-  const newVarBindings = useMemo(() =>
+  const newVarBindings: VarBindings = useMemo(() =>
     Object.fromEntries(
-      _.zipWith(vars, setting.values, (var_, value) => [var_.id, {var_, value: {value: value}}])
+      _.zipWith(program.vars, setting.values, (var_, value) => [var_.id, {var_, output: {value}}])
     )
-  , [setting, vars]);
+  , [setting, program.vars]);
 
   return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
-    {bodyComponent}
+    <ToolInSet toolSet={bodyToolSet} keyInSet={setting.id} program={bodyProgram} updateProgram={updateBodyProgram} />
   </AddObjToContext>;
 });
 
@@ -327,7 +320,7 @@ export const FunctionThingComponent = memo((props: FunctionThingComponentProps) 
   const { program, updateProgram, closureVarBindings } = functionThing;
 
   const inputVarBindings = useMemo(() =>
-    Object.fromEntries(program.vars.map((var_) => [var_.id, {var_, value: inputs[var_.id] || undefined}]))
+    Object.fromEntries(program.vars.map((var_) => [var_.id, {var_, output: inputs[var_.id] || undefined}]))
   , [inputs, program.vars]);
 
   const varBindings = useMemo(() =>

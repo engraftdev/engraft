@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { updateF } from './updateF';
 
@@ -52,6 +53,12 @@ export function useUpdateAt<T, K extends string & keyof T>(update: Updater<T>, k
 export function useAt<T, K extends string & keyof T>(t: T, updateT: Updater<T>, key: K): [T[K], Updater<T[K]>] {
   const updateTK = useUpdateAt(updateT, key);
   return [t[key], updateTK];
+}
+
+export function useAts<T>(ts: {[key: string]: T}, updateTs: Updater<{[key: string]: T}>): {[key: string]: readonly [T, Updater<T>]} {
+  return useMemo(() => {
+    return _.mapValues(ts, (v, k) => [v, at(updateTs, k)] as const)
+  }, [ts, updateTs]);
 }
 
 export function useSetter<T>(updateT: Updater<T>): Setter<T> {

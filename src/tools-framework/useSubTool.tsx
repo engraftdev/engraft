@@ -1,8 +1,7 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
-import { arrEqWith, refEq, useDedupe } from "src/util/useDedupe";
-import { lookUpTool, ToolProgram, ToolOutput, ToolView, ToolViewRenderProps } from "./tools";
+import { lookUpTool, ToolOutput, ToolProgram, ToolView, ToolViewRenderProps } from "./tools";
 
 export function useView(reportView: Setter<ToolView | null>, view: ToolView | null) {
   useEffect(() => {
@@ -88,71 +87,53 @@ export function useSubTool<C, K extends string & keyof C>({program, updateProgra
 export type PerTool<T> = {[key: string]: T}
 type PerToolInternal<T> = Immutable.Map<string, T>
 
-export type UseToolsReturn = [
-  components: PerTool<JSX.Element>,
-  views: PerTool<ToolView | null>,
-  outputs: PerTool<ToolOutput | null>,
-]
-
-// TODO: use object rather than array of keys?
-function cleanUpOldProperties<T>(oldObject: PerToolInternal<T>, newKeys: string[]) {
-  let newObject = oldObject;
-  oldObject.forEach((_, key) => {
-    if (!newKeys.includes(key)) {
-      newObject = newObject.delete(key);
-    }
-  })
-  return newObject;
-}
-
-export function useTools<C extends ToolProgram>(tools: {[key: string]: UseToolProps<C>}): UseToolsReturn {
-  const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolOutput | null>>(Immutable.Map())
-  const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
-
-  const toolKeys = useDedupe(useMemo(() => Object.keys(tools), [tools]), arrEqWith(refEq));
-
-  useEffect(() => {
-    // console.log("cleaner running");
-    updateOutputs((oldOutputs) => cleanUpOldProperties(oldOutputs, toolKeys));
-    updateViews((oldViews) => cleanUpOldProperties(oldViews, toolKeys));
-  }, [toolKeys, updateOutputs, updateViews])
-
-  const components = useMemo(() =>
-    Object.fromEntries(Object.entries(tools).map(([keyName, {program, updateProgram}]) => {
-      return [keyName, <ToolAt
-        key={keyName}
-        keyName={keyName}
-        program={program}
-        updateProgram={updateProgram as unknown as Updater<ToolProgram>}
-        updateOutputs={updateOutputs}
-        updateViews={updateViews}
-      />]
-    }))
-  , [tools, updateOutputs, updateViews]);
-
-  const viewsObj = useMemo(() => views.toObject(), [views])
-  const outputsObj = useMemo(() => outputs.toObject(), [outputs])
-
-  return [components, viewsObj, outputsObj];
-}
-
-interface ToolAtProps {
-  keyName: string,
-  program: ToolProgram,
-  updateProgram: Updater<ToolProgram>
+export type ToolSet = {
   updateOutputs: Updater<PerToolInternal<ToolOutput | null>>,
   updateViews: Updater<PerToolInternal<ToolView | null>>,
 }
 
-const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, program, updateProgram}: ToolAtProps) {
-  const reportOutput = useCallback((output: ToolOutput | null) => {
-    return updateOutputs((oldOutputs) => oldOutputs.set(keyName, output));
-  }, [keyName, updateOutputs])
-  const reportView = useCallback((view: ToolView | null) => {
-    return updateViews((oldViews) => oldViews.set(keyName, view));
-  }, [keyName, updateViews])
+export type UseToolSetReturn = [
+  toolSet: ToolSet,
+  outputs: PerTool<ToolOutput | null>,
+  views: PerTool<ToolView | null>,
+]
 
-  // TODO: use useEffect to clean up after ourselves?
+export function useToolSet<C extends ToolProgram>(): UseToolSetReturn {
+  const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolOutput | null>>(Immutable.Map())
+  const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
+
+  const toolSet = useMemo(() => ({updateOutputs, updateViews}), [updateOutputs, updateViews]);
+  const outputsObj = useMemo(() => outputs.toObject(), [outputs])
+  const viewsObj = useMemo(() => views.toObject(), [views])
+
+  return [toolSet, outputsObj, viewsObj];
+}
+
+export type ToolInSetProps<P extends ToolProgram> = {
+  toolSet: ToolSet,
+  keyInSet: string,
+  program: P,
+  updateProgram: Updater<P>,
+}
+
+const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInSetProps<P>) {
+  const { toolSet, keyInSet, program, updateProgram } = props;
+  const { updateOutputs, updateViews } = toolSet;
+
+  const reportOutput = useCallback((output: ToolOutput | null) => {
+    if (output === null) {
+      return updateOutputs((oldOutputs) => oldOutputs.delete(keyInSet));
+    } else {
+      return updateOutputs((oldOutputs) => oldOutputs.set(keyInSet, output));
+    }
+  }, [keyInSet, updateOutputs])
+  const reportView = useCallback((view: ToolView | null) => {
+    if (view === null) {
+      return updateViews((oldViews) => oldViews.delete(keyInSet));
+    } else {
+      return updateViews((oldViews) => oldViews.set(keyInSet, view));
+    }
+  }, [keyInSet, updateViews])
 
   const toolName = program.toolName;
   const Tool = lookUpTool(toolName);
@@ -163,4 +144,5 @@ const ToolAt = memo(function ToolAt({keyName, updateOutputs, updateViews, progra
     reportOutput={reportOutput}
     reportView={reportView}
   />;
-})
+};
+export const ToolInSet = memo(ToolInSetNoMemo) as typeof ToolInSetNoMemo;
