@@ -7,6 +7,7 @@ export const RootStyles = memo(function RootStyles() {
   </style>
 });
 
+// TODO: this has a div in it, which forces block layout
 const IsolateStyles = memo(function IsolateStyles({children, ...props}: HTMLProps<HTMLDivElement>) {
   return <div style={{...props.style, all: 'initial'}} {...props}>
     <RootStyles/>
