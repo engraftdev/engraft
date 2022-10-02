@@ -195,7 +195,7 @@ interface CellModelProps {
 }
 
 const CellModel = memo(function CellModel(props: CellModelProps) {
-  const { id, cells, updateCells, outputs, toolSet, prevVar } = props;
+  const { id, cells, updateCells, outputs, toolSet } = props;
 
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var_.id === id);

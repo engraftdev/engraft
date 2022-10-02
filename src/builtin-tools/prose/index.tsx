@@ -7,10 +7,9 @@ import { addListNodes } from "prosemirror-schema-list";
 import { EditorState, NodeSelection, Plugin, Transaction } from "prosemirror-state";
 import { EditorView, NodeView } from "prosemirror-view";
 import prosemirrorViewCSS from "prosemirror-view/style/prosemirror.css";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
-import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import PortalSet, { usePortalSet } from "src/util/PortalSet";
@@ -18,6 +17,7 @@ import { at, Updater, useAt } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
+import { useRefForCallback } from "src/util/useRefForCallback";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "../slot";
 import prosemirrorCSS from "./Editor.css";
@@ -49,7 +49,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   useOutput(reportOutput, useMemo(() => {
     // TODO
     return null;
-  }, [cells, outputs]));
+  }, []));
 
   useView(reportView, useMemo(() => ({
     render: () => <View {...props} outputs={outputs} views={views}/>
@@ -145,16 +145,14 @@ type ViewProps = {
 }
 
 export const View = memo((props: ViewProps) => {
-  const { program, updateProgram, outputs, views } = props;
+  const { program, updateProgram, views } = props;
   const [docJSON, updateDocJSON] = useAt(program, updateProgram, 'docJSON');
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const [toolPortalSet, toolPortals] = usePortalSet<{id: string}>();
 
-  useEffect(() => {
-    if (!div) { return; }
-
+  const insertToolCmdRef = useRefForCallback(useCallback(
     function insertToolCmd(state: EditorState, dispatch: ((tr:Transaction) => void) | undefined){
       let { $from } = state.selection, index = $from.index();
       if (!$from.parent.canReplaceWith(index, index, toolNodeType)) {
@@ -162,7 +160,7 @@ export const View = memo((props: ViewProps) => {
       }
       if (dispatch) {
         const usedLabels = Object.values(cells).map((cell) => cell.var_.label);
-        console.log('used', usedLabels);
+        console.log('used', usedLabels, cells);
         const var_ = newVar(unusedLabel(alphaLabels, usedLabels));
         updateCells(updateF({[var_.id]: {$set: {
           var_,
@@ -175,6 +173,18 @@ export const View = memo((props: ViewProps) => {
         dispatch(tr);
       }
       return true;
+    },
+    [cells, updateCells]
+  ));
+
+  const viewRef = useRef<EditorView | null>(null);
+
+  useEffect(() => {
+    if (viewRef.current) { return; }
+    if (!div) { return; }
+
+    function insertToolCmd(...args: Parameters<typeof insertToolCmdRef.current>) {
+      return insertToolCmdRef.current(...args);
     }
 
     const state = EditorState.create({
@@ -198,14 +208,18 @@ export const View = memo((props: ViewProps) => {
       schema: schema,
       doc: Node.fromJSON(schema, docJSON),  // TODO: load live changes from docJSON
     });
-    const view = new EditorView(div, {
+
+    viewRef.current = new EditorView(div, {
       state,
     });
-
+  });
+  useEffect(() => {
     return () => {
-      view.destroy();
+      if (viewRef.current) {
+        viewRef.current.destroy();
+      }
     }
-  }, [div]);
+  }, []);
 
   return <>
     {/* TODO: figure out how to actually handle stylesheets */}
@@ -222,11 +236,15 @@ export const View = memo((props: ViewProps) => {
       const updateVar = at(updateCell, 'var_');
       return ReactDOM.createPortal(
         views[id] ?
-          <div style={{display: 'inline-block', position: 'relative'}}>
+          // <div style={{display: 'inline-block', position: 'relative'}}>
+          //   <ShowView view={views[id]} autoFocus={true} />
+          //   <div style={{display: 'inline-block', position: 'absolute', right: 3, top: 3}}>
+          //     <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
+          //   </div>
+          // </div> :
+          <div style={{display: 'inline-flex', position: 'relative', gap: 5}} className="xRow xAlignTop">
+            <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
             <ShowView view={views[id]} autoFocus={true} />
-            <div style={{display: 'inline-block', position: 'absolute', right: 3, top: 3}}>
-              <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
-            </div>
           </div> :
           <span style={{backgroundColor: 'red'}}>tool not found</span>,
         elem
@@ -270,13 +288,4 @@ class ToolNodeView implements NodeView {
   }
 
   stopEvent() { return true }
-}
-
-function SillyTool(props: {initialProgram: ToolProgram}) {
-  const [program, updateProgram] = useState(props.initialProgram);
-  return <ToolWithView
-    program={program}
-    updateProgram={updateProgram}
-    reportOutput={() => {}}
-  />;
 }

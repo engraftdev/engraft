@@ -98,7 +98,7 @@ export type UseToolSetReturn = [
   views: PerTool<ToolView | null>,
 ]
 
-export function useToolSet<C extends ToolProgram>(): UseToolSetReturn {
+export function useToolSet(): UseToolSetReturn {
   const [outputs, updateOutputs] = useStateUpdateOnly<PerToolInternal<ToolOutput | null>>(Immutable.Map())
   const [views, updateViews] = useStateUpdateOnly<PerToolInternal<ToolView | null>>(Immutable.Map())
 
@@ -136,6 +136,14 @@ const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInS
       return updateViews((oldViews) => oldViews.set(keyInSet, view));
     }
   }, [keyInSet, updateViews])
+
+  // in case a tool doesn't do a good job cleaning up after itself...
+  useEffect(() => {
+    return () => {
+      updateOutputs((oldOutputs) => oldOutputs.delete(keyInSet));
+      updateViews((oldViews) => oldViews.delete(keyInSet));
+    }
+  }, [keyInSet, updateOutputs, updateViews])  // TODO: these deps never change, but it's still weird to have them here
 
   const toolName = program.toolName;
   const Tool = lookUpTool(toolName);
