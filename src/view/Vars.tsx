@@ -44,8 +44,12 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
         def.scrollIntoView();
       }}
       >
-      {varBinding && <span dangerouslySetInnerHTML={{__html: varBinding.var_.label}}/>}
-      {varBinding?.var_.label.length === 0 && <span style={{fontStyle: 'italic'}}>unnamed</span>}
+      {varBinding
+       ? varBinding?.var_.label.length > 0
+         ? <span dangerouslySetInnerHTML={{__html: varBinding.var_.label}}/>
+         : <span style={{fontStyle: 'italic'}}>unnamed</span>
+       : <span style={{fontStyle: 'italic'}}>unknown ref</span>
+      }
     </span>
     {(() => {
       if (!inspected) { return; }

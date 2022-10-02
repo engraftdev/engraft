@@ -18,10 +18,18 @@ import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import { useRefForCallback } from "src/util/useRefForCallback";
+import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "../slot";
 import prosemirrorCSS from "./Editor.css";
 import { addMathNodes, mathCSS, mathSetup } from "./math";
+
+// TODO:
+// [ ] [HIGH] clean up deleted tools
+// [ ] copy & paste
+// [ ] keyboard navigation
+// [ ] makes me think about "exports" & "imports"
+
 
 export type Program = {
   toolName: 'prose',
@@ -145,7 +153,7 @@ type ViewProps = {
 }
 
 export const View = memo((props: ViewProps) => {
-  const { program, updateProgram, views } = props;
+  const { program, updateProgram, outputs, views } = props;
   const [docJSON, updateDocJSON] = useAt(program, updateProgram, 'docJSON');
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
@@ -241,9 +249,12 @@ export const View = memo((props: ViewProps) => {
           //     <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
           //   </div>
           // </div> :
-          <div style={{display: 'inline-flex', position: 'relative', gap: 5}} className="xRow xAlignTop">
+          <div className="xRow xAlignTop" style={{display: 'inline-flex', gap: 5}}>
             <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
-            <ShowView view={views[id]} autoFocus={true} />
+            <div className="xCol" style={{gap: 5}}>
+              <ShowView view={views[id]} autoFocus={true} />
+              <ToolOutputView toolOutput={outputs[id]}/>
+            </div>
           </div> :
           <span style={{backgroundColor: 'red'}}>tool not found</span>,
         elem
