@@ -160,7 +160,6 @@ export const View = memo((props: ViewProps) => {
       }
       if (dispatch) {
         const usedLabels = Object.values(cells).map((cell) => cell.var_.label);
-        console.log('used', usedLabels, cells);
         const var_ = newVar(unusedLabel(alphaLabels, usedLabels));
         updateCells(updateF({[var_.id]: {$set: {
           var_,
