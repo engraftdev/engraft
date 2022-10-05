@@ -9,7 +9,7 @@ export type Setter<T> = (newT: T) => void;
 export type Updater<T, U extends T = T> = (f: (oldU: U) => T) => void;
 
 export function updaterToSetter<T, U extends T = T>(updater: Updater<T, U>): Setter<T> {
-  return (newT) => updater((_) => newT);
+  return (newT) => updater(() => newT);
 }
 
 // React's useState returns a setter that doesn't work for function types
@@ -50,9 +50,10 @@ export function useUpdateAt<T, K extends string & keyof T>(update: Updater<T>, k
   return useMemo(() => at(update, key), [update, key]);
 }
 
-export function useAt<T, K extends string & keyof T>(t: T, updateT: Updater<T>, key: K): [T[K], Updater<T[K]>] {
+export function useAt<T, K extends string & keyof T>(t: T, updateT: Updater<T>, key: K): [T[K], Updater<T[K]>, Setter<T[K]>] {
   const updateTK = useUpdateAt(updateT, key);
-  return [t[key], updateTK];
+  const setTK = useMemo(() => updaterToSetter(updateTK), [updateTK]);
+  return [t[key], updateTK, setTK];
 }
 
 export function useAts<T>(ts: {[key: string]: T}, updateTs: Updater<{[key: string]: T}>): {[key: string]: readonly [T, Updater<T>]} {

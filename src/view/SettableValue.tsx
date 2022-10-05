@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { hasValue, ToolOutput } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { slotSetTo } from "src/builtin-tools/slot";
@@ -8,10 +8,12 @@ import { Value } from "./Value";
 export type SettableValueProps = {
   value: any,
   setValue: Setter<any>,
+
+  displayRaw?: boolean,
 }
 
 export const SettableValue = memo(function SettableValue(props: SettableValueProps) {
-  const {value, setValue} = props;
+  const {value, setValue, displayRaw} = props;
 
   const [expanded, setExpanded] = useState(false);
 
@@ -28,10 +30,22 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     }
   }, [entryOutput, setValue]);
 
+  const valueDisplay = useMemo(() => {
+    if (displayRaw) {
+      try {
+        return <pre>{JSON.stringify(value)}</pre>;
+      } catch (e) {
+        return <pre>[cannot stringify]</pre>;
+      }
+    } else {
+      return <Value value={value} />;
+    }
+  }, [displayRaw, value]);
+
   return (
     <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
       <div onClick={onClickValue}>
-        <Value value={value} />
+        {valueDisplay}
       </div>
       {expanded &&
         <>

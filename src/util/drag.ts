@@ -34,6 +34,7 @@ export function startDrag<T>(props: Drag<T>) {
     }
 
     const onMousemove = (event: MouseEvent) => {
+      event.stopPropagation();
       move.call(
         {
           event, startEvent,
@@ -43,7 +44,8 @@ export function startDrag<T>(props: Drag<T>) {
         state
       );
     }
-    const onMouseup = (e: MouseEvent) => {
+    const onMouseup = (event: MouseEvent) => {
+      event.stopPropagation();
       document.removeEventListener('mousemove', onMousemove);
       document.removeEventListener('mouseup', onMouseup);
       if (cursorToUse) {

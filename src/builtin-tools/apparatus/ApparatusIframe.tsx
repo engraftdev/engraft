@@ -4,14 +4,16 @@ import { HTMLProps, memo, useEffect, useRef, useState } from "react";
 // It contains no references to Engraft per se.
 
 type ApparatusIframeProps = HTMLProps<HTMLIFrameElement> & {
-  project: string | null;
-  setProject: (apparatusProject: string) => void;
+  initialProject?: string | null,
+  project?: string | null,
+  setProject: (apparatusProject: string) => void,
 
-  input: unknown;
+  input?: unknown,
+  regionOfInterest?: { x: [number, number], y: [number, number] },
 }
 
 export const ApparatusIframe = memo((props: ApparatusIframeProps) => {
-  const { project, setProject, input, title, ...iframeProps } = props;
+  const { initialProject, project, setProject, input, regionOfInterest, title, ...iframeProps } = props;
 
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null);
   const [port, setPort] = useState<MessagePort | null>(null);
@@ -28,20 +30,35 @@ export const ApparatusIframe = memo((props: ApparatusIframeProps) => {
   }, [iframe, setPort]);
 
   // Send initial project (or absence thereof) to channel
-  const projectSent = useRef(false);
+  const initialProjectSent = useRef(false);
   useEffect(() => {
-    if (!port || projectSent.current) { return; }
-    // console.log('outer sending project');
-    port.postMessage(['load', project]);
-    projectSent.current = true;
+    if (!port || initialProject === undefined || initialProjectSent.current) { return; }
+    // console.log('outer sending initial project');
+    port.postMessage(['load', initialProject]);
+    initialProjectSent.current = true;
   });
 
+  // Send changing project to channel
+  useEffect(() => {
+    if (!port || project === undefined ) { return; }
+    // console.log('outer sending project');
+    port.postMessage(['load', project]);
+  }, [port, project]);
+
   // Send input to channel
+  // NOTE: If you don't provide an input, this well send `undefined` anyway
   useEffect(() => {
     if (!port) { return; }
     // console.log('outer sending input');
     port.postMessage(['input', input]);
   }, [port, input]);
+
+  // Send region of interest to channel
+  useEffect(() => {
+    if (!port || regionOfInterest === undefined) { return; }
+    // console.log('outer sending roi');
+    port.postMessage(['regionOfInterest', regionOfInterest]);
+  }, [port, regionOfInterest]);
 
   // Receive saved projects from channel
   useEffect(() => {

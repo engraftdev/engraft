@@ -13,7 +13,7 @@ export type Tool<P extends ToolProgram = any> = {
 export type ToolOutput = ToolOutputValue | ToolOutputError;
 export type ToolOutputValue = {
   value: unknown;
-  alreadyDisplayed?: boolean;
+  alreadyDisplayed?: boolean;  // TODO: wrong place? it's persisted too far
 };
 export type ToolOutputError = {
   error: string;
