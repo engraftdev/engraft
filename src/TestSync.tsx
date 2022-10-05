@@ -4,6 +4,7 @@ import { lookUpTool, ToolOutput, ToolProgram, ToolView } from './tools-framework
 import ReactCell from './util/ReactCell';
 
 import { examples } from './examples/examples';
+import { noOp } from './util/noOp';
 
 function exampleByName(name: string) {
   return examples.find((example) => example.name === name);
@@ -34,7 +35,7 @@ export function TestSync() {
 
     const component = <Tool.Component
       program={program}
-      updateProgram={() => {}}
+      updateProgram={noOp}
       reportOutput={(o) => output = o}
       reportView={(v) => view = v}
     />

@@ -6,6 +6,7 @@ import { updateF } from "src/util/updateF";
 import { Use } from 'src/util/Use';
 import useHover from 'src/util/useHover';
 import update from 'immutability-helper';
+import { noOp } from 'src/util/noOp';
 
 
 // **************
@@ -228,7 +229,7 @@ export type FormatterContextInfo = {
 
 export const FormatterContext = createContext<FormatterContextInfo>({
   controlValues: {},
-  updateControlValues: () => {},
+  updateControlValues: noOp,
   editMode: false,
 });
 
