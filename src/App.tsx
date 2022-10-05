@@ -70,20 +70,16 @@ const App = memo(function App() {
       {appCss}
     </style>
     <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
-      <ErrorBoundary fallbackRender={(props) => {
-        return <div>
-          <h1>error!</h1>
-          <pre>{props.error.message}</pre>
-          <pre>{props.error.stack}</pre>
-          <button onClick={() => {
-            updateProgram(() => defaultProgram);
-            props.resetErrorBoundary();
-          }}>reset</button>
-          <button onClick={() => {
-            props.resetErrorBoundary();
-          }}>redraw</button>
-        </div>
-      }}>
+      <ErrorBoundary
+        fallbackRender={(props) => {
+          return <div>
+            <h1>error!</h1>
+            <pre>{props.error.message}</pre>
+            <pre>{props.error.stack}</pre>
+          </div>
+        }}
+        resetKeys={[program]}
+      >
         <VarBindingsContext.Provider value={context}>
           <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
         </VarBindingsContext.Provider>
@@ -122,7 +118,7 @@ const App = memo(function App() {
     </div>
     <br/>
     <div>
-      <button onClick={() => updateProgram(() => defaultProgram)}>Reset</button>
+      <button onClick={() => updateProgram(() => defaultProgram)}>Clear</button>
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
@@ -133,6 +129,10 @@ const App = memo(function App() {
           <option key={name} value={name}>{name}</option>
         )}
       </select>
+    </div>
+    <br/>
+    <div>
+      <button onClick={incrementVersion}>Redraw</button>
     </div>
     <br/>
     <div>
