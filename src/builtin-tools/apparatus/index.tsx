@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { startDrag } from "src/util/drag";
@@ -49,6 +49,7 @@ export const Component = memo((props: ToolProps<Program>) => {
       src="http://localhost:8090/?engraft=1&fullScreen=1&viewOnly=1"
       width={program.viewerSize[0]} height={program.viewerSize[1]}
       title="Apparatus viewer"
+      style={{ border: 'none' }}
     />,
   }), [program.apparatusProject, program.regionOfInterest, program.viewerSize, inputOutput]));
 

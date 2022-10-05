@@ -1,258 +1,262 @@
 {
-  "toolName": "prose",
-  "docJSON": {
-    "type": "doc",
-    "content": [
-      {
-        "type": "heading",
-        "attrs": {
-          "level": 1
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "prose",
+    "docJSON": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Building an arrow"
+            }
+          ]
         },
-        "content": [
-          {
-            "type": "text",
-            "text": "Building an arrow"
-          }
-        ]
-      },
-      {
-        "type": "heading",
-        "attrs": {
-          "level": 2
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Inputs"
+            }
+          ]
         },
-        "content": [
-          {
-            "type": "text",
-            "text": "Inputs"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "text",
-            "text": "We are provided with a numeric vector as input:"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDjumper962434"
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "We are provided with a numeric vector as input:"
             }
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "text",
-            "text": "Optional style inputs:"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDpeanut687258"
-            }
-          }
-        ]
-      },
-      {
-        "type": "heading",
-        "attrs": {
-          "level": 2
+          ]
         },
-        "content": [
-          {
-            "type": "text",
-            "text": "Shaft"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDquit877166"
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDjumper962434"
+              }
             }
-          }
-        ]
-      },
-      {
-        "type": "heading",
-        "attrs": {
-          "level": 2
+          ]
         },
-        "content": [
-          {
-            "type": "text",
-            "text": "Head"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDquilt885943"
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Optional style inputs:"
             }
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDvoice275567"
-            }
-          }
-        ]
-      },
-      {
-        "type": "heading",
-        "attrs": {
-          "level": 2
+          ]
         },
-        "content": [
-          {
-            "type": "text",
-            "text": "Put it all together"
-          }
-        ]
-      },
-      {
-        "type": "paragraph",
-        "content": [
-          {
-            "type": "tool",
-            "attrs": {
-              "id": "IDrunner593273"
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDpeanut687258"
+              }
             }
-          }
-        ]
-      }
-    ]
-  },
-  "cells": {
-    "IDjumper962434": {
-      "var_": {
-        "id": "IDjumper962434",
-        "label": "vector"
-      },
-      "program": {
-        "toolName": "slot",
-        "modeName": "code",
-        "code": "{\n  x: IDgerbil950643,\n  y: IDlaborer771513,\n}",
-        "subTools": {
-          "IDgerbil950643": {
-            "toolName": "slot",
-            "modeName": "tool",
-            "subProgram": {
-              "toolName": "slider",
-              "value": 4,
-              "min": -10,
-              "max": 10,
-              "step": 1
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Shaft"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDquit877166"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Head"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDquilt885943"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDvoice275567"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Put it all together"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "tool",
+              "attrs": {
+                "id": "IDrunner593273"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "cells": {
+      "IDjumper962434": {
+        "var_": {
+          "id": "IDjumper962434",
+          "label": "vector"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "{\n  x: IDgerbil950643,\n  y: IDlaborer771513,\n}",
+          "subTools": {
+            "IDgerbil950643": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "slider",
+                "value": 4,
+                "min": -10,
+                "max": 10,
+                "step": 1
+              }
+            },
+            "IDlaborer771513": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "slider",
+                "value": 7,
+                "min": -10,
+                "max": 10,
+                "step": 1
+              }
             }
           },
-          "IDlaborer771513": {
-            "toolName": "slot",
-            "modeName": "tool",
-            "subProgram": {
-              "toolName": "slider",
-              "value": 7,
-              "min": -10,
-              "max": 10,
-              "step": 1
-            }
-          }
+          "defaultCode": ""
+        }
+      },
+      "IDquit877166": {
+        "var_": {
+          "id": "IDquit877166",
+          "label": "shaft"
         },
-        "defaultCode": ""
-      }
-    },
-    "IDquit877166": {
-      "var_": {
-        "id": "IDquit877166",
-        "label": "shaft"
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.path({\n  points: [\n    {x: 0, y: 0},\n    IDjumper962434\n  ],\n})",
+          "subTools": {},
+          "defaultCode": ""
+        }
       },
-      "program": {
-        "toolName": "slot",
-        "modeName": "code",
-        "code": "Diagram.path({\n  points: [\n    {x: 0, y: 0},\n    IDjumper962434\n  ],\n})",
-        "subTools": {},
-        "defaultCode": ""
-      }
-    },
-    "IDquilt885943": {
-      "var_": {
-        "id": "IDquilt885943",
-        "label": "horizontal head"
-      },
-      "program": {
-        "toolName": "slot",
-        "modeName": "code",
-        "code": "Diagram.path({\n  points: [\n    {x: 0, y: -1},\n    {x: 0, y: 1},\n    {x: 3, y: 0}\n  ],\n  fillColor: IDpeanut687258,\n  strokeColor: null\n})",
-        "subTools": {},
-        "defaultCode": ""
-      }
-    },
-    "IDpeanut687258": {
-      "var_": {
-        "id": "IDpeanut687258",
-        "label": "head color"
-      },
-      "program": {
-        "toolName": "slot",
-        "modeName": "tool",
-        "subProgram": {
-          "toolName": "color",
-          "r": 250,
-          "g": 114,
-          "b": 100
+      "IDquilt885943": {
+        "var_": {
+          "id": "IDquilt885943",
+          "label": "horizontal head"
         },
-        "defaultCode": ""
-      }
-    },
-    "IDvoice275567": {
-      "var_": {
-        "id": "IDvoice275567",
-        "label": "positioned head"
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.path({\n  points: [\n    {x: 0, y: -1},\n    {x: 0, y: 1},\n    {x: 3, y: 0}\n  ],\n  fillColor: IDpeanut687258,\n  strokeColor: null\n})",
+          "subTools": {},
+          "defaultCode": ""
+        }
       },
-      "program": {
-        "toolName": "slot",
-        "modeName": "code",
-        "code": "Diagram.translate(\n  Diagram.rotate(\n    IDquilt885943,\n    Math.atan2(IDjumper962434.y, IDjumper962434.x) * 180 / Math.PI\n  ),\n  IDjumper962434\n)",
-        "subTools": {},
-        "defaultCode": ""
-      }
-    },
-    "IDrunner593273": {
-      "var_": {
-        "id": "IDrunner593273",
-        "label": "full arrow"
+      "IDpeanut687258": {
+        "var_": {
+          "id": "IDpeanut687258",
+          "label": "head color"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "color",
+            "r": 250,
+            "g": 114,
+            "b": 100
+          },
+          "defaultCode": ""
+        }
       },
-      "program": {
-        "toolName": "slot",
-        "modeName": "code",
-        "code": "Diagram.group({\n  children: [IDquit877166, IDvoice275567]\n})",
-        "subTools": {},
-        "defaultCode": ""
+      "IDvoice275567": {
+        "var_": {
+          "id": "IDvoice275567",
+          "label": "positioned head"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.translate(\n  Diagram.rotate(\n    IDquilt885943,\n    Math.atan2(IDjumper962434.y, IDjumper962434.x) * 180 / Math.PI\n  ),\n  IDjumper962434\n)",
+          "subTools": {},
+          "defaultCode": ""
+        }
+      },
+      "IDrunner593273": {
+        "var_": {
+          "id": "IDrunner593273",
+          "label": "full arrow"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Diagram.group({\n  children: [IDquit877166, IDvoice275567]\n})",
+          "subTools": {},
+          "defaultCode": ""
+        }
       }
     }
   }
