@@ -13,11 +13,13 @@ import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, V
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { AddObjToContext } from "src/util/context";
 import PortalSet, { usePortalSet } from "src/util/PortalSet";
-import { at, Updater, useAt } from "src/util/state";
+import { Updater, useAt } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
+import { useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import { useRefForCallback } from "src/util/useRefForCallback";
+import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "../slot";
@@ -40,6 +42,8 @@ export type Program = {
 interface Cell {
   var_: Var,
   program: ToolProgram,
+  justTool?: boolean,
+  justOutput?: boolean,
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({
@@ -206,7 +210,7 @@ export const View = memo((props: ViewProps) => {
         new Plugin({
           props: {
             nodeViews: {
-              tool(node) { return new ToolNodeView(node, toolPortalSet); }
+              tool(node) { return new PortalNodeView(node, toolPortalSet); }
             }
           }
         }),
@@ -237,29 +241,20 @@ export const View = memo((props: ViewProps) => {
       {mathCSS}
     </style>
     <div ref={setDiv}/>
-    {toolPortals.map(([elem, {id}]) => {
-      // TODO: not memoized; is that a problem?
-      const updateCell = at(updateCells, id);
-      const updateVar = at(updateCell, 'var_');
-      return ReactDOM.createPortal(
-        views[id] ?
-          // <div style={{display: 'inline-block', position: 'relative'}}>
-          //   <ShowView view={views[id]} autoFocus={true} />
-          //   <div style={{display: 'inline-block', position: 'absolute', right: 3, top: 3}}>
-          //     <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
-          //   </div>
-          // </div> :
-          <div className="xRow xAlignTop" style={{display: 'inline-flex', gap: 5}}>
-            <VarDefinition var_={cells[id].var_} updateVar={updateVar} />
-            <div className="xCol" style={{gap: 5}}>
-              <ShowView view={views[id]} autoFocus={true} />
-              <ToolOutputView toolOutput={outputs[id]}/>
-            </div>
-          </div> :
-          <span style={{backgroundColor: 'red'}}>tool not found</span>,
-        elem
+    {toolPortals.map(([elem, {id}]) =>
+      ReactDOM.createPortal(
+        // TODO: cells[id] below is a hack
+        cells[id] && <CellView
+          id={id}
+          cells={cells}
+          updateCells={updateCells}
+          outputs={outputs}
+          views={views}
+        />,
+        elem,
+        id
       )
-    })}
+    )}
   </>;
 });
 
@@ -280,17 +275,13 @@ function onDocChangePlugin(onDocChange: (doc: Node) => void) {
   });
 }
 
-class ToolNodeView implements NodeView {
+class PortalNodeView implements NodeView {
   dom = document.createElement("span");
 
   constructor(node: Node, private portalSet: PortalSet<{id: string}>) {
     this.dom.id = node.attrs.id;
 
     this.portalSet.register(this.dom, {id: node.attrs.id});
-    // // TODO: switch to portals when it is time
-    // const root = createRoot(this.dom);
-    // // root.render(<span>HI</span>);
-    // root.render(<SillyTool initialProgram={slotSetTo(lookUpTool('slider').programFactory())} />);
   }
 
   destroy() {
@@ -299,3 +290,45 @@ class ToolNodeView implements NodeView {
 
   stopEvent() { return true }
 }
+
+
+type CellViewProps = {
+  id: string,
+
+  cells: {[id: string]: Cell},
+  updateCells: Updater<{[id: string]: Cell}>,
+
+  views: {[id: string]: ToolView | null},
+  outputs: {[id: string]: ToolOutput | null},
+}
+
+
+const CellView = memo((props: CellViewProps) => {
+  const { id, cells, updateCells, views, outputs} = props;
+
+  const [cell, updateCell] = useAt(cells, updateCells, id);
+  const [var_, updateVar] = useAt(cell, updateCell, 'var_');
+  const [justTool, , setJustTool] = useAt(cell, updateCell, 'justTool');
+  const [justOutput, , setJustOutput] = useAt(cell, updateCell, 'justOutput');
+
+  const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
+    <MyContextMenu>
+      <MyContextMenuHeading>Prose Cell</MyContextMenuHeading>
+      <div>
+        <button onClick={() => setJustTool(true)}>Just tool</button>
+        <button onClick={() => setJustOutput(true)}>Just output</button>
+      </div>
+    </MyContextMenu>
+  , []));
+
+  return views[id] ?
+    <div className="xRow xAlignTop" style={{display: 'inline-flex', gap: 5}} onContextMenu={openMenu}>
+      {menuNode}
+      {!justTool && !justOutput && <VarDefinition var_={var_} updateVar={updateVar} />}
+      <div className="xCol" style={{gap: 5}}>
+        {!justOutput && <ShowView view={views[id]} autoFocus={true} noFrame={justTool} />}
+        {!justTool && <ToolOutputView toolOutput={outputs[id]}/>}
+      </div>
+    </div> :
+    <span style={{backgroundColor: 'red'}}>tool not found</span>
+});

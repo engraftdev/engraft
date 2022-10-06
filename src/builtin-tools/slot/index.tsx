@@ -309,16 +309,18 @@ const ToolMode = memo(function ToolMode({ program, reportOutput, reportView, upd
   }, [program.defaultCode, updateProgram]);
 
   useView(reportView, useMemo(() => ({
-    render: ({autoFocus, expand}) =>
-      <ToolFrame
-        expand={expand}
-        program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
-        onClose={onCloseFrame}
-      >
-        {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
-          <ShowView view={toolView} autoFocus={autoFocus} />
-        {/* </div> */}
-      </ToolFrame>
+    render: ({autoFocus, expand, noFrame}) =>
+      noFrame
+      ? <ShowView view={toolView} autoFocus={autoFocus} />
+      : <ToolFrame
+          expand={expand}
+          program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
+          onClose={onCloseFrame}
+        >
+          {/* <div style={{ minWidth: 100, padding: '10px', position: "relative"}}> */}
+            <ShowView view={toolView} autoFocus={autoFocus} />
+          {/* </div> */}
+        </ToolFrame>
   }), [subProgram, updateSubProgram, varBindings, onCloseFrame, toolView]));
 
   return component;

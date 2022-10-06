@@ -263,7 +263,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
-      <MyContextMenuHeading>Cell</MyContextMenuHeading>
+      <MyContextMenuHeading>Notebook Cell</MyContextMenuHeading>
       <button
         onClick={() => {
           removeCell();

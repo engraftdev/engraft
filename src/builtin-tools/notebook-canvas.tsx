@@ -270,7 +270,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
-      <MyContextMenuHeading>Cell</MyContextMenuHeading>
+      <MyContextMenuHeading>Canvas Cell</MyContextMenuHeading>
       <div>
         <button
           onClick={() => {

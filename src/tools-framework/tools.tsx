@@ -44,6 +44,7 @@ export interface ToolProgram {
 export interface ToolViewRenderProps {
   autoFocus?: boolean,
   expand?: boolean,
+  noFrame?: boolean,  // TODO: this is just for slots, huh?
 }
 
 export type ToolView = {
