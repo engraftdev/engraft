@@ -10,10 +10,12 @@ type ApparatusIframeProps = HTMLProps<HTMLIFrameElement> & {
 
   input?: unknown,
   regionOfInterest?: { x: [number, number], y: [number, number] },
+
+  setOutput?: (output: unknown) => void,
 }
 
 export const ApparatusIframe = memo((props: ApparatusIframeProps) => {
-  const { initialProject, project, setProject, input, regionOfInterest, title, ...iframeProps } = props;
+  const { initialProject, project, setProject, input, regionOfInterest, setOutput, title, ...iframeProps } = props;
 
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null);
   const [port, setPort] = useState<MessagePort | null>(null);
@@ -60,16 +62,18 @@ export const ApparatusIframe = memo((props: ApparatusIframeProps) => {
     port.postMessage(['regionOfInterest', regionOfInterest]);
   }, [port, regionOfInterest]);
 
-  // Receive saved projects from channel
+  // Receive saved projects & output from channel
   useEffect(() => {
     if (!port) { return; }
     port.onmessage = (event) => {
       // console.log('got message', event.data);
       if (event.data[0] === 'save') {
         setProject(event.data[1]);
+      } else if (event.data[0] === 'output') {
+        setOutput?.(event.data[1]);
       }
     }
-  }, [port, setProject]);
+  }, [port, setOutput, setProject]);
 
   return  <iframe
     ref={setIframe}

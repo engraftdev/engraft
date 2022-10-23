@@ -13,12 +13,11 @@ export function DOM({element, ...rest}: Props) {
         container.removeChild(container.lastChild);
       }
       if (element) {
-        // TODO: if you don't clone, you can't display it multiple times
-        // but if you DO clone, you can't have canvases
-        // boo
-
-        // container.appendChild(children.cloneNode(true));
-        container.appendChild(element);
+        if (element.isConnected) {
+          container.appendChild(element.cloneNode(true));
+        } else {
+          container.appendChild(element);
+        }
       }
     }
   }, [container, element])

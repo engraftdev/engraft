@@ -39,8 +39,10 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
 
-  useOutput(reportOutput, useMemo(() => ({
-    value: <ApparatusIframe
+  const [apparatusOutput, setApparatusOutput] = useState<unknown>({});
+
+  const outputView = useMemo(() =>
+    <ApparatusIframe
       project={program.apparatusProject}
       setProject={noOp}
       input={valueOrUndefined(inputOutput)}
@@ -50,8 +52,17 @@ export const Component = memo((props: ToolProps<Program>) => {
       width={program.viewerSize[0]} height={program.viewerSize[1]}
       title="Apparatus viewer"
       style={{ border: 'none' }}
-    />,
-  }), [program.apparatusProject, program.regionOfInterest, program.viewerSize, inputOutput]));
+
+      setOutput={setApparatusOutput}
+    />
+  , [program.apparatusProject, program.regionOfInterest, program.viewerSize, inputOutput]);
+
+  useOutput(reportOutput, useMemo(() => ({
+    value: {
+      view: outputView,
+      output: apparatusOutput,
+    }
+  }), [outputView, apparatusOutput]));
 
   useView(reportView, useMemo(() => ({
     render: (renderProps) => <View
@@ -173,8 +184,20 @@ const SizeEditor = memo((props: SizeEditorProps) => {
         style={{position: 'absolute', border: '1px dashed gray', top: 0, left: 0, width, height, backgroundColor: 'white', zIndex: 100, cursor: 'pointer'}}
         onClick={() => { if (!isDragging) { setIsExpanded(false) }}}
       >
-        {width} x {height}
-        <div className="xCenter" style={{position: 'absolute', top: 0, left: 0, width: width + 100, height: height + 100, zIndex: 99}}>
+        <input
+          type='number'
+          value={width} onChange={(e) => setSize([parseInt(e.target.value), height])}
+          onClick={(e) => {console.log('stopping'); e.stopPropagation()}}
+          style={{width: 50, zIndex: 101}}
+        />
+        {' x '}
+        <input
+          type='number'
+          value={height} onChange={(e) => setSize([width, parseInt(e.target.value)])}
+          onClick={(e) => e.stopPropagation()}
+          style={{width: 50, zIndex: 101}}
+        />
+        <div style={{position: 'absolute', top: 0, left: 0, width: width + 100, height: height + 100, zIndex: 99}}>
         </div>
         <div
           style={{position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, cursor: 'nwse-resize', zIndex: 101}}

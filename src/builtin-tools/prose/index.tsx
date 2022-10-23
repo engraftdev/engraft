@@ -315,11 +315,15 @@ const CellView = memo((props: CellViewProps) => {
     <MyContextMenu>
       <MyContextMenuHeading>Prose Cell</MyContextMenuHeading>
       <div>
-        <button onClick={() => setJustTool(true)}>Just tool</button>
-        <button onClick={() => setJustOutput(true)}>Just output</button>
+        {!justTool && !justOutput ? <>
+          <button onClick={() => setJustTool(true)}>Just tool</button>
+          <button onClick={() => setJustOutput(true)}>Just output</button>
+        </> : <>
+          <button onClick={() => {setJustTool(false); setJustOutput(false);}}>Normal</button>
+        </>}
       </div>
     </MyContextMenu>
-  , []));
+  , [justOutput, justTool, setJustOutput, setJustTool]));
 
   return views[id] ?
     <div className="xRow xAlignTop" style={{display: 'inline-flex', gap: 5}} onContextMenu={openMenu}>
@@ -327,7 +331,7 @@ const CellView = memo((props: CellViewProps) => {
       {!justTool && !justOutput && <VarDefinition var_={var_} updateVar={updateVar} />}
       <div className="xCol" style={{gap: 5}}>
         {!justOutput && <ShowView view={views[id]} autoFocus={true} noFrame={justTool} />}
-        {!justTool && <ToolOutputView toolOutput={outputs[id]}/>}
+        {!justTool && <ToolOutputView toolOutput={outputs[id]} displayReactElementsDirectly={justOutput}/>}
       </div>
     </div> :
     <span style={{backgroundColor: 'red'}}>tool not found</span>
