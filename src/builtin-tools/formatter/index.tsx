@@ -12,6 +12,7 @@ import { slotSetTo } from "../slot";
 import { ControlValues, FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
 
 import builtinStyles from './builtin.css';
+import { empty } from 'src/util/noOp';
 
 export type Program = {
   toolName: 'formatter';
@@ -35,9 +36,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 };
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram', varBindings})
 
   const [controlValues, updateControlValues] = useStateUpdateOnly<ControlValues>({});
 
@@ -356,7 +357,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
       </select>
     </div>
     <b>style</b>
-    <ToolWithView program={styleProgram} updateProgram={updateStyleProgram} reportOutput={setStyleOutput}/>
+    <ToolWithView program={styleProgram} updateProgram={updateStyleProgram} varBindings={empty} reportOutput={setStyleOutput}/>
     <b>classes</b>
     <input value={element.className} onChange={onChangeClasses}/>
   </>;

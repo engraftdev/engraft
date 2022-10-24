@@ -1,14 +1,14 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
-import { examples } from './examples/examples';
-import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, VarBinding } from './tools-framework/tools';
-import { ToolWithView } from './tools-framework/ToolWithView';
 import { slotSetTo } from './builtin-tools/slot';
+import { builtinTools } from "./builtinTools";
+import { examples } from './examples/examples';
+import { registerTool, ToolOutput, ToolProgram, VarBinding } from './tools-framework/tools';
+import { ToolWithView } from './tools-framework/ToolWithView';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import { ToolOutputView } from './view/Value';
-import { builtinTools } from "./builtinTools";
-import { ErrorBoundary } from 'react-error-boundary';
 
 
 
@@ -36,7 +36,7 @@ const App = memo(function App() {
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);
   const [programIsFromLocalStorage, setIsProgramFromLocalStorage] = useState(false);
 
-  const context = useMemo(() => varBindingsObject([
+  const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
     {var_: {id: 'IDarray000000', label: 'array'}, output: {value: [1, 2, 3]}},
     {var_: {id: 'IDrange000000', label: 'range'}, output: {value: range}},
@@ -80,9 +80,7 @@ const App = memo(function App() {
         }}
         resetKeys={[program]}
       >
-        <VarBindingsContext.Provider value={context}>
-          <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-        </VarBindingsContext.Provider>
+        <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
       </ErrorBoundary>
     </div>
     <br/>

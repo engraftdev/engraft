@@ -1,19 +1,19 @@
 import _ from "lodash";
-import React, { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { slotSetTo } from "./builtin-tools/slot";
+import { builtinTools } from "./builtinTools";
 import libCss from "./lib.css";
-import { VarBindingsContext, registerTool, ToolProgram, ToolOutput, ToolView, VarBinding, hasValue } from "./tools-framework/tools";
+import { hasValue, registerTool, ToolOutput, ToolProgram, ToolView, VarBinding } from "./tools-framework/tools";
 import { ToolWithView } from "./tools-framework/ToolWithView";
 import { ShowView, useTool } from "./tools-framework/useSubTool";
-import { slotSetTo } from "./builtin-tools/slot";
 import { DOM } from "./util/DOM";
 import { ObservableInspector } from "./util/ObservableInspector";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "./util/state";
 import { useDedupe } from "./util/useDedupe";
 import { RootStyles } from "./view/IsolateStyles";
-import { ToolOutputBuffer, Value, ToolOutputView } from "./view/Value";
+import { ToolOutputBuffer, ToolOutputView, Value } from "./view/Value";
 import { VarDefinition } from "./view/Vars";
-import { builtinTools } from "./builtinTools";
 
 
 
@@ -63,9 +63,7 @@ export const EmbedComponent = memo(function EmbedComponent({variables, initialPr
       <ToolOutputView toolOutput={output}/>
     </div>
     <div>
-      <VarBindingsContext.Provider value={varBindings}>
-        <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </VarBindingsContext.Provider>
+      <ToolWithView program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
     </div>
     <div className="bottom-stuff">
       <button className="button-add" onClick={async () => {
@@ -129,9 +127,7 @@ export const ObservableEmbed = memo(function ObservableEmbed({localStorageKey, v
         toolOutput={output}
         renderValue={(value) => <ObservableInspector value={value}/>}
       />
-      <VarBindingsContext.Provider value={varBindings}>
-        <ToolWithView program={program} updateProgram={updateProgram} reportOutput={setOutput} autoFocus={true}/>
-      </VarBindingsContext.Provider>
+      <ToolWithView program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
     </div>
   );
 });
@@ -200,7 +196,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
     }
   }, [program])
 
-  const [component, view, output] = useTool({program, updateProgram});
+  const [component, view, output] = useTool({program, updateProgram, varBindings});
 
   const [useDefault, setUseDefault] = useState(!hide);
   useEffect(() => {
@@ -211,9 +207,7 @@ export function useLiveTool(variables: object = {}, {defaultValue, hide}: UseLiv
 
   useEffect(() => {
     newRoot.render(<>
-      <VarBindingsContext.Provider value={varBindings}>
-        {component}
-      </VarBindingsContext.Provider>
+      {component}
       {!hide &&
         <Split
           left={
@@ -356,15 +350,15 @@ const Split = memo(function Split({left, right}: SplitProps) {
 
 export { default as React } from 'react';
 export { default as ReactDOM } from 'react-dom';
-
-
+export { slotSetTo } from 'src/builtin-tools/slot';
 ////////////////
 // Re-exports //
 ////////////////
-
-export { VarBindingsContext, hasValue, hasError } from 'src/tools-framework/tools';
-export type { ToolProgram, ToolOutput } from 'src/tools-framework/tools';
-export { useTool } from 'src/tools-framework/useSubTool';
+export { hasError, hasValue } from 'src/tools-framework/tools';
+export type { ToolOutput, ToolProgram } from 'src/tools-framework/tools';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
-export { slotSetTo } from 'src/builtin-tools/slot';
+export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolOutputView } from "./view/Value";
+
+
+

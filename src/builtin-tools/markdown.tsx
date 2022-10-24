@@ -18,9 +18,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [sourceComponent, sourceView, sourceOutput] = useSubTool({program, updateProgram, subKey: 'sourceProgram'})
+  const [sourceComponent, sourceView, sourceOutput] = useSubTool({program, updateProgram, subKey: 'sourceProgram', varBindings})
 
   const md = useMemo(() => new MarkdownIt({html: true, linkify: true}), [])
 

@@ -41,10 +41,10 @@ const paramsDefault = `{
 }`;
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [urlComponent, urlView, urlOutput] = useSubTool({program, updateProgram, subKey: 'urlProgram'});
-  const [paramsComponent, paramsView, paramsOutput] = useSubTool({program, updateProgram, subKey: 'paramsProgram'});
+  const [urlComponent, urlView, urlOutput] = useSubTool({program, updateProgram, subKey: 'urlProgram', varBindings});
+  const [paramsComponent, paramsView, paramsOutput] = useSubTool({program, updateProgram, subKey: 'paramsProgram', varBindings});
 
   const [response, setResponse] = useStateSetOnly<Response | null>(null);
 

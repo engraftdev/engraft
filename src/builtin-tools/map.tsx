@@ -1,5 +1,5 @@
 import { CSSProperties, memo, useEffect, useMemo } from "react";
-import { hasValue, newVar, ProgramFactory, ProvideVarBinding, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
+import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { PerTool, ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
 import { useAt, useStateSetOnly } from "src/util/state";
@@ -26,9 +26,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 };
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram'})
+  const [inputComponent, inputView, inputOutput] = useSubTool({program, updateProgram, subKey: 'inputProgram', varBindings})
 
   const inputArray = useMemo(() => {
     if (!hasValue(inputOutput)) { return null; }
@@ -48,6 +48,14 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [perItemToolSet, perItemOutputs, perItemViews] = useToolSet();
 
+  const perItemVarBindings = useMemo(() =>
+    inputArray?.map((inputArrayElem, i) => ({
+      ...varBindings,
+      [program.itemVar.id]: {var_: program.itemVar, output: inputArrayElem},
+    }))
+  , [inputArray, program.itemVar, varBindings])
+
+
   useOutput(reportOutput, useMemo(() => ({
     value: range(inputLength).map((i) => valueOrUndefined(perItemOutputs[i]))
   }), [inputLength, perItemOutputs]));
@@ -64,10 +72,8 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   return <>
     {inputComponent}
-    {inputArray?.map((inputArrayElem, i) =>
-      <ProvideVarBinding key={i} var_={program.itemVar} output={inputArrayElem}>
-        <ToolInSet toolSet={perItemToolSet} keyInSet={`${i}`} program={perItemProgram} updateProgram={updatePerItemProgram} />
-      </ProvideVarBinding>
+    {perItemVarBindings && perItemVarBindings.map((newVarBindings, i) =>
+      <ToolInSet toolSet={perItemToolSet} keyInSet={`${i}`} program={perItemProgram} updateProgram={updatePerItemProgram} varBindings={newVarBindings}/>
     )}
   </>
 });

@@ -21,9 +21,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportView } = props;
+  const { program, updateProgram, varBindings, reportView } = props;
 
-  const [enabledComponent, enabledView, enabledOutput] = useSubTool({program, updateProgram, subKey: 'enabledProgram'});
+  const [enabledComponent, enabledView, enabledOutput] = useSubTool({program, updateProgram, subKey: 'enabledProgram', varBindings});
   const isEnabled = hasValue(enabledOutput) && !!enabledOutput.value;
 
   const [actualView, setActualView] = useStateSetOnly<ToolView | null>(null);
@@ -53,9 +53,9 @@ export const Component = memo((props: ToolProps<Program>) => {
 });
 
 export const ComponentWhenEnabled = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [actualComponent, actualView, actualOutput] = useSubTool({program, updateProgram, subKey: 'actualProgram'});
+  const [actualComponent, actualView, actualOutput] = useSubTool({program, updateProgram, subKey: 'actualProgram', varBindings});
 
   useOutput(reportOutput, actualOutput);
   useView(reportView, actualView);

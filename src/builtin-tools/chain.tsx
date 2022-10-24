@@ -1,12 +1,11 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { VarBindingsContext, newVar, ProgramFactory, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, Var, VarBinding } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
-import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
 import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
-import { ValueFrame, ToolOutputView } from "src/view/Value";
+import { ToolOutputView, ValueFrame } from "src/view/Value";
 import { slotSetTo, summarizeSlotProgram } from "./slot";
 
 export interface Program {
@@ -42,7 +41,7 @@ const BLOCK_WIDTH = 50;
 const BLOCK_HEIGHT = 50;
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
   const [links, updateLinks] = useAt(program, updateProgram, 'links');
 
@@ -72,6 +71,7 @@ export const Component = memo((props: ToolProps<Program>) => {
         id={link.id}
         links={links}
         updateLinks={updateLinks}
+        varBindings={varBindings}
         outputs={outputs}
         updateOutputs={updateOutputs}
         updateViews={updateViews}
@@ -87,6 +87,8 @@ interface CellModelProps {
   links: Link[];
   updateLinks: Updater<Link[]>;
 
+  varBindings: VarBindings;
+
   outputs: {[id: string]: ToolOutput | null};
   updateOutputs: Updater<{[id: string]: ToolOutput | null}>;
 
@@ -95,7 +97,7 @@ interface CellModelProps {
   prevVar: Var;
 }
 
-const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, updateOutputs, updateViews, prevVar}: CellModelProps) {
+const LinkModel = memo(function LinkModel({id, links, updateLinks, varBindings, outputs, updateOutputs, updateViews, prevVar}: CellModelProps) {
   const i = useMemo(() => {
     const i = links.findIndex((link) => link.id === id);
     if (i === -1) {
@@ -106,7 +108,26 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
 
   const [link, updateLink] = useAtIndex(links, updateLinks, i);
   const [program, updateProgram] = useAt(link, updateLink, 'program');
-  const [component, view, output] = useTool({program, updateProgram})
+
+  const prevOutput: ToolOutput | null | undefined = useMemo(() => {
+    const prevLink: Link | undefined = links[i - 1];
+    if (prevLink) {
+      return outputs[prevLink.id];
+    }
+  }, [i, links, outputs])
+  const newVarBindings = useMemo(() => {
+    if (prevOutput) {
+      const prevVarBinding: VarBinding = {
+        var_: prevVar,
+        output: prevOutput,
+      };
+      return {...varBindings, [prevVar.id]: prevVarBinding};
+    } else {
+      return varBindings;
+    }
+  }, [prevOutput, prevVar, varBindings])
+
+  const [component, view, output] = useTool({program, updateProgram, varBindings: newVarBindings})
 
   useEffect(() => {
     updateViews(updateF({[id]: {$set: view}}));
@@ -118,31 +139,7 @@ const LinkModel = memo(function LinkModel({id, links, updateLinks, outputs, upda
     return () => updateOutputs(updateF({$unset: [id]}));
   }, [id, output, updateOutputs])
 
-  const prevOutput: ToolOutput | null | undefined = useMemo(() => {
-    const prevLink: Link | undefined = links[i - 1];
-    if (prevLink) {
-      return outputs[prevLink.id];
-    }
-  }, [i, links, outputs])
-  const prevVarContext = useMemo(() => {
-    if (prevOutput) {
-      const prevVarBinding: VarBinding = {
-        var_: prevVar,
-        output: prevOutput,
-      };
-      return {[prevVar.id]: prevVarBinding};
-    } else {
-      return undefined;
-    }
-  }, [prevOutput, prevVar])
-
-  if (prevVarContext) {
-    return <AddObjToContext context={VarBindingsContext} obj={prevVarContext}>
-      {component}
-    </AddObjToContext>;
-  } else {
-    return component;
-  }
+  return component;
 });
 
 interface ChainViewProps extends ToolProps<Program>, ToolViewRenderProps {

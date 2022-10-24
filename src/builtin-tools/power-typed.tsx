@@ -16,10 +16,10 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
   const [baseComponent, baseView, baseOutput] =
-    useSubTool({program, updateProgram, subKey: 'baseProgram'});
+    useSubTool({program, updateProgram, subKey: 'baseProgram', varBindings});
 
   useOutput(reportOutput, useMemo(() => {
     if (hasValue(baseOutput)) {

@@ -97,12 +97,13 @@ export interface SubToolProps {
   id: string,
   subToolPrograms: {[id: string]: ToolProgram},
   updateSubToolPrograms: Updater<{[id: string]: ToolProgram}>,
+  varBindings: VarBindings,
   updateOutputs: Updater<{[id: string]: ToolOutput | null}>,
   updateViews: Updater<{[id: string]: ToolView | null}>,
 }
 
 // TODO: how is this not a standard function? hmmmmmmm
-export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubToolPrograms, updateOutputs, updateViews}: SubToolProps) {
+export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubToolPrograms, varBindings, updateOutputs, updateViews}: SubToolProps) {
   const [program, updateProgram] = useAt(subToolPrograms, updateSubToolPrograms, id);
 
   const reportOutput = useCallback((output: ToolOutput | null) => updateKeys(updateOutputs, {[id]: output}), [id, updateOutputs]);
@@ -112,6 +113,7 @@ export const SubTool = memo(function SubTool({id, subToolPrograms, updateSubTool
   return <Tool.Component
     program={program}
     updateProgram={updateProgram}
+    varBindings={varBindings}
     reportOutput={reportOutput}
     reportView={reportView}
   />;

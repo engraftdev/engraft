@@ -1,9 +1,9 @@
 import { autocompletion } from "@codemirror/autocomplete";
 import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
-import { memo, useCallback, useContext, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { VarBindingsContext, ProgramFactory, Tool, ToolProgram, ToolProps, ToolOutput, ToolView, ToolViewRenderProps, VarBinding, VarBindings, hasValue } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -32,11 +32,9 @@ export const programFactory: ProgramFactory<Program> = () => {
 };
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
-
-  const varBindings = useContext(VarBindingsContext)
 
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
@@ -78,7 +76,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
-      <SubTool key={id} id={id} subToolPrograms={subToolPrograms}
+      <SubTool key={id} id={id} subToolPrograms={subToolPrograms} varBindings={varBindings}
               updateSubToolPrograms={updateSubToolPrograms} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;

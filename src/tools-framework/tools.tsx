@@ -1,8 +1,6 @@
-import { createContext, memo, ReactElement, ReactNode } from "react";
-import { AddToContext } from "src/util/context";
+import { ReactElement } from "react";
 import { newId } from "src/util/id";
 import { Setter, Updater } from "src/util/state";
-import { useMemoObject } from "src/util/useMemoObject";
 
 export type Tool<P extends ToolProgram = any> = {
   Component: ToolComponent<P>;
@@ -54,6 +52,7 @@ export type ToolView = {
 export interface ToolProps<P extends ToolProgram> {
   program: P;
   updateProgram: Updater<P>;
+  varBindings: VarBindings;
   reportOutput: Setter<ToolOutput | null>;
   reportView: Setter<ToolView | null>;
 }
@@ -102,12 +101,6 @@ export interface VarBinding {
 
 export type VarBindings = {[varId: string]: VarBinding};
 
-export const VarBindingsContext = createContext<VarBindings>({});
-VarBindingsContext.displayName = 'VarBindingsContext';
-
-
-
-
 export interface Var {
   id: string;
   label: string;
@@ -117,18 +110,3 @@ export interface Var {
 export function newVar(label = 'new var') {
   return {id: newId(), label};
 }
-
-
-export interface ProvideVarBindingProps {
-  var_: Var;
-  output: ToolOutput | undefined;
-  children?: ReactNode | undefined,
-}
-
-export const ProvideVarBinding = memo(function ProvideVar({var_, output, children}: ProvideVarBindingProps) {
-  const varBinding = useMemoObject({var_, output});
-
-  return <AddToContext context={VarBindingsContext} k={var_.id} v={varBinding}>
-    {children}
-  </AddToContext>
-});

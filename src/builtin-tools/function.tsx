@@ -1,8 +1,7 @@
 import _ from "lodash";
-import { memo, useCallback, useContext, useEffect, useMemo } from "react";
-import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
+import { memo, useCallback, useEffect, useMemo } from "react";
+import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings } from "src/tools-framework/tools";
 import { PerTool, ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
-import { AddObjToContext } from "src/util/context";
 import { newId } from "src/util/id";
 import { noOp } from "src/util/noOp";
 import { atAllIndices, atIndexZip, removers, Updater, useAt } from "src/util/state";
@@ -40,20 +39,18 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 };
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
   const { settings } = program;
   const [bodyToolSet, bodyOutputs, bodyViews] = useToolSet();
-
-  const closureVarBindings = useContext(VarBindingsContext);
 
   useOutput(reportOutput, useMemo(() => {
     const functionThing: FunctionThing = {
       program,
       updateProgram,
-      closureVarBindings,
+      closureVarBindings: varBindings,
     };
     return {value: functionThing};
-  }, [closureVarBindings, program, updateProgram]));
+  }, [program, updateProgram, varBindings]));
 
   useView(reportView, useMemo(() => ({
     render: (renderProps) =>
@@ -80,18 +77,19 @@ type SettingModelProps = ToolProps<Program> & {
 }
 
 export const SettingModel = memo((props: SettingModelProps) => {
-  const { program, updateProgram, setting, bodyToolSet } = props;
+  const { program, updateProgram, varBindings, setting, bodyToolSet } = props;
   const [ bodyProgram, updateBodyProgram ] = useAt(program, updateProgram, 'bodyProgram');
 
   const newVarBindings: VarBindings = useMemo(() =>
-    Object.fromEntries(
-      _.zipWith(program.vars, setting.values, (var_, value) => [var_.id, {var_, output: {value}}])
-    )
-  , [setting, program.vars]);
+    ({
+      ...varBindings,
+      ...Object.fromEntries(
+        _.zipWith(program.vars, setting.values, (var_, value) => [var_.id, {var_, output: {value}}])
+      )
+    })
+  , [varBindings, program.vars, setting.values]);
 
-  return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
-    <ToolInSet toolSet={bodyToolSet} keyInSet={setting.id} program={bodyProgram} updateProgram={updateBodyProgram} />
-  </AddObjToContext>;
+  return <ToolInSet toolSet={bodyToolSet} keyInSet={setting.id} program={bodyProgram} updateProgram={updateBodyProgram} varBindings={newVarBindings}/>;
 });
 
 
@@ -330,12 +328,11 @@ export const FunctionThingComponent = memo((props: FunctionThingComponentProps) 
   const toolName = program.bodyProgram.toolName;
   const Tool = lookUpTool(toolName);
 
-  return <VarBindingsContext.Provider value={varBindings}>
-    <Tool.Component
-      program={program.bodyProgram}
-      updateProgram={updateProgram}
-      reportOutput={reportOutput}
-      reportView={reportView || noOp}
-    />
-  </VarBindingsContext.Provider>;
+  return <Tool.Component
+    program={program.bodyProgram}
+    updateProgram={updateProgram}
+    varBindings={varBindings}
+    reportOutput={reportOutput}
+    reportView={reportView || noOp}
+  />;
 });

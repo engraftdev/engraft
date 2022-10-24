@@ -4,11 +4,11 @@ import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from '@codemirror/view';
 import _ from 'lodash';
-import { memo, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
+import { memo, ReactNode, useCallback, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import seedrandom from 'seedrandom';
 import { cN } from 'src/deps';
-import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings, VarBindingsContext } from "src/tools-framework/tools";
+import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -112,7 +112,7 @@ type CodeModeProps = Replace<ToolProps<Program>, {
 }>
 
 const CodeMode = memo(function CodeMode(props: CodeModeProps) {
-  const { program, updateProgram, reportOutput, reportView} = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView} = props;
 
   const compiled = useMemo(() => {
     if (program.code === '') {
@@ -129,9 +129,6 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
       return {error: (e as any).toString()};
     }
   }, [program.code])
-
-  // We have to use useContext here, not in the view – the view isn't inside tool context!
-  const varBindings = useContext(VarBindingsContext)
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
@@ -179,13 +176,12 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
         {...props} {...viewProps}
         updateSubToolPrograms={updateSubToolPrograms}
         views={views}
-        varBindings={varBindings}
       />
-  }), [props, updateSubToolPrograms, views, varBindings]));
+  }), [props, updateSubToolPrograms, views]));
 
   return <>
     {Object.entries(subToolPrograms).map(([id, subToolProgram]) =>
-      <SubTool key={id} id={id} subToolPrograms={subToolPrograms}
+      <SubTool key={id} id={id} subToolPrograms={subToolPrograms} varBindings={varBindings}
                updateSubToolPrograms={updateSubToolPrograms} updateOutputs={updateOutputs} updateViews={updateViews} />
     )}
   </>;
@@ -288,13 +284,11 @@ type ToolModeProps = Replace<ToolProps<Program>, {
   updateProgram: Updater<Program, ProgramToolMode>,
 }>
 
-const ToolMode = memo(function ToolMode({ program, reportOutput, reportView, updateProgram}: ToolModeProps) {
+const ToolMode = memo(function ToolMode({ program, varBindings, reportOutput, reportView, updateProgram}: ToolModeProps) {
 
-  const [component, toolView, output] = useSubTool({ program, updateProgram, subKey: 'subProgram' })
+  const [component, toolView, output] = useSubTool({ program, updateProgram, subKey: 'subProgram', varBindings })
 
   useOutput(reportOutput, output);
-
-  const varBindings = useContext(VarBindingsContext);
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 

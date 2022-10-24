@@ -9,9 +9,8 @@ import { EditorView, NodeView } from "prosemirror-view";
 import prosemirrorViewCSS from "prosemirror-view/style/prosemirror.css";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
-import { AddObjToContext } from "src/util/context";
 import PortalSet, { usePortalSet } from "src/util/PortalSet";
 import { Updater, useAt } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
@@ -53,7 +52,7 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, reportOutput, reportView, updateProgram } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
   const [toolSet, outputs, views] = useToolSet();
@@ -74,6 +73,7 @@ export const Component = memo((props: ToolProps<Program>) => {
         id={varId}
         cells={cells}
         updateCells={updateCells}
+        varBindings={varBindings}
         outputs={outputs}
         toolSet={toolSet}
       />
@@ -88,19 +88,21 @@ interface CellModelProps {
   cells: { [varId: string]: Cell };
   updateCells: Updater<{ [varId: string]: Cell }>;
 
+  varBindings: VarBindings;
+
   outputs: {[id: string]: ToolOutput | null};
 
   toolSet: ToolSet;
 }
 
 const CellModel = memo(function CellModel(props: CellModelProps) {
-  const { id, cells, updateCells, outputs, toolSet } = props;
+  const { id, cells, updateCells, varBindings, outputs, toolSet } = props;
 
   const [cell, updateCell] = useAt(cells, updateCells, id);
   const [cellProgram, updateCellProgram] = useAt(cell, updateCell, 'program');
 
   const newVarBindings = useDedupe(useMemo(() => {
-    let result: {[label: string]: VarBinding} = {};
+    let result = {...varBindings};
     for (let otherCellId in cells) {
       if (otherCellId !== cell.var_.id) {
         result[otherCellId] = {
@@ -110,13 +112,11 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
       }
     };
     return result;
-  }, [cell.var_.id, cells, outputs]), objEqWith(objEqWith(refEq)))
+  }, [cell.var_.id, cells, outputs, varBindings]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
 
-  return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
-    <ToolInSet toolSet={toolSet} keyInSet={id} program={cellProgram} updateProgram={updateCellProgram} />
-  </AddObjToContext>;
+  return <ToolInSet toolSet={toolSet} keyInSet={id} program={cellProgram} updateProgram={updateCellProgram} varBindings={newVarBindings}/>;
 });
 
 

@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo } from "react";
 import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
-import { at, useAt, useAts } from "src/util/state";
+import { useAt, useAts } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { FunctionThingComponent, isProbablyFunctionThing } from "./function";
 import { slotSetTo } from "./slot";
@@ -19,9 +19,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [functionComponent, functionView, functionOutput] = useSubTool({program, updateProgram, subKey: 'functionProgram'});
+  const [functionComponent, functionView, functionOutput] = useSubTool({program, updateProgram, subKey: 'functionProgram', varBindings});
 
   const functionThing = useMemo(() => {
     if (!hasValue(functionOutput)) { return null; }
@@ -92,7 +92,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   return <>
     {functionComponent}
     {Object.entries(inputProgramAts).map(([varId, [inputProgram, updateInputProgram]]) =>
-      <ToolInSet key={varId} toolSet={inputToolSet} keyInSet={varId} program={inputProgram} updateProgram={updateInputProgram} />
+      <ToolInSet key={varId} toolSet={inputToolSet} keyInSet={varId} program={inputProgram} updateProgram={updateInputProgram} varBindings={varBindings} />
     )}
     {functionThing &&
       <FunctionThingComponent

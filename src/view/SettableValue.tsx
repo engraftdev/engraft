@@ -4,6 +4,7 @@ import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { slotSetTo } from "src/builtin-tools/slot";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
+import { empty } from "src/util/noOp";
 
 export type SettableValueProps = {
   value: any,
@@ -50,7 +51,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
       {expanded &&
         <>
           <div>←</div>
-          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutput={setEntryOutput}/>
+          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutput={setEntryOutput} varBindings={empty}/>
           <button disabled={entryOutput === null} onClick={onClickSet}>set</button>
         </>
       }

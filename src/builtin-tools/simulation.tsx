@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { memo, useEffect, useMemo } from "react";
-import { newVar, ProgramFactory, ProvideVarBinding, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
+import { newVar, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { ToolOutputView } from "src/view/Value";
@@ -33,17 +33,15 @@ export const Component = memo((props: ToolProps<Program>) => {
   // (window as any).count++;
   // console.log("render simulation", (window as any).count);
 
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [initComponent, initView, initOutput] = useSubTool({program, updateProgram, subKey: 'initProgram'})
+  const [initComponent, initView, initOutput] = useSubTool({program, updateProgram, subKey: 'initProgram', varBindings})
 
   const { iterationsCount } = program;
 
   const [upProgram, updateUpProgram] = useAt(program, updateProgram, 'upProgram');
 
   const [upToolSet, upOutputs, upViews] = useToolSet();
-
-  const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram'})
 
   useOutput(reportOutput, useMemo(() => {
     let outputs = [{...valueOrUndefined(initOutput) as object, i: 0}];
@@ -60,6 +58,12 @@ export const Component = memo((props: ToolProps<Program>) => {
       setHighlightedIndex(Math.max(iterationsCount, 0));
     }
   }, [highlightedIndex, iterationsCount, setHighlightedIndex])
+
+  const viewVarBindings = useMemo(() => ({
+    ...varBindings,
+    [program.stateVar.id]: {var_: program.stateVar, output: (upOutputs[highlightedIndex]) || undefined},
+  }), [highlightedIndex, program.stateVar, upOutputs, varBindings]);
+  const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram', varBindings: viewVarBindings})
 
   useView(reportView, useMemo(() => ({
     render: ({autoFocus}) =>
@@ -99,15 +103,19 @@ export const Component = memo((props: ToolProps<Program>) => {
       </div>
   }), [highlightedIndex, initView, iterationsCount, setHighlightedIndex, upViews, viewOutput, viewView]));
 
+  const perUpVarBindings = useMemo(() => _.range(iterationsCount).map((inputArrayElem, i) =>
+    ({
+      ...varBindings,
+      [program.stateVar.id]: {var_: program.stateVar, output: (i === 0 ? initOutput : upOutputs[i - 1]) || undefined},
+    })
+  ), [initOutput, iterationsCount, upOutputs, varBindings, program.stateVar]);
+
+
   return <>
     {initComponent}
-    {_.range(iterationsCount).map((inputArrayElem, i) =>
-      <ProvideVarBinding key={i} var_={program.stateVar} output={(i === 0 ? initOutput : upOutputs[i - 1]) || undefined}>
-        <ToolInSet toolSet={upToolSet} keyInSet={`${i}`} program={upProgram} updateProgram={updateUpProgram}/>
-      </ProvideVarBinding>
+    {perUpVarBindings.map((upVarBindings, i) =>
+      <ToolInSet toolSet={upToolSet} keyInSet={`${i}`} program={upProgram} updateProgram={updateUpProgram} varBindings={upVarBindings}/>
     )}
-    <ProvideVarBinding var_={program.stateVar} output={(upOutputs[highlightedIndex]) || undefined}>
-      {viewComponent}
-    </ProvideVarBinding>
+    {viewComponent}
   </>
 });

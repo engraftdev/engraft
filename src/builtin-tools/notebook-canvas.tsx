@@ -1,9 +1,8 @@
 import update from "immutability-helper";
 import _ from "lodash";
 import React, { memo, useCallback, useMemo } from "react";
-import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindingsContext } from "src/tools-framework/tools";
+import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
-import { AddObjToContext } from "src/util/context";
 import { startDrag } from "src/util/drag";
 import { atIndex, Updater, useAt, useAtIndex } from "src/util/state";
 import { unusedLabel } from "src/util/unusedLabel";
@@ -56,7 +55,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
 }
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
   const [cells, updateCells] = useAt(program, updateProgram, 'cells');
 
@@ -80,6 +79,7 @@ export const Component = memo((props: ToolProps<Program>) => {
       id={cell.var_.id}
       cells={cells}
       updateCells={updateCells}
+      varBindings={varBindings}
       outputs={outputs}
       toolSet={toolSet}
       prevVar={program.prevVar}
@@ -187,6 +187,8 @@ interface CellModelProps {
   cells: Cell[];
   updateCells: Updater<Cell[]>;
 
+  varBindings: VarBindings,
+
   outputs: {[id: string]: ToolOutput | null};
 
   toolSet: ToolSet;
@@ -195,7 +197,7 @@ interface CellModelProps {
 }
 
 const CellModel = memo(function CellModel(props: CellModelProps) {
-  const { id, cells, updateCells, outputs, toolSet } = props;
+  const { id, cells, updateCells, varBindings, outputs, toolSet } = props;
 
   const i = useMemo(() => {
     const i = cells.findIndex((cell) => cell.var_.id === id);
@@ -209,20 +211,18 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
   const [cellProgram, updateCellProgram] = useAt(cell, updateCell, 'program');
 
   const newVarBindings = useDedupe(useMemo(() => {
-    let result: {[label: string]: VarBinding} = {};
+    let result: {[label: string]: VarBinding} = {...varBindings};
     cells.forEach((otherCell) => {
       if (otherCell.var_.id !== cell.var_.id) {
         result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
-  }, [cell.var_.id, cells, outputs]), objEqWith(objEqWith(refEq)))
+  }, [cell.var_.id, cells, outputs, varBindings]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
 
-  return <AddObjToContext context={VarBindingsContext} obj={newVarBindings}>
-    <ToolInSet toolSet={toolSet} keyInSet={id} program={cellProgram} updateProgram={updateCellProgram} />
-  </AddObjToContext>;
+  return <ToolInSet toolSet={toolSet} keyInSet={id} program={cellProgram} updateProgram={updateCellProgram} varBindings={newVarBindings} />;
 });
 
 

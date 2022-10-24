@@ -1,7 +1,7 @@
 import * as Immutable from "immutable";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { Setter, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
-import { lookUpTool, ToolOutput, ToolProgram, ToolView, ToolViewRenderProps } from "./tools";
+import { lookUpTool, ToolOutput, ToolProgram, ToolView, ToolViewRenderProps, VarBindings } from "./tools";
 
 export function useView(reportView: Setter<ToolView | null>, view: ToolView | null) {
   useEffect(() => {
@@ -37,7 +37,8 @@ export const ShowView = memo(function ShowView({view, ...rest}: ShowViewProps) {
 
 export interface UseToolProps<C extends ToolProgram> {
   program: C,
-  updateProgram: Updater<C>
+  updateProgram: Updater<C>,
+  varBindings: VarBindings,
 }
 
 export type UseToolReturn = [
@@ -46,7 +47,7 @@ export type UseToolReturn = [
   output: ToolOutput | null,
 ]
 
-export function useTool<C extends ToolProgram>({program, updateProgram}: UseToolProps<C>): UseToolReturn {
+export function useTool<C extends ToolProgram>({program, updateProgram, varBindings}: UseToolProps<C>): UseToolReturn {
   const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null)
   const [view, setView] = useStateSetOnly<ToolView | null>(null)
 
@@ -58,6 +59,7 @@ export function useTool<C extends ToolProgram>({program, updateProgram}: UseTool
     updateProgram={updateProgram}
     reportOutput={setOutput}
     reportView={setView}
+    varBindings={varBindings}
   />
 
   return [component, view, output];
@@ -70,16 +72,18 @@ export interface UseSubToolProps<P, K extends keyof P> {
   program: P,
   updateProgram: Updater<P>,
   subKey: K
+  varBindings: VarBindings,
 }
 
 // TODO: doesn't check that the sub-program is actually a toolprogram! dang typing
 
-export function useSubTool<C, K extends string & keyof C>({program, updateProgram, subKey}: UseSubToolProps<C, K>) {
+export function useSubTool<C, K extends string & keyof C>({program, updateProgram, subKey, varBindings}: UseSubToolProps<C, K>) {
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, subKey);
 
   return useTool<any>({
     program: subProgram,
     updateProgram: updateSubProgram,
+    varBindings,
   })
 }
 
@@ -114,10 +118,11 @@ export type ToolInSetProps<P extends ToolProgram> = {
   keyInSet: string,
   program: P,
   updateProgram: Updater<P>,
+  varBindings: VarBindings,
 }
 
 const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInSetProps<P>) {
-  const { toolSet, keyInSet, program, updateProgram } = props;
+  const { toolSet, keyInSet, program, updateProgram, varBindings } = props;
   const { updateOutputs, updateViews } = toolSet;
 
   const reportOutput = useCallback((output: ToolOutput | null) => {
@@ -153,6 +158,7 @@ const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInS
     updateProgram={updateProgram}
     reportOutput={reportOutput}
     reportView={reportView}
+    varBindings={varBindings}
   />;
 };
 export const ToolInSet = memo(ToolInSetNoMemo) as typeof ToolInSetNoMemo;

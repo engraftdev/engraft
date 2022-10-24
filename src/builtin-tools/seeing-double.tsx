@@ -17,9 +17,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
-  const { program, updateProgram, reportOutput, reportView } = props;
+  const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const [subComponent, subView, subOutput] = useSubTool({program, updateProgram, subKey: 'subProgram'});
+  const [subComponent, subView, subOutput] = useSubTool({program, updateProgram, subKey: 'subProgram', varBindings});
   const [rerenderOn, updateRerenderOn] = useAt(program, updateProgram, 'rerenderOn');
 
   useOutput(reportOutput, subOutput);
