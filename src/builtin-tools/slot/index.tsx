@@ -159,7 +159,7 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
             setOutput({value: value});
           })
         } else {
-          setOutput({value: compiled(scope)});
+          setOutput({value: result});
         }
       } catch (e) {
         // console.warn("error with", program.code)
