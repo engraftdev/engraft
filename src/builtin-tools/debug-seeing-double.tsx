@@ -5,13 +5,13 @@ import { useAt } from "src/util/state";
 import { slotSetTo } from "./slot";
 
 export type Program = {
-  toolName: 'seeing-double',
+  toolName: 'debug-seeing-double',
   subProgram: ToolProgram,
   rerenderOn: boolean,
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'seeing-double',
+  toolName: 'debug-seeing-double',
   subProgram: slotSetTo(''),
   rerenderOn: false,
 });

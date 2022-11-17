@@ -4,13 +4,13 @@ import { useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { slotSetTo } from "./slot";
 
 export type Program = {
-  toolName: 'logger',
+  toolName: 'debug-logger',
   label: string,
   actualProgram: ToolProgram,
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'logger',
+  toolName: 'debug-logger',
   label: 'unknown label',
   actualProgram: slotSetTo(''),
 });
@@ -37,7 +37,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
 export function loggerWrapping(program: ToolProgram, label: string): Program {
   return {
-    toolName: 'logger',
+    toolName: 'debug-logger',
     label,
     actualProgram: program,
   };

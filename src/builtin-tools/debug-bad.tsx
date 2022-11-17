@@ -3,11 +3,11 @@ import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
 
 export type Program = {
-  toolName: 'bad',
+  toolName: 'debug-bad',
 };
 
 export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'bad',
+  toolName: 'debug-bad',
 });
 
 export const Component = memo((props: ToolProps<Program>) => {
