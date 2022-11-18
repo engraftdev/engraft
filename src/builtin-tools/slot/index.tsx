@@ -6,7 +6,6 @@ import { EditorView } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, ReactNode, useCallback, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
-import seedrandom from 'seedrandom';
 import { cN } from 'src/deps';
 import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
@@ -15,6 +14,7 @@ import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMi
 import { compileExpression } from "src/util/compile";
 import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
+import { makeRand } from 'src/util/rand';
 import refsExtension, { refCode, refRE } from "src/util/refsExtension";
 import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { useDedupe } from 'src/util/useDedupe';
@@ -145,7 +145,7 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
     if ('error' in compiled) {
       setOutput({error: compiled.error});
     } else {
-      const rand = seedrandom('live-compose 2022');
+      const rand = makeRand();
       const scope = {
         ...Object.fromEntries(Object.entries(varBindings).map(([k, v]) => [refCode(k), valueOrUndefined(v.output)])),
         ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
