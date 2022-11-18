@@ -59,7 +59,10 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   useOutput(reportOutput, useMemo(() => {
     // TODO
-    return null;
+    return {
+      value: null,
+      alreadyDisplayed: true,
+    };
   }, []));
 
   useView(reportView, useMemo(() => ({
