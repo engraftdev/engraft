@@ -23,7 +23,6 @@ import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "../slot";
 import prosemirrorCSS from "./Editor.css";
-import { addMathNodes, mathCSS, mathSetup } from "./math";
 
 // TODO:
 // [ ] [HIGH] clean up deleted tools
@@ -125,7 +124,7 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
 
 
 const schema = new Schema({
-  nodes: addMathNodes(addListNodes(schemaBasic.spec.nodes, "paragraph block*", "block")).append({
+  nodes: addListNodes(schemaBasic.spec.nodes, "paragraph block*", "block").append({
     tool: {
       group: "inline",
       inline: true,
@@ -217,7 +216,6 @@ export const View = memo((props: ViewProps) => {
             }
           }
         }),
-        ...mathSetup(schema),
       ],
       schema: schema,
       doc: Node.fromJSON(schema, docJSON),  // TODO: load live changes from docJSON
@@ -241,7 +239,6 @@ export const View = memo((props: ViewProps) => {
       {prosemirrorCSS}
       {prosemirrorViewCSS}
       {prosemirrorMenuCSS}
-      {mathCSS}
     </style>
     <div ref={setDiv}/>
     {toolPortals.map(([elem, {id}]) =>
