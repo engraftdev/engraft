@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "datavoyager": {
-      "signature": "2067240777be8a48b2edd8e523089346",
-      "file": true
-    }
-  }
-}
