@@ -4,10 +4,6 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.17.9",
-    "@babel/plugin-syntax-flow": "^7.16.7",
-    "@babel/plugin-transform-react-jsx": "^7.17.3",
-    "@babel/preset-react": "^7.16.7",
-    "@babel/preset-typescript": "^7.16.7",
     "@babel/standalone": "^7.17.6",
     "@codemirror/lang-javascript": "^6.0.2",
     "@codemirror/lang-markdown": "^6.0.1",
@@ -15,7 +11,6 @@
     "@codemirror/view": "^6.2.0",
     "@googlemaps/react-wrapper": "^1.1.35",
     "@observablehq/inspector": "^3.2.4",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@simbathesailor/use-what-changed": "^2.0.0",
     "@types/babel__core": "^7.1.19",
     "@types/babel__standalone": "^7.1.4",
@@ -31,13 +26,9 @@
     "@types/seedrandom": "^3.0.2",
     "@types/webpack-env": "^1.16.3",
     "astring": "^1.8.1",
-    "babel-loader": "^8.2.4",
     "classnames": "^2.3.1",
     "codemirror": "^6.0.1",
     "create-react-class": "^15.7.0",
-    "css-loader": "^6.6.0",
-    "eslint": "^8.12.0",
-    "eslint-config-react-app": "^7.0.0",
     "fast-memoize": "^2.5.2",
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "friendly-words": "^1.2.0",
@@ -68,10 +59,6 @@
     "react-test-renderer": "^18.0.0",
     "rect-connect": "^1.0.0",
     "seedrandom": "^3.0.5",
-    "speed-measure-webpack-plugin": "^1.5.0",
-    "style-loader": "^3.3.1",
-    "to-string-loader": "^1.2.0",
-    "typescript": "^4.4.2",
     "use-debounce": "^7.0.1"
   },
   "scripts": {
@@ -94,18 +81,27 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-syntax-flow": "^7.18.6",
+    "@babel/plugin-transform-react-jsx": "^7.19.0",
+    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@types/create-react-class": "^15.6.3",
     "@types/google.maps": "^3.49.2",
+    "babel-loader": "^8.2.4",
     "cors-anywhere": "^0.4.4",
+    "css-loader": "^6.6.0",
+    "eslint": "^8.12.0",
+    "eslint-config-react-app": "^7.0.0",
+    "speed-measure-webpack-plugin": "^1.5.0",
+    "style-loader": "^3.3.1",
+    "to-string-loader": "^1.2.0",
     "tsc-alias": "^1.7.0",
+    "typescript": "^4.4.2",
     "webpack": "^5.64.4",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.6.0",
     "webpack-node-externals": "^3.0.0"
-  },
-  "resolutions": {
-    "canvas": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.0.2.tgz",
-    "canvas-prebuilt": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.0.2.tgz"
   },
   "eslintConfig": {
     "extends": [
