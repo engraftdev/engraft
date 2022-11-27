@@ -63,7 +63,6 @@ export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,
       left: 0,
       right: 0,
       bottom: 0,
-      margin: -2,
       boxShadow,
     }}/>
   </div>
