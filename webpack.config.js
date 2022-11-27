@@ -5,6 +5,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const nodeExternals = require('webpack-node-externals');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const disableMinification = true;
 
 function makeConfig(name) {
     return {
@@ -25,11 +26,8 @@ function makeConfig(name) {
                 filename: 'build/liveCompose.js',
                 path: __dirname,
                 library: {
-                    type: 'module',
+                    type: 'commonjs2',
                 },
-            },
-            experiments: {
-                outputModule: true
             },
         } : {}),
 
@@ -39,11 +37,8 @@ function makeConfig(name) {
                 filename: 'build/liveCompose2.js',
                 path: __dirname,
                 library: {
-                    type: 'module',
+                    type: 'commonjs2',
                 },
-            },
-            experiments: {
-                outputModule: true
             },
             externals: [nodeExternals()],
             // externalsType: 'module',
@@ -57,7 +52,6 @@ function makeConfig(name) {
             extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
             alias: {
                 src: resolve(__dirname, 'src'),  // 'absolute' paths
-                'font-awesome-sass-loader$': false,  // BS for datavoyager
             },
         },
         devServer: {
@@ -102,6 +96,9 @@ function makeConfig(name) {
                 overlay: false
             }),
         ].filter(Boolean),
+        optimization: {
+            minimize: !disableMinification,
+        },
     }
 }
 
