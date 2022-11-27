@@ -100,9 +100,11 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   function wrapInline(children: ReactNode) {
     return <div className='ValueInternal-wrapInline-row xRow' style={{width: '100%'}}>
       {prefix}
-      <customizations.SubValueHandle value={value} path={path}>
-        {children}
-      </customizations.SubValueHandle>
+      <div className='xShrinkable'>
+        <customizations.SubValueHandle value={value} path={path}>
+          {children}
+        </customizations.SubValueHandle>
+      </div>
       {suffix}
     </div>;
   }
