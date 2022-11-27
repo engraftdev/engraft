@@ -291,7 +291,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </div>
     { !alreadyDisplayed &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
-        <div className="xStickyTop10">
+        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10">
           <ToolOutputView toolOutput={toolOutput}/>
         </div>
       </div>

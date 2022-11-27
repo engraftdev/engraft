@@ -31,7 +31,10 @@ export const ValueFrame = memo(function ValueFrame({children, type, innerStyle, 
   </ScrollShadow>
 
   if (type) {
-    return <div style={{display: 'inline-flex', flexDirection: 'column', maxWidth: '100%', alignItems: 'start'}}>
+    return <div
+      className="ValueFrame"
+      style={{display: 'inline-flex', flexDirection: 'column', maxWidth: '100%', alignItems: 'start'}}
+    >
       <div style={{height: 15, background: '#e4e4e4', fontSize: 13,
                    color: '#0008', display: 'flex',
                    borderTopLeftRadius: 5, borderTopRightRadius: 5, paddingLeft: 3, paddingRight: 3}}>
@@ -370,17 +373,23 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolV
 
   const valueView =
     hasValue(lastOutputValue)
-    ? <div style={{
-        opacity: hasValue(toolValue) ? 1 : 0.3,
-        maxWidth: '100%',
-      }}>
+    ? <div
+        className="ToolOutputBuffer-value"
+        style={{
+          opacity: hasValue(toolValue) ? 1 : 0.3,
+          maxWidth: '100%',
+        }}
+      >
         {renderValue(lastOutputValue.value)}
       </div>
-    : <div style={{fontSize: 13, fontStyle: 'italic'}}>
+    : <div
+        className="ToolOutputBuffer-no-value"
+        style={{fontSize: 13, fontStyle: 'italic'}}
+      >
         no value yet
       </div>;
 
-  return <div className="xCol xGap10 xAlignLeft">
+  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft">
     {valueView}
     {hasError(toolValue) && <ErrorView error={toolValue.error} />}
   </div>
