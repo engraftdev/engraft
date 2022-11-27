@@ -67,9 +67,7 @@ export interface SubValueHandleProps {
 }
 
 export const SubValueHandleDefault = memo(function SubValueHandleDefault({path, children}: SubValueHandleProps) {
-  return <div style={{minWidth: 0}}>
-    {children}
-  </div>
+  return <>{children}</>;
 })
 
 export function pathString(path: (string | number)[]) {
