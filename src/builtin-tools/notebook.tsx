@@ -3,11 +3,14 @@ import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, T
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { atIndices, removers, Updater, useAt, useAtIndex } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
+import { updateF } from "src/util/updateF";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import { objEqWith, refEq, useDedupe } from "src/util/useDedupe";
 import useHover from "src/util/useHover";
+import useSize from "src/util/useSize";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
+import ScrollShadow from "src/view/ScrollShadow";
 import { ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "./slot";
@@ -23,6 +26,7 @@ export type Program = {
 interface Cell {
   var_: Var;  // empty label if unlabelled, natch
   program: ToolProgram;
+  outputManualHeight: number | undefined;  // can be Infinity, meaning "show entire output"
   // pinning?
   // output?
 }
@@ -31,7 +35,11 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
-      { var_: newVar(alphaLabels[0]), program: slotSetTo(defaultInput || '') }
+      {
+        var_: newVar(alphaLabels[0]),
+        program: slotSetTo(defaultInput || ''),
+        outputManualHeight: undefined,
+      }
     ],
     prevVar: newVar('prev')
   };
@@ -140,6 +148,7 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
         program: slotSetTo(i === 0 ? '' : prevVar.id),
+        outputManualHeight: undefined,
       });
       return newCells;
     })
@@ -276,6 +285,18 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </MyContextMenu>
   , [notebookMenuMaker, removeCell]));
 
+  const [toolRef, toolSize] = useSize();
+
+  const [outputRef, isOutputHovered] = useHover()
+
+  const outputMaxHeight: number | undefined = (() => {
+    // TODO: draggable height
+    if (cell.outputManualHeight === Infinity) {
+      return undefined; // no limit
+    }
+    return Math.max(cell.outputManualHeight || 0, toolSize?.height || 0);
+  })();
+
   return <>
     {menuNode}
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
@@ -285,14 +306,24 @@ const CellView = memo(function CellView(props: CellViewProps) {
       </div>
     </div>
     <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
-      <div className="xStickyTop10">
+      <div className="xStickyTop10" ref={toolRef}>
         <ShowView view={toolView}/>
       </div>
     </div>
     { !alreadyDisplayed &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
-        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10">
-          <ToolOutputView toolOutput={toolOutput}/>
+        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={outputRef}>
+          <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
+            <ToolOutputView toolOutput={toolOutput}/>
+          </ScrollShadow>
+          { isOutputHovered &&
+            <div
+              style={{position: 'absolute', bottom: 0, right: 0, width: 15, height: 15, fontSize: 15, cursor: 'pointer'}}
+              onClick={() => updateCell(updateF({outputManualHeight: (old) => old === Infinity ? undefined : Infinity}))}
+            >
+              {cell.outputManualHeight === Infinity ? '⊖' : '⊕'}
+            </div>
+          }
         </div>
       </div>
     }
