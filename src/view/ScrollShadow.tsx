@@ -22,13 +22,13 @@ export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,
     if (div.scrollTop > 0) {
       boxShadowBits.push(`inset 0 ${shadowBlur + shadowSpread}px ${shadowBlur}px -${shadowBlur}px ${shadowColor}`);
     }
-    if (div.scrollTop < div.scrollHeight - div.offsetHeight) {
+    if (div.scrollTop < div.scrollHeight - div.offsetHeight - 1) {
       boxShadowBits.push(`inset 0 -${shadowBlur + shadowSpread}px ${shadowBlur}px -${shadowBlur}px ${shadowColor}`);
     }
     if (div.scrollLeft > 0) {
       boxShadowBits.push(`inset ${shadowBlur + shadowSpread}px 0 ${shadowBlur}px -${shadowBlur}px ${shadowColor}`);
     }
-    if (div.scrollLeft < div.scrollWidth - div.offsetWidth) {
+    if (div.scrollLeft < div.scrollWidth - div.offsetWidth - 1) {
       boxShadowBits.push(`inset -${shadowBlur + shadowSpread}px 0 ${shadowBlur}px -${shadowBlur}px ${shadowColor}`);
     }
     setBoxShadow(boxShadowBits.join(', '));
@@ -46,6 +46,10 @@ export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,
       return () => observer.disconnect();
     }
   }, [div, updateShadows])
+
+  // quick little notes on how this works...
+  // * the inner and outer divs should be the same size: small.
+  // * the inner div will (potentially) scroll its contents, which is `children`.
 
   return <div className="ScrollShadow-outer" {...props} style={{
     ...outerStyle,
