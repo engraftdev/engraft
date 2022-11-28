@@ -100,6 +100,10 @@ export default function ScrollShadow(props: Props) {
       left: 0,
       right: 0,
       bottom: 0,
+      margin: -2,
+      // TODO: That margin is required for Extractor SubValueHandles and such.
+      // But it somehow makes some things that shouldn't scroll instead scroll by two pixels.
+      // I tried to fix this in a number of ways and couldn't figure it out.
       boxShadow,
     }}/>
   </div>
