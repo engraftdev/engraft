@@ -10,7 +10,13 @@ interface Props extends Omit<HTMLProps<HTMLDivElement>, 'style'> {
 }
 
 
-export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,1)', shadowBlur = 8, shadowSpread = 10, innerStyle, outerStyle, ...props}: Props) {
+export default function ScrollShadow(props: Props) {
+  const {
+    children,
+    shadowColor = 'rgba(255,255,255,1)',
+    shadowBlur = 8,
+    shadowSpread = 10,
+    innerStyle, outerStyle, ...restProps} = props;
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
   const [boxShadow, setBoxShadow] = useState('')
 
@@ -51,7 +57,7 @@ export default function ScrollShadow({children, shadowColor = 'rgba(255,255,255,
   // * the inner and outer divs should be the same size: small.
   // * the inner div will (potentially) scroll its contents, which is `children`.
 
-  return <div className="ScrollShadow-outer" {...props} style={{
+  return <div className="ScrollShadow-outer" {...restProps} style={{
     ...outerStyle,
     position: 'relative'
   }}>
