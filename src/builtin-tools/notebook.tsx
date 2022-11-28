@@ -294,7 +294,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
     if (cell.outputManualHeight === Infinity) {
       return undefined; // no limit
     }
-    return Math.max(cell.outputManualHeight || 0, toolSize?.height || 0);
+    return Math.max(cell.outputManualHeight || 0, toolSize?.height || 0, 50);
   })();
 
   return <>
@@ -313,16 +313,22 @@ const CellView = memo(function CellView(props: CellViewProps) {
     { !alreadyDisplayed &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={outputRef}>
-          <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
-            <ToolOutputView toolOutput={toolOutput}/>
-          </ScrollShadow>
-          { isOutputHovered &&
-            <div
-              style={{position: 'absolute', bottom: 0, right: 0, width: 15, height: 15, fontSize: 15, cursor: 'pointer'}}
-              onClick={() => updateCell(updateF({outputManualHeight: (old) => old === Infinity ? undefined : Infinity}))}
-            >
-              {cell.outputManualHeight === Infinity ? '⊖' : '⊕'}
-            </div>
+          {/* TODO: clean this up */}
+          { outputBelowInput
+            ? <ToolOutputView toolOutput={toolOutput}/>
+            : <>
+                <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
+                  <ToolOutputView toolOutput={toolOutput}/>
+                </ScrollShadow>
+                { isOutputHovered &&
+                  <div
+                    style={{position: 'absolute', bottom: 0, right: 0, width: 15, height: 15, fontSize: 15, cursor: 'pointer'}}
+                    onClick={() => updateCell(updateF({outputManualHeight: (old) => old === Infinity ? undefined : Infinity}))}
+                  >
+                    {cell.outputManualHeight === Infinity ? '⊖' : '⊕'}
+                  </div>
+                }
+              </>
           }
         </div>
       </div>
