@@ -25,26 +25,35 @@ export default function ScrollShadow(props: Props) {
     shadowBlur = 8,
     shadowSpread = 10,
     innerStyle, outerStyle, ...restProps} = props;
-  const [div, setDiv] = useState<HTMLDivElement | null>(null);
+  const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
+  const [content, setContent] = useState<HTMLDivElement | null>(null);
   const [scrollInfo, setScrollInfo] = useState<ScrollInfo | null>(null);
 
-  const updateScrollInfo = useCallback((div: HTMLDivElement) => {
-    const {scrollLeft, scrollTop, scrollWidth, scrollHeight, offsetWidth, offsetHeight} = div;
+  const updateScrollInfo = useCallback((scroller: HTMLDivElement) => {
+    const {scrollLeft, scrollTop, scrollWidth, scrollHeight, offsetWidth, offsetHeight} = scroller;
     setScrollInfo({scrollLeft, scrollTop, scrollWidth, scrollHeight, offsetWidth, offsetHeight});
   }, []);
 
   const onScroll = useCallback((ev: UIEvent<HTMLDivElement>) => {
-    const div = ev.currentTarget;
-    updateScrollInfo(div);
+    const scroller = ev.currentTarget;
+    updateScrollInfo(scroller);
   }, [updateScrollInfo])
 
   useEffect(() => {
-    if (div) {
-      const observer = new ResizeObserver(() => updateScrollInfo(div));
-      observer.observe(div);
+    if (scroller) {
+      const observer = new ResizeObserver(() => updateScrollInfo(scroller));
+      observer.observe(scroller);
       return () => observer.disconnect();
     }
-  }, [div, updateScrollInfo])
+  }, [scroller, updateScrollInfo])
+
+  useEffect(() => {
+    if (content && scroller) {
+      const observer = new ResizeObserver(() => updateScrollInfo(scroller));
+      observer.observe(content);
+      return () => observer.disconnect();
+    }
+  }, [content, updateScrollInfo])
 
   const boxShadow = useMemo(() => {
     if (!scrollInfo) { return undefined; }
@@ -73,14 +82,16 @@ export default function ScrollShadow(props: Props) {
   // * the inner and outer divs should be the same size: small.
   // * the inner div will (potentially) scroll its contents, which is `children`.
 
-  return <div className="ScrollShadow-outer" {...restProps} style={{
+  return <div className="ScrollShadow-container" {...restProps} style={{
     ...outerStyle,
     position: 'relative'
   }}>
-    <div className="ScrollShadow-inner" ref={setDiv} onScroll={onScroll} style={{
+    <div className="ScrollShadow-scroller" ref={setScroller} onScroll={onScroll} style={{
       ...innerStyle,
     }}>
-      {children}
+      <div className="ScrollShadow-content" ref={setContent}>
+        {children}
+      </div>
     </div>
     <div style={{
       pointerEvents: 'none',
