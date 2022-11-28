@@ -30,7 +30,7 @@ export const ValueFrame = memo(function ValueFrame({children, type, innerStyle, 
     className="ValueFrame-shadow"
     outerStyle={{...outerStyle}}
     innerStyle={{...innerStyle, overflow: 'auto'}}
-    shadowMargin={-2}  // TODO: for when there are tokeny backgrounds around the shadow
+    shadowMargin={0}  // TODO: I want -2, for when there are tokeny backgrounds around the shadow, but it still doesn't work
   >
     {children}
   </ScrollShadow>
