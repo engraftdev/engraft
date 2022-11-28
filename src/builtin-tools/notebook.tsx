@@ -26,7 +26,7 @@ export type Program = {
 interface Cell {
   var_: Var;  // empty label if unlabelled, natch
   program: ToolProgram;
-  outputManualHeight: number | undefined;  // can be Infinity, meaning "show entire output"
+  outputManualHeight: number | undefined | 'infinity';  // 'infinity' means 'show entire output' (not Infinity cuz that isn't JSON-serializable)
   // pinning?
   // output?
 }
@@ -291,7 +291,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const outputMaxHeight: number | undefined = (() => {
     // TODO: draggable height
-    if (cell.outputManualHeight === Infinity) {
+    if (cell.outputManualHeight === 'infinity') {
       return undefined; // no limit
     }
     return Math.max(cell.outputManualHeight || 0, toolSize?.height || 0, 50);
@@ -323,9 +323,9 @@ const CellView = memo(function CellView(props: CellViewProps) {
                 { isOutputHovered &&
                   <div
                     style={{position: 'absolute', bottom: 0, right: 0, width: 15, height: 15, fontSize: 15, cursor: 'pointer'}}
-                    onClick={() => updateCell(updateF({outputManualHeight: (old) => old === Infinity ? undefined : Infinity}))}
+                    onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
                   >
-                    {cell.outputManualHeight === Infinity ? '⊖' : '⊕'}
+                    {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
                   </div>
                 }
               </>
