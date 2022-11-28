@@ -26,7 +26,12 @@ export interface ValueFrameProps {
 }
 
 export const ValueFrame = memo(function ValueFrame({children, type, innerStyle, outerStyle}: ValueFrameProps) {
-  const withShadow = <ScrollShadow className="ValueFrame-shadow" outerStyle={{...outerStyle}} innerStyle={{...innerStyle, overflow: 'auto'}}>
+  const withShadow = <ScrollShadow
+    className="ValueFrame-shadow"
+    outerStyle={{...outerStyle}}
+    innerStyle={{...innerStyle, overflow: 'auto'}}
+    shadowMargin={-2}  // TODO: for when there are tokeny backgrounds around the shadow
+  >
     {children}
   </ScrollShadow>
 

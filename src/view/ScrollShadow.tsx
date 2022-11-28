@@ -5,6 +5,7 @@ interface Props extends Omit<HTMLProps<HTMLDivElement>, 'style'> {
   shadowColor?: string;
   shadowBlur?: number;
   shadowSpread?: number;
+  shadowMargin?: number;
   innerStyle?: CSSProperties;
   outerStyle?: CSSProperties;
 }
@@ -24,6 +25,7 @@ export default function ScrollShadow(props: Props) {
     shadowColor = 'rgba(255,255,255,1)',
     shadowBlur = 8,
     shadowSpread = 10,
+    shadowMargin = 0,
     innerStyle, outerStyle, ...restProps} = props;
   const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
   const [content, setContent] = useState<HTMLDivElement | null>(null);
@@ -100,7 +102,7 @@ export default function ScrollShadow(props: Props) {
       left: 0,
       right: 0,
       bottom: 0,
-      margin: -2,
+      margin: shadowMargin,
       // TODO: That margin is required for Extractor SubValueHandles and such.
       // But it somehow makes some things that shouldn't scroll instead scroll by two pixels.
       // I tried to fix this in a number of ways and couldn't figure it out.
