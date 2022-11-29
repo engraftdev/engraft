@@ -75,6 +75,63 @@
       },
       {
         "var_": {
+          "id": "IDindividual655393",
+          "label": "year"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "slider",
+            "value": 76,
+            "min": 70,
+            "max": 82,
+            "step": 1
+          },
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDslice699073",
+          "label": "filtered"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDsunstone954193.filter(d => d[\"model year\"] === IDindividual655393)",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDsyzygy990594",
+          "label": "max weight"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Math.max(...IDsunstone954193.map(d => d[\"weight\"]))",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDbarber580391",
+          "label": "max mpg"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Math.max(...IDsunstone954193.map(d => d[\"mpg\"]))",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
           "id": "IDgateway426198",
           "label": "B"
         },
@@ -86,12 +143,26 @@
             "dataProgram": {
               "toolName": "slot",
               "modeName": "code",
-              "code": "IDsunstone954193",
+              "code": "IDslice699073",
               "subTools": {},
               "defaultCode": "IDbush078616"
             },
             "xField": "weight",
-            "yField": "gpm"
+            "xExtraProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{scale: {domainMax: IDsyzygy990594}}",
+              "subTools": {},
+              "defaultCode": ""
+            },
+            "yField": "mpg",
+            "yExtraProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{scale: {domainMax: IDbarber580391}}",
+              "subTools": {},
+              "defaultCode": ""
+            }
           },
           "defaultCode": "IDbush078616"
         },

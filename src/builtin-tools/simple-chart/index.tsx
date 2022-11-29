@@ -1,16 +1,18 @@
 import { memo, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { slotSetTo } from "../slot";
 import Select from 'react-select'
 import { updateF } from "src/util/updateF";
-import { VegaLite } from "react-vega";
+import { VegaLite, VisualizationSpec } from "react-vega";
 
 export type Program = {
   toolName: 'simple-chart',
   dataProgram: ToolProgram,
   xField: string | undefined,
+  xExtraProgram: ToolProgram,
   yField: string | undefined,
+  yExtraProgram: ToolProgram,
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultInputCode?: string) => {
@@ -18,7 +20,9 @@ export const programFactory: ProgramFactory<Program> = (defaultInputCode?: strin
     toolName: 'simple-chart',
     dataProgram: slotSetTo(defaultInputCode || ''),
     xField: undefined,
+    xExtraProgram: slotSetTo(''),
     yField: undefined,
+    yExtraProgram: slotSetTo(''),
   }
 };
 
@@ -26,6 +30,8 @@ export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
   const [dataComponent, dataView, dataOutput] = useSubTool({program, updateProgram, subKey: 'dataProgram', varBindings});
+  const [xExtraComponent, xExtraView, xExtraOutput] = useSubTool({program, updateProgram, subKey: 'xExtraProgram', varBindings});
+  const [yExtraComponent, yExtraView, yExtraOutput] = useSubTool({program, updateProgram, subKey: 'yExtraProgram', varBindings});
 
   const fieldNames = useMemo(() => {
     try {
@@ -49,25 +55,36 @@ export const Component = memo((props: ToolProps<Program>) => {
     return options.find(option => option.value === program.yField);
   }, [options, program.yField]);
 
+  const spec = useMemo(() => {
+    if (xOption !== undefined && yOption !== undefined) {
+      const xExtra = valueOrUndefined(xExtraOutput);
+      const yExtra = valueOrUndefined(yExtraOutput);
+
+      const spec: VisualizationSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        mark: 'point',
+        encoding: {
+          x: {field: xOption.value, type: 'quantitative', ...(xExtra as any)},
+          y: {field: yOption.value, type: 'quantitative', ...(yExtra as any)},
+        },
+        data: { name: 'values' },
+      };
+
+      return spec;
+    }
+  }, [xExtraOutput, xOption, yExtraOutput, yOption]);
+
   useOutput(reportOutput, useMemo(() => {
-    if (hasValue(dataOutput) && xOption !== undefined && yOption !== undefined) {
+    if (hasValue(dataOutput) && spec !== undefined) {
       return {
         value:
           <VegaLite
             data={{values: dataOutput.value}}
-            spec={{
-              $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-              mark: 'point',
-              encoding: {
-                x: {field: xOption.value, type: 'quantitative'},
-                y: {field: yOption.value, type: 'quantitative'}
-              },
-              data: { name: 'values' },
-            }}
+            spec={spec}
           />
       }
     }
-  }, [dataOutput, xOption, yOption]));
+  }, [dataOutput, spec]));
 
   useView(reportView, useMemo(() => ({
     render: () =>
@@ -80,22 +97,30 @@ export const Component = memo((props: ToolProps<Program>) => {
           value={{value: 'point', label: 'point'}}
         />
         <b style={{justifySelf: 'end'}}>x</b>
-        <Select
-          options={fieldNames.map(name => ({value: name, label: name}))}
-          value={xOption}
-          onChange={(xField) => updateProgram(updateF({xField: {$set: xField?.value}}))}
-        />
+        <div className="xRow xGap10">
+          <Select
+            options={fieldNames.map(name => ({value: name, label: name}))}
+            value={xOption}
+            onChange={(xField) => updateProgram(updateF({xField: {$set: xField?.value}}))}
+          />
+          <ShowView view={xExtraView} />
+        </div>
         <b style={{justifySelf: 'end'}}>y</b>
-        <Select
-          options={fieldNames.map(name => ({value: name, label: name}))}
-          value={yOption}
-          onChange={(yField) => updateProgram(updateF({yField: {$set: yField?.value}}))}
-        />
+        <div className="xRow xGap10">
+          <Select
+            options={fieldNames.map(name => ({value: name, label: name}))}
+            value={yOption}
+            onChange={(yField) => updateProgram(updateF({yField: {$set: yField?.value}}))}
+          />
+          <ShowView view={yExtraView} />
+        </div>
       </div>
-  }), [dataView, fieldNames, updateProgram, xOption, yOption]));
+  }), [dataView, fieldNames, updateProgram, xExtraView, xOption, yExtraView, yOption]));
 
   return <>
     {dataComponent}
+    {xExtraComponent}
+    {yExtraComponent}
   </>
 });
 
