@@ -55,10 +55,47 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "IDbreath219911.csvParse(IDscallop639928)",
+          "code": "IDbreath219911.csvParse(IDscallop639928, IDbreath219911.autoType)",
           "subTools": {},
           "defaultCode": "IDbush078616"
         }
+      },
+      {
+        "var_": {
+          "id": "IDsunstone954193",
+          "label": "data with gpm"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDbush078616.map((d) => ({...d, gpm: 1/d.mpg}))",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDgateway426198",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDsunstone954193",
+              "subTools": {},
+              "defaultCode": "IDbush078616"
+            },
+            "xField": "weight",
+            "yField": "gpm"
+          },
+          "defaultCode": "IDbush078616"
+        },
+        "outputManualHeight": "infinity"
       }
     ],
     "prevVar": {
