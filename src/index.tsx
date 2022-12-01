@@ -17,6 +17,7 @@ root.render(
         <Route path="/" element={<App/>}/>
         <Route path="/synonymizer" element={<TestSynonyms/>}/>
         <Route path="/sync" element={<TestSync/>}/>
+        <Route path="/safe" element={<App safeMode={true}/>}/>
       </Routes>
     </HashRouter>
   </React.StrictMode>,

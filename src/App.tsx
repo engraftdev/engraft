@@ -8,7 +8,9 @@ import { registerTool, ToolOutput, ToolProgram, VarBinding } from './tools-frame
 import { ToolWithView } from './tools-framework/ToolWithView';
 import range from './util/range';
 import { useStateSetOnly, useStateUpdateOnly } from './util/state';
+import IsolateStyles from './view/IsolateStyles';
 import { ToolOutputView } from './view/Value';
+import { ValueEditable } from './view/ValueEditable';
 
 
 
@@ -26,7 +28,7 @@ function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
 }
 
-const App = memo(function App() {
+const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   useEffect(() => {
     document.title = "Engraft";
   }, []);
@@ -69,20 +71,27 @@ const App = memo(function App() {
     <style>
       {appCss}
     </style>
-    <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
-      <ErrorBoundary
-        fallbackRender={(props) => {
-          return <div>
-            <h1>error!</h1>
-            <pre>{props.error.message}</pre>
-            <pre>{props.error.stack}</pre>
-          </div>
-        }}
-        resetKeys={[program]}
-      >
-        <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
-      </ErrorBoundary>
-    </div>
+    { safeMode
+      ? <div>
+          <IsolateStyles>
+            <ValueEditable value={program} updater={updateProgram}/>
+          </IsolateStyles>
+        </div>
+      : <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
+          <ErrorBoundary
+            fallbackRender={(props) => {
+              return <div>
+                <h1>error!</h1>
+                <pre>{props.error.message}</pre>
+                <pre>{props.error.stack}</pre>
+              </div>
+            }}
+            resetKeys={[program]}
+          >
+            <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
+          </ErrorBoundary>
+        </div>
+    }
     <br/>
     <br/>
     {showOutput && <ToolOutputView toolOutput={output} />}
