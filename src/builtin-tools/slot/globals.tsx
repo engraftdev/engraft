@@ -4,6 +4,22 @@ import { createElementFromReact } from "src/util/createElementFrom";
 import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
+import ReactCell from 'src/util/ReactCell';
+import { slotSetTo } from '.';
+import { lookUpTool } from 'src/tools-framework/tools';
+
+
+// Here's where I'll throw ad-hoc things I want to have available in every code editor
+
+function html(s: string) {
+  return <div dangerouslySetInnerHTML={{__html: s}}/>
+}
+
+const Meta = {
+  ReactCell,
+  slotSetTo,
+  lookUpTool,
+}
 
 
 // These are available in every code editor
@@ -16,11 +32,5 @@ export const globals = {
   GoogleMap,
   html,
   Diagram,
-}
-
-
-// And here's where I'll throw ad-hoc things I want to have available in every code editor
-
-function html(s: string) {
-  return <div dangerouslySetInnerHTML={{__html: s}}/>
-}
+  Meta,
+};
