@@ -10,11 +10,12 @@ function atPath(updater: Updater<any>, path: (string | number)[]): Updater<any> 
     return updater;
   }
 
-  const [firstStep, ...restPath] = path;
-  if (typeof firstStep === 'string') {
-    return at(atPath(updater, restPath), firstStep);
+  const initPath = path.slice(0, -1);
+  const lastStep = path[path.length - 1];
+  if (typeof lastStep === 'string') {
+    return at(atPath(updater, initPath), lastStep);
   } else {
-    return atIndex(atPath(updater, restPath), firstStep);
+    return atIndex(atPath(updater, initPath), lastStep);
   }
 }
 
