@@ -125,7 +125,8 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     </div>
     <br/>
     <div>
-      <button onClick={() => updateProgram(() => defaultProgram)}>Clear</button>
+      {/* HACK: {...defaultProgram} is to distinguish it from defaultProgram, so it gets saved */}
+      <button onClick={() => updateProgram(() => ({...defaultProgram}))}>Clear</button>
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
