@@ -232,13 +232,13 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
 
   const newVarBindings = useDedupe(useMemo(() => {
     let result: {[label: string]: VarBinding} = {...varBindings, ...prevVarContext};
-    cells.forEach((otherCell) => {
-      if (otherCell.var_.id !== cell.var_.id) {
+    cells.forEach((otherCell, cellIdx) => {
+      if (cellIdx < i) {
         result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
       }
     });
     return result;
-  }, [cell.var_.id, cells, outputs, prevVarContext, varBindings]), objEqWith(objEqWith(refEq)))
+  }, [cells, i, outputs, prevVarContext, varBindings]), objEqWith(objEqWith(refEq)))
 
   // TODO: exclude things that are already present? or does this happen elsewhere
 
