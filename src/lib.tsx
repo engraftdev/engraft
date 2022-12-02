@@ -359,6 +359,6 @@ export type { ToolOutput, ToolProgram } from 'src/tools-framework/tools';
 export { ToolWithView } from 'src/tools-framework/ToolWithView';
 export { useTool } from 'src/tools-framework/useSubTool';
 export { ToolOutputView } from "./view/Value";
-
+export { default as IsolateStyles } from "src/view/IsolateStyles";
 
 
