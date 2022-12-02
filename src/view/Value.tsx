@@ -218,6 +218,10 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
   const isArray = value instanceof Array;
 
+  const classLabel = !isArray && value.constructor.name !== 'Object'
+    ? <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre'}}>{value.constructor.name + ' '}</div>
+    : undefined;
+
   if (isExpanded) {
     let entries = isArray ? Array.from(value.entries()) : Object.entries(value);
     // TODO: customization of maxItems
@@ -234,6 +238,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
         <Use hook={useHover} children={([hoverRef, isHovered]) =>
           <div className='ValueComposite-open-row xRow' ref={hoverRef} style={{flexGrow: 1}}>
             <customizations.SubValueHandle value={value} path={path}>
+              {classLabel}
               <div style={valueFont}>{isArray ? '[' : '{'}</div>
             </customizations.SubValueHandle>
             { isHovered &&
@@ -300,6 +305,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
       </>
     } else {
       abbreviated = <>
+        {classLabel}
         {'{'}
         <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
           {Object.keys(value).join(', ')}
