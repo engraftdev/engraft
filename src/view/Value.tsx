@@ -198,7 +198,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
         <div
             className='Value-is-string'
             // todo: hacky hanging indent
-            style={{color: 'rgb(196, 26, 22)', ...valueFont, textIndent: -6, paddingLeft: 6}}
+            style={{color: 'rgb(196, 26, 22)', ...valueFont, textIndent: -6, paddingLeft: 6, whiteSpace: 'pre-wrap'}}
           >
           '{value}'
         </div>
