@@ -322,10 +322,14 @@ const CellView = memo(function CellView(props: CellViewProps) {
                 </ScrollShadow>
                 { isOutputHovered &&
                   <div
-                    style={{position: 'absolute', bottom: 0, right: 0, width: 15, height: 15, fontSize: 15, cursor: 'pointer'}}
-                    onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                    style={{position: 'absolute', left: 0, top: 0, height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', pointerEvents: 'none'}}
                   >
-                    {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+                    <div
+                      style={{position: 'sticky', bottom: 5, width: 15, height: 15, fontSize: 15, cursor: 'pointer', textAlign: 'right', margin: 5, userSelect: 'none', pointerEvents: 'initial'}}
+                      onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                    >
+                      {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+                    </div>
                   </div>
                 }
               </>
