@@ -97,7 +97,11 @@ export function renderElementToNode(element: FormatterElement, data: any, parent
       break;
     case 'control':
       try {
-        const keyValue = (compileExpressionCached(element.keyFuncCode)({}) as (data: any) => string)(node.innerData);
+        const compileResult = compileExpressionCached(element.keyFuncCode);
+        if ('error' in compileResult) {
+          throw compileResult.error;
+        }
+        const keyValue = (compileResult({}) as (data: any) => string)(node.innerData);
         node.controlKey = typeof keyValue === 'string' ? keyValue : JSON.stringify(keyValue);
       } catch (e) {
         console.warn(e);

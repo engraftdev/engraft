@@ -4,10 +4,14 @@ export function compileExpression(exprCode: string): (context: object) => unknow
 }
 
 // TODO: this will just fill up; should we use TTL?
-const _cache: {[exprCode: string]: (context: object) => unknown} = {};
-export function compileExpressionCached(exprCode: string): (context: object) => unknown {
+const _cache: {[exprCode: string]: ((context: object) => unknown) | {error: string}} = {};
+export function compileExpressionCached(exprCode: string): ((context: object) => unknown) | {error: string} {
   if (!_cache[exprCode]) {
-    _cache[exprCode] = compileExpression(exprCode);
+    try {
+      _cache[exprCode] = compileExpression(exprCode);
+    } catch (e) {
+      _cache[exprCode] = {error: (e as any).toString()};
+    }
   }
   return _cache[exprCode];
 }

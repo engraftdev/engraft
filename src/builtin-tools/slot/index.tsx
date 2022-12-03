@@ -11,7 +11,7 @@ import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, Too
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
-import { compileExpression } from "src/util/compile";
+import { compileExpressionCached } from "src/util/compile";
 import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
 import { makeRand } from 'src/util/rand';
@@ -97,13 +97,16 @@ export function summarizeSlotProgram(program: Program): ReactNode {
 // CODE MODE //
 ///////////////
 
-let _transformCachedCache: {[code: string]: BabelFileResult} = {};
+let _transformCachedCache: {[code: string]: BabelFileResult | {error: string}} = {};
 function transformCached(code: string) {
-  const fromCache = _transformCachedCache[code]
-  if (fromCache) { return fromCache; }
-  const computed = transform(code, { presets: ["react"] });
-  _transformCachedCache[code] = computed;
-  return computed;
+  if (!_transformCachedCache[code]) {
+    try {
+      _transformCachedCache[code] = transform(code, { presets: ["react"] });
+    } catch (e) {
+      _transformCachedCache[code] = {error: (e as any).toString()};
+    }
+  }
+  return _transformCachedCache[code];
 }
 
 type CodeModeProps = Replace<ToolProps<Program>, {
@@ -119,15 +122,13 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
       return null;
     }
 
-    try {
-      // TODO: better treatment of non-expression code (multiple lines w/return, etc)
-      let translated = transformCached("(" + program.code + ")").code!;
-      translated = translated.replace(/;$/, "");
-      const result = compileExpression(translated);
-      return result;
-    } catch (e) {
-      return {error: (e as any).toString()};
-    }
+    // TODO: better treatment of non-expression code (multiple lines w/return, etc)
+    let transformResult = transformCached("(" + program.code + ")");
+    if ('error' in transformResult) { return transformResult; }
+    const translated = transformResult.code!.replace(/;$/, "");
+    const compileResult = compileExpressionCached(translated);
+    if ('error' in compileResult) { return compileResult; }
+    return compileResult;
   }, [program.code])
 
   const [subToolPrograms, updateSubToolPrograms] = useAt(program, updateProgram, 'subTools');
