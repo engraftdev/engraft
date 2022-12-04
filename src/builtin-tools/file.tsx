@@ -2,9 +2,7 @@ import { memo, useCallback, useMemo } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
 import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
-import { updateKeys } from "src/util/state";
 import { updateF } from "src/util/updateF";
-import { useMemoObject } from "src/util/useMemoObject";
 
 export type Program = {
   toolName: 'file';
