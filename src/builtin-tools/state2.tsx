@@ -11,10 +11,10 @@ export type Program = {
   initialValueProgram: any,
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+export const programFactory: ProgramFactory<Program> = () => {
   return {
     toolName: 'state2',
-    initialValueProgram: slotSetTo(defaultCode || ''),
+    initialValueProgram: slotSetTo(''),
   };
 };
 
