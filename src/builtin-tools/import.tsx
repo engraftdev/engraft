@@ -29,7 +29,8 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const sendRequest = useCallback(async () => {
     // TODO: The `import` below doesn't work in lib2 output. Ugh.
-    const url = `https://cdn.skypack.dev/${name}`;
+    // const url = `https://cdn.skypack.dev/${name}`;
+    const url = `https://esm.sh/${name}`;
     const result = await import(/*webpackIgnore: true*/ url);
     setResult({value: result});
   }, [name]);
