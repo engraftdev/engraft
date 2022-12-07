@@ -30,9 +30,13 @@ export const Component = memo((props: ToolProps<Program>) => {
     }
   }, [initialValueOutput, setStateValue, stateValue]);
 
+  const set = useMemo(() => {
+    return (value: unknown) => setStateValue({value});
+  }, [setStateValue]);
+
   useOutput(reportOutput, useMemo(() => (stateValue && {
-    value: {get: stateValue.value, set: setStateValue}
-  }), [setStateValue, stateValue]));
+    value: {get: stateValue.value, set}
+  }), [set, stateValue]));
 
   useView(reportView, useMemo(() => ({
     render: () =>
