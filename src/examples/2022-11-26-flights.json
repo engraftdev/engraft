@@ -21,6 +21,21 @@
       },
       {
         "var_": {
+          "id": "IDfortnight998620",
+          "label": "inputs"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "import",
+            "name": "@observablehq/inputs"
+          },
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
           "id": "IDotter620976",
           "label": "csv"
         },
@@ -48,6 +63,204 @@
           "toolName": "slot",
           "modeName": "code",
           "code": "IDbreath219911.csvParse(IDotter620976)",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDdevourer411907",
+          "label": "airlines"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "_.compact(_.uniq(IDquasar651368))",
+          "subTools": {
+            "IDquasar651368": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "extractor",
+                "inputProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDbush078616",
+                  "subTools": {},
+                  "defaultCode": "IDbush078616"
+                },
+                "patternsWithIds": [
+                  {
+                    "id": "IDhonesty880345",
+                    "pattern": [
+                      {
+                        "wildcard": true
+                      },
+                      "airline"
+                    ]
+                  }
+                ],
+                "minimized": true
+              }
+            }
+          },
+          "defaultCode": "IDbush078616"
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDmole755728",
+          "label": "airline"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "state2",
+            "initialValueProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "'Delta'",
+              "subTools": {},
+              "defaultCode": "IDbush078616"
+            }
+          },
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDdrug884600",
+          "label": "control"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<select value={IDmole755728.get} onChange={(e) => IDmole755728.set(e.target.value)}>\n  {IDdevourer411907.map((airline) => \n    <option value={airline}>{airline}</option>\n  )}\n</select>",
+          "subTools": {
+            "IDhydrofoil261770": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "map",
+                "inputProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDdevourer411907",
+                  "subTools": {},
+                  "defaultCode": ""
+                },
+                "itemVar": {
+                  "id": "IDgram469810",
+                  "label": "item"
+                },
+                "perItemProgram": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "notebook",
+                    "cells": [
+                      {
+                        "var_": {
+                          "id": "IDcaribou210547",
+                          "label": "A"
+                        },
+                        "program": {
+                          "toolName": "slot",
+                          "modeName": "code",
+                          "code": "<option value={IDgram469810}>{IDgram469810}</option>",
+                          "subTools": {},
+                          "defaultCode": "IDgram469810"
+                        }
+                      }
+                    ],
+                    "prevVar": {
+                      "id": "IDsassafras725660",
+                      "label": "prev"
+                    }
+                  },
+                  "defaultCode": "IDgram469810"
+                }
+              }
+            }
+          },
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDbell956739",
+          "label": "filtered"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDdigestion776207.filter((d) => d.airline === IDmole755728.get)",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDconga517636",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDfortnight998620.table(IDbell956739)",
+          "subTools": {},
+          "defaultCode": "IDbush078616"
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDfeather827176",
+          "label": "chart"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDbell956739",
+              "subTools": {},
+              "defaultCode": "IDbush078616"
+            },
+            "xField": "month",
+            "xExtraProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{type: 'temporal'}",
+              "subTools": {},
+              "defaultCode": ""
+            },
+            "yField": "passengers",
+            "yExtraProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "",
+              "subTools": {},
+              "defaultCode": ""
+            }
+          },
+          "defaultCode": "IDbush078616"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDmuscari621158",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<div>\n  {IDdrug884600}\n  {IDfeather827176}\n</div>",
           "subTools": {},
           "defaultCode": "IDbush078616"
         },
