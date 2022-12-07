@@ -229,7 +229,7 @@ export type OptionWithIcon<Value> = {
 }
 
 export const formatOptionLabel = ({icon, label}: OptionWithIcon<Mark>) => (
-  <div>
+  <div className="xRow">
     <span style={{color: '#717a94', marginRight: 7}}>
       {icon}
     </span>
