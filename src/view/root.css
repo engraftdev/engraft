@@ -80,6 +80,9 @@ pre {
 .xRow.xAlignVCenter {
   align-items: center;
 }
+.xRow.xAlignHCenter {
+  justify-content: center;
+}
 
 .xCol {
   display: flex;
@@ -169,4 +172,8 @@ pre {
 
 .xWidthFitContent {
   width: fit-content;
+}
+
+.xUnset {
+  all: unset;
 }
