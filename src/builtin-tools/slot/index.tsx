@@ -267,7 +267,14 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   return (
     <div
       className={cN('CodeModeView', {xWidthFitContent: !expand})}
-      style={{display: 'inline-block', minWidth: 20, border: '1px solid #0083', boxSizing: 'border-box', maxWidth: '100%'}}
+      style={{
+        display: 'inline-block',
+        minWidth: 20,
+        border: '1px solid #0083',
+        boxSizing: 'border-box',
+        maxWidth: '100%',
+        ...expand ? {width: '100%'} : {},
+      }}
     >
       {contents}
     </div>
