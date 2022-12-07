@@ -148,6 +148,41 @@ const View = memo(function View(props: ViewProps) {
   const [ showSettingsX, setShowSettingsX ] = useState(false);
   const [ showSettingsY, setShowSettingsY ] = useState(false);
 
+  const selectProps: SelectProps<any, false> = {
+    theme: (theme) => ({
+      ...theme,
+      colors: {
+        ...theme.colors,
+        primary: "#ccc",
+        neutral0: "#fff",
+      },
+    }),
+    styles: {
+      container: (baseStyles) => ({
+        ...baseStyles,
+        flexGrow: 1,
+      }),
+      control: (base) => ({
+        ...base,
+        minHeight: 32,
+      }),
+      dropdownIndicator: (base) => ({
+        ...base,
+        padding: '0 2px',
+      }),
+      clearIndicator: (base) => ({
+        ...base,
+        paddingTop: 0,
+        paddingBottom: 0,
+      }),
+    },
+    menuPortalTarget: document.body,
+    // TODO: can't get this to work so I'm putting .live-compose-root onto individual items, shrug
+    // classNames: {
+    //   menuPortal: () => 'live-compose-root',
+    // }
+  };
+
   return <div className="xPad10 xGap10" style={{display: 'grid', gridTemplateColumns: 'repeat(2, auto)'}}>
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', alignSelf: 'center'}}>data</div>
     <div style={{width: 200}}>
@@ -229,40 +264,10 @@ export type OptionWithIcon<Value> = {
 }
 
 export const formatOptionLabel = ({icon, label}: OptionWithIcon<Mark>) => (
-  <div className="xRow">
+  <div className="xRow live-compose-root">
     <span style={{color: '#717a94', marginRight: 7}}>
       {icon}
     </span>
     {label}
   </div>
 );
-
-const selectProps: SelectProps<any, false> = {
-  theme: (theme) => ({
-    ...theme,
-    colors: {
-      ...theme.colors,
-      primary: "#ccc",
-      neutral0: "#fff",
-    },
-  }),
-  styles: {
-    container: (baseStyles) => ({
-      ...baseStyles,
-      flexGrow: 1,
-    }),
-    control: (base) => ({
-      ...base,
-      minHeight: 32,
-    }),
-    dropdownIndicator: (base) => ({
-      ...base,
-      padding: '0 2px',
-    }),
-    clearIndicator: (base) => ({
-      ...base,
-      paddingTop: 0,
-      paddingBottom: 0,
-    }),
-  },
-};
