@@ -3,7 +3,7 @@ import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
 import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
-import { updateF } from "src/util/updateF";
+import { Updater, useAt } from "src/util/state";
 import { slotSetTo } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
 
@@ -11,9 +11,9 @@ export type Program = {
   toolName: 'simple-chart',
   dataProgram: ToolProgram,
   mark: Mark | undefined,
-  xField: string | undefined,
+  xField: Field | undefined,
   xExtraProgram: ToolProgram,
-  yField: string | undefined,
+  yField: Field | undefined,
   yExtraProgram: ToolProgram,
 }
 
@@ -42,22 +42,24 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [yExtraComponent, yExtraView, yExtraOutput] = useSubTool({program, updateProgram, subKey: 'yExtraProgram', varBindings});
 
   const spec = useMemo(() => {
-    if (xField !== undefined && yField !== undefined) {
-      const xExtra = valueOrUndefined(xExtraOutput);
-      const yExtra = valueOrUndefined(yExtraOutput);
+    const xExtra = valueOrUndefined(xExtraOutput);
+    const yExtra = valueOrUndefined(yExtraOutput);
 
-      const spec: VisualizationSpec = {
-        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        mark: mark || 'bar',
-        encoding: {
-          x: {field: xField, type: 'quantitative', ...(xExtra as any)},
-          y: {field: yField, type: 'quantitative', ...(yExtra as any)},
+    const spec: VisualizationSpec = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+      mark: mark || 'bar',
+      encoding: {
+        ...xField && {
+          x: {field: xField.name, type: xField.type, ...(xExtra as any)},
         },
-        data: { name: 'values' },
-      };
+        ...yField && {
+          y: {field: yField.name, type: yField.type, ...(yExtra as any)},
+        }
+      },
+      data: { name: 'values' },
+    };
 
-      return spec;
-    }
+    return spec;
   }, [mark, xExtraOutput, xField, yExtraOutput, yField]);
 
   useOutput(reportOutput, useMemo(() => {
@@ -90,14 +92,34 @@ export const Component = memo((props: ToolProps<Program>) => {
 
 type TabularData = {[key: string]: any}[];
 
-function getFieldNames(data: TabularData) {
-  const fieldNames = new Set<string>();
-  for (const row of data) {
-    for (const key of Object.keys(row)) {
-      fieldNames.add(key);
+type FieldType = 'quantitative' | 'nominal' | 'ordinal' | 'temporal';
+
+type Field = {
+  name: string,
+  type: FieldType,
+}
+
+// TODO: only looks at first row; assumes no missing data
+function getFields(data: TabularData): Field[] {
+  const fields: Field[] = [];
+  const row = data[0];
+  for (const [key, value] of Object.entries(row)) {
+    let type: FieldType;
+    if (typeof value === 'number') {
+      type = 'quantitative';
+    } else if (typeof value === 'string') {
+      type = 'nominal';
+    } else if (value instanceof Date) {
+      type = 'temporal';
+    } else {
+      throw new Error(`Unknown type for value ${value}`);
     }
+    fields.push({
+      name: key,
+      type
+    });
   }
-  return [...fieldNames];
+  return fields;
 }
 
 
@@ -112,9 +134,11 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
 const View = memo(function View(props: ViewProps) {
   const { program, updateProgram, dataView, dataOutput, xExtraView, yExtraView } = props;
 
-  const { mark = 'bar', xField, yField } = program;
+  const [ mark, updateMark ] = useAt(program, updateProgram, 'mark');
+  const [ xField, updateXField ] = useAt(program, updateProgram, 'xField');
+  const [ yField, updateYField ] = useAt(program, updateProgram, 'yField');
 
-  const markOptions = useMemo(() => {
+  const markOptions: OptionWithIcon<Mark>[] = useMemo(() => {
     return marks.map(mark => ({value: mark, label: mark, icon: markIcons[mark]}));
   }, []);
 
@@ -122,31 +146,15 @@ const View = memo(function View(props: ViewProps) {
     return markOptions.find(option => option.value === mark)!;
   }, [mark, markOptions]);
 
-  const fieldNames = useMemo(() => {
+  const fields = useMemo(() => {
     try {
       if (hasValue(dataOutput)) {
-        return getFieldNames(dataOutput.value as any);
+        return getFields(dataOutput.value as any);
       }
     } catch {}
 
     return [];
   }, [dataOutput]);
-
-  const fieldOptions = useMemo(() => {
-    return fieldNames.map(name => ({value: name, label: name, icon: typeIcons['quantitative']}));
-  }, [fieldNames]);
-
-  const xOption = useMemo(() => {
-    return fieldOptions.find(option => option.value === xField);
-  }, [fieldOptions, xField]);
-
-  const yOption = useMemo(() => {
-    return fieldOptions.find(option => option.value === yField);
-  }, [fieldOptions, yField]);
-
-
-  const [ showSettingsX, setShowSettingsX ] = useState(false);
-  const [ showSettingsY, setShowSettingsY ] = useState(false);
 
   const selectProps: SelectProps<any, false> = {
     theme: (theme) => ({
@@ -185,58 +193,94 @@ const View = memo(function View(props: ViewProps) {
 
   return <div className="xPad10 xGap10" style={{display: 'grid', gridTemplateColumns: 'repeat(2, auto)'}}>
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', alignSelf: 'center'}}>data</div>
-    <div style={{width: 200}}>
+    <div style={{width: 250}}>
       <ShowView view={dataView} expand={true}/>
     </div>
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>mark</div>
-    <div className="xRow xGap10" style={{width: 200}}>
+    <div className="xRow xGap10" style={{width: 250}}>
       <Select
         options={markOptions}
         value={markOption}
-        onChange={(markOption) => updateProgram(updateF({mark: {$set: markOption?.value}}))}
+        onChange={(markOption) => updateMark(() => markOption?.value)}
         formatOptionLabel={formatOptionLabel}
         {...selectProps}
       />
       <SettingsToggle active={false} setActive={() => {}} />
     </div>
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>x-axis</div>
-    <div className="xCol xGap10">
-      <div className="xRow xGap10" style={{width: 200}}>
-        <Select
-          options={fieldOptions}
-          value={xOption}
-          onChange={(xField) => updateProgram(updateF({xField: {$set: xField?.value}}))}
-          formatOptionLabel={formatOptionLabel}
-          {...selectProps}
-        />
-        <SettingsToggle active={showSettingsX} setActive={setShowSettingsX} />
-      </div>
-      { showSettingsX &&
-        <div className="xRow xGap10" style={{width: 200}}>
-          <ShowView view={xExtraView} />
-        </div>
-      }
-    </div>
+    <FieldEditor
+      allFields={fields}
+      field={xField}
+      updateField={updateXField}
+      selectProps={selectProps}
+      extraView={xExtraView}
+    />
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>y-axis</div>
-    <div className="xCol xGap10">
-      <div className="xRow xGap10" style={{width: 200}}>
-        <Select
-          options={fieldOptions}
-          value={yOption}
-          onChange={(yField) => updateProgram(updateF({yField: {$set: yField?.value}}))}
-          formatOptionLabel={formatOptionLabel}
-          {...selectProps}
-        />
-        <SettingsToggle active={showSettingsY} setActive={setShowSettingsY} />
-      </div>
-      { showSettingsY &&
-        <div className="xRow xGap10" style={{width: 200}}>
-          <ShowView view={yExtraView} />
-        </div>
-      }
-    </div>
+    <FieldEditor
+      allFields={fields}
+      field={yField}
+      updateField={updateYField}
+      selectProps={selectProps}
+      extraView={yExtraView}
+    />
   </div>;
 });
+
+type FieldEditorProps = {
+  allFields: Field[],
+  field: Field | undefined,
+  updateField: Updater<Field | undefined>,
+  selectProps?: SelectProps<any, false>,
+  extraView: ToolView | null,
+}
+
+const FieldEditor = memo(function FieldEditor(props: FieldEditorProps) {
+  const {allFields: fields, field: selectedField, updateField, selectProps, extraView} = props;
+
+  const options: OptionWithIcon<string>[] = useMemo(() => {
+    return fields.map(({name, type}) => ({
+      value: name,
+      label: name,
+      icon: typeIcons[name === selectedField?.name ? selectedField.type : type],
+    }));
+  }, [fields, selectedField]);
+
+  const selectedOption = useMemo(() => {
+    return options.find(option => option.value === selectedField?.name);
+  }, [options, selectedField]);
+
+  const [ showSettings, setShowSettings ] = useState(false);
+
+  return <div className="xCol xGap10">
+    <div className="xRow xGap10" style={{width: 250}}>
+      <Select
+        isClearable={true}
+        options={options}
+        value={selectedOption}
+        onChange={(option: OptionWithIcon<string> | null) => {
+          if (option) {
+            const field = fields.find(field => field.name === option.value);
+            updateField(() => field);
+          } else {
+            updateField(() => undefined);
+            return;
+          }
+        }}
+        formatOptionLabel={formatOptionLabel}
+        {...selectProps}
+      />
+      <SettingsToggle
+        active={showSettings}
+        setActive={setShowSettings}
+      />
+    </div>
+    { showSettings &&
+      <div className="xRow xGap10" style={{width: 250}}>
+        <ShowView view={extraView} />
+      </div>
+    }
+  </div>
+})
 
 const SettingsToggle = memo(function SettingsToggle(props: {active: boolean, setActive: (active: boolean) => void}) {
   return <div
@@ -263,7 +307,7 @@ export type OptionWithIcon<Value> = {
   icon: ReactNode,
 }
 
-export const formatOptionLabel = ({icon, label}: OptionWithIcon<Mark>) => (
+export const formatOptionLabel = ({icon, label}: OptionWithIcon<any>) => (
   <div className="xRow live-compose-root">
     <span style={{color: '#717a94', marginRight: 7}}>
       {icon}
