@@ -62,108 +62,31 @@
               "type": "tool",
               "attrs": {
                 "id": "IDgrandiflora173946"
-              },
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
+              }
             },
             {
-              "type": "math_inline",
-              "content": [
-                {
-                  "type": "text",
-                  "marks": [
-                    {
-                      "type": "strong"
-                    }
-                  ],
-                  "text": "^2 +"
-                }
-              ],
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
+              "type": "text",
+              "text": "² + "
             },
             {
               "type": "tool",
               "attrs": {
                 "id": "IDrecorder460405"
-              },
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
+              }
             },
             {
               "type": "text",
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ],
-              "text": " "
-            },
-            {
-              "type": "math_inline",
-              "content": [
-                {
-                  "type": "text",
-                  "marks": [
-                    {
-                      "type": "strong"
-                    }
-                  ],
-                  "text": "="
-                }
-              ],
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " "
+              "text": " = "
             },
             {
               "type": "tool",
               "attrs": {
                 "id": "IDguavaberry357580"
-              },
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "math_inline",
-              "content": [
-                {
-                  "type": "text",
-                  "marks": [
-                    {
-                      "type": "strong"
-                    }
-                  ],
-                  "text": "^2"
-                }
-              ],
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
+              }
             },
             {
               "type": "text",
-              "text": "."
+              "text": "²."
             }
           ]
         },
