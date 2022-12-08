@@ -62,7 +62,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "IDbreath219911.csvParse(IDotter620976)",
+          "code": "IDbreath219911.csvParse(IDotter620976, IDbreath219911.autoType)",
           "subTools": {},
           "defaultCode": "IDbush078616"
         }
@@ -247,10 +247,20 @@
               "code": "",
               "subTools": {},
               "defaultCode": ""
+            },
+            "mark": "point",
+            "xChannel": {
+              "field": "month",
+              "type": "temporal"
+            },
+            "yChannel": {
+              "field": "passengers",
+              "type": "quantitative"
             }
           },
           "defaultCode": "IDbush078616"
-        }
+        },
+        "outputManualHeight": "infinity"
       },
       {
         "var_": {
