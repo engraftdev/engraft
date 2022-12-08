@@ -1,9 +1,10 @@
-import { memo, ReactNode, useMemo, useState } from "react";
+import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
-import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
+import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Updater, useAt } from "src/util/state";
+import { updateF } from "src/util/updateF";
 import { slotSetTo } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
 
@@ -11,10 +12,8 @@ export type Program = {
   toolName: 'simple-chart',
   dataProgram: ToolProgram,
   mark: Mark | undefined,
-  xField: Field | undefined,
-  xExtraProgram: ToolProgram,
-  yField: Field | undefined,
-  yExtraProgram: ToolProgram,
+  xChannel: ChannelSpec | undefined,
+  yChannel: ChannelSpec | undefined,
 }
 
 export type Mark = 'bar' | 'line' | 'area' | 'point';
@@ -25,42 +24,31 @@ export const programFactory: ProgramFactory<Program> = (defaultInputCode?: strin
     toolName: 'simple-chart',
     dataProgram: slotSetTo(defaultInputCode || ''),
     mark: 'bar',
-    xField: undefined,
-    xExtraProgram: slotSetTo(''),
-    yField: undefined,
-    yExtraProgram: slotSetTo(''),
+    xChannel: undefined,
+    yChannel: undefined,
   }
 };
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
-  const { mark = 'bar', xField, yField } = program;
+  const { mark = 'bar', xChannel, yChannel } = program;
 
   const [dataComponent, dataView, dataOutput] = useSubTool({program, updateProgram, subKey: 'dataProgram', varBindings});
-  const [xExtraComponent, xExtraView, xExtraOutput] = useSubTool({program, updateProgram, subKey: 'xExtraProgram', varBindings});
-  const [yExtraComponent, yExtraView, yExtraOutput] = useSubTool({program, updateProgram, subKey: 'yExtraProgram', varBindings});
 
   const spec = useMemo(() => {
-    const xExtra = valueOrUndefined(xExtraOutput);
-    const yExtra = valueOrUndefined(yExtraOutput);
-
     const spec: VisualizationSpec = {
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
       mark: mark || 'bar',
       encoding: {
-        ...xField && {
-          x: {field: xField.name, type: xField.type, ...(xExtra as any)},
-        },
-        ...yField && {
-          y: {field: yField.name, type: yField.type, ...(yExtra as any)},
-        }
+        ...xChannel && { x: xChannel },
+        ...yChannel && { y: yChannel },
       },
       data: { name: 'values' },
     };
 
     return spec;
-  }, [mark, xExtraOutput, xField, yExtraOutput, yField]);
+  }, [mark, xChannel, yChannel]);
 
   useOutput(reportOutput, useMemo(() => {
     if (hasValue(dataOutput) && spec !== undefined) {
@@ -78,33 +66,38 @@ export const Component = memo((props: ToolProps<Program>) => {
     render: () => <View
       {...props}
       dataView={dataView} dataOutput={dataOutput}
-      xExtraView={xExtraView}
-      yExtraView={yExtraView}
     />,
-  }), [dataOutput, dataView, props, xExtraView, yExtraView]));
+  }), [dataOutput, dataView, props]));
 
   return <>
     {dataComponent}
-    {xExtraComponent}
-    {yExtraComponent}
   </>
 });
 
 type TabularData = {[key: string]: any}[];
 
-type FieldType = 'quantitative' | 'nominal' | 'ordinal' | 'temporal';
+type ChannelType = 'quantitative' | 'nominal' | 'ordinal' | 'temporal';
+const channelTypes: ChannelType[] = ['quantitative', 'nominal', 'ordinal', 'temporal'];
 
-type Field = {
-  name: string,
-  type: FieldType,
-}
+type ChannelAggregate = 'count' | 'sum' | 'mean' | 'median' | 'min' | 'max';
+const channelAggregates: ChannelAggregate[] = ['count', 'sum', 'mean', 'median', 'min', 'max'];
+
+type ChannelSpec = ChannelSpecFromField;
+type ChannelSpecFromField = {
+  field: string,
+  type: ChannelType,
+  aggregate?: ChannelAggregate,
+  bin?: boolean,
+  // TODO: cool idea; not implemented
+  // extraProgram: ToolProgram,
+};
 
 // TODO: only looks at first row; assumes no missing data
-function getFields(data: TabularData): Field[] {
-  const fields: Field[] = [];
+function getChannelTemplatesFromData(data: TabularData): ChannelSpec[] {
+  const fields: ChannelSpec[] = [];
   const row = data[0];
   for (const [key, value] of Object.entries(row)) {
-    let type: FieldType;
+    let type: ChannelType;
     if (typeof value === 'number') {
       type = 'quantitative';
     } else if (typeof value === 'string') {
@@ -115,7 +108,7 @@ function getFields(data: TabularData): Field[] {
       throw new Error(`Unknown type for value ${value}`);
     }
     fields.push({
-      name: key,
+      field: key,
       type
     });
   }
@@ -127,16 +120,14 @@ function getFields(data: TabularData): Field[] {
 type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
   dataView: ToolView | null,
   dataOutput: ToolOutput | null,
-  xExtraView: ToolView | null,
-  yExtraView: ToolView | null,
 }
 
 const View = memo(function View(props: ViewProps) {
-  const { program, updateProgram, dataView, dataOutput, xExtraView, yExtraView } = props;
+  const { program, updateProgram, dataView, dataOutput } = props;
 
   const [ mark, updateMark ] = useAt(program, updateProgram, 'mark');
-  const [ xField, updateXField ] = useAt(program, updateProgram, 'xField');
-  const [ yField, updateYField ] = useAt(program, updateProgram, 'yField');
+  const [ xChannel, updateXChannel ] = useAt(program, updateProgram, 'xChannel');
+  const [ yChannel, updateYChannel ] = useAt(program, updateProgram, 'yChannel');
 
   const markOptions: OptionWithIcon<Mark>[] = useMemo(() => {
     return marks.map(mark => ({value: mark, label: mark, icon: markIcons[mark]}));
@@ -146,10 +137,13 @@ const View = memo(function View(props: ViewProps) {
     return markOptions.find(option => option.value === mark)!;
   }, [mark, markOptions]);
 
-  const fields = useMemo(() => {
+  const channelTemplates: ChannelSpec[] = useMemo(() => {
     try {
       if (hasValue(dataOutput)) {
-        return getFields(dataOutput.value as any);
+        return [
+          ...getChannelTemplatesFromData(dataOutput.value as any),
+          // TODO: add "COUNT" option
+        ];
       }
     } catch {}
 
@@ -209,47 +203,57 @@ const View = memo(function View(props: ViewProps) {
     </div>
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>x-axis</div>
     <FieldEditor
-      allFields={fields}
-      field={xField}
-      updateField={updateXField}
+      channelTemplates={channelTemplates}
+      channel={xChannel}
+      updateChannel={updateXChannel}
       selectProps={selectProps}
-      extraView={xExtraView}
     />
     <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>y-axis</div>
     <FieldEditor
-      allFields={fields}
-      field={yField}
-      updateField={updateYField}
+      channelTemplates={channelTemplates}
+      channel={yChannel}
+      updateChannel={updateYChannel}
       selectProps={selectProps}
-      extraView={yExtraView}
     />
   </div>;
 });
 
 type FieldEditorProps = {
-  allFields: Field[],
-  field: Field | undefined,
-  updateField: Updater<Field | undefined>,
+  channelTemplates: ChannelSpec[],
+  channel: ChannelSpec | undefined,
+  updateChannel: Updater<ChannelSpec | undefined>,
   selectProps?: SelectProps<any, false>,
-  extraView: ToolView | null,
 }
 
 const FieldEditor = memo(function FieldEditor(props: FieldEditorProps) {
-  const {allFields: fields, field: selectedField, updateField, selectProps, extraView} = props;
+  const {channelTemplates, channel, updateChannel, selectProps} = props;
 
   const options: OptionWithIcon<string>[] = useMemo(() => {
-    return fields.map(({name, type}) => ({
-      value: name,
-      label: name,
-      icon: typeIcons[name === selectedField?.name ? selectedField.type : type],
-    }));
-  }, [fields, selectedField]);
+    return channelTemplates.map((template) => {
+      const {field, type} = template;
+      let newType = type;
+      if (channel && template.field === channel.field) {
+        newType = channel.type;
+      }
+      return {
+        value: field,
+        label: field,
+        icon: typeIcons[newType],
+      }
+    });
+  }, [channelTemplates, channel]);
 
   const selectedOption = useMemo(() => {
-    return options.find(option => option.value === selectedField?.name);
-  }, [options, selectedField]);
+    return options.find(option => option.value === channel?.field);
+  }, [options, channel]);
 
   const [ showSettings, setShowSettings ] = useState(false);
+
+  useEffect(() => {
+    if (!channel) {
+      setShowSettings(false);
+    }
+  }, [channel])
 
   return <div className="xCol xGap10">
     <div className="xRow xGap10" style={{width: 250}}>
@@ -259,10 +263,10 @@ const FieldEditor = memo(function FieldEditor(props: FieldEditorProps) {
         value={selectedOption}
         onChange={(option: OptionWithIcon<string> | null) => {
           if (option) {
-            const field = fields.find(field => field.name === option.value);
-            updateField(() => field);
+            const template = channelTemplates.find(template => template.field === option.value);
+            updateChannel(() => template);
           } else {
-            updateField(() => undefined);
+            updateChannel(() => undefined);
             return;
           }
         }}
@@ -272,17 +276,46 @@ const FieldEditor = memo(function FieldEditor(props: FieldEditorProps) {
       <SettingsToggle
         active={showSettings}
         setActive={setShowSettings}
+        disabled={!channel}
       />
     </div>
-    { showSettings &&
-      <div className="xRow xGap10" style={{width: 250}}>
-        <ShowView view={extraView} />
+    { showSettings && channel &&
+      <div className="xGap10" style={{display: 'grid', gridTemplateColumns: 'repeat(2, auto)'}}>
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end'}}>type</div>
+        <div className="xRow xGap10" style={{width: 150}}>
+          <select
+            value={channel.type}
+            onChange={(e) => updateChannel(updateF({type: {$set: e.target.value as ChannelType}}))}
+          >
+            {channelTypes.map(type => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </div>
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end'}}>aggregate</div>
+        <div className="xRow xGap10" style={{width: 150}}>
+          <select
+            value={channel.aggregate || ""}
+            onChange={(e) => updateChannel(updateF({aggregate: {$set: e.target.value === "" ? undefined : e.target.value as ChannelAggregate}}))}
+          >
+            <option value="">none</option>
+            {channelAggregates.map(type => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </div>
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end'}}>binning?</div>
+        <div className="xRow xGap10" style={{width: 150}}>
+          <select
+            value={channel.bin ? "true" : "false"}
+            onChange={(e) => updateChannel(updateF({bin: {$set: e.target.value === 'true' ? true : false}}))}
+          >
+            <option value="false">off</option>
+            <option value="true">on</option>
+          </select>
+        </div>
       </div>
     }
   </div>
 })
 
-const SettingsToggle = memo(function SettingsToggle(props: {active: boolean, setActive: (active: boolean) => void}) {
+const SettingsToggle = memo(function SettingsToggle(props: {active: boolean, setActive: (active: boolean) => void, disabled?: boolean}) {
   return <div
     className="xRow xAlignHCenter xAlignVCenter"
     style={{
@@ -294,8 +327,12 @@ const SettingsToggle = memo(function SettingsToggle(props: {active: boolean, set
       borderRadius: 4,
       height: '100%',
       aspectRatio: '1 / 1',
+      ...props.disabled && {
+        cursor: 'not-allowed',
+        opacity: 0.35,
+      }
     }}
-    onClick={() => props.setActive(!props.active)}
+    onClick={() => !props.disabled && props.setActive(!props.active)}
   >
     {gearIcon}
   </div>;
