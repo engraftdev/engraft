@@ -80,6 +80,12 @@ pre {
 .xRow.xAlignVCenter {
   align-items: center;
 }
+.xRow.xAlignLeft {
+  justify-content: flex-start;
+}
+.xRow.xAlignRight {
+  justify-content: flex-end;
+}
 .xRow.xAlignHCenter {
   justify-content: center;
 }
@@ -97,6 +103,12 @@ pre {
 }
 .xCol.xAlignHCenter {
   align-items: center;
+}
+.xCol.xAlignTop {
+  justify-content: flex-start;
+}
+.xCol.xAlignBottom {
+  justify-content: flex-end;
 }
 .xCol.xAlignVCenter {
   justify-content: center;

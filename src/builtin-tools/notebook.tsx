@@ -1,6 +1,8 @@
-import { Fragment, memo, useCallback, useMemo } from "react";
+import { Fragment, memo, useCallback, useMemo, useRef } from "react";
+import { mergeRefs } from "react-merge-refs";
 import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { startDrag } from "src/util/drag";
 import { atIndices, removers, Updater, useAt, useAtIndex } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
@@ -287,7 +289,8 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const [toolRef, toolSize] = useSize();
 
-  const [outputRef, isOutputHovered] = useHover()
+  const [outputHoverRef, isOutputHovered] = useHover()
+  const outputRef = useRef<HTMLDivElement>(null);
 
   const outputMaxHeight: number | undefined = (() => {
     // TODO: draggable height
@@ -296,6 +299,18 @@ const CellView = memo(function CellView(props: CellViewProps) {
     }
     return Math.max(cell.outputManualHeight || 0, toolSize?.height || 0, 50);
   })();
+
+  const onMouseDownResizer = useMemo(() => startDrag({
+    init() {
+      return {startHeight: outputRef.current!.clientHeight};
+    },
+    move({startHeight}) {
+      const newHeight = startHeight + this.event.clientY - this.startEvent.clientY;
+      updateCell(updateF({ outputManualHeight: {$set: newHeight} }));
+    },
+    done() {},
+    keepCursor: true,
+  }), [updateCell]);
 
   return <>
     {menuNode}
@@ -312,7 +327,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </div>
     { !alreadyDisplayed &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
-        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={outputRef}>
+        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputRef, outputHoverRef])}>
           {/* TODO: clean this up */}
           { outputBelowInput
             ? <ToolOutputView toolOutput={toolOutput}/>
@@ -325,10 +340,35 @@ const CellView = memo(function CellView(props: CellViewProps) {
                     style={{position: 'absolute', left: 0, top: 0, height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', pointerEvents: 'none'}}
                   >
                     <div
-                      style={{position: 'sticky', bottom: 5, width: 15, height: 15, fontSize: 15, cursor: 'pointer', textAlign: 'right', margin: 5, userSelect: 'none', pointerEvents: 'initial'}}
-                      onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                      className="xRow xAlignRight"
+                      style={{
+                        position: 'sticky',
+                        bottom: 5,
+                        width: '100%',
+                        height: 15,
+                        fontSize: 15,
+                        margin: 5,
+                        userSelect: 'none',
+                      }}
                     >
-                      {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+                      <div
+                        onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                        style={{
+                          cursor: 'pointer',
+                          pointerEvents: 'initial'
+                        }}
+                      >
+                        {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+                      </div>
+                      <div
+                        onMouseDown={onMouseDownResizer}
+                        style={{
+                          cursor: 'ns-resize',
+                          pointerEvents: 'initial'
+                        }}
+                      >
+                        ↕
+                      </div>
                     </div>
                   </div>
                 }
