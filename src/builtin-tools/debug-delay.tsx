@@ -5,6 +5,7 @@ import { useStateSetOnly } from "src/util/state";
 import { Program as TangleProgram } from "./tangle";
 import { slotSetTo } from "./slot";
 import { union } from "src/util/sets";
+import { useRefForCallback } from "src/util/useRefForCallback";
 
 export type Program = {
   toolName: 'debug-delay',
@@ -32,20 +33,22 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const [delayComponent, delayView, delayOutput] = useSubTool({program, updateProgram, varBindings, subKey: 'delayProgram'});
   const delayMs: number = hasValue(delayOutput) && typeof delayOutput.value === 'number' ? delayOutput.value : 0;
+  const delayMsRef = useRefForCallback(delayMs);
 
   const [actualComponent, actualView, actualOutput] = useSubTool({program, updateProgram, varBindings, subKey: 'actualProgram'});
 
   const [delayedOutput, setDelayedOutput] = useStateSetOnly<ToolOutput | null>(null);
   useEffect(() => {
-    if (delayMs === 0) {
+    if (delayMsRef.current === 0) {
       setDelayedOutput(actualOutput);
     } else {
+      setDelayedOutput(null);
       const timeout = setTimeout(() => {
         setDelayedOutput(actualOutput);
-      }, delayMs);
+      }, delayMsRef.current);
       return () => clearTimeout(timeout);
     }
-  }, [actualOutput, delayMs, setDelayedOutput]);
+  }, [actualOutput, delayMsRef, setDelayedOutput]);
 
   useOutput(reportOutput, delayedOutput);
 
