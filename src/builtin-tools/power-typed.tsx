@@ -26,6 +26,8 @@ export const Component = memo((props: ToolProps<Program>) => {
   useOutput(reportOutput, useMemo(() => {
     if (hasValue(baseOutput)) {
       return {value: (baseOutput.value as any) ** program.exponent};
+    } else {
+      return {error: 'base is not a number'};
     }
   }, [baseOutput, program.exponent]));
 

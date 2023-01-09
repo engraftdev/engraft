@@ -72,7 +72,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const viewVarBindings = useMemo(() => ({
     ...varBindings,
-    [program.stateVar.id]: {var_: program.stateVar, output: (upOutputs[highlightedIndex]) || undefined},
+    [program.stateVar.id]: {var_: program.stateVar, output: upOutputs[highlightedIndex]},
   }), [highlightedIndex, program.stateVar, upOutputs, varBindings]);
   const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram', varBindings: viewVarBindings})
 
@@ -117,7 +117,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const perUpVarBindings = useMemo(() => _.range(iterationsCount).map((inputArrayElem, i) =>
     ({
       ...varBindings,
-      [program.stateVar.id]: {var_: program.stateVar, output: (i === 0 ? initOutput : upOutputs[i - 1]) || undefined},
+      [program.stateVar.id]: {var_: program.stateVar, output: i === 0 ? initOutput : upOutputs[i - 1]},
     })
   ), [initOutput, iterationsCount, upOutputs, varBindings, program.stateVar]);
 

@@ -10,9 +10,9 @@ export function useView(reportView: Setter<ToolView | null>, view: ToolView | nu
   }, [reportView, view])
 }
 
-export function useOutput(reportOutput: Setter<ToolOutput | null>, output: ToolOutput | null | undefined) {
+export function useOutput(reportOutput: Setter<ToolOutput | null>, output: ToolOutput | null) {
   useEffect(() => {
-    reportOutput(output || null);
+    reportOutput(output);
     return () => reportOutput(null);
   }, [reportOutput, output])
 }

@@ -28,6 +28,8 @@ export const Component = memo((props: ToolProps<Program>) => {
   useOutput(reportOutput, useMemo(() => {
     if (hasValue(xOutput) && hasValue(yOutput)) {
       return {value: (xOutput.value as any) + (yOutput.value as any)};
+    } else {
+      return {error: 'x and y must be numbers'};
     }
   }, [xOutput, yOutput]));
 

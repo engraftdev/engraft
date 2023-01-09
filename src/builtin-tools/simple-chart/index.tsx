@@ -62,6 +62,8 @@ export const Component = memo((props: ToolProps<Program>) => {
             spec={spec}
           />
       }
+    } else {
+      return null;
     }
   }, [dataOutput, spec]));
 

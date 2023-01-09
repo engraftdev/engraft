@@ -116,7 +116,7 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
       if (otherCellId !== cell.var_.id) {
         result[otherCellId] = {
           var_: cells[otherCellId].var_,
-          output: outputs[otherCellId] || undefined
+          output: outputs[otherCellId]
         };
       }
     };

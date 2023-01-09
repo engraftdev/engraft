@@ -221,7 +221,7 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
     let result: {[label: string]: VarBinding} = {...varBindings};
     cells.forEach((otherCell) => {
       if (otherCell.var_.id !== cell.var_.id) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id] || undefined};  // OH NO will this infinity?
+        result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id]};  // OH NO will this infinity?
       }
     });
     return result;

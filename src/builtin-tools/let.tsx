@@ -31,7 +31,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [bindingComponent, bindingView, bindingOutput] = useSubTool({program, updateProgram, subKey: 'bindingProgram', varBindings});
   const newVarBindings = useMemo(() => ({
     ...varBindings,
-    [program.bindingVar.id]: {var_: program.bindingVar, output: bindingOutput || undefined},
+    [program.bindingVar.id]: {var_: program.bindingVar, output: bindingOutput},
   }), [varBindings, program.bindingVar, bindingOutput]);
   const [bodyComponent, bodyView, bodyOutput] = useSubTool({program, updateProgram, subKey: 'bodyProgram', varBindings: newVarBindings});
   const [bindingVar, updateBindingVar] = useAt(program, updateProgram, 'bindingVar');

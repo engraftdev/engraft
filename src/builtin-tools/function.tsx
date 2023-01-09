@@ -322,7 +322,7 @@ export const FunctionThingComponent = memo((props: FunctionThingComponentProps) 
   const { program, updateProgram, closureVarBindings } = functionThing;
 
   const inputVarBindings = useMemo(() =>
-    Object.fromEntries(program.vars.map((var_) => [var_.id, {var_, output: inputs[var_.id] || undefined}]))
+    Object.fromEntries(program.vars.map((var_) => [var_.id, {var_, output: inputs[var_.id]}]))
   , [inputs, program.vars]);
 
   const varBindings = useMemo(() =>

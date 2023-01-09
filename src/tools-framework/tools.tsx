@@ -18,12 +18,12 @@ export type ToolOutputError = {
   error: string;
 };
 
-export function hasValue(output: ToolOutput | null | undefined): output is ToolOutputValue {
+export function hasValue(output: ToolOutput | null): output is ToolOutputValue {
   if (!output) { return false; }
   return 'value' in output;
 }
 
-export function valueOrUndefined(output: ToolOutput | null | undefined): unknown {
+export function valueOrUndefined(output: ToolOutput | null): unknown {
   if (hasValue(output)) {
     return output.value;
   } else {
@@ -31,7 +31,7 @@ export function valueOrUndefined(output: ToolOutput | null | undefined): unknown
   }
 }
 
-export function hasError(output: ToolOutput | null | undefined): output is ToolOutputError {
+export function hasError(output: ToolOutput | null): output is ToolOutputError {
   if (!output) { return false; }
   return 'error' in output;
 }
@@ -107,7 +107,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  output: ToolOutput | undefined;
+  output: ToolOutput | null;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};

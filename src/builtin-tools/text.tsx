@@ -60,7 +60,7 @@ export const Component = memo((props: ToolProps<Program>) => {
         // ignore
       }
     }
-    Object.entries(varBindings).map(([k, v]) => [k, v.output || null] as const).forEach(applyReplacement);
+    Object.entries(varBindings).map(([k, v]) => [k, v.output] as const).forEach(applyReplacement);
     Object.entries(outputs).forEach(applyReplacement);
     return result;
   }, [program.text, varBindings, outputs])
