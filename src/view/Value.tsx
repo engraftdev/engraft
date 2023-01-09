@@ -13,7 +13,7 @@ import { inlineBlock } from "./styles";
 import { format } from "isoformat";
 import { isProbablyFunctionThing } from "src/builtin-tools/function";
 import Diagram from "src/util/Diagram";
-import { hasProperty } from "src/util/hasProperty";
+import { hasProperty, isObject } from "src/util/hasProperty";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -354,12 +354,12 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
     toolOutput={toolOutput}
     renderValue={(value) => {
       if (displayReactElementsDirectly && hasValue(toolOutput)) {
-        let maybeElement = toolOutput.value as object | null | undefined;
+        let maybeElement = toolOutput.value;
         // TODO: extra hack for formatter-tool... should think through this
-        if (maybeElement && typeof maybeElement === 'object' && 'view' in maybeElement) {
-          maybeElement = (maybeElement as any).view;
+        if (hasProperty(maybeElement, 'view')) {
+          maybeElement = maybeElement.view;
         };
-        if (isValidElement(maybeElement)) {
+        if (isObject(maybeElement) && isValidElement(maybeElement)) {
           return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
         }
       }
