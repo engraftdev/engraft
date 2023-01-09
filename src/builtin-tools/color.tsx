@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { RgbColorPicker } from 'react-colorful';
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
 
@@ -17,6 +17,8 @@ export const programFactory: ProgramFactory<Program> = () => ({
   g: 200,
   b: 100,
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;

@@ -1,8 +1,9 @@
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
 import { mergeRefs } from "react-merge-refs";
-import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { ComputeReferences, hasValue, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { startDrag } from "src/util/drag";
+import { difference, union } from "src/util/sets";
 import { atIndices, removers, Updater, useAt, useAtIndex } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
@@ -47,6 +48,12 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
   };
 }
 
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(
+    union(...Object.values(program.cells).map(cell => references(cell.program))),
+    Object.keys(program.cells)
+  );
+
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;
 
@@ -63,7 +70,9 @@ export const Component = memo((props: ToolProps<Program>) => {
     if (!lastCell) {
       return null;
     }
-    return outputs[lastCell.var_.id];
+    const output = outputs[lastCell.var_.id];
+    console.log("notebook output", output);
+    return output;
   }, [cells, outputs]));
 
   return <>{cells.map((cell) =>

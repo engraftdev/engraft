@@ -1,7 +1,8 @@
 import { CSSProperties, memo, useEffect, useMemo } from "react";
-import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
+import { hasValue, references, newVar, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { PerTool, ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
 import range from "src/util/range";
+import { difference, union } from "src/util/sets";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { Value } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
@@ -24,6 +25,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     perItemProgram: slotSetTo(itemVar.id)
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.inputProgram), difference(references(program.perItemProgram), [program.itemVar.id]));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

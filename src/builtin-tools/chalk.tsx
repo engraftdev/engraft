@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
+import { references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import ChalkEditor from "src/util/ChalkEditor";
 import { compileExpression } from "src/util/compile";
@@ -22,6 +22,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
 const defaultCode = `function (x) {
   return x;
 }`;
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.inputProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

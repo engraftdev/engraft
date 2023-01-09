@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it';
 import { memo, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useMemoObject } from "src/util/useMemoObject";
 import { slotSetTo } from "./slot";
@@ -16,6 +16,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
   // TODO: idk if I like this "textProgramFactory" import
   sourceProgram: slotSetTo(textProgramFactory()),
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.sourceProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

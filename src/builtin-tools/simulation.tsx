@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { memo, useEffect, useMemo } from "react";
-import { newVar, ProgramFactory, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
+import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { difference, union } from "src/util/sets";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { ToolOutputView } from "src/view/Value";
 import { slotSetTo } from "./slot";
@@ -26,6 +27,16 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     viewProgram: slotSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(
+    union(
+      references(program.initProgram),
+      references(program.upProgram),
+      references(program.viewProgram),
+    ),
+    [program.stateVar.id]
+  )
 
 // (window as any).count = 0;
 

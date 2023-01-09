@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { CSSProperties, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Details } from "src/util/Details";
@@ -34,6 +34,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     },
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.inputProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

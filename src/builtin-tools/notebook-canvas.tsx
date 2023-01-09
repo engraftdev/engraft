@@ -1,9 +1,10 @@
 import update from "immutability-helper";
 import _ from "lodash";
 import React, { memo, useCallback, useMemo } from "react";
-import { hasValue, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { ComputeReferences, hasValue, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { startDrag } from "src/util/drag";
+import { difference, union } from "src/util/sets";
 import { atIndex, Updater, useAt, useAtIndex } from "src/util/state";
 import { unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
@@ -53,6 +54,12 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
     height: 16 * 20,
   };
 }
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(
+    union(...Object.values(program.cells).map(cell => references(cell.program))),
+    Object.keys(program.cells)
+  );
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

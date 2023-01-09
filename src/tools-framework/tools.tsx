@@ -5,6 +5,7 @@ import { Setter, Updater } from "src/util/state";
 export type Tool<P extends ToolProgram = any> = {
   Component: ToolComponent<P>;
   programFactory: ProgramFactory<P>;
+  computeReferences: ComputeReferences<P>;  // TODO: separate from Component because it's supposed to be statically available, but work may be duped
   isInternal?: boolean;
 }
 
@@ -63,6 +64,8 @@ export interface ToolComponent<P extends ToolProgram> {
 
 export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;
 
+export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<string>;
+
 let toolIndex: { [toolName: string]: Tool } = {};
 
 export function lookUpTool(toolName: string): Tool<any> {
@@ -84,7 +87,15 @@ export function registerTool(tool: Tool<any>) {
     throw new Error(`Tool has no programFactory`);
   }
   if (!tool.Component) {
+    console.error(tool);
     throw new Error(`Tool has no Component`);
+  }
+  if (!tool.computeReferences) {
+    let toolName = 'UNKNOWN';
+    try {
+      toolName = tool.programFactory().toolName;
+    } catch { }
+    throw new Error(`Tool has no references: ${toolName}`);
   }
 
   const { toolName } = tool.programFactory();
@@ -109,4 +120,10 @@ export interface Var {
 
 export function newVar(label = 'new var') {
   return {id: newId(), label};
+}
+
+// TODO: cache with a WeakMap?
+export function references(program: ToolProgram): Set<string> {
+  const tool = lookUpTool(program.toolName);
+  return tool.computeReferences(program);
 }

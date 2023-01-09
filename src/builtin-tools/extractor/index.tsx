@@ -1,6 +1,6 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { slotSetTo } from "src/builtin-tools/slot";
-import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";
 import { noOp } from "src/util/noOp";
@@ -33,6 +33,9 @@ export const programFactory: ProgramFactory<Program> = (defaultInputCode?: strin
     minimized: false,
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.inputProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

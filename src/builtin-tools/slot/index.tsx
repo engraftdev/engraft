@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { memo, ReactNode, useCallback, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { cN } from 'src/deps';
-import { ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { references, ProgramFactory, ComputeReferences, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
@@ -53,6 +53,16 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   code: '',
   subTools: {},
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => {
+  if (program.modeName === 'code') {
+    // TODO: this is not principled or robust; should probably actually parse the code?
+    // (but then we'd want to share some work to avoid parsing twice? idk)
+    return new Set([...program.code.matchAll(refRE)].map(m => m[1]));
+  } else {
+    return references(program.subProgram);
+  }
+}
 
 export const Component = memo((props: ToolProps<Program>) => {
   const {program, updateProgram} = props;

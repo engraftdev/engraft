@@ -1,9 +1,10 @@
 import { memo, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, ToolView } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useStateSetOnly } from "src/util/state";
 import { slotSetTo } from "./slot";
 import { Program as CheckboxProgram } from "./checkbox";
+import { union } from "src/util/sets";
 
 export type Program = {
   toolName: 'disabler',
@@ -19,6 +20,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   }),
   actualProgram: slotSetTo(defaultCode || ''),
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.enabledProgram), references(program.actualProgram));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportView } = props;

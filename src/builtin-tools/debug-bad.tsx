@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from "react";
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useView } from "src/tools-framework/useSubTool";
 
 export type Program = {
@@ -9,6 +9,8 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'debug-bad',
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const [ goneBad, setGoneBad ] = useState(false);

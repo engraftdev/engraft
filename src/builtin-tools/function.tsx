@@ -1,9 +1,10 @@
 import _ from "lodash";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { lookUpTool, newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings } from "src/tools-framework/tools";
+import { references, lookUpTool, newVar, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBindings } from "src/tools-framework/tools";
 import { PerTool, ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";
 import { noOp } from "src/util/noOp";
+import { difference } from "src/util/sets";
 import { atAllIndices, atIndexZip, removers, Updater, useAt } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -37,6 +38,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     bodyProgram: slotSetTo(var1.id),
   }
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(references(program.bodyProgram), program.vars.map((v) => v.id));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

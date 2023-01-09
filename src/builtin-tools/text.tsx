@@ -3,13 +3,14 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorView } from "@codemirror/view";
 import { memo, useCallback, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { hasValue, ProgramFactory, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { ComputeReferences, hasValue, ProgramFactory, references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
 import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
 import refsExtension, { refCode } from "src/util/refsExtension";
+import { union } from "src/util/sets";
 import { updateKeys, useAt, useStateUpdateOnly } from "src/util/state";
 import { useMemoObject } from "src/util/useMemoObject";
 import { useRefForCallback } from "src/util/useRefForCallback";
@@ -30,6 +31,9 @@ export const programFactory: ProgramFactory<Program> = () => {
     subTools: {},
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(...Object.values(program.subTools).map(references));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

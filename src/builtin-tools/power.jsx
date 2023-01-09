@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { hasValue } from "src/tools-framework/tools";
+import { hasValue, references } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { slotSetTo } from "./slot";
 
@@ -8,6 +8,8 @@ export const programFactory = () => ({
   baseProgram: slotSetTo(''),
   exponent: 1,
 });
+
+export const computeReferences = (program) => references(program.baseProgram);
 
 export const Component = memo((props) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

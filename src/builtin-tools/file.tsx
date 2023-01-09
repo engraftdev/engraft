@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateF } from "src/util/updateF";
 
@@ -14,6 +14,8 @@ export type Program = {
 }
 
 type OutputMode = 'text' | 'data-uri' | 'react-image';
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'file',

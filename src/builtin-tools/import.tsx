@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ProgramFactory, ToolOutput, ToolProps } from "src/tools-framework/tools";
+import { ComputeReferences, ProgramFactory, ToolOutput, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { ControlledTextInput } from "src/util/ControlledTextInput";
 import { useAt } from "src/util/state";
@@ -15,6 +15,8 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     name: 'lodash',
   }
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;

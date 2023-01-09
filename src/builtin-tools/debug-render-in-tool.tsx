@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { ToolOutputView } from "src/view/Value";
 import { slotSetTo } from "./slot";
@@ -13,6 +13,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   toolName: 'debug-render-in-tool',
   renderProgram: slotSetTo(defaultCode || ''),
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.renderProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

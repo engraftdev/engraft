@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { updateKeys, useAt } from "src/util/state";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -25,6 +25,8 @@ export const programFactory: ProgramFactory<Program> = () => ({
   max: 10,
   step: 1,
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, reportOutput, reportView } = props;

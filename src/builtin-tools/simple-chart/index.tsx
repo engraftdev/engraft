@@ -1,7 +1,7 @@
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
-import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { Updater, useAt } from "src/util/state";
 import { updateF } from "src/util/updateF";
@@ -28,6 +28,9 @@ export const programFactory: ProgramFactory<Program> = (defaultInputCode?: strin
     yChannel: undefined,
   }
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.dataProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

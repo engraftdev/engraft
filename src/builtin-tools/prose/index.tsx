@@ -9,9 +9,10 @@ import { EditorView, NodeView } from "prosemirror-view";
 import prosemirrorViewCSS from "prosemirror-view/style/prosemirror.css";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBindings } from "src/tools-framework/tools";
+import { references, newVar, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import PortalSet, { usePortalSet } from "src/util/PortalSet";
+import { difference, union } from "src/util/sets";
 import { Updater, useAt } from "src/util/state";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
@@ -49,6 +50,12 @@ export const programFactory: ProgramFactory<Program> = () => ({
   docJSON: {type: 'doc', content: []},
   cells: {},
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(
+    union(...Object.values(program.cells).map(cell => references(cell.program))),
+    Object.keys(program.cells)
+  );
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

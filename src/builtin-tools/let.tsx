@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react";
-import { newVar, ProgramFactory, ToolProgram, ToolProps, Var } from "src/tools-framework/tools";
+import { references, newVar, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, Var } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { difference, union } from "src/util/sets";
 import { useAt } from "src/util/state";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "./slot";
@@ -20,6 +21,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     bodyProgram: slotSetTo(''),
   }
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.bindingProgram), difference(references(program.bodyProgram), [program.bindingVar.id]));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from "react";
-import { ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
+import { references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { startDrag } from "src/util/drag";
 import { noOp } from "src/util/noOp";
@@ -33,6 +33,9 @@ export const programFactory: ProgramFactory<Program> = (defaultInputCode) => ({
     y: [-5, 5],
   },
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.inputProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

@@ -1,10 +1,11 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { slotSetTo } from "src/builtin-tools/slot";
 import { Program as TextProgram } from "src/builtin-tools/text";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { RowToCol } from "src/util/RowToCol";
 import { safeToString } from "src/util/safeToString";
+import { union } from "src/util/sets";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { useDebounce } from "use-debounce";
 
@@ -39,6 +40,9 @@ export const programFactory: ProgramFactory<Program> = () => {
 const paramsDefault = `{
   my_param: "hello world!"
 }`;
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.urlProgram), references(program.paramsProgram));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

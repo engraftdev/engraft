@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ComputeReferences, ProgramFactory, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { Setter, updaterToSetter, useAt, useStateSetOnly } from "src/util/state";
 import { SettableValue } from "src/view/SettableValue";
@@ -16,6 +16,8 @@ export const programFactory: ProgramFactory<Program> = () => {
     initialValue: undefined,
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;

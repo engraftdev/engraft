@@ -9,7 +9,7 @@ import update from "immutability-helper"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
 import { slotSetTo } from "src/builtin-tools/slot"
-import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools"
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools"
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool"
 import CodeMirror from "src/util/CodeMirror"
 import { compileExpression } from "src/util/compile"
@@ -41,6 +41,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     inOutPairs: []
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  references(program.inputProgram);
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

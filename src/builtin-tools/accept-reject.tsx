@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { cloneElement, memo, useMemo } from "react";
-import { ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { union } from "src/util/sets";
 import { slotSetTo } from "./slot";
 
 export type Program = {
@@ -15,6 +16,10 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   acceptedProgram: slotSetTo(defaultCode || ''),
   draftProgram: slotSetTo(defaultCode || ''),
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.acceptedProgram), references(program.draftProgram));
+
 
 const check = <svg
   xmlns="http://www.w3.org/2000/svg"

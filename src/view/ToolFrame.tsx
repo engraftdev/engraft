@@ -1,6 +1,6 @@
 import { CSSProperties, memo, ReactNode } from "react";
 import { cN } from "src/deps";
-import { ToolProgram, VarBindings } from "src/tools-framework/tools";
+import { references, ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
@@ -91,6 +91,12 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
           <ValueEditable value={program} updater={updateProgram}/> :
           <Value value={program}/>
         }
+        <h3>References</h3>
+        <ul>
+          { [...references(program)].map((ref) =>
+            <li key={ref}>{ref}</li>
+          ) }
+        </ul>
         <h3>Variable bindings</h3>
         <Value value={varBindings}/>
       </IsolateStyles>

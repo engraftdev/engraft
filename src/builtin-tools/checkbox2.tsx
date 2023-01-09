@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 import { useAt } from "src/util/state";
 
@@ -12,6 +12,8 @@ export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'checkbox2',
   checked: false,
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, reportOutput, reportView } = props;

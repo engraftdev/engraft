@@ -1,7 +1,8 @@
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { newVar, ProgramFactory, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { references, newVar, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useTool, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";
+import { difference, union } from "src/util/sets";
 import { updateKeys, Updater, useAt, useAtIndex, useStateUpdateOnly } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
@@ -36,6 +37,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     ],
   };
 };
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  difference(union(...program.links.map((l) => references(l.program))), [program.prevVar.id]);
 
 const BLOCK_WIDTH = 50;
 const BLOCK_HEIGHT = 50;

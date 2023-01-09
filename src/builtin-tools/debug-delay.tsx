@@ -1,15 +1,19 @@
 import { memo, useEffect, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolOutput, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { useStateSetOnly } from "src/util/state";
 import { Program as TangleProgram } from "./tangle";
 import { slotSetTo } from "./slot";
+import { union } from "src/util/sets";
 
 export type Program = {
   toolName: 'debug-delay',
   delayProgram: ToolProgram,
   actualProgram: ToolProgram,
 }
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.delayProgram), references(program.actualProgram));
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => ({
   toolName: 'debug-delay',

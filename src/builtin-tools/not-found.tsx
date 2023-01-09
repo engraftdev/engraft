@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { ProgramFactory, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
 import { useOutput, useView } from "src/tools-framework/useSubTool";
 
 export type Program = {
@@ -9,6 +9,8 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'not-found',
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { reportOutput, reportView } = props;

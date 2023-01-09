@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
+import { union } from "src/util/sets";
 import { Program as CheckboxProgram } from "./checkbox";
 import { slotSetTo } from "./slot";
 
@@ -18,6 +19,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   }),
   actualProgram: slotSetTo(defaultCode || ''),
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.shownProgram), references(program.actualProgram));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;

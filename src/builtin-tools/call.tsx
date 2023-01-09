@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo } from "react";
-import { hasValue, ProgramFactory, ToolProgram, ToolProps } from "src/tools-framework/tools";
+import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { union } from "src/util/sets";
 import { useAt, useAts } from "src/util/state";
 import { updateF } from "src/util/updateF";
 import { FunctionThingComponent, isProbablyFunctionThing } from "./function";
@@ -17,6 +18,9 @@ export const programFactory: ProgramFactory<Program> = () => ({
   functionProgram: slotSetTo(''),
   inputPrograms: {},
 });
+
+export const computeReferences: ComputeReferences<Program> = (program) =>
+  union(references(program.functionProgram), ...Object.values(program.inputPrograms).map(references));
 
 export const Component = memo((props: ToolProps<Program>) => {
   const { program, updateProgram, varBindings, reportOutput, reportView } = props;
