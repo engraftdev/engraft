@@ -1,6 +1,6 @@
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
 import { mergeRefs } from "react-merge-refs";
-import { ComputeReferences, hasValue, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { ComputeReferences, hasValue, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolView, Var, VarBindings } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, ToolSet, useOutput, useToolSet, useView } from "src/tools-framework/useSubTool";
 import { startDrag } from "src/util/drag";
 import { difference, union } from "src/util/sets";
@@ -71,7 +71,7 @@ export const Component = memo((props: ToolProps<Program>) => {
       return null;
     }
     const output = outputs[lastCell.var_.id];
-    console.log("notebook output", output);
+    // console.log("notebook output", output);
     return output;
   }, [cells, outputs]));
 
@@ -217,35 +217,32 @@ const CellModel = memo(function CellModel(props: CellModelProps) {
   const [cell, updateCell] = useAtIndex(cells, updateCells, i);
   const [cellProgram, updateCellProgram] = useAt(cell, updateCell, 'program');
 
-  let prevOutput: ToolOutput | null | undefined = undefined;
-  let prevLabel: string | undefined = undefined;
-  const prevCell: Cell | undefined = cells[i - 1];
+  let prevOutput: ToolOutput | null = null;
+  let prevLabel: string | null = null;
+  const prevCell = cells[i - 1] as Cell | undefined;
   if (prevCell) {
     prevOutput = outputs[prevCell.var_.id];
     prevLabel = prevCell.var_.label;
   }
-  const prevVarContext = useMemo(() => {
-    if (prevOutput && prevLabel) {
-      const labelledPrevVar: Var = {
-        ...prevVar,
-        label: `↑ <i>${prevLabel}</i>`,
-        autoCompleteLabel: '↑ prev'
-      };
-      const prevVarBinding = {
-        var_: labelledPrevVar,
-        output: prevOutput,
-      };
-      return {[prevVar.id]: prevVarBinding};
-    } else {
-      return undefined;
-    }
+  const prevVarContext: VarBindings = useMemo(() => {
+    const labelledPrevVar: Var = {
+      ...prevVar,
+      label: `↑ <i>${prevLabel}</i>`,
+      autoCompleteLabel: '↑ prev'
+    };
+    const prevVarBinding = {
+      var_: labelledPrevVar,
+      output: prevOutput,
+    };
+    return {[prevVar.id]: prevVarBinding};
   }, [prevLabel, prevOutput, prevVar])
 
   const newVarBindings = useDedupe(useMemo(() => {
-    let result: {[label: string]: VarBinding} = {...varBindings, ...prevVarContext};
+    let result: VarBindings = {...varBindings, ...prevVarContext};
     cells.forEach((otherCell, cellIdx) => {
       if (cellIdx < i) {
-        result[otherCell.var_.id] = {var_: otherCell.var_, output: outputs[otherCell.var_.id]};  // OH NO will this infinity?
+        const output = outputs[otherCell.var_.id] as ToolOutput | null | undefined;
+        result[otherCell.var_.id] = {var_: otherCell.var_, output: output || null};  // OH NO will this infinity?
       }
     });
     return result;

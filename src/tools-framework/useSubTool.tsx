@@ -127,22 +127,13 @@ const ToolInSetNoMemo = function ToolInSet<P extends ToolProgram>(props: ToolInS
 
   const reportOutput = useCallback((output: ToolOutput | null) => {
     // console.log("reporting output", keyInSet, output);
-    if (output === null) {
-      return updateOutputs((oldOutputs) => oldOutputs.delete(keyInSet));
-    } else {
-      return updateOutputs((oldOutputs) => oldOutputs.set(keyInSet, output));
-    }
+    return updateOutputs((oldOutputs) => oldOutputs.set(keyInSet, output));
   }, [keyInSet, updateOutputs])
   const reportView = useCallback((view: ToolView | null) => {
     // console.log("reporting view", keyInSet, view);
-    if (view === null) {
-      return updateViews((oldViews) => oldViews.delete(keyInSet));
-    } else {
-      return updateViews((oldViews) => oldViews.set(keyInSet, view));
-    }
+    return updateViews((oldViews) => oldViews.set(keyInSet, view));
   }, [keyInSet, updateViews])
 
-  // in case a tool doesn't do a good job cleaning up after itself...
   useEffect(() => {
     return () => {
       updateOutputs((oldOutputs) => oldOutputs.delete(keyInSet));

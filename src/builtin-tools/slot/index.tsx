@@ -7,15 +7,17 @@ import _ from 'lodash';
 import { memo, ReactNode, useCallback, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { cN } from 'src/deps';
-import { references, ProgramFactory, ComputeReferences, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
+import { ComputeReferences, hasError, ProgramFactory, references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";
 import { compileExpressionCached } from "src/util/compile";
+import { hasProperty } from 'src/util/hasProperty';
 import { newId } from "src/util/id";
 import { usePortalSet } from "src/util/PortalSet";
 import { makeRand } from 'src/util/rand';
 import refsExtension, { refCode, refRE } from "src/util/refsExtension";
+import { difference, union } from 'src/util/sets';
 import { Replace, updateKeys, Updater, useAt, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { useDedupe } from 'src/util/useDedupe';
 import { useRefForCallback } from "src/util/useRefForCallback";
@@ -56,12 +58,19 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
 
 export const computeReferences: ComputeReferences<Program> = (program) => {
   if (program.modeName === 'code') {
-    // TODO: this is not principled or robust; should probably actually parse the code?
-    // (but then we'd want to share some work to avoid parsing twice? idk)
-    return new Set([...program.code.matchAll(refRE)].map(m => m[1]));
+    return difference(
+      union(referencesFromCode(program.code), ...Object.values(program.subTools).map(references)),
+      Object.keys(program.subTools)
+    );
   } else {
     return references(program.subProgram);
   }
+}
+
+function referencesFromCode(code: string): Set<string> {
+  // TODO: this is not principled or robust; should probably actually parse the code?
+  // (but then we'd want to share some work to avoid parsing twice? idk)
+  return new Set([...code.matchAll(refRE)].map(m => m[1]));
 }
 
 export const Component = memo((props: ToolProps<Program>) => {
@@ -145,6 +154,32 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
   const [views, updateViews] = useStateUpdateOnly<{[id: string]: ToolView | null}>({});
   const [outputs, updateOutputs] = useStateUpdateOnly<{[id: string]: ToolOutput | null}>({});
 
+  const codeReferences = useMemo(() => referencesFromCode(program.code), [program]);
+
+  const codeReferenceScope = useMemo(() => {
+    const result: {[varName: string]: unknown} = {};
+    for (const ref of codeReferences) {
+      const binding = varBindings[ref];
+      if (!binding) {
+        return {error: `Unknown reference ${ref}`};
+      }
+
+      const output = binding.output;
+      if (output === null || output === undefined) {
+        if (output === undefined) {
+          console.log('bad output', ref, program)
+          // report it; it's bad
+        }
+        return {pending: true};
+      }
+      if (hasError(output)) {
+        return {error: `Error from reference ${ref}`};
+      }
+      result[refCode(ref)] = output.value;
+    };
+    return {success: result};
+  }, [varBindings, codeReferences]);
+
   // TODO: should this be useMemo? issues with async, huh?
   const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
   useEffect(() => {
@@ -155,30 +190,41 @@ const CodeMode = memo(function CodeMode(props: CodeModeProps) {
 
     if ('error' in compiled) {
       setOutput({error: compiled.error});
-    } else {
-      const rand = makeRand();
-      const scope = {
-        ...Object.fromEntries(Object.entries(varBindings).map(([k, v]) => [refCode(k), valueOrUndefined(v.output)])),
-        ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
-        ...globals,
-        rand
-      };
-      try {
-        const result = compiled(scope);
-        if (result instanceof Promise) {
-          result.then((value) => {
-            setOutput({value: value});
-          })
-        } else {
-          setOutput({value: result});
-        }
-      } catch (e) {
-        // console.warn("error with", program.code)
-        // console.warn(e);
-        setOutput({error: (e as any).toString()});
-      }
+      return;
     }
-  }, [compiled, varBindings, outputs, setOutput])
+
+    if (hasProperty(codeReferenceScope, 'error')) {
+      setOutput({error: codeReferenceScope.error});
+      return;
+    }
+
+    if (hasProperty(codeReferenceScope, 'pending')) {
+      setOutput(null);
+      return;
+    }
+
+    const rand = makeRand();
+    const scope = {
+      ...codeReferenceScope.success,
+      ...Object.fromEntries(Object.entries(outputs).map(([k, v]) => [refCode(k), valueOrUndefined(v)])),
+      ...globals,
+      rand
+    };
+    try {
+      const result = compiled(scope);
+      if (result instanceof Promise) {
+        result.then((value) => {
+          setOutput({value: value});
+        })
+      } else {
+        setOutput({value: result});
+      }
+    } catch (e) {
+      // console.warn("error with", program.code)
+      // console.warn(e);
+      setOutput({error: (e as any).toString()});
+    }
+  }, [compiled, outputs, setOutput, codeReferenceScope])
   useOutput(reportOutput, useDedupe(output, _.isEqual));
 
   useView(reportView, useMemo(() => ({

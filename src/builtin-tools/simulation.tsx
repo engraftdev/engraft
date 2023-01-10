@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { memo, useEffect, useMemo } from "react";
-import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
+import { ComputeReferences, hasError, newVar, ProgramFactory, references, ToolProgram, ToolProps, valueOrUndefined, Var } from "src/tools-framework/tools";
 import { ShowView, ToolInSet, useOutput, useSubTool, useToolSet, useView } from "src/tools-framework/useSubTool";
+import { isObject } from "src/util/hasProperty";
 import { difference, union } from "src/util/sets";
 import { useAt, useStateSetOnly } from "src/util/state";
 import { ToolOutputView } from "src/view/Value";
@@ -55,10 +56,34 @@ export const Component = memo((props: ToolProps<Program>) => {
   const [upToolSet, upOutputs, upViews] = useToolSet();
 
   useOutput(reportOutput, useMemo(() => {
-    let outputs = [{...valueOrUndefined(initOutput) as object, i: 0}];
-    for (let i = 0; i < iterationsCount; i++) {
-      outputs.push({...valueOrUndefined(upOutputs[i]) as object, i: i + 1});
+    function addIndex(x: unknown, i: number) {
+      if (isObject(x)) {
+        return {...x, i};
+      } else {
+        return x;
+      }
     }
+
+    if (!initOutput) {
+      return null;
+    }
+    if (hasError(initOutput)) {
+      return {error: `Error in init: ${initOutput.error}`};
+    }
+
+    let outputs = [addIndex(initOutput.value, 0)];
+
+    for (let i = 0; i < iterationsCount; i++) {
+      const upOutput = upOutputs[i];
+      if (!upOutput) {
+        return null;
+      }
+      if (hasError(upOutput)) {
+        return {error: `Error in update ${i + 1}: ${upOutput.error}`};
+      }
+      outputs.push(addIndex(upOutput.value, i + 1));
+    }
+
     return {value: outputs};
   }, [initOutput, iterationsCount, upOutputs]));
 
@@ -72,7 +97,7 @@ export const Component = memo((props: ToolProps<Program>) => {
 
   const viewVarBindings = useMemo(() => ({
     ...varBindings,
-    [program.stateVar.id]: {var_: program.stateVar, output: upOutputs[highlightedIndex]},
+    [program.stateVar.id]: {var_: program.stateVar, output: upOutputs[highlightedIndex] || null},
   }), [highlightedIndex, program.stateVar, upOutputs, varBindings]);
   const [viewComponent, viewView, viewOutput] = useSubTool({program, updateProgram, subKey: 'viewProgram', varBindings: viewVarBindings})
 
@@ -117,7 +142,7 @@ export const Component = memo((props: ToolProps<Program>) => {
   const perUpVarBindings = useMemo(() => _.range(iterationsCount).map((inputArrayElem, i) =>
     ({
       ...varBindings,
-      [program.stateVar.id]: {var_: program.stateVar, output: i === 0 ? initOutput : upOutputs[i - 1]},
+      [program.stateVar.id]: {var_: program.stateVar, output: i === 0 ? initOutput : upOutputs[i - 1] || null},
     })
   ), [initOutput, iterationsCount, upOutputs, varBindings, program.stateVar]);
 
