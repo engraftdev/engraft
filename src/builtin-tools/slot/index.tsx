@@ -2,9 +2,9 @@ import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
-import { EditorView } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
 import _ from 'lodash';
-import { memo, ReactNode, useCallback, useEffect, useMemo } from "react";
+import { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { cN } from 'src/deps';
 import { ComputeReferences, hasError, ProgramFactory, references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/tools-framework/tools";
@@ -23,6 +23,7 @@ import { useDedupe } from 'src/util/useDedupe';
 import { useRefForCallback } from "src/util/useRefForCallback";
 import IsolateStyles from "src/view/IsolateStyles";
 import { ToolFrame } from "src/view/ToolFrame";
+import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
 import { VarUse } from "src/view/Vars";
 import { globals } from './globals';
 
@@ -256,6 +257,8 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
+  const [showInspector, setShowInspector] = useState(false);
+
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = newId();
@@ -294,6 +297,9 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
           }
         }
       }),
+      keymap.of([
+        {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},
+      ]),
     ];
   }, [program.defaultCode, varBindingsRef, refSet, updateProgram, updateSubToolPrograms])
 
@@ -318,6 +324,13 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         elem
       )
     })}
+    <ToolInspectorWindow
+      show={showInspector}
+      onClose={() => {setShowInspector(false)}}
+      program={program}
+      updateProgram={updateProgram as any}
+      varBindings={varBindings}
+    />
   </>
 
   return (

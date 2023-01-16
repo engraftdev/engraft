@@ -1,14 +1,10 @@
-import { CSSProperties, memo, ReactNode } from "react";
+import { CSSProperties, memo, ReactNode, useState } from "react";
 import { cN } from "src/deps";
-import { references, ToolProgram, VarBindings } from "src/tools-framework/tools";
-import { Updater, useStateUpdateOnly } from "src/util/state";
-import { updateF } from "src/util/updateF";
+import { ToolProgram, VarBindings } from "src/tools-framework/tools";
+import { Updater } from "src/util/state";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
-import { WindowPortal } from "src/util/WindowPortal";
-import IsolateStyles from "./IsolateStyles";
-import { Value } from "./Value";
-import { ValueEditable } from "./ValueEditable";
+import { ToolInspectorWindow } from "./ToolInspectorWindow";
 
 
 export interface ToolFrameProps {
@@ -25,7 +21,7 @@ const SOFT_STYLE = false as boolean;
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
   const {children, expand, program, updateProgram, onClose, varBindings} = props;
 
-  const [showInspector, updateShowInspector] = useStateUpdateOnly(false);
+  const [showInspector, setShowInspector] = useState(false);
 
   return <div
     className={cN("ToolFrame", {xWidthFitContent: !expand})}
@@ -65,7 +61,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
             onClick={() => {navigator.clipboard.writeText(JSON.stringify(program))}}
           >cp</div>
           <div style={buttonStyle}
-            onClick={() => {updateShowInspector((i) => !i)}}
+            onClick={() => {setShowInspector(true)}}
           >i</div>
           {onClose &&
             <div style={buttonStyle}
@@ -80,37 +76,12 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
     <div style={{minHeight: 0}}>
       {children}
     </div>
-    {showInspector && <WindowPortal
-      title="Tool info"
-      onClose={() => {
-        updateShowInspector(() => false);
-      }}
-    >
-      <IsolateStyles>
-        <div className="xRow xGap10">
-          Debug ID
-          { updateProgram ?
-            <input
-              value={program.debugId || ""}
-              onChange={(e) => updateProgram(updateF({debugId: {$set: e.target.value.length > 0 ? e.target.value : undefined}}))}
-            /> :
-            <span>{(program as any).debugId}</span>
-          }
-        </div>
-        <h3>Program</h3>
-        { updateProgram ?
-          <ValueEditable value={program} updater={updateProgram}/> :
-          <Value value={program}/>
-        }
-        <h3>References</h3>
-        <ul>
-          { [...references(program)].map((ref) =>
-            <li key={ref}>{ref}</li>
-          ) }
-        </ul>
-        <h3>Variable bindings</h3>
-        <Value value={varBindings}/>
-      </IsolateStyles>
-    </WindowPortal>}
+    <ToolInspectorWindow
+      show={showInspector}
+      onClose={() => {setShowInspector(false)}}
+      program={program}
+      updateProgram={updateProgram}
+      varBindings={varBindings}
+    />
   </div>;
 });
