@@ -1,0 +1,82 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDsnipe413801",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "slider",
+            "value": 0,
+            "min": -10,
+            "max": 10,
+            "step": 1
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDresonance252138",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "let",
+            "bindingVar": {
+              "id": "IDkeyboard458005",
+              "label": "new var"
+            },
+            "bindingProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "debug-delay",
+                "delayProgram": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "tangle",
+                    "min": 0,
+                    "max": 5000,
+                    "step": 100,
+                    "value": 1000
+                  }
+                },
+                "actualProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDsnipe413801",
+                  "subTools": {},
+                  "defaultCode": ""
+                }
+              },
+              "defaultCode": ""
+            },
+            "bodyProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDsnipe413801 - IDkeyboard458005",
+              "subTools": {},
+              "defaultCode": ""
+            }
+          },
+          "defaultCode": "IDfruitadens694927"
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDfruitadens694927",
+      "label": "prev"
+    }
+  }
+}
