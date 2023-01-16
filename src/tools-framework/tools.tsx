@@ -38,6 +38,7 @@ export function hasError(output: ToolOutput | null): output is ToolOutputError {
 
 export interface ToolProgram {
   toolName: string;
+  debugId?: string;
 }
 
 export interface ToolViewRenderProps {

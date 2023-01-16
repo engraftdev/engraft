@@ -2,6 +2,7 @@ import { CSSProperties, memo, ReactNode } from "react";
 import { cN } from "src/deps";
 import { references, ToolProgram, VarBindings } from "src/tools-framework/tools";
 import { Updater, useStateUpdateOnly } from "src/util/state";
+import { updateF } from "src/util/updateF";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
 import { WindowPortal } from "src/util/WindowPortal";
@@ -86,6 +87,16 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
       }}
     >
       <IsolateStyles>
+        <div className="xRow xGap10">
+          Debug ID
+          { updateProgram ?
+            <input
+              value={program.debugId || ""}
+              onChange={(e) => updateProgram(updateF({debugId: {$set: e.target.value.length > 0 ? e.target.value : undefined}}))}
+            /> :
+            <span>{(program as any).debugId}</span>
+          }
+        </div>
         <h3>Program</h3>
         { updateProgram ?
           <ValueEditable value={program} updater={updateProgram}/> :
