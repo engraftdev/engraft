@@ -1,6 +1,6 @@
 import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/tools-framework/tools";
+import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/engraft/tools";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";

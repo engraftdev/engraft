@@ -1,4 +1,4 @@
-import { Tool } from "src/tools-framework/tools";
+import { Tool } from "src/engraft/tools";
 
 // this matches "./builtin-tools/some.tsx" or "./builtin-tools/some/index.tsx"
 const toolsContext = require.context('.', true, /^\.\/builtin-tools\/([^/]*)\.[jt]sx?$|^\.\/builtin-tools\/([^/]*)\/index\.tsx$/);

@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
+import { ProgramFactory, ComputeReferences, ToolProps } from "src/engraft/tools";
 
 export type Program = {
   toolName: 'hello-world',
