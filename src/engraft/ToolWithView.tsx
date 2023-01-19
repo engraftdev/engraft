@@ -1,20 +1,26 @@
-import { memo } from "react";
-import { useStateSetOnly } from "src/util/state";
+import { memo, useEffect } from "react";
+import { useMento } from "src/mento/react";
+import { Setter } from "src/util/immutable";
 import IsolateStyles from "src/view/IsolateStyles";
-import { lookUpTool, ToolProps, ToolView, ToolViewRenderProps } from "./tools";
-import { ShowView } from "./useSubTool";
+import { ToolOutput, ToolProps, ToolViewRenderProps } from ".";
+import { PromiseState } from "./EngraftPromise";
+import { usePromiseState } from "./EngraftPromise.react";
+import { runTool } from "./hooks";
+import { ShowViewStream } from "./ShowView";
 
-type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & ToolViewRenderProps;
+type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & { reportOutputState: Setter<PromiseState<ToolOutput>> } & ToolViewRenderProps;
 
-export const ToolWithView = memo(function ToolWithView({ program, updateProgram, varBindings, reportOutput, ...rest }: ToolWithViewProps) {
-  const [view, setView] = useStateSetOnly<ToolView | null>(null);
+export const ToolWithView = memo(function ToolWithView({ program, updateProgram, varBindings, reportOutputState, ...rest }: ToolWithViewProps) {
+  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
 
-  const Tool = lookUpTool(program.toolName);
+  const outputState = usePromiseState(outputP);
+  useEffect(() => {
+    reportOutputState(outputState);
+  }, [outputState, reportOutputState]);
 
   return <>
-    <Tool.Component program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={reportOutput} reportView={setView} />
     <IsolateStyles>
-      <ShowView view={view} {...rest} />
+      <ShowViewStream viewS={viewS} {...rest} />
     </IsolateStyles>
   </>
 });

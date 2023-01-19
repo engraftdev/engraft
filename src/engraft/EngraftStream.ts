@@ -1,11 +1,11 @@
-export type Stream<T> = {
+export type EngraftStream<T> = {
   get: () => T | undefined;
   subscribe: (listener: (value: T | undefined) => void) => () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const Stream = {
-  of: <T>(value: T): Stream<T> => {
+export const EngraftStream = {
+  of: <T>(value: T): EngraftStream<T> => {
     return {
       get: () => value,
       subscribe: (newListener) => {
@@ -15,24 +15,24 @@ export const Stream = {
     };
   },
 
-  map<T, U>(ts: Stream<T>, f: (value: T) => U): Stream<U> {
+  map<T, U>(ts: EngraftStream<T>, f: (value: T) => U): EngraftStream<U> {
     return new MappedStream(ts, f);
   },
 
-  flatMap<T, U>(ts: Stream<T>, f: (value: T) => Stream<U>): Stream<U> {
+  flatMap<T, U>(ts: EngraftStream<T>, f: (value: T) => EngraftStream<U>): EngraftStream<U> {
     // TODO: Shouldn't f take T | undefined?
     return new FlatMappedStream(ts, f);
   },
 
   lift2<T, U, V>(
     f: (t: T, u: U) => V,
-    t: Stream<T>, u: Stream<U>,
-  ): Stream<V> {
-    return Stream.flatMap(t, (t) => Stream.map(u, (u) => f(t, u)));
+    t: EngraftStream<T>, u: EngraftStream<U>,
+  ): EngraftStream<V> {
+    return EngraftStream.flatMap(t, (t) => EngraftStream.map(u, (u) => f(t, u)));
   },
 
   // TODO: performance lol
-  liftArr<T, U>(ts: Stream<T>[], f: (arr: (T | undefined)[]) => U): Stream<U> {
+  liftArr<T, U>(ts: EngraftStream<T>[], f: (arr: (T | undefined)[]) => U): EngraftStream<U> {
     const get = () => f(ts.map((t) => t.get()));
 
     // subscribe to all the streams
@@ -60,18 +60,18 @@ export const Stream = {
     };
   },
 
-  liftArrOld<T, U>(ts: Stream<T>[], f: (arr: T[]) => U): Stream<U> {
-    return Stream.flatMap(ts[0], (t) => {
+  liftArrOld<T, U>(ts: EngraftStream<T>[], f: (arr: T[]) => U): EngraftStream<U> {
+    return EngraftStream.flatMap(ts[0], (t) => {
       if (ts.length === 1) {
-        return Stream.of(f([t]));
+        return EngraftStream.of(f([t]));
       } else {
-        return Stream.liftArrOld(ts.slice(1), (us: T[]) => f([t, ...us]));
+        return EngraftStream.liftArrOld(ts.slice(1), (us: T[]) => f([t, ...us]));
       }
     });
   }
 }
 
-export class WritableStream<T> implements Stream<T> {
+export class WritableStream<T> implements EngraftStream<T> {
   value: T | undefined = undefined;
   listeners: ((value: T | undefined) => void)[] = [];
 
@@ -98,9 +98,9 @@ export class WritableStream<T> implements Stream<T> {
   }
 }
 
-class MappedStream<T, U> implements Stream<U> {
+class MappedStream<T, U> implements EngraftStream<U> {
   constructor(
-    private readonly stream: Stream<T>,
+    private readonly stream: EngraftStream<T>,
     private readonly f: (value: T) => U,
   ) {}
 
@@ -123,10 +123,10 @@ class MappedStream<T, U> implements Stream<U> {
   }
 }
 
-class FlatMappedStream<T, U> implements Stream<U> {
+class FlatMappedStream<T, U> implements EngraftStream<U> {
   constructor(
-    private readonly ts: Stream<T>,
-    private readonly f: (value: T) => Stream<U>,
+    private readonly ts: EngraftStream<T>,
+    private readonly f: (value: T) => EngraftStream<U>,
   ) {}
 
   get(): U | undefined {

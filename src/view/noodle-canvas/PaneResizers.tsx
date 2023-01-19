@@ -1,6 +1,6 @@
 import { CSSProperties, memo, useMemo, useState } from "react";
 import { combineDrags, startDrag, someDrag } from "src/util/drag";
-import { Updater } from "src/util/state";
+import { Updater } from "src/util/immutable";
 import { updateF } from "src/util/updateF";
 import useHover from "src/util/useHover";
 import { useRefForCallback } from "src/util/useRefForCallback";

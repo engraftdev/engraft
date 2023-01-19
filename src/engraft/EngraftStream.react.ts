@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
-import { Stream } from ".";
+import { EngraftStream } from "./EngraftStream";
 
-export function useStream<T>(stream: Stream<T>): T | undefined {
+export function useStream<T>(stream: EngraftStream<T>): T | undefined {
   const [value, setValue] = useState(stream.get());
   useEffect(() => {
     const unsubscribe = stream.subscribe(setValue);
@@ -11,7 +11,7 @@ export function useStream<T>(stream: Stream<T>): T | undefined {
   return value;
 }
 
-export function useStreamObj<T>(streams: {[key: string]: Stream<T>}): {[key: string]: T | undefined} {
+export function useStreamObj<T>(streams: {[key: string]: EngraftStream<T>}): {[key: string]: T | undefined} {
   const [values, setValues] = useState(() => _.mapValues(streams, stream => stream.get()));
   useEffect(() => {
     const unsubscribes = _.map(streams, (stream, key) => stream.subscribe(value => {

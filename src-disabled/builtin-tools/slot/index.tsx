@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { cN } from 'src/deps';
-import { ComputeReferences, hasError, ProgramFactory, references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/engraft/tools";
+import { ComputeReferences, hasError, ProgramFactory, references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined, VarBinding, VarBindings } from "src/engraft";
 import { ShowView, useOutput, useSubTool, useView } from "src/engraft/useSubTool";
 import CodeMirror from "src/util/CodeMirror";
 import { refCompletions, setup, SubTool, toolCompletions } from "src/util/codeMirrorStuff";

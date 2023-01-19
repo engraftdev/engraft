@@ -1,17 +1,18 @@
+import { format } from "isoformat";
 import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useEffect, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolOutput, hasValue, hasError, ToolOutputValue } from "src/engraft/tools";
+import { ToolOutput } from "src/engraft";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
+import { useStateSetOnly } from "src/util/immutable-react";
 import { saveFile } from "src/util/saveFile";
-import { useStateSetOnly } from "src/util/state";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
-import { format } from "isoformat";
 // import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
+import { PromiseState } from "src/engraft/EngraftPromise";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
 
@@ -343,21 +344,22 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
 
 export type ToolOutputViewProps = {
-  toolOutput: ToolOutput | null;
+  outputState: PromiseState<ToolOutput>;
   customizations?: ValueCustomizations;
   displayReactElementsDirectly?: boolean;
 }
 
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
-  const {toolOutput, customizations, displayReactElementsDirectly} = props;
+  const {outputState, customizations, displayReactElementsDirectly} = props;
+
   return <ToolOutputBuffer
-    toolOutput={toolOutput}
+    outputState={outputState}
     renderValue={(value) => {
-      if (displayReactElementsDirectly && hasValue(toolOutput)) {
-        let maybeElement = toolOutput.value;
+      if (displayReactElementsDirectly) {
+        let maybeElement = value as object | null | undefined;
         // TODO: extra hack for formatter-tool... should think through this
-        if (hasProperty(maybeElement, 'view')) {
-          maybeElement = maybeElement.view;
+        if (maybeElement && typeof maybeElement === 'object' && 'view' in maybeElement) {
+          maybeElement = (maybeElement as any).view;
         };
         if (isObject(maybeElement) && isValidElement(maybeElement)) {
           return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
@@ -369,25 +371,27 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
 });
 
 export type ToolOutputBufferProps = {
-  toolOutput: ToolOutput | null;
+  outputState: PromiseState<ToolOutput>;
   renderValue: (value: any) => ReactNode;
 }
 
-export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolValue, renderValue}: ToolOutputBufferProps) {
-  const [lastOutputValue, setLastOutputValue] = useStateSetOnly<ToolOutputValue | null>(null);
+export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputBufferProps) {
+  const {outputState, renderValue} = props;
+
+  const [lastOutputValue, setLastOutputValue] = useStateSetOnly<ToolOutput | undefined>(undefined);
 
   useEffect(() => {
-    if (hasValue(toolValue)) {
-      setLastOutputValue(toolValue);
+    if (outputState.status === 'fulfilled') {
+      setLastOutputValue(outputState.value);
     }
-  }, [setLastOutputValue, toolValue])
+  }, [setLastOutputValue, outputState]);
 
   const valueView =
-    hasValue(lastOutputValue)
+    lastOutputValue !== undefined
     ? <div
         className="ToolOutputBuffer-value"
         style={{
-          opacity: hasValue(toolValue) ? 1 : 0.3,
+          opacity: outputState.status === 'fulfilled' ? 1 : 0.3,
           maxWidth: '100%',
         }}
       >
@@ -402,12 +406,12 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer({toolOutput: toolV
 
   return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft">
     {valueView}
-    {hasError(toolValue) && <ErrorView error={toolValue.error} />}
+    {outputState.status === 'rejected' && <ErrorView error={(outputState.reason as any).toString()} />}
   </div>
 });
 
 export type ErrorProps = {
-  error: string;
+  error: string;  // TODO: ErrorView should take mysterious error objects, not strings
 }
 
 export const ErrorView = memo(function ErrorView(props: ErrorProps) {

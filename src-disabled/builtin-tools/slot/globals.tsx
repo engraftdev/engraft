@@ -6,7 +6,7 @@ import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
 import ReactCell from 'src/util/ReactCell';
 import { slotSetTo } from '.';
-import { lookUpTool } from 'src/engraft/tools';
+import { lookUpTool } from 'src/engraft';
 
 
 // Here's where I'll throw ad-hoc things I want to have available in every code editor

@@ -1,5 +1,5 @@
 import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
-import { at, atIndex, Updater } from "src/util/state";
+import { at, atIndex, Updater } from "src/util/immutable";
 import useHover from "src/util/useHover";
 import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
 

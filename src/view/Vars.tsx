@@ -1,8 +1,9 @@
 import { memo, useRef, useState } from "react";
-import { hasValue, Var, VarBinding } from "src/engraft/tools";
+import { Var, VarBinding } from "src/engraft";
 import { ControlledSpan } from "src/util/ControlledTextInput";
-import { updateKeys, Updater } from "src/util/state";
+import { updateKeys, Updater } from "src/util/immutable";
 import { ObjectInspector } from "react-inspector";
+import { usePromiseState } from "src/engraft/EngraftPromise.react";
 
 
 interface VarDefinitionProps {
@@ -51,14 +52,22 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
        : <span style={{fontStyle: 'italic'}}>unknown ref</span>
       }
     </span>
-    {(() => {
-      if (!inspected) { return; }
-      if (!varBinding) { return; }
-      if (hasValue(varBinding.output)) {
-        return <ObjectInspector data={varBinding.output.value} />;
-      } else {
-        return <span style={{fontStyle: 'italic'}}>missing</span>;
-      }
-    })()}
+    { inspected && varBinding && <VarUseInspector varBinding={varBinding} /> }
   </div>
+});
+
+type VarUseInspectorProps = {
+  varBinding: VarBinding,
+}
+
+export const VarUseInspector = memo(function VarUseInspector(props: VarUseInspectorProps) {
+  const {varBinding} = props;
+
+  const outputState = usePromiseState(varBinding.output);
+
+  if (outputState.status === 'fulfilled') {
+    return <ObjectInspector data={outputState.value} />;
+  } else {
+    return <span style={{fontStyle: 'italic'}}>missing</span>;
+  }
 });

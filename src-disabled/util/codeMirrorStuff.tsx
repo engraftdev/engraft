@@ -5,10 +5,11 @@ import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import { dropCursor, EditorView, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
 import { memo, useCallback } from "react"
-import { getFullToolIndex, lookUpTool, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/engraft/tools"
-import { updateKeys, Updater, useAt } from "src/util/state"
-import { refCode } from "./refsExtension"
+import { getFullToolIndex, lookUpTool, Tool, ToolOutput, ToolProgram, ToolView, VarBindings } from "src/engraft"
+import { updateKeys, Updater } from "src/util/immutable"
+import { refCode } from "../../src/util/refsExtension"
 import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete"
+import { useAt } from "../../src/util/immutable-react"
 
 
 export const setup = [

@@ -1,7 +1,7 @@
 import { CSSProperties, memo, ReactNode, useState } from "react";
 import { cN } from "src/deps";
-import { ToolProgram, VarBindings } from "src/engraft/tools";
-import { Updater } from "src/util/state";
+import { ToolProgram, VarBindings } from "src/engraft";
+import { Updater } from "src/util/immutable";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
 import { ToolInspectorWindow } from "./ToolInspectorWindow";

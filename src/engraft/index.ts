@@ -1,44 +1,36 @@
 import { ReactElement } from "react";
+import { Mento } from "src/mento";
+import { EngraftStream } from "./EngraftStream";
 import { newId } from "src/util/id";
-import { Setter, Updater } from "src/util/state";
+import { Updater } from "src/util/immutable";
+import { EngraftPromise } from "./EngraftPromise";
 
 export type Tool<P extends ToolProgram = any> = {
-  Component: ToolComponent<P>;
+  run: ToolRun<P>;
   programFactory: ProgramFactory<P>;
-  computeReferences: ComputeReferences<P>;  // TODO: separate from Component because it's supposed to be statically available, but work may be duped
+  computeReferences: ComputeReferences<P>;  // TODO: separate from `run` because it's supposed to be statically available, but work may be duped
   isInternal?: boolean;
 }
 
-export type ToolOutput = ToolOutputValue | ToolOutputError;
-export type ToolOutputValue = {
+export type ToolProgram = {
+  toolName: string,
+  debugId?: string,
+}
+
+export type ToolRun<P extends ToolProgram> = Mento<[props: ToolProps<P>], ToolResult>;
+
+export type ToolResult = {
+  outputP: EngraftPromise<ToolOutput>,
+  viewS: EngraftStream<ToolView>,
+};
+
+export type ToolOutput = {
   value: unknown;
   alreadyDisplayed?: boolean;  // TODO: wrong place? it's persisted too far
 };
-export type ToolOutputError = {
-  error: string;
-};
 
-export function hasValue(output: ToolOutput | null): output is ToolOutputValue {
-  if (!output) { return false; }
-  return 'value' in output;
-}
-
-export function valueOrUndefined(output: ToolOutput | null): unknown {
-  if (hasValue(output)) {
-    return output.value;
-  } else {
-    return undefined;
-  }
-}
-
-export function hasError(output: ToolOutput | null): output is ToolOutputError {
-  if (!output) { return false; }
-  return 'error' in output;
-}
-
-export interface ToolProgram {
-  toolName: string;
-  debugId?: string;
+export type ToolView = {
+  render: (props: ToolViewRenderProps) => ReactElement<any, any> | null
 }
 
 export interface ToolViewRenderProps {
@@ -47,20 +39,12 @@ export interface ToolViewRenderProps {
   noFrame?: boolean,  // TODO: this is just for slots, huh?
 }
 
-export type ToolView = {
-  render: (props: ToolViewRenderProps) => ReactElement<any, any> | null
-}
-
 export interface ToolProps<P extends ToolProgram> {
   program: P;
-  updateProgram: Updater<P>;
   varBindings: VarBindings;
-  reportOutput: Setter<ToolOutput | null>;
-  reportView: Setter<ToolView | null>;
-}
 
-export interface ToolComponent<P extends ToolProgram> {
-  (props: ToolProps<P>): ReactElement<any, any> | null;
+  // TODO: might belong in view? not sure
+  updateProgram: Updater<P>;
 }
 
 export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;
@@ -87,9 +71,9 @@ export function registerTool(tool: Tool<any>) {
   if (!tool.programFactory) {
     throw new Error(`Tool has no programFactory`);
   }
-  if (!tool.Component) {
+  if (!tool.run) {
     console.error(tool);
-    throw new Error(`Tool has no Component`);
+    throw new Error(`Tool has no run`);
   }
   if (!tool.computeReferences) {
     let toolName = 'UNKNOWN';
@@ -100,7 +84,6 @@ export function registerTool(tool: Tool<any>) {
   }
 
   const { toolName } = tool.programFactory();
-  (tool.Component as any).displayName = toolName;
   toolIndex[toolName] = tool;
 }
 
@@ -108,7 +91,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  output: ToolOutput | null;
+  output: EngraftPromise<ToolOutput>;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};
@@ -127,4 +110,12 @@ export function newVar(label = 'new var') {
 export function references(program: ToolProgram): Set<string> {
   const tool = lookUpTool(program.toolName);
   return tool.computeReferences(program);
+}
+
+export function programSummary(program: ToolProgram): string {
+  let summary = program.toolName;
+  if (program.debugId) {
+    summary += `#${program.debugId}`;
+  }
+  return summary;
 }

@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { references, ToolProgram, VarBindings } from "src/engraft/tools";
-import { Updater } from "src/util/state";
+import { references, ToolProgram, VarBindings } from "src/engraft";
+import { Updater } from "src/util/immutable";
 import { updateF } from "src/util/updateF";
 import { WindowPortal } from "src/util/WindowPortal";
 import IsolateStyles from "./IsolateStyles";

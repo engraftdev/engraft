@@ -1,13 +1,16 @@
-import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
+import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
-import { slotSetTo } from '../src-disabled/builtin-tools/slot';
 import { builtinTools } from "./builtinTools";
+import { registerTool, ToolProgram, VarBinding } from './engraft';
+import { EngraftPromise } from './engraft/EngraftPromise';
+import { usePromiseState } from './engraft/EngraftPromise.react';
+import { runTool } from './engraft/hooks';
+import { ShowViewStream } from './engraft/ShowView';
 import { examples } from './examples/examples';
-import { registerTool, ToolOutput, ToolProgram, VarBinding } from './engraft/tools';
-import { ToolWithView } from './engraft/ToolWithView';
+import { useMento } from './mento/react';
+import { useStateSetOnly, useStateUpdateOnly } from './util/immutable-react';
 import range from './util/range';
-import { useStateSetOnly, useStateUpdateOnly } from './util/state';
 import IsolateStyles from './view/IsolateStyles';
 import { ToolOutputView } from './view/Value';
 import { ValueEditable } from './view/ValueEditable';
@@ -38,19 +41,17 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
   const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);
-  const [programIsFromLocalStorage, setIsProgramFromLocalStorage] = useState(false);
 
   const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDarray000000', label: 'array'}, output: {value: [1, 2, 3]}},
-    {var_: {id: 'IDrange000000', label: 'range'}, output: {value: range}},
+    {var_: {id: 'IDarray000000', label: 'array'}, output: EngraftPromise.resolve({value: [1, 2, 3]})},
+    {var_: {id: 'IDrange000000', label: 'range'}, output: EngraftPromise.resolve({value: range})},
   ]), []);
 
   useEffect(() => {
     const programJson = window.localStorage.getItem(localStorageKey)
     if (programJson) {
       updateProgram(() => JSON.parse(programJson));
-      setIsProgramFromLocalStorage(true);
     }
   }, [updateProgram])
 
@@ -64,7 +65,9 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     }
   }, [program])
 
-  const [output, setOutput] = useStateSetOnly<ToolOutput | null>(null);
+  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
+  const outputState = usePromiseState(outputP);
+
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
   const [showTool, setShowTool] = useStateSetOnly(true);
   const [showOutput, setShowOutput] = useStateSetOnly(false);
@@ -90,13 +93,13 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
             }}
             resetKeys={[program]}
           >
-            <ToolWithView key={`${programIsFromLocalStorage}`} program={program} updateProgram={updateProgram} varBindings={varBindings} reportOutput={setOutput} autoFocus={true}/>
+            <ShowViewStream viewS={viewS} autoFocus={true} />
           </ErrorBoundary>
         </div>
     }
     <br/>
     <br/>
-    {showOutput && <ToolOutputView toolOutput={output} />}
+    {showOutput && <ToolOutputView outputState={outputState} />}
     <br/>
     <br/>
     <br/>
