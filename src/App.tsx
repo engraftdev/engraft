@@ -2,7 +2,7 @@ import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
 import { builtinTools } from "./builtinTools";
-import { registerTool, ToolProgram, VarBinding } from './engraft';
+import { lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';
 import { EngraftPromise } from './engraft/EngraftPromise';
 import { usePromiseState } from './engraft/EngraftPromise.react';
 import { runTool } from './engraft/hooks';
@@ -16,7 +16,6 @@ import { ToolOutputView } from './view/Value';
 import { ValueEditable } from './view/ValueEditable';
 
 
-
 builtinTools.map(registerTool);
 
 /*
@@ -25,9 +24,7 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultProgram = {
-  toolName: 'hello-world',
-};
+const defaultProgram = lookUpTool('debug-array')!.programFactory();
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));

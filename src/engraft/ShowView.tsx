@@ -4,7 +4,7 @@ import { useStream } from "src/engraft/EngraftStream.react";
 import { ToolViewRenderProps, ToolView } from ".";
 
 export interface ShowViewProps extends ToolViewRenderProps {
-  view: ToolView | null;
+  view: ToolView | undefined;
 }
 
 export const ShowView = memo(function ShowView({view, ...rest}: ShowViewProps) {
@@ -23,9 +23,5 @@ export interface ShowViewStreamProps extends ToolViewRenderProps {
 export const ShowViewStream = memo(function ShowViewStream({viewS, ...rest}: ShowViewStreamProps) {
   const view = useStream(viewS);
 
-  if (!view) {
-    return null;
-  }
-
-  return view.render(rest);
+  return <ShowView view={view} {...rest} />;
 });
