@@ -3,7 +3,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { MentoMemory } from 'src/mento';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { noOp } from 'src/util/noOp';
-import { tool } from './checkbox';
+import { tool } from '.';
 
 describe('checkbox', () => {
   it('output works', () => {

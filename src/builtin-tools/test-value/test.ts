@@ -3,7 +3,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { MentoMemory } from 'src/mento';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
-import { Program, tool } from './test-value';
+import { Program, tool } from '.';
 
 describe('test-value', () => {
   it('output basically works', () => {

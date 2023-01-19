@@ -7,7 +7,7 @@ import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
-import { Program } from './test-array';
+import { Program } from './index';
 
 registerTool(toolFromModule(require('./test-array')));
 registerTool(toolFromModule(require('./test-value')));

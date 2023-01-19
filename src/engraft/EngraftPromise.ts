@@ -171,4 +171,10 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
       }
     });
   },
+
+  // It would be nice to have something comparable to async/await for EngraftPromise.
+  // You can't use async/await itself – it always returns a normal Promise.
+  // You can pull this off with generators, but not with correct types.
+  //   (You can't express "(yield (p: EngraftPromise<T>)): T" in TypeScript yet.)
+  // So we'll leave this for later.
 });
