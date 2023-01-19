@@ -1,7 +1,9 @@
 import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
+import { javascript } from '@codemirror/lang-javascript';
+import { keymap } from '@codemirror/view';
 import _ from 'lodash';
-import { memo } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { cN } from 'src/deps';
 import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
@@ -9,12 +11,15 @@ import { EngraftStream } from 'src/engraft/EngraftStream';
 import { hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hookForkLater, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
+import CodeMirror from 'src/util/CodeMirror';
+import { setup } from "src/util/codeMirrorStuff";
 import { compileExpressionCached } from "src/util/compile";
 import { Updater } from 'src/util/immutable';
 import { OrError } from 'src/util/OrError';
 import { makeRand } from 'src/util/rand';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
+import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
 import { globals } from './globals';
 
 export type Program = ProgramCodeMode;
@@ -123,7 +128,23 @@ const runCodeMode = (props: CodeModeProps) => {
 type CodeModeViewProps = CodeModeProps & ToolViewRenderProps;
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {expand, program, updateProgram} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus} = props;
+
+  const [showInspector, setShowInspector] = useState(false);
+
+  const extensions = useMemo(() => {
+    return [
+      ...setup,
+      javascript({jsx: true}),
+      keymap.of([
+        {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},
+      ]),
+    ];
+  }, [])
+
+  const onChange = useCallback((value: string) => {
+    updateProgram(updateF({code: {$set: value}}));
+  }, [updateProgram]);
 
   return (
     <div
@@ -137,9 +158,19 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         ...expand ? {width: '100%'} : {},
       }}
     >
-      <input type="text" value={program.code} onChange={(e) => {
-        updateProgram(updateF({code: {$set: e.target.value}}));
-      }} />
+      <CodeMirror
+        extensions={extensions}
+        autoFocus={autoFocus}
+        text={program.code}
+        onChange={onChange}
+      />
+      <ToolInspectorWindow
+        show={showInspector}
+        onClose={() => {setShowInspector(false)}}
+        program={program}
+        updateProgram={updateProgram as any}
+        varBindings={varBindings}
+      />
     </div>
   );
 });

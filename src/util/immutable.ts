@@ -12,11 +12,6 @@ export function updaterToSetter<T, U extends T = T>(updater: Updater<T, U>): Set
 
 // utils for working with updaters
 
-// arguably this should just be `(oldT) => ({...oldT, ...newKeys})` part. this feels less abstract tho?
-export function updateKeys<T, U extends T>(update: Updater<T, U>, newKeys: Partial<U>) {
-  update((oldT) => ({...oldT, ...newKeys}));
-}
-
 export function at<T, K extends string & keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
   return (f: (oldTK: T[K]) => T[K]) => {
     update((oldT) => ({...oldT, [key]: f(oldT[key])}));
