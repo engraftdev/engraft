@@ -1,7 +1,6 @@
-import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
+import { ComputeReferences, lookUpTool, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
 import { hookRunTool } from "src/engraft/hooks";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { programFactory as checkboxProgramFactory } from "./checkbox";
 import { memoizeProps } from "src/mento/memoize";
 import { hookFork, hooks } from "src/mento/hooks";
 import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
@@ -15,14 +14,18 @@ export type Program = {
   subToolPrograms: ToolProgram[],
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'debug-array',
-  subToolPrograms: [
-    checkboxProgramFactory(),
-    checkboxProgramFactory(),
-    checkboxProgramFactory(),
-  ],
-});
+export const programFactory: ProgramFactory<Program> = () => {
+  const checkboxProgramFactory = lookUpTool('checkbox').programFactory;
+  return {
+    toolName: 'debug-array',
+    subToolPrograms: [
+      checkboxProgramFactory(),
+      checkboxProgramFactory(),
+      checkboxProgramFactory(),
+      checkboxProgramFactory(),
+    ],
+  }
+};
 
 export const computeReferences: ComputeReferences<Program> = (program) =>
   union(...program.subToolPrograms.map(subToolProgram => references(subToolProgram)));

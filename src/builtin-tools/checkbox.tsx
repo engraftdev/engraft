@@ -1,4 +1,4 @@
-import { ComputeReferences, ProgramFactory, ToolProps } from "src/engraft";
+import { Tool } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
@@ -10,32 +10,37 @@ export type Program = {
   checked: boolean,
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'checkbox',
-  checked: false,
-});
+export const tool: Tool<Program> = {
+  programFactory() {
+    return {
+      toolName: 'checkbox',
+      checked: false,
+    };
+  },
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+  computeReferences(_program) {
+    return new Set();
+  },
 
-export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, updateProgram } = props;
+  run: memoizeProps(hooks((props) => {
+    const { program, updateProgram } = props;
 
-  // console.log("running checkbox", program);
+    const outputP = hookMemo(() => EngraftPromise.resolve({
+      value: program.checked
+    }), [program.checked]);
 
-  const outputP = hookMemo(() => EngraftPromise.resolve({
-    value: program.checked
-  }), [program.checked]);
+    const viewS = hookMemo(() => EngraftStream.of({
+      render: () =>
+        <input
+          type="checkbox"
+          checked={program.checked}
+          onChange={(e) => {
+            updateProgram((old) => ({...old, checked: e.target.checked}))
+          }}
+        />
+    }), [program.checked, updateProgram]);
 
-  const viewS = hookMemo(() => EngraftStream.of({
-    render: () =>
-      <input
-        type="checkbox"
-        checked={program.checked}
-        onChange={(e) => {
-          updateProgram((old) => ({...old, checked: e.target.checked}))
-        }}
-      />
-  }), [program.checked, updateProgram]);
+    return { outputP, viewS };
+  })),
+};
 
-  return { outputP, viewS };
-}));
