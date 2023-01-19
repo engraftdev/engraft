@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { slotSetTo } from "./builtin-tools-disabled/slot";
+import { slotSetTo } from "../src-disabled/builtin-tools/slot";
 import { builtinTools } from "./builtinTools";
 import libCss from "./lib.css";
 import { hasValue, registerTool, ToolOutput, ToolProgram, ToolView, VarBinding } from "./tools-framework/tools";

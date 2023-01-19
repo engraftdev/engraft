@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
-import App from './App';
+import App from '../src/App';
 import { ObservableEmbed } from './lib';
-import { Value } from './view/Value';
+import { Value } from '../src/view/Value';
 
 const TestUseLiveTool = memo(function TestUseLiveTool() {
   const [input, setInput] = useState(0);

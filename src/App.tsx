@@ -1,7 +1,7 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
-import { slotSetTo } from './builtin-tools-disabled/slot';
+import { slotSetTo } from '../src-disabled/builtin-tools/slot';
 import { builtinTools } from "./builtinTools";
 import { examples } from './examples/examples';
 import { registerTool, ToolOutput, ToolProgram, VarBinding } from './tools-framework/tools';

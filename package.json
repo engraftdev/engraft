@@ -72,7 +72,8 @@
     "build-lib": "NODE_ENV=production webpack --config-name lib",
     "watch-lib": "webpack --config-name lib --watch",
     "build-lib-tsc": "tsc && tsc-alias",
-    "build-lib2": "NODE_ENV=production webpack --config-name lib2"
+    "build-lib2": "NODE_ENV=production webpack --config-name lib2",
+    "test": "jest --watch"
   },
   "babel": {
     "presets": [

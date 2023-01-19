@@ -11,7 +11,7 @@ import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
 import { format } from "isoformat";
-import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
+// import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
 
@@ -117,13 +117,13 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   // SPECIAL CASES
 
   // TODO: special-case hack which needs some generalization
-  if (isProbablyFunctionThing(value)) {
-    return wrapInline(
-      <div style={{background: '#e4e4e4', padding: 5, borderRadius: 5, fontSize: 13, color: '#0008'}}>
-        function
-      </div>
-    );
-  }
+  // if (isProbablyFunctionThing(value)) {
+  //   return wrapInline(
+  //     <div style={{background: '#e4e4e4', padding: 5, borderRadius: 5, fontSize: 13, color: '#0008'}}>
+  //       function
+  //     </div>
+  //   );
+  // }
 
   // TODO: an EVEN MORE special-case hack
   if (hasProperty(value, 'isDiagram') && value.isDiagram) {

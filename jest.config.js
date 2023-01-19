@@ -13,4 +13,5 @@ module.exports = {
   transformIgnorePatterns: [
     "<rootDir>/node_modules/(?!(isoformat)/)",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/src-disabled/"],
 };

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import './App.css';
-import { lookUpTool, ToolOutput, ToolProgram, ToolView } from './tools-framework/tools';
-import ReactCell from './util/ReactCell';
+import { lookUpTool, ToolOutput, ToolProgram, ToolView } from '../src/tools-framework/tools';
+import ReactCell from '../src/util/ReactCell';
 
-import { examples } from './examples/examples';
-import { empty, noOp } from './util/noOp';
+import { examples } from '../src/examples/examples';
+import { empty, noOp } from '../src/util/noOp';
 
 function exampleByName(name: string) {
   return examples.find((example) => example.name === name);
