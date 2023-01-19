@@ -15,7 +15,6 @@ import IsolateStyles from './view/IsolateStyles';
 import { ToolOutputView } from './view/Value';
 import { ValueEditable } from './view/ValueEditable';
 
-
 builtinTools.map(registerTool);
 
 /*
@@ -90,7 +89,9 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
             }}
             resetKeys={[program]}
           >
-            <ShowViewStream viewS={viewS} autoFocus={true} />
+            <IsolateStyles>
+              <ShowViewStream viewS={viewS} autoFocus={true} />
+            </IsolateStyles>
           </ErrorBoundary>
         </div>
     }
