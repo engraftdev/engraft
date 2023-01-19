@@ -8,7 +8,7 @@ import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codem
 import update from "immutability-helper"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import { slotSetTo } from "src/builtin-tools/slot"
+import { slotSetTo } from "src/builtin-tools-disabled/slot"
 import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps } from "src/tools-framework/tools"
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool"
 import CodeMirror from "src/util/CodeMirror"

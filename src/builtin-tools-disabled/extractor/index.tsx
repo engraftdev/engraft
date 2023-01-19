@@ -1,5 +1,5 @@
 import React, { createContext, memo, MouseEvent, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { slotSetTo } from "src/builtin-tools/slot";
+import { slotSetTo } from "src/builtin-tools-disabled/slot";
 import { hasValue, references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/tools-framework/tools";
 import { ShowView, useOutput, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { newId } from "src/util/id";

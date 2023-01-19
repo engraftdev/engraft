@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { hasValue, ToolOutput } from "src/tools-framework/tools";
 import { ToolWithView } from "src/tools-framework/ToolWithView";
-import { slotSetTo } from "src/builtin-tools/slot";
+import { slotSetTo } from "src/builtin-tools-disabled/slot";
 import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
 import { Value } from "./Value";
 import { empty } from "src/util/noOp";

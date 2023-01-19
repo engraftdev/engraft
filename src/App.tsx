@@ -1,7 +1,7 @@
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
-import { slotSetTo } from './builtin-tools/slot';
+import { slotSetTo } from './builtin-tools-disabled/slot';
 import { builtinTools } from "./builtinTools";
 import { examples } from './examples/examples';
 import { registerTool, ToolOutput, ToolProgram, VarBinding } from './tools-framework/tools';
@@ -22,7 +22,9 @@ TODO: fix remounting text-editor bug
 
 const localStorageKey = 'live-compose-v1';
 
-const defaultProgram = slotSetTo('');
+const defaultProgram = {
+  toolName: 'hello-world',
+};
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));

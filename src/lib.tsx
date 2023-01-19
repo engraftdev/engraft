@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { slotSetTo } from "./builtin-tools/slot";
+import { slotSetTo } from "./builtin-tools-disabled/slot";
 import { builtinTools } from "./builtinTools";
 import libCss from "./lib.css";
 import { hasValue, registerTool, ToolOutput, ToolProgram, ToolView, VarBinding } from "./tools-framework/tools";
@@ -350,7 +350,7 @@ const Split = memo(function Split({left, right}: SplitProps) {
 
 export { default as React } from 'react';
 export { default as ReactDOM } from 'react-dom';
-export { slotSetTo } from 'src/builtin-tools/slot';
+export { slotSetTo } from 'src/builtin-tools-disabled/slot';
 ////////////////
 // Re-exports //
 ////////////////

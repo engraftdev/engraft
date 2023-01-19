@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { slotSetTo } from "src/builtin-tools/slot";
-import { Program as TextProgram } from "src/builtin-tools/text";
+import { slotSetTo } from "src/builtin-tools-disabled/slot";
+import { Program as TextProgram } from "src/builtin-tools-disabled/text";
 import { hasValue, references, ProgramFactory, ComputeReferences, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, valueOrUndefined } from "src/tools-framework/tools";
 import { ShowView, useSubTool, useView } from "src/tools-framework/useSubTool";
 import { RowToCol } from "src/util/RowToCol";

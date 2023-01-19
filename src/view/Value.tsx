@@ -11,7 +11,7 @@ import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
 import { format } from "isoformat";
-import { isProbablyFunctionThing } from "src/builtin-tools/function";
+import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
 
