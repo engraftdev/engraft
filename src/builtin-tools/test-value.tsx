@@ -6,35 +6,32 @@ import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
 
 export type Program = {
-  toolName: 'checkbox',
-  checked: boolean,
+  toolName: 'test-value',
+  value: unknown,
+  onRun?: () => void,  // TODO: for testing, breaks serialization
 }
 
 export const tool: Tool<Program> = {
   programFactory: () => ({
-    toolName: 'checkbox',
-    checked: false,
+    toolName: 'test-value',
+    value: null,
   }),
 
   computeReferences: () => new Set(),
 
   run: memoizeProps(hooks((props) => {
-    const { program, updateProgram } = props;
+    const { program } = props;
+    const { value, onRun } = program;
+
+    if (onRun) { onRun(); }
 
     const outputP = hookMemo(() => EngraftPromise.resolve({
-      value: program.checked
-    }), [program.checked]);
+      value
+    }), [value]);
 
     const viewS = hookMemo(() => EngraftStream.of({
-      render: () =>
-        <input
-          type="checkbox"
-          checked={program.checked}
-          onChange={(e) => {
-            updateProgram((old) => ({...old, checked: e.target.checked}))
-          }}
-        />
-    }), [program.checked, updateProgram]);
+      render: () => null  // TODO: add a view
+    }), []);
 
     return { outputP, viewS };
   })),

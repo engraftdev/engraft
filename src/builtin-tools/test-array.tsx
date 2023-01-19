@@ -1,29 +1,23 @@
-import { ComputeReferences, lookUpTool, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
-import { hookRunTool } from "src/engraft/hooks";
+import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { memoizeProps } from "src/mento/memoize";
-import { hookFork, hooks } from "src/mento/hooks";
-import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
-import { hookMemo } from "src/mento/hookMemo";
 import { EngraftStream } from "src/engraft/EngraftStream";
+import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
+import { hookMemo } from "src/mento/hookMemo";
+import { hookFork, hooks } from "src/mento/hooks";
+import { memoizeProps } from "src/mento/memoize";
+import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
 import { union } from "src/util/sets";
 
 export type Program = {
-  toolName: 'debug-array',
+  toolName: 'test-array',
   subToolPrograms: ToolProgram[],
 }
 
 export const programFactory: ProgramFactory<Program> = () => {
-  const checkboxProgramFactory = lookUpTool('checkbox').programFactory;
   return {
-    toolName: 'debug-array',
-    subToolPrograms: [
-      checkboxProgramFactory(),
-      checkboxProgramFactory(),
-      checkboxProgramFactory(),
-      checkboxProgramFactory(),
-    ],
+    toolName: 'test-array',
+    subToolPrograms: [],
   }
 };
 

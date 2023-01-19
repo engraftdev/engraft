@@ -5,7 +5,7 @@ import { newId } from "src/util/id";
 import { Updater } from "src/util/immutable";
 import { EngraftPromise } from "./EngraftPromise";
 
-export type Tool<P extends ToolProgram = any> = {
+export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
   programFactory: ProgramFactory<P>;
   computeReferences: ComputeReferences<P>;  // TODO: separate from `run` because it's supposed to be statically available, but work may be duped
@@ -15,6 +15,7 @@ export type Tool<P extends ToolProgram = any> = {
 export type ToolProgram = {
   toolName: string,
   debugId?: string,
+  [others: string]: any,
 }
 
 export type ToolRun<P extends ToolProgram> = Mento<[props: ToolProps<P>], ToolResult>;

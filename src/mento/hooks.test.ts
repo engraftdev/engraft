@@ -1,5 +1,6 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, it } from '@jest/globals';
 import _ from 'lodash';
+import { expectToEqual, expectToNotEqual } from 'src/util/expectToEqual';
 import { MentoMemory } from '.';
 import { hookFork, hookMento, hookRef, hooks } from './hooks';
 
@@ -20,14 +21,14 @@ describe('hookRef', () => {
   it('single hookRef works (square)', () => {
     squareRuns = 0;
     const memory = MentoMemory.create();
-    expect(square(memory, 10)).toBe(100);
-    expect(squareRuns).toBe(1);
-    expect(square(memory, 10)).toBe(100);
-    expect(squareRuns).toBe(1);
-    expect(square(memory, 11)).toBe(121);
-    expect(squareRuns).toBe(2);
-    expect(square(memory, 11)).toBe(121);
-    expect(squareRuns).toBe(2);
+    expectToEqual(square(memory, 10), 100);
+    expectToEqual(squareRuns, 1);
+    expectToEqual(square(memory, 10), 100);
+    expectToEqual(squareRuns, 1);
+    expectToEqual(square(memory, 11), 121);
+    expectToEqual(squareRuns, 2);
+    expectToEqual(square(memory, 11), 121);
+    expectToEqual(squareRuns, 2);
   });
 });
 
@@ -47,36 +48,36 @@ describe('hookFork', () => {
   it('basically works', () => {
     squareRuns = 0;
     const memory = MentoMemory.create();
-    expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
-    expect(squareRuns).toBe(2);
-    expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
-    expect(squareRuns).toBe(2);
-    expect(squareEach(memory, {x: 1, y: 3})).toEqual({x: 1, y: 9});
-    expect(squareRuns).toBe(3);
+    expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
+    expectToEqual(squareRuns, 2);
+    expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
+    expectToEqual(squareRuns, 2);
+    expectToEqual(squareEach(memory, {x: 1, y: 3}), {x: 1, y: 9});
+    expectToEqual(squareRuns, 3);
   });
 
   it('cleans up appropriately (check 1)', () => {
     squareRuns = 0;
     const memory = MentoMemory.create();
-    expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
-    expect(squareRuns).toBe(2);
-    expect(squareEach(memory, {x: 1})).toEqual({x: 1});
-    expect(squareRuns).toBe(2);
-    expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
-    expect(squareRuns).toBe(3);
+    expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
+    expectToEqual(squareRuns, 2);
+    expectToEqual(squareEach(memory, {x: 1}), {x: 1});
+    expectToEqual(squareRuns, 2);
+    expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
+    expectToEqual(squareRuns, 3);
   });
 
   it('cleans up appropriately (check 2)', () => {
     squareRuns = 0;
     const memory = MentoMemory.create();
-    expect(squareEach(memory, {x: 1})).toEqual({x: 1});
-    expect(squareRuns).toBe(1);
+    expectToEqual(squareEach(memory, {x: 1}), {x: 1});
+    expectToEqual(squareRuns, 1);
     const memoryAfterJustX = _.cloneDeep(memory);
-    expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
-    expect(squareRuns).toBe(2);
-    expect(memory).not.toEqual(memoryAfterJustX);
-    expect(squareEach(memory, {x: 1})).toEqual({x: 1});
-    expect(squareRuns).toBe(2);
-    expect(memory).toEqual(memoryAfterJustX);
+    expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
+    expectToEqual(squareRuns, 2);
+    expectToNotEqual(memory, memoryAfterJustX);
+    expectToEqual(squareEach(memory, {x: 1}), {x: 1});
+    expectToEqual(squareRuns, 2);
+    expectToEqual(memory, memoryAfterJustX);
   });
 });

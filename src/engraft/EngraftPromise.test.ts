@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
+import { expectToEqual } from 'src/util/expectToEqual';
 import { EngraftPromise } from './EngraftPromise';
 
 describe('EngraftPromise', () => {
@@ -17,29 +18,29 @@ describe('EngraftPromise', () => {
 describe('EngraftPromise.state', () => {
   it('works when fulfilled', () => {
     const promise = EngraftPromise.resolve(100);
-    expect(EngraftPromise.state(promise)).toEqual({status: 'fulfilled', value: 100});
+    expectToEqual(EngraftPromise.state(promise), {status: 'fulfilled', value: 100});
   });
 
   it('works when rejected', () => {
     const promise = EngraftPromise.reject('no good');
-    expect(EngraftPromise.state(promise)).toEqual({status: 'rejected', reason: 'no good'});
+    expectToEqual(EngraftPromise.state(promise), {status: 'rejected', reason: 'no good'});
   });
 
   it('works when pending', () => {
     const promise = new EngraftPromise(() => {});
-    expect(EngraftPromise.state(promise)).toEqual({status: 'pending'});
+    expectToEqual(EngraftPromise.state(promise), {status: 'pending'});
   });
 })
 
 describe('EngraftPromise.try', () => {
   it('works when no error', () => {
     const promise = EngraftPromise.try(() => 100);
-    expect(EngraftPromise.state(promise)).toEqual({status: 'fulfilled', value: 100});
+    expectToEqual(EngraftPromise.state(promise), {status: 'fulfilled', value: 100});
   });
 
   it('works when error', () => {
     // eslint-disable-next-line no-throw-literal
     const promise = EngraftPromise.try(() => { throw 'no good'; });
-    expect(EngraftPromise.state(promise)).toEqual({status: 'rejected', reason: 'no good'});
+    expectToEqual(EngraftPromise.state(promise), {status: 'rejected', reason: 'no good'});
   });
 });

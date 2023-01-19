@@ -1,4 +1,4 @@
-import { ComputeReferences, ProgramFactory, ToolProps } from "src/engraft";
+import { Tool } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
@@ -9,20 +9,22 @@ export type Program = {
   toolName: 'hello-world',
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'hello-world',
-});
+export const tool: Tool<Program> = {
+  programFactory: (_defaultInputCode) => ({
+    toolName: 'hello-world',
+  }),
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+  computeReferences: (_program) => new Set(),
 
-export const run = memoizeProps(hooks((_props: ToolProps<Program>) => {
-  const outputP = hookMemo(() => EngraftPromise.resolve({
-    value: "Output: Hello world!"
-  }), []);
+  run: memoizeProps(hooks((_props) => {
+    const outputP = hookMemo(() => EngraftPromise.resolve({
+      value: "Output: Hello world!"
+    }), []);
 
-  const viewS = hookMemo(() => EngraftStream.of({
-    render: () => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>
-  }), []);
+    const viewS = hookMemo(() => EngraftStream.of({
+      render: () => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>
+    }), []);
 
-  return { outputP, viewS };
-}));
+    return { outputP, viewS };
+  })),
+};
