@@ -2,7 +2,7 @@ import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
 import { builtinTools } from "./builtinTools";
-import { lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';
+import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';
 import { EngraftPromise } from './engraft/EngraftPromise';
 import { usePromiseState } from './engraft/EngraftPromise.react';
 import { runTool } from './engraft/hooks';
@@ -17,13 +17,9 @@ import { ValueEditable } from './view/ValueEditable';
 
 builtinTools.map(registerTool);
 
-/*
-TODO: fix remounting text-editor bug
-*/
-
 const localStorageKey = 'live-compose-v1';
 
-const defaultProgram = lookUpTool('debug-array')!.programFactory();
+const defaultProgram = lookUpTool('slot')!.programFactory();
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
@@ -137,6 +133,16 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
         }}>
         <option value='none' disabled={true}>Load example...</option>
         {examples.map(({name, program}) =>
+          <option key={name} value={name}>{name}</option>
+        )}
+      </select>
+      {' '}
+      <select value='none' onChange={(ev) => {
+          incrementVersion();
+          updateProgram(() => lookUpTool(ev.target.value).programFactory());
+        }}>
+        <option value='none' disabled={true}>Load tool...</option>
+        {Object.keys(getFullToolIndex()).map((name) =>
           <option key={name} value={name}>{name}</option>
         )}
       </select>
