@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { expectToEqual } from 'src/util/expectToEqual';
+import { SynchronousPromise } from 'synchronous-promise';
 import { EngraftPromise } from './EngraftPromise';
 
 describe('EngraftPromise', () => {
@@ -42,5 +43,34 @@ describe('EngraftPromise.try', () => {
     // eslint-disable-next-line no-throw-literal
     const promise = EngraftPromise.try(() => { throw 'no good'; });
     expectToEqual(EngraftPromise.state(promise), {status: 'rejected', reason: 'no good'});
+  });
+});
+
+describe('https://github.com/fluffynuts/synchronous-promise/issues/39', () => {
+  test('Promise non-bug', () => {
+    const delayP = new Promise((resolve) => setTimeout(() => resolve(100), 10));
+    const resolvedWithPromiseP = new Promise((resolve) => resolve(delayP));
+    return resolvedWithPromiseP.then((value) => expect(value).toBe(100));
+  });
+
+  test('SynchronousPromise bug', () => {
+    const delayP = new SynchronousPromise((resolve) => setTimeout(() => resolve(100), 10));
+    const resolvedWithPromiseP = new SynchronousPromise((resolve) => resolve(delayP));
+
+    let resolvedWithPromisePFulfilled = false;
+    resolvedWithPromiseP.then((value) => {
+      resolvedWithPromisePFulfilled = true;
+    });
+
+    const timeoutP = new Promise((resolve) => setTimeout(resolve, 25));
+    return timeoutP.then(() => {
+      expect(resolvedWithPromisePFulfilled).toBe(false);
+    });
+  });
+
+  test('EngraftPromise.try non-bug', () => {
+    const delayP = new EngraftPromise((resolve) => setTimeout(() => resolve(100), 10));
+    const resolvedWithPromiseP = EngraftPromise.try(() => delayP);
+    return resolvedWithPromiseP.then((value) => expect(value).toBe(100));
   });
 });

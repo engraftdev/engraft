@@ -5,7 +5,7 @@ import { keymap } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
 import { cN } from 'src/deps';
-import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps } from "src/engraft";
+import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { EngraftStream } from 'src/engraft/EngraftStream';
 import { hookMemo } from 'src/mento/hookMemo';
@@ -17,6 +17,7 @@ import { compileExpressionCached } from "src/util/compile";
 import { Updater } from 'src/util/immutable';
 import { OrError } from 'src/util/OrError';
 import { makeRand } from 'src/util/rand';
+import { refRE } from 'src/util/refsExtension';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
 import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
@@ -45,7 +46,19 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   code: '',
 });
 
-export const computeReferences = (program: Program) => new Set();
+export const computeReferences = (program: Program) => {
+  if (program.modeName === 'code') {
+    return referencesFromCode(program.code);
+  } else {
+    throw new Error("TODO: implement tool mode");
+  }
+};
+
+function referencesFromCode(code: string): Set<string> {
+  // TODO: this is not principled or robust; should probably actually parse the code?
+  // (but then we'd want to share some work to avoid parsing twice? idk)
+  return new Set([...code.matchAll(refRE)].map(m => m[1]));
+}
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const {program, updateProgram} = props;
@@ -80,7 +93,7 @@ type CodeModeProps = Replace<ToolProps<Program>, {
 }>
 
 const runCodeMode = (props: CodeModeProps) => {
-  const { program } = props;
+  const { program, varBindings } = props;
 
   const compiledP = hookMemo(() => EngraftPromise.try(() => {
     if (program.code === '') {
@@ -93,13 +106,34 @@ const runCodeMode = (props: CodeModeProps) => {
     return compileExpressionCached(translated);  // might throw
   }), [program.code])
 
+  const codeReferences = hookMemo(() => referencesFromCode(program.code), [program.code]);
+
+  const codeReferenceScopeP = hookMemo(() => EngraftPromise.try(() => {
+    const codeReferencesArr = Array.from(codeReferences);
+
+    const outputValuePromises = codeReferencesArr.map((ref) => {
+      const binding = varBindings[ref] as VarBinding | undefined;
+      if (!binding) {
+        throw new Error(`Unknown reference ${ref}`);  // caught by promise
+      }
+      return binding.outputP.catch(() => {
+        throw new Error(`Error from reference ${binding.var_.label}`);
+      });
+    })
+
+    return EngraftPromise.all(outputValuePromises).then((outputValues) => {
+      return _.zipObject(codeReferencesArr, outputValues.map((v) => v.value));
+    });
+  }), [varBindings, codeReferences]);
+
   const outputP = hookMemo(() => {
     const valueDedupeFork = hookForkLater();
 
-    return compiledP.then((compiled) => {
+    return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
       const rand = makeRand();
       const scope = {
         ...globals,
+        ...codeReferenceScope,
         rand
       };
       const outputValueP = EngraftPromise.resolve(compiled(scope));
@@ -113,7 +147,7 @@ const runCodeMode = (props: CodeModeProps) => {
 
       return dedupedOutputValueP;
     })
-  }, [compiledP]);
+  }, [compiledP, codeReferenceScopeP]);
 
   const viewS = hookMemo(() => EngraftStream.of({
     render: (viewProps: ToolViewRenderProps) =>

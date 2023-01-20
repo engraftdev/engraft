@@ -5,6 +5,7 @@ import PortalWidget from "./PortalWidget";
 import { idRegExp } from "./id";
 
 export function refCode(s: string) {
+  // currently, the id of a reference is just embedded directly into code
   return s;
 }
 export const refRE = new RegExp(refCode(`(${idRegExp})`), "g")

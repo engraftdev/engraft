@@ -36,8 +36,8 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
   const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDarray000000', label: 'array'}, output: EngraftPromise.resolve({value: [1, 2, 3]})},
-    {var_: {id: 'IDrange000000', label: 'range'}, output: EngraftPromise.resolve({value: range})},
+    {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
+    {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
   useEffect(() => {

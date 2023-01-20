@@ -9,8 +9,8 @@ import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { Program } from './index';
 
-registerTool(toolFromModule(require('./test-array')));
-registerTool(toolFromModule(require('./test-value')));
+registerTool(toolFromModule(require('.')));
+registerTool(toolFromModule(require('../test-value')));
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {

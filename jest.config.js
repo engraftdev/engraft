@@ -14,4 +14,5 @@ module.exports = {
     "<rootDir>/node_modules/(?!(isoformat)/)",
   ],
   modulePathIgnorePatterns: ["<rootDir>/src-disabled/"],
+  testTimeout: 1000,
 };

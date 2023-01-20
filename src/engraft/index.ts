@@ -92,7 +92,7 @@ export function registerTool(tool: Tool<any>) {
 
 export interface VarBinding {
   var_: Var;
-  output: EngraftPromise<ToolOutput>;
+  outputP: EngraftPromise<ToolOutput>;
 }
 
 export type VarBindings = {[varId: string]: VarBinding};

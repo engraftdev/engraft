@@ -1,3 +1,4 @@
+import { hasProperty } from "src/util/hasProperty";
 import { SynchronousPromise } from "synchronous-promise";
 
 // In this file, we re-type SynchronousPromise as EngraftPromise, and give it better types.
@@ -38,7 +39,14 @@ export interface SynchronousPromiseConstructor2 {
     * a resolve callback used resolve the promise with a value or the result of another promise,
     * and a reject callback used to reject the promise with a provided reason or error.
     */
-  new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): EngraftPromise<T>;
+  new <T>(executor: (resolve: (value?: T) => void, reject: (reason?: any) => void) => void): EngraftPromise<T>;
+
+  // TODO: Per https://github.com/fluffynuts/synchronous-promise/issues/39, calling `resolve` with a
+  // PromiseLike is broken. We've disabled that type, shown below:
+
+  // new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): EngraftPromise<T>;
+
+
 
   /**
     * Creates a Promise that is resolved with an array of results when all of the provided Promises
@@ -165,7 +173,18 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
   try<T>(func: () => T | PromiseLike<T>): EngraftPromise<T> {
     return new EngraftPromise((resolve, reject) => {
       try {
-        resolve(func());
+        // this should just be `resolve(func())`, but https://github.com/fluffynuts/synchronous-promise/issues/39
+        // here's a workaround
+        const result = func();
+        if (hasProperty(result, 'then') && typeof result.then === 'function') {
+          (result as EngraftPromise<T>).then(function (newResult) {
+            resolve(newResult);
+          }).catch(function (error) {
+            reject(error);
+          });
+        } else {
+          resolve(result as T);
+        }
       } catch (e) {
         reject(e);
       }
