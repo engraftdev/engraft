@@ -1,6 +1,5 @@
 import { Tool } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
 import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
