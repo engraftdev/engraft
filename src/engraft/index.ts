@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 import { Mento } from "src/mento";
-import { EngraftStream } from "./EngraftStream";
 import { newId } from "src/util/id";
 import { Updater } from "src/util/immutable";
 import { EngraftPromise } from "./EngraftPromise";
@@ -22,7 +21,7 @@ export type ToolRun<P extends ToolProgram> = Mento<[props: ToolProps<P>], ToolRe
 
 export type ToolResult = {
   outputP: EngraftPromise<ToolOutput>,
-  viewS: EngraftStream<ToolView>,
+  view: ToolView,
 };
 
 export type ToolOutput = {

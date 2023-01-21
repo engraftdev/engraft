@@ -29,11 +29,11 @@ export const tool: Tool<Program> = {
       value
     }), [value]);
 
-    const viewS = hookMemo(() => EngraftStream.of({
+    const view = hookMemo(() => ({
       render: () => null  // TODO: add a view
     }), []);
 
-    return { outputP, viewS };
+    return { outputP, view };
   })),
 };
 

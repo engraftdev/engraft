@@ -1,6 +1,5 @@
 import { Tool } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
 import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
@@ -25,7 +24,7 @@ export const tool: Tool<Program> = {
       value: program.checked
     }), [program.checked]);
 
-    const viewS = hookMemo(() => EngraftStream.of({
+    const view = hookMemo(() => ({
       render: () =>
         <input
           type="checkbox"
@@ -36,7 +35,7 @@ export const tool: Tool<Program> = {
         />
     }), [program.checked, updateProgram]);
 
-    return { outputP, viewS };
+    return { outputP, view };
   })),
 };
 

@@ -1,6 +1,5 @@
 import { Tool } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
 import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
@@ -21,10 +20,10 @@ export const tool: Tool<Program> = {
       value: "Output: Hello world!"
     }), []);
 
-    const viewS = hookMemo(() => EngraftStream.of({
+    const view = hookMemo(() => ({
       render: () => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>
     }), []);
 
-    return { outputP, viewS };
+    return { outputP, view };
   })),
 };

@@ -6,12 +6,12 @@ import { ToolOutput, ToolProps, ToolViewRenderProps } from ".";
 import { PromiseState } from "./EngraftPromise";
 import { usePromiseState } from "./EngraftPromise.react";
 import { runTool } from "./hooks";
-import { ShowViewStream } from "./ShowView";
+import { ShowView } from "./ShowView";
 
 type ToolWithViewProps = Omit<ToolProps<any>, 'reportView'> & { reportOutputState: Setter<PromiseState<ToolOutput>> } & ToolViewRenderProps;
 
 export const ToolWithView = memo(function ToolWithView({ program, updateProgram, varBindings, reportOutputState, ...rest }: ToolWithViewProps) {
-  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
+  const {outputP, view} = useMento(runTool, { program, varBindings, updateProgram });
 
   const outputState = usePromiseState(outputP);
   useEffect(() => {
@@ -20,7 +20,7 @@ export const ToolWithView = memo(function ToolWithView({ program, updateProgram,
 
   return <>
     <IsolateStyles>
-      <ShowViewStream viewS={viewS} {...rest} />
+      <ShowView view={view} {...rest} />
     </IsolateStyles>
   </>
 });

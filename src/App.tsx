@@ -7,7 +7,7 @@ import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } f
 import { EngraftPromise } from './engraft/EngraftPromise';
 import { usePromiseState } from './engraft/EngraftPromise.react';
 import { runTool } from './engraft/hooks';
-import { ShowViewStream } from './engraft/ShowView';
+import { ShowView } from './engraft/ShowView';
 import { examples } from './examples/examples';
 import { useMento } from './mento/react';
 import { Updater } from './util/immutable';
@@ -142,7 +142,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
-  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
+  const {outputP, view} = useMento(runTool, { program, varBindings, updateProgram });
   const outputState = usePromiseState(outputP);
 
   const [showTool, setShowTool] = useStateSetOnly(() => true);
@@ -161,7 +161,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         resetKeys={[program]}
       >
         <IsolateStyles>
-          <ShowViewStream viewS={viewS} autoFocus={true} />
+          <ShowView view={view} autoFocus={true} />
         </IsolateStyles>
       </ErrorBoundary>
     </div>

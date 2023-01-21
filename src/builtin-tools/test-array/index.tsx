@@ -1,6 +1,5 @@
 import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/mento/hookMemo";
@@ -48,7 +47,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   , [subToolPrograms, updateSubToolPrograms, varBindings]);
 
   const subToolOutputPs = subToolResults.map(result => result.outputP);
-  const subToolViewSs = subToolResults.map(result => result.viewS);
+  const subToolViews = subToolResults.map(result => result.view);
 
   const outputP = hookMemo(() =>
     EngraftPromise.all(subToolOutputPs).then(outputs => ({
@@ -56,14 +55,12 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     }))
   , subToolOutputPs);
 
-  const viewS = hookMemo(() =>
-    EngraftStream.liftArr(subToolViewSs, (views) => ({
-      render: () =>
-        <div className="ArrayTool">
-          {views.map((view, i) => <ShowView key={i} view={view} />)}
-        </div>
-    }))
-  , subToolViewSs);
+  const view = hookMemo(() => ({
+    render: () =>
+      <div className="ArrayTool">
+        {subToolViews.map((view, i) => <ShowView key={i} view={view} />)}
+      </div>
+  }), subToolViews);
 
-  return { outputP, viewS };
+  return { outputP, view };
 }));

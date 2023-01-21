@@ -1,7 +1,6 @@
 import { memo, useState } from "react";
 import { Tool, ToolProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { EngraftStream } from "src/engraft/EngraftStream";
 import { hookMemo } from "src/mento/hookMemo";
 import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
@@ -32,11 +31,11 @@ export const tool: Tool<Program> = {
       value: program.text
     }), [program.text]);
 
-    const viewS = hookMemo(() => EngraftStream.of({
+    const view = hookMemo(() => ({
       render: () => <View {...props} />
     }), [props]);
 
-    return { outputP, viewS };
+    return { outputP, view };
   })),
 };
 

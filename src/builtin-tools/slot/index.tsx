@@ -9,9 +9,8 @@ import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
 import { ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { EngraftStream } from 'src/engraft/EngraftStream';
 import { hookRunSubTool } from 'src/engraft/hooks';
-import { ShowViewStream } from 'src/engraft/ShowView';
+import { ShowView } from 'src/engraft/ShowView';
 import { hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hookForkLater, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
@@ -189,14 +188,14 @@ const runCodeMode = (props: CodeModeProps) => {
     })
   }, [compiledP, codeReferenceScopeP]);
 
-  const viewS = hookMemo(() => EngraftStream.of({
+  const view = hookMemo(() => ({
     render: (viewProps: ToolViewRenderProps) =>
       <CodeModeView
         {...props} {...viewProps}
       />
   }), [props]);
 
-  return {outputP, viewS};
+  return {outputP, view};
 };
 
 type CodeModeViewProps = CodeModeProps & ToolViewRenderProps;
@@ -296,21 +295,21 @@ type ToolModeProps = Replace<ToolProps<Program>, {
 const runToolMode = (props: ToolModeProps) => {
   const { program, updateProgram, varBindings } = props;
 
-  const { outputP: subOutputP, viewS: subViewS } = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'subProgram' });
+  const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'subProgram' });
 
-  const viewS = hookMemo(() => EngraftStream.of({
-    render: () => <ToolModeView {...props} subViewS={subViewS} />
-  }), [subViewS]);
+  const view = hookMemo(() => ({
+    render: () => <ToolModeView {...props} subView={subView} />
+  }), [subView]);
 
-  return { outputP: subOutputP, viewS };
+  return { outputP: subOutputP, view };
 };
 
 type ToolModeViewProps = ToolModeProps & ToolViewRenderProps & {
-  subViewS: EngraftStream<ToolView>,
+  subView: ToolView,
 };
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subViewS} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView} = props;
 
   const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
 
@@ -325,14 +324,14 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   }, [program.defaultCode, updateProgram]);
 
   if (noFrame) {
-    return <ShowViewStream viewS={subViewS} autoFocus={autoFocus} />;
+    return <ShowView view={subView} autoFocus={autoFocus} />;
   } else {
     return <ToolFrame
       expand={expand}
       program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
       onClose={onCloseFrame}
     >
-      <ShowViewStream viewS={subViewS} autoFocus={autoFocus} />
+      <ShowView view={subView} autoFocus={autoFocus} />
     </ToolFrame>;
   }
 });
