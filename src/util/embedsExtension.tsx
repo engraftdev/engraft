@@ -1,17 +1,14 @@
 import { EditorSelection, EditorState, Extension, StateField, TransactionSpec, Text, RangeSet } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
-import PortalSet from "./PortalSet";
-import PortalWidget from "./PortalWidget";
-import { idRegExp } from "./id";
+import { PortalSet, PortalWidget } from "./PortalWidget";
 
-export function refCode(s: string) {
-  // currently, the id of a reference is just embedded directly into code
-  return s;
-}
-export const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
 
-function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
-  const matches = Array.from(text.sliceString(0).matchAll(refRE));
+// embedsExtension is a CodeMirror extension which lets you embed arbitrary React-rendered content
+// ("embeds") into the editor in place of specific strings ("embed ids") detected by regex. Embeds
+// will act like characters; arrow keys / backspace / etc. will treat them as single units.
+
+function embedsFromText(text: Text, portalSet: PortalSet<{id: string}>, embedIdRE: RegExp) {
+  const matches = Array.from(text.sliceString(0).matchAll(embedIdRE));
 
   return RangeSet.of(
     matches.map((match) => {
@@ -23,32 +20,32 @@ function refsFromText(text: Text, portalSet: PortalSet<{id: string}>) {
   );
 }
 
-export default function refsExtension(portalSet: PortalSet<{id: string}>): Extension {
-  const refsField = StateField.define<DecorationSet>({
+export function embedsExtension(portalSet: PortalSet<{id: string}>, embedIdRE: RegExp): Extension {
+  const embedsField = StateField.define<DecorationSet>({
     create(state) {
-      return refsFromText(state.doc, portalSet)
+      return embedsFromText(state.doc, portalSet, embedIdRE)
     },
     update(old, tr) {
-      return refsFromText(tr.newDoc, portalSet)
+      return embedsFromText(tr.newDoc, portalSet, embedIdRE)
     },
     provide: f => EditorView.decorations.from(f)
   });
 
-  const jumpOverRefs = EditorState.transactionFilter.of(tr => {
-    const refs = tr.startState.field(refsField)
+  const jumpOverEmbeds = EditorState.transactionFilter.of(tr => {
+    const embeds = tr.startState.field(embedsField)
 
     // TODO: only single selection will be supported
 
     if (tr.isUserEvent('select')) {
       let {head, anchor} = tr.newSelection.main;
       let change = false;
-      refs.between(head, head, (refFrom, refTo, ref) => {
+      embeds.between(head, head, (embedFrom, embedTo, embed) => {
         function applyWormhole(src: number, dst: number) {
           if (head === src) { head = dst; change = true; }
           if (anchor === src) { anchor = dst; change = true; }
         }
-        applyWormhole(refTo - 1, refFrom);
-        applyWormhole(refFrom + 1, refTo);
+        applyWormhole(embedTo - 1, embedFrom);
+        applyWormhole(embedFrom + 1, embedTo);
         if (change) { return false; }
       })
       if (change) {
@@ -59,7 +56,7 @@ export default function refsExtension(portalSet: PortalSet<{id: string}>): Exten
 
       const head = tr.startState.selection.main.head;
       let result: TransactionSpec | readonly TransactionSpec[] = tr;
-      refs.between(head, head, (refFrom, refTo, ref) => {
+      embeds.between(head, head, (refFrom, refTo, ref) => {
         if (head === (forward ? refFrom : refTo)) {
           result = [{changes: {from: refFrom, to: refTo}}];
           return false;
@@ -71,5 +68,5 @@ export default function refsExtension(portalSet: PortalSet<{id: string}>): Exten
     return tr;
   })
 
-  return [refsField, jumpOverRefs]
+  return [embedsField, jumpOverEmbeds]
 }

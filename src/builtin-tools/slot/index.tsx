@@ -4,6 +4,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { keymap } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
+import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
 import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
@@ -17,11 +18,14 @@ import { compileExpressionCached } from "src/util/compile";
 import { Updater } from 'src/util/immutable';
 import { OrError } from 'src/util/OrError';
 import { makeRand } from 'src/util/rand';
-import { refRE } from 'src/util/refsExtension';
+import { embedsExtension } from 'src/util/embedsExtension';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
 import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
+import { VarUse } from 'src/view/Vars';
 import { globals } from './globals';
+import { idRegExp } from 'src/util/id';
+import { usePortalSet } from 'src/util/PortalWidget';
 
 export type Program = ProgramCodeMode;
 
@@ -53,6 +57,12 @@ export const computeReferences = (program: Program) => {
     throw new Error("TODO: implement tool mode");
   }
 };
+
+export function refCode(s: string) {
+  // currently, the id of a reference is just embedded directly into code
+  return s;
+}
+export const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
 
 function referencesFromCode(code: string): Set<string> {
   // TODO: this is not principled or robust; should probably actually parse the code?
@@ -166,6 +176,8 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
 
   const [showInspector, setShowInspector] = useState(false);
 
+  const [refSet, refs] = usePortalSet<{id: string}>();
+
   const extensions = useMemo(() => {
     return [
       ...setup,
@@ -173,8 +185,9 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       keymap.of([
         {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},
       ]),
+      embedsExtension(refSet, refRE),
     ];
-  }, [])
+  }, [refSet])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));
@@ -198,6 +211,12 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         text={program.code}
         onChange={onChange}
       />
+      {refs.map(([elem, {id}]) => {
+        return ReactDOM.createPortal(
+          <VarUse key={id} varBinding={varBindings[id] as VarBinding | undefined} />,
+          elem
+        )
+      })}
       <ToolInspectorWindow
         show={showInspector}
         onClose={() => {setShowInspector(false)}}
