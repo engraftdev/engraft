@@ -7,9 +7,11 @@ import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
-import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps, VarBinding, VarBindings } from "src/engraft";
+import { ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { EngraftStream } from 'src/engraft/EngraftStream';
+import { hookRunSubTool } from 'src/engraft/hooks';
+import { ShowViewStream } from 'src/engraft/ShowView';
 import { hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hookForkLater, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
@@ -19,17 +21,19 @@ import { compileExpressionCached } from "src/util/compile";
 import { embedsExtension } from 'src/util/embedsExtension';
 import { idRegExp } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
+import { useAt } from 'src/util/immutable-react';
 import { OrError } from 'src/util/OrError';
 import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
 import { useRefForCallback } from 'src/util/useRefForCallback';
+import { ToolFrame } from 'src/view/ToolFrame';
 import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
 import { VarUse } from 'src/view/Vars';
 import { globals } from './globals';
 
-export type Program = ProgramCodeMode;
+export type Program = ProgramCodeMode | ProgramToolMode;
 
 type ProgramShared = {
   toolName: 'slot',
@@ -45,6 +49,11 @@ type ProgramCodeMode = ProgramShared & {
   code: string,
 }
 
+type ProgramToolMode = ProgramShared & {
+  modeName: 'tool',
+  subProgram: ToolProgram,
+}
+
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => ({
   toolName: 'slot',
   modeName: 'code',
@@ -52,11 +61,28 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   code: '',
 });
 
+// Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
+// ToolFrame, and with it, the ability to switch out of the given tool into a different one.
+export function slotSetTo<P extends ToolProgram | string>(program: P): Program {
+  // TODO: this is a hack, isn't it? (the program.toolName === 'slot' part, I mean)
+  if (typeof program !== 'string' && program.toolName === 'slot') {
+    return program as Program;
+  }
+
+  return {
+    toolName: 'slot',
+    ...(typeof program === 'string' ?
+        { modeName: 'code', code: program, defaultCode: program }:
+        { modeName: 'tool', subProgram: program, defaultCode: undefined }
+    )
+  };
+}
+
 export const computeReferences = (program: Program) => {
   if (program.modeName === 'code') {
     return referencesFromCode(program.code);
   } else {
-    throw new Error("TODO: implement tool mode");
+    return references(program.subProgram);
   }
 };
 
@@ -81,7 +107,9 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         return runCodeMode({...props, program, updateProgram: updateProgram as Updater<Program, ProgramCodeMode>});
       });
     } else {
-      throw new Error("TODO: implement tool mode");
+      return branch('tool mode', () => {
+        return runToolMode({...props, program, updateProgram: updateProgram as Updater<Program, ProgramToolMode>});
+      });
     }
   });
 }));
@@ -254,3 +282,57 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
     }
   };
 }
+
+
+///////////////
+// TOOL MODE //
+///////////////
+
+type ToolModeProps = Replace<ToolProps<Program>, {
+  program: ProgramToolMode,
+  updateProgram: Updater<Program, ProgramToolMode>,
+}>
+
+const runToolMode = (props: ToolModeProps) => {
+  const { program, updateProgram, varBindings } = props;
+
+  const { outputP: subOutputP, viewS: subViewS } = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'subProgram' });
+
+  const viewS = hookMemo(() => EngraftStream.of({
+    render: () => <ToolModeView {...props} subViewS={subViewS} />
+  }), [subViewS]);
+
+  return { outputP: subOutputP, viewS };
+};
+
+type ToolModeViewProps = ToolModeProps & ToolViewRenderProps & {
+  subViewS: EngraftStream<ToolView>,
+};
+
+const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
+  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subViewS} = props;
+
+  const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
+
+  const onCloseFrame = useCallback(() => {
+    updateProgram(() => ({
+      toolName: 'slot',
+      modeName: 'code',
+      code: program.defaultCode || '',
+      subTools: {},
+      defaultCode: program.defaultCode,
+    }));
+  }, [program.defaultCode, updateProgram]);
+
+  if (noFrame) {
+    return <ShowViewStream viewS={subViewS} autoFocus={autoFocus} />;
+  } else {
+    return <ToolFrame
+      expand={expand}
+      program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
+      onClose={onCloseFrame}
+    >
+      <ShowViewStream viewS={subViewS} autoFocus={autoFocus} />
+    </ToolFrame>;
+  }
+});
