@@ -3,7 +3,7 @@ const { compilerOptions } = require('./tsconfig')
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  preset: 'ts-jest/presets/js-with-ts',
+  preset: 'ts-jest/presets/js-with-ts-esm',
   testEnvironment: 'jsdom',
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: {
@@ -11,7 +11,7 @@ module.exports = {
     '\\.css$': '<rootDir>/__mocks__/styleMock.js',
   },
   transformIgnorePatterns: [
-    "<rootDir>/node_modules/(?!(isoformat)/)",
+    "<rootDir>/node_modules/(?!(isoformat|react-merge-refs)/)",
   ],
   modulePathIgnorePatterns: ["<rootDir>/src-disabled/"],
   testTimeout: 1000,
