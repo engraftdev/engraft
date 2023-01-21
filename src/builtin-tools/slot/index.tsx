@@ -1,12 +1,13 @@
 import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
+import { autocompletion, CompletionContext, CompletionSource } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
 import { keymap } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
-import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps, VarBinding } from "src/engraft";
+import { ProgramFactory, ToolProps, ToolRun, ToolViewRenderProps, VarBinding, VarBindings } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { EngraftStream } from 'src/engraft/EngraftStream';
 import { hookMemo } from 'src/mento/hookMemo';
@@ -15,17 +16,18 @@ import { memoizeProps } from 'src/mento/memoize';
 import CodeMirror from 'src/util/CodeMirror';
 import { setup } from "src/util/codeMirrorStuff";
 import { compileExpressionCached } from "src/util/compile";
+import { embedsExtension } from 'src/util/embedsExtension';
+import { idRegExp } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
 import { OrError } from 'src/util/OrError';
+import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
-import { embedsExtension } from 'src/util/embedsExtension';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
+import { useRefForCallback } from 'src/util/useRefForCallback';
 import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
 import { VarUse } from 'src/view/Vars';
 import { globals } from './globals';
-import { idRegExp } from 'src/util/id';
-import { usePortalSet } from 'src/util/PortalWidget';
 
 export type Program = ProgramCodeMode;
 
@@ -173,12 +175,16 @@ type CodeModeViewProps = CodeModeProps & ToolViewRenderProps;
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const {program, varBindings, updateProgram, expand, autoFocus} = props;
+  const varBindingsRef = useRefForCallback(varBindings);
 
   const [showInspector, setShowInspector] = useState(false);
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
   const extensions = useMemo(() => {
+    const completions = [
+      refCompletions(() => varBindingsRef.current),
+    ];
     return [
       ...setup,
       javascript({jsx: true}),
@@ -186,8 +192,9 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},
       ]),
       embedsExtension(refSet, refRE),
+      autocompletion({override: completions}),
     ];
-  }, [refSet])
+  }, [refSet, varBindingsRef])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));
@@ -227,3 +234,23 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     </div>
   );
 });
+
+// TODO: varBindingsGetter is pretty weird; CodeMirror might have a more idiomatic approach
+export function refCompletions(varBindingsGetter?: () => VarBindings | undefined): CompletionSource {
+  return (completionContext: CompletionContext) => {
+    let word = completionContext.matchBefore(/@?\w*/)!
+    if (word.from === word.to && !completionContext.explicit) {
+      return null
+    }
+
+    const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
+
+    return {
+      from: word.from,
+      options: Object.values(varBindings).map((varBinding) => ({
+        label: varBinding.var_.autoCompleteLabel || varBinding.var_.label,
+        apply: refCode(varBinding.var_.id),
+      })),
+    }
+  };
+}
