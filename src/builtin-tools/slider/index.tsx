@@ -1,9 +1,12 @@
-import { memo, useCallback, useMemo } from "react";
-import { ProgramFactory, ComputeReferences, ToolProps } from "src/tools-framework/tools";
-import { useOutput, useView } from "src/tools-framework/useSubTool";
-import { updateKeys, useAt } from "src/util/state";
+import { memo, useCallback } from "react";
+import { Tool, ToolProps } from "src/engraft";
+import { EngraftPromise } from "src/engraft/EngraftPromise";
+import { hookMemo } from "src/mento/hookMemo";
+import { hooks } from "src/mento/hooks";
+import { memoizeProps } from "src/mento/memoize";
+import { useAt } from "src/util/immutable-react";
+import { updateF } from "src/util/updateF";
 import { useContextMenu } from "src/util/useContextMenu";
-import { useMemoObject } from "src/util/useMemoObject";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 
 
@@ -15,29 +18,31 @@ export interface Program {
   step: number;
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'slider',
-  value: 0,
-  min: -10,
-  max: 10,
-  step: 1,
-});
+export const tool: Tool<Program> = {
+  programFactory: () => ({
+    toolName: 'slider',
+    value: 0,
+    min: -10,
+    max: 10,
+    step: 1,
+  }),
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+  computeReferences: () => new Set(),
 
-export const Component = memo((props: ToolProps<Program>) => {
-  const { program, reportOutput, reportView } = props;
+  run: memoizeProps(hooks((props) => {
+    const { program } = props;
 
-  useOutput(reportOutput, useMemoObject({
-    value: program.value
-  }));
+    const outputP = hookMemo(() => EngraftPromise.resolve({
+      value: program.value
+    }), [program.value]);
 
-  useView(reportView, useMemo(() => ({
-    render: () => <View {...props} />
-  }), [props]));
+    const view = hookMemo(() => ({
+      render: () => <View {...props} />
+    }), [props]);
 
-  return null;
-})
+    return { outputP, view };
+  })),
+};
 
 const View = memo((props: ToolProps<Program>) => {
   const { program, updateProgram } = props;
@@ -66,7 +71,7 @@ const View = memo((props: ToolProps<Program>) => {
     <input
       type="range"
       value={program.value}
-      onChange={(e) => updateKeys(updateProgram, { value: +e.target.value })}
+      onChange={(e) => updateProgram(updateF({ value: {$set: +e.target.value }}))}
       min={program.min} max={program.max} step={program.step}/>
     {' '}
     <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{program.value}</div>
