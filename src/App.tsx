@@ -9,6 +9,7 @@ import { runTool } from './engraft/hooks';
 import { ShowViewStream } from './engraft/ShowView';
 import { examples } from './examples/examples';
 import { useMento } from './mento/react';
+import { Updater } from './util/immutable';
 import { useStateSetOnly, useStateUpdateOnly } from './util/immutable-react';
 import range from './util/range';
 import IsolateStyles from './view/IsolateStyles';
@@ -32,24 +33,19 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
-  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(defaultProgram);
-
-  const varBindings = useMemo(() => varBindingsObject([
-    // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
-    {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
-  ]), []);
-
-  useEffect(() => {
-    const programJson = window.localStorage.getItem(localStorageKey)
-    if (programJson) {
-      updateProgram(() => JSON.parse(programJson));
-    }
-  }, [updateProgram])
+  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(() => {
+    try {
+      const programJson = window.localStorage.getItem(localStorageKey)
+      if (programJson) {
+        return JSON.parse(programJson);
+      }
+    } catch {}
+    return defaultProgram;
+  });
 
   useEffect(() => {
     try {
-      if (program !== defaultProgram) {
+      if (program !== null) {
         window.localStorage.setItem(localStorageKey, JSON.stringify(program));
       }
     } catch (e) {
@@ -57,12 +53,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     }
   }, [program])
 
-  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
-  const outputState = usePromiseState(outputP);
-
-  const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly('');
-  const [showTool, setShowTool] = useStateSetOnly(true);
-  const [showOutput, setShowOutput] = useStateSetOnly(false);
+  const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly(() => '');
 
   return <Fragment key={version}>
     <style>
@@ -74,29 +65,11 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
             <ValueEditable value={program} updater={updateProgram}/>
           </IsolateStyles>
         </div>
-      : <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
-          <ErrorBoundary
-            fallbackRender={(props) => {
-              return <div>
-                <h1>error!</h1>
-                <pre>{props.error.message}</pre>
-                <pre>{props.error.stack}</pre>
-              </div>
-            }}
-            resetKeys={[program]}
-          >
-            <IsolateStyles>
-              <ShowViewStream viewS={viewS} autoFocus={true} />
-            </IsolateStyles>
-          </ErrorBoundary>
-        </div>
+      : <AppWithRunningProgram
+          program={program}
+          updateProgram={updateProgram as Updater<ToolProgram>}
+        />
     }
-    <br/>
-    <br/>
-    {showOutput && <ToolOutputView outputState={outputState} />}
-    <br/>
-    <br/>
-    <br/>
     <br/>
     <br/>
     <br/>
@@ -125,7 +98,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     <br/>
     <div>
       {/* HACK: {...defaultProgram} is to distinguish it from defaultProgram, so it gets saved */}
-      <button onClick={() => updateProgram(() => ({...defaultProgram}))}>Clear</button>
+      <button onClick={() => updateProgram(() => defaultProgram)}>Clear</button>
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
@@ -151,6 +124,50 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     <div>
       <button onClick={incrementVersion}>Redraw</button>
     </div>
+  </Fragment>
+});
+
+type AppWithRunningProgramProps = {
+  program: ToolProgram,
+  updateProgram: Updater<ToolProgram>,
+}
+
+const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
+  const {program, updateProgram} = props;
+
+  const varBindings = useMemo(() => varBindingsObject([
+    // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
+    {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
+    {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
+  ]), []);
+
+  const {outputP, viewS} = useMento(runTool, { program, varBindings, updateProgram });
+  const outputState = usePromiseState(outputP);
+
+  const [showTool, setShowTool] = useStateSetOnly(() => true);
+  const [showOutput, setShowOutput] = useStateSetOnly(() => false);
+
+  return <>
+    <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
+      <ErrorBoundary
+        fallbackRender={(props) => {
+          return <div>
+            <h1>error!</h1>
+            <pre>{props.error.message}</pre>
+            <pre>{props.error.stack}</pre>
+          </div>
+        }}
+        resetKeys={[program]}
+      >
+        <IsolateStyles>
+          <ShowViewStream viewS={viewS} autoFocus={true} />
+        </IsolateStyles>
+      </ErrorBoundary>
+    </div>
+    <br/>
+    <br/>
+    {showOutput && <ToolOutputView outputState={outputState} />}
+    <br/>
     <br/>
     <div>
       <input type='checkbox' checked={showTool} onChange={(ev) => setShowTool(ev.target.checked)}/>
@@ -160,7 +177,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       <input type='checkbox' checked={showOutput} onChange={(ev) => setShowOutput(ev.target.checked)}/>
       <label>Show output</label>
     </div>
-  </Fragment>
+  </>;
 });
 
 export default App;
