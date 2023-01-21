@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { hasProperty } from "src/util/hasProperty";
 import { SynchronousPromise } from "synchronous-promise";
 
@@ -170,13 +171,17 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
     return result;
   },
 
+  looksLikeAPromise<T>(value: unknown): value is EngraftPromise<T> {
+    return hasProperty(value, 'then') && typeof value.then === 'function';
+  },
+
   try<T>(func: () => T | PromiseLike<T>): EngraftPromise<T> {
     return new EngraftPromise((resolve, reject) => {
       try {
         // this should just be `resolve(func())`, but https://github.com/fluffynuts/synchronous-promise/issues/39
         // here's a workaround
         const result = func();
-        if (hasProperty(result, 'then') && typeof result.then === 'function') {
+        if (EngraftPromise.looksLikeAPromise(result)) {
           (result as EngraftPromise<T>).then(function (newResult) {
             resolve(newResult);
           }).catch(function (error) {
@@ -188,6 +193,14 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
       } catch (e) {
         reject(e);
       }
+    });
+  },
+
+  allValues<T>(promiseObject: {[key: string]: EngraftPromise<T>}): EngraftPromise<{[key: string]: T}> {
+    const keys = Object.keys(promiseObject);
+    const promises = Object.values(promiseObject);
+    return EngraftPromise.all(promises).then((values) => {
+      return _.zipObject(keys, values);
     });
   },
 

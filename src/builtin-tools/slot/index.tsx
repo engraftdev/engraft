@@ -1,15 +1,15 @@
 import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
-import { autocompletion, CompletionContext, CompletionSource } from "@codemirror/autocomplete";
+import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
 import { keymap } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
-import { ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding, VarBindings } from "src/engraft";
+import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { hookRunSubTool } from 'src/engraft/hooks';
+import { hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
 import { hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hookForkLater, hooks } from 'src/mento/hooks';
@@ -18,19 +18,24 @@ import CodeMirror from 'src/util/CodeMirror';
 import { setup } from "src/util/codeMirrorStuff";
 import { compileExpressionCached } from "src/util/compile";
 import { embedsExtension } from 'src/util/embedsExtension';
-import { idRegExp } from 'src/util/id';
+import { newId } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
-import { useAt } from 'src/util/immutable-react';
+import { hookAt, hookUpdateAt } from 'src/util/immutable-mento';
+import { useAt, useUpdateAt } from 'src/util/immutable-react';
 import { OrError } from 'src/util/OrError';
 import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
+import { difference, union } from 'src/util/sets';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
 import { useRefForCallback } from 'src/util/useRefForCallback';
+import IsolateStyles from 'src/view/IsolateStyles';
 import { ToolFrame } from 'src/view/ToolFrame';
 import { ToolInspectorWindow } from 'src/view/ToolInspectorWindow';
 import { VarUse } from 'src/view/Vars';
+import { refCompletions, toolCompletions } from './autocomplete';
 import { globals } from './globals';
+import { referencesFromCode, refRE } from './refs';
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 
@@ -46,6 +51,7 @@ type ProgramShared = {
 type ProgramCodeMode = ProgramShared & {
   modeName: 'code',
   code: string,
+  subPrograms: {[id: string]: ToolProgram},
 }
 
 type ProgramToolMode = ProgramShared & {
@@ -58,6 +64,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   modeName: 'code',
   defaultCode,
   code: '',
+  subPrograms: {},
 });
 
 // Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
@@ -71,7 +78,7 @@ export function slotSetTo<P extends ToolProgram | string>(program: P): Program {
   return {
     toolName: 'slot',
     ...(typeof program === 'string' ?
-        { modeName: 'code', code: program, defaultCode: program }:
+        { modeName: 'code', code: program, defaultCode: program, subPrograms: {} } :
         { modeName: 'tool', subProgram: program, defaultCode: undefined }
     )
   };
@@ -79,23 +86,16 @@ export function slotSetTo<P extends ToolProgram | string>(program: P): Program {
 
 export const computeReferences = (program: Program) => {
   if (program.modeName === 'code') {
-    return referencesFromCode(program.code);
+    return difference(
+      // references from code & subprograms...
+      union(referencesFromCode(program.code), ...Object.values(program.subPrograms).map(references)),
+      // ...minus the subprogram ids themselves
+      Object.keys(program.subPrograms)
+    );
   } else {
     return references(program.subProgram);
   }
 };
-
-export function refCode(s: string) {
-  // currently, the id of a reference is just embedded directly into code
-  return s;
-}
-export const refRE = new RegExp(refCode(`(${idRegExp})`), "g")
-
-function referencesFromCode(code: string): Set<string> {
-  // TODO: this is not principled or robust; should probably actually parse the code?
-  // (but then we'd want to share some work to avoid parsing twice? idk)
-  return new Set([...code.matchAll(refRE)].map(m => m[1]));
-}
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const {program, updateProgram} = props;
@@ -132,7 +132,7 @@ type CodeModeProps = Replace<ToolProps<Program>, {
 }>
 
 const runCodeMode = (props: CodeModeProps) => {
-  const { program, varBindings } = props;
+  const { program, updateProgram, varBindings } = props;
 
   const compiledP = hookMemo(() => EngraftPromise.try(() => {
     if (program.code === '') {
@@ -145,25 +145,46 @@ const runCodeMode = (props: CodeModeProps) => {
     return compileExpressionCached(translated);  // might throw
   }), [program.code])
 
+  const [subPrograms, updateSubPrograms] = hookAt(program, updateProgram, 'subPrograms');
+
+  const subResults = hookMemo(() =>
+    hookFork((branch) =>
+      _.mapValues(subPrograms, (subProgram, id) => branch(id, () => {
+        return hookMemo(() => {
+          const updateSubProgram = hookUpdateAt(updateSubPrograms, id);
+
+          return hookRunTool({
+            program: subProgram,
+            updateProgram: updateSubProgram,
+            varBindings,
+          });
+        }, [subProgram, updateSubPrograms, varBindings])
+      }))
+    )
+  , [subPrograms, updateSubPrograms, varBindings]);
+
   const codeReferences = hookMemo(() => referencesFromCode(program.code), [program.code]);
 
   const codeReferenceScopeP = hookMemo(() => EngraftPromise.try(() => {
     const codeReferencesArr = Array.from(codeReferences);
 
-    const outputValuePromises = codeReferencesArr.map((ref) => {
-      const binding = varBindings[ref] as VarBinding | undefined;
-      if (!binding) {
+    const outputValuePs = codeReferencesArr.map((ref) => {
+      if (subResults[ref]) {
+        return subResults[ref].outputP;
+      } else if (varBindings[ref]) {
+        const binding = varBindings[ref];
+        return binding.outputP.catch(() => {
+          throw new Error(`Error from reference ${binding.var_.label}`);
+        });
+      } else {
         throw new Error(`Unknown reference ${ref}`);  // caught by promise
       }
-      return binding.outputP.catch(() => {
-        throw new Error(`Error from reference ${binding.var_.label}`);
-      });
     })
 
-    return EngraftPromise.all(outputValuePromises).then((outputValues) => {
+    return EngraftPromise.all(outputValuePs).then((outputValues) => {
       return _.zipObject(codeReferencesArr, outputValues.map((v) => v.value));
     });
-  }), [varBindings, codeReferences]);
+  }), [varBindings, codeReferences, subResults]);
 
   const outputP = hookMemo(() => {
     const valueDedupeFork = hookForkLater();
@@ -188,29 +209,55 @@ const runCodeMode = (props: CodeModeProps) => {
     })
   }, [compiledP, codeReferenceScopeP]);
 
+  const subViews = hookMemo(() => {
+    return _.mapValues(subResults, (subResult, id) => {
+      return subResult.view;
+    });
+  }, [subResults]);
+
   const view = hookMemo(() => ({
     render: (viewProps: ToolViewRenderProps) =>
       <CodeModeView
         {...props} {...viewProps}
+        subViews={subViews}
       />
   }), [props]);
 
   return {outputP, view};
 };
 
-type CodeModeViewProps = CodeModeProps & ToolViewRenderProps;
+type CodeModeViewProps = CodeModeProps & ToolViewRenderProps & {
+  subViews: {[id: string]: ToolView},
+};
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, subViews} = props;
   const varBindingsRef = useRefForCallback(varBindings);
+  const updateSubPrograms = useUpdateAt(updateProgram, 'subPrograms');
 
   const [showInspector, setShowInspector] = useState(false);
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
   const extensions = useMemo(() => {
+    function insertTool(tool: Tool) {
+      const id = newId();
+      const newProgram = slotSetTo(tool.programFactory());
+      updateSubPrograms(updateF({[id]: {$set: newProgram}}));
+      // TODO: we never remove these! lol
+      return id;
+    };
+    function replaceWithTool(tool: Tool) {
+      updateProgram(() => ({
+        toolName: 'slot',
+        modeName: 'tool',
+        subProgram: tool.programFactory(program.defaultCode),
+        defaultCode: program.defaultCode
+      }));
+    };
     const completions = [
       refCompletions(() => varBindingsRef.current),
+      toolCompletions(insertTool, replaceWithTool),
     ];
     return [
       ...setup,
@@ -221,7 +268,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       embedsExtension(refSet, refRE),
       autocompletion({override: completions}),
     ];
-  }, [refSet, varBindingsRef])
+  }, [program.defaultCode, refSet, updateProgram, updateSubPrograms, varBindingsRef])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));
@@ -247,7 +294,11 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       />
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(
-          <VarUse key={id} varBinding={varBindings[id] as VarBinding | undefined} />,
+          subViews[id]
+          ? <IsolateStyles style={{display: 'inline-block'}}>
+              <ShowView view={subViews[id]} />
+            </IsolateStyles>
+          : <VarUse key={id} varBinding={varBindings[id] as VarBinding | undefined} />,
           elem
         )
       })}
@@ -261,26 +312,6 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     </div>
   );
 });
-
-// TODO: varBindingsGetter is pretty weird; CodeMirror might have a more idiomatic approach
-export function refCompletions(varBindingsGetter?: () => VarBindings | undefined): CompletionSource {
-  return (completionContext: CompletionContext) => {
-    let word = completionContext.matchBefore(/@?\w*/)!
-    if (word.from === word.to && !completionContext.explicit) {
-      return null
-    }
-
-    const varBindings = varBindingsGetter ? varBindingsGetter() || {} : {};
-
-    return {
-      from: word.from,
-      options: Object.values(varBindings).map((varBinding) => ({
-        label: varBinding.var_.autoCompleteLabel || varBinding.var_.label,
-        apply: refCode(varBinding.var_.id),
-      })),
-    }
-  };
-}
 
 
 ///////////////
@@ -318,7 +349,7 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
       toolName: 'slot',
       modeName: 'code',
       code: program.defaultCode || '',
-      subTools: {},
+      subPrograms: {},
       defaultCode: program.defaultCode,
     }));
   }, [program.defaultCode, updateProgram]);

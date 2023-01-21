@@ -1,15 +1,16 @@
 import { describe, it } from '@jest/globals';
 import _ from 'lodash';
-import { registerTool, ToolOutput } from 'src/engraft';
+import { registerTool, Tool, ToolOutput } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { runTool } from 'src/engraft/hooks';
+import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { Program } from '.';
 
-const slotTool = toolFromModule(require('./index'));
+const slotTool = toolFromModule(require('./index')) as unknown as Tool<Program>;  // TODO: don't love this dance
 registerTool(slotTool);
 
 describe('slot', () => {
@@ -45,12 +46,14 @@ describe('slot', () => {
     return expectToEqual(value, { value: 2 });
   });
 
-  it('computes references correctly', () => {
+  it('computes references correctly in code-mode', () => {
     expectToEqual(
       slotTool.computeReferences({
         toolName: 'slot',
         modeName: 'code',
         code: '1 + 1',
+        subPrograms: {},
+        defaultCode: undefined,
       }),
       new Set()
     );
@@ -60,11 +63,51 @@ describe('slot', () => {
         toolName: 'slot',
         modeName: 'code',
         code: 'IDfox000000 + 1',
+        subPrograms: {},
+        defaultCode: undefined,
       }),
       new Set(['IDfox000000'])
     );
   });
 
+  it('computes references correctly in code-mode with subprograms', () => {
+    expectToEqual(
+      slotTool.computeReferences({
+        toolName: 'slot',
+        modeName: 'code',
+        code: '1 + IDsubtool000000',
+        subPrograms: {
+          IDsubtool000000: {
+            toolName: 'slot',
+            modeName: 'code',
+            code: 'IDfox000000 + 1',
+            subPrograms: {},
+            defaultCode: undefined,
+          },
+        },
+        defaultCode: undefined,
+      }),
+      new Set(['IDfox000000'])
+    );
+  });
+
+  it('computes references correctly in tool-mode', () => {
+    expectToEqual(
+      slotTool.computeReferences({
+        toolName: 'slot',
+        modeName: 'tool',
+        subProgram: {
+          toolName: 'slot',
+          modeName: 'code',
+          code: 'IDfox000000 + 1',
+          subPrograms: {},
+          defaultCode: undefined,
+        },
+        defaultCode: undefined,
+      }),
+      new Set(['IDfox000000'])
+    );
+  });
 
   it('resolves references correctly', () => {
     expectToEqual(
@@ -74,13 +117,10 @@ describe('slot', () => {
             toolName: 'slot',
             modeName: 'code',
             code: 'IDfox000000 + 1',
-          },
-          varBindings: {
-            IDfox000000: {
-              var_: {id: 'IDfox000000', label: 'fox'},
-              outputP: EngraftPromise.resolve({value: 100}),
-            }
-          },
+            subPrograms: {},
+            defaultCode: undefined,
+          } satisfies Program,
+          varBindings: makeVarBindings({IDfox000000: {value: 100}}),
           updateProgram: noOp,
         }).outputP
       ),
@@ -97,13 +137,10 @@ describe('slot', () => {
         toolName: 'slot',
         modeName: 'code',
         code: 'IDfox000000 + 1',
-      },
-      varBindings: {
-        IDfox000000: {
-          var_: {id: 'IDfox000000', label: 'fox'},
-          outputP: foxOutputP,
-        }
-      },
+        subPrograms: {},
+        defaultCode: undefined,
+      } satisfies Program,
+      varBindings: makeVarBindings({IDfox000000: foxOutputP}),
       updateProgram: noOp,
     });
     expectToEqual(EngraftPromise.state(outputP), {status: 'pending'});
@@ -119,6 +156,7 @@ describe('slot', () => {
       modeName: 'code',
       code: '1 + 1',
       defaultCode: undefined,
+      subPrograms: {},
     };
     const programTool: Program = {
       toolName: 'slot',
@@ -159,5 +197,32 @@ describe('slot', () => {
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 4}});
     // same
     expectToEqual(JSON.stringify(memory), JSON.stringify(memoryAfterTool));
+  });
+
+  it('works with subtools', () => {
+    expectToEqual(
+      EngraftPromise.state(
+        runTool(MentoMemory.create(), {
+          program: {
+            toolName: 'slot',
+            modeName: 'code',
+            code: '1 + IDsubtool000000',
+            subPrograms: {
+              IDsubtool000000: {
+                toolName: 'slot',
+                modeName: 'code',
+                code: '2 + 2 + IDmoose000000',
+                subPrograms: {},
+                defaultCode: undefined,
+              },
+            },
+            defaultCode: undefined,
+          } satisfies Program,
+          varBindings: makeVarBindings({IDmoose000000: {value: 100}}),
+          updateProgram: noOp,
+        }).outputP
+      ),
+      {status: 'fulfilled', value: {value: 105}},
+    )
   });
 });
