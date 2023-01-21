@@ -1,11 +1,10 @@
 import { format } from "isoformat";
-import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useEffect, useState } from "react";
+import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useRef, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
 import { ToolOutput } from "src/engraft";
 import { count } from "src/util/count";
 import { DOM } from "src/util/DOM";
 import { ErrorBoundary } from "src/util/ErrorBoundary";
-import { useStateSetOnly } from "src/util/immutable-react";
 import { saveFile } from "src/util/saveFile";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
@@ -378,16 +377,13 @@ export type ToolOutputBufferProps = {
 export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputBufferProps) {
   const {outputState, renderValue} = props;
 
-  const [lastOutputValue, setLastOutputValue] = useStateSetOnly<ToolOutput | undefined>(undefined);
-
-  useEffect(() => {
-    if (outputState.status === 'fulfilled') {
-      setLastOutputValue(outputState.value);
-    }
-  }, [setLastOutputValue, outputState]);
+  const lastOutputValueRef = useRef<unknown>();
+  if (outputState.status === 'fulfilled') {
+    lastOutputValueRef.current = outputState.value.value;
+  }
 
   const valueView =
-    lastOutputValue !== undefined
+    lastOutputValueRef.current !== undefined
     ? <div
         className="ToolOutputBuffer-value"
         style={{
@@ -395,7 +391,7 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
           maxWidth: '100%',
         }}
       >
-        {renderValue(lastOutputValue.value)}
+        {renderValue(lastOutputValueRef.current)}
       </div>
     : <div
         className="ToolOutputBuffer-no-value"
