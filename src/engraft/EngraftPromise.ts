@@ -110,13 +110,6 @@ export interface SynchronousPromiseConstructor2 {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
-  reject(reason: any): EngraftPromise<void>;
-
-  /**
-    * Creates a new rejected promise for the provided reason.
-    * @param reason The reason the promise was rejected.
-    * @returns A new rejected Promise.
-    */
   reject<T>(reason: any): EngraftPromise<T>;
 
   /**

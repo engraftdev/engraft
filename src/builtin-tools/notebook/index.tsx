@@ -1,6 +1,6 @@
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
 import { mergeRefs } from "react-merge-refs";
-import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, ToolResult, Var } from "src/engraft";
+import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, Var, VarBindings } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunTool } from "src/engraft/hooks";
@@ -12,7 +12,8 @@ import { startDrag } from "src/util/drag";
 import { atIndices, removers, Updater } from "src/util/immutable";
 import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
 import { useAt } from "src/util/immutable-react";
-import { difference, union } from "src/util/sets";
+import { difference, intersection, union } from "src/util/sets";
+import { toposort } from "src/util/toposort";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
 import { updateF } from "src/util/updateF";
 import { Use } from "src/util/Use";
@@ -65,6 +66,32 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const [cells, updateCells] = hookAt(program, updateProgram, 'cells');
 
+  const cellIds = hookMemo(() => new Set(cells.map(cell => cell.var_.id)), [cells]);
+  const interCellReferences = hookMemo(() =>
+    hookFork((branch) =>
+      Object.fromEntries(cells.map((cell) => branch(cell.var_.id, () => {
+        return hookMemo(() => {
+          return [cell.var_.id, intersection(references(cell.program), cellIds)] as const;
+        }, [cell]);
+      })))
+    )
+  , [cells]);
+  const { sorted, cyclic } = hookMemo(() => {
+    return toposort([...cellIds], interCellReferences);
+  }, [cells, interCellReferences, cellIds]);
+  console.log(sorted, cyclic);
+
+  // TODO: For now, we'll just wire all cells up to all cells, without any special accounting for
+  // topological order. This is probably very inefficient.
+  const cellOutputVarBindings = hookMemo(() =>
+    Object.fromEntries(cells.map((cell) => [cell.var_.id, {var_: cell.var_, outputP: EngraftPromise.unresolved<ToolOutput>()}] as const))
+  , [cells]);
+
+  const allVarBindings: VarBindings = hookMemo(() => ({
+    ...varBindings,
+    ...cellOutputVarBindings,
+  }), [varBindings, cellOutputVarBindings]);
+
   const cellResults = hookMemo(() =>
     hookFork((branch) =>
       cells.map((cell, i) => branch(cell.var_.id, () => {
@@ -72,15 +99,23 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           const updateCell = hookUpdateAtIndex(updateCells, i);
           const [cellProgram, updateCellProgram] = hookAt(cell, updateCell, 'program');
 
-          return hookRunTool({
+          const { outputP, view } = hookRunTool({
             program: cellProgram,
             updateProgram: updateCellProgram,
-            varBindings,  // TODO: wire up cells
+            varBindings: allVarBindings,
           });
-        }, [cell, updateCells, varBindings]);
+          // TODO: inelegance because synchronous-promise isn't good at resolving with promises
+          outputP.then(cellOutputVarBindings[cell.var_.id].outputP.resolve, cellOutputVarBindings[cell.var_.id].outputP.reject);
+          return {
+            outputP: cyclic.has(cell.var_.id)
+              ? EngraftPromise.reject<ToolOutput>(new Error("cyclic"))
+              : outputP,
+            view,
+          }
+        }, [cell, updateCells, varBindings, cyclic, i]);
       }))
     )
-  , [cells, updateCells, varBindings]);
+  , [cells, updateCells, varBindings, cyclic, cellOutputVarBindings, allVarBindings]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCellResult = cellResults[cellResults.length - 1] as ToolResult | undefined;
