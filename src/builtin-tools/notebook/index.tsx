@@ -129,15 +129,12 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     if (!lastCellResult) {
       throw new Error("no cells");
     }
-    const lastOutputP = lastCellResult.outputP;
-    return hookMemo(() => {
-      // mark the output as already displayed
-      return lastOutputP.then((output) => ({...output, alreadyDisplayed: true}));
-    }, [lastOutputP]);
+    return lastCellResult.outputP;
   }), [cellResults]);
 
   const view = hookMemo(() => ({
-    render: () => <View {...props} cellResults={cellResults} />
+    render: () => <View {...props} cellResults={cellResults} />,
+    showsOwnOutput: true,
   }), [props, cellResults]);
 
   return { outputP, view };
@@ -251,12 +248,9 @@ type CellViewProps = {
 
 const CellView = memo(function CellView(props: CellViewProps) {
   const {cell, updateCell, cellResult, removeCell, notebookMenuMaker, outputBelowInput} = props;
-
   const [var_, updateVar] = useAt(cell, updateCell, 'var_');
-
   const cellOutputState = usePromiseState(cellResult.outputP);
-
-  const alreadyDisplayed = cellOutputState.status === 'fulfilled' && cellOutputState.value.alreadyDisplayed;
+  const cellShowsOwnOutput = cellResult.view.showsOwnOutput;
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -306,12 +300,12 @@ const CellView = memo(function CellView(props: CellViewProps) {
         <VarDefinition var_={var_} updateVar={updateVar}/>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(alreadyDisplayed || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
+    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(cellShowsOwnOutput || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
       <div className="xStickyTop10" ref={toolRef}>
         <ShowView view={cellResult.view}/>
       </div>
     </div>
-    { !alreadyDisplayed &&
+    { !cellShowsOwnOutput &&
       <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputRef, outputHoverRef])}>
           {/* TODO: clean this up */}

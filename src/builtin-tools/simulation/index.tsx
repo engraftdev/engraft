@@ -137,7 +137,7 @@ const View = memo((props: ViewProps) => {
               </div>
             }
             <ShowView view={onTickResults[selectedTick].view} autoFocus={autoFocus} />
-            {afterSelectedTickOutputState.status === 'fulfilled' && !afterSelectedTickOutputState.value.alreadyDisplayed &&
+            {!onTickResults[selectedTick].view.showsOwnOutput &&
               <div className="xRow xGap10">
                 <div>after</div>
                 <ToolOutputView outputState={afterSelectedTickOutputState} />

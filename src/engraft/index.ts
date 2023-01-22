@@ -26,11 +26,11 @@ export type ToolResult = {
 
 export type ToolOutput = {
   value: unknown;
-  alreadyDisplayed?: boolean;  // TODO: wrong place? it's persisted too far (put into ToolResult?)
 };
 
 export type ToolView = {
   render: (props: ToolViewRenderProps) => ReactElement<any, any> | null
+  showsOwnOutput?: boolean,
 }
 
 export interface ToolViewRenderProps {

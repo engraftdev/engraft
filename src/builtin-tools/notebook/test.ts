@@ -104,7 +104,6 @@ describe('notebook', () => {
         status: 'fulfilled',
         value: {
           value: 101,
-          alreadyDisplayed: true,
         },
       }
     );

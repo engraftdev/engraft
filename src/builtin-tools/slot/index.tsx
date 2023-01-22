@@ -346,7 +346,9 @@ const runToolMode = (props: ToolModeProps) => {
   const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'subProgram' });
 
   const view = hookMemo(() => ({
-    render: () => <ToolModeView {...props} subView={subView} />
+    render: () => <ToolModeView {...props} subView={subView} />,
+    showsOwnOutput: subView.showsOwnOutput,
+    // TODO: what happens if we add more properties to ToolView?
   }), [subView]);
 
   return { outputP: subOutputP, view };
