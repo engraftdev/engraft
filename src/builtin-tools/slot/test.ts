@@ -1,5 +1,6 @@
 import { describe, it } from '@jest/globals';
 import _ from 'lodash';
+import { update } from 'src/deps';
 import { registerTool, Tool, ToolOutput } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { runTool } from 'src/engraft/hooks';
@@ -224,5 +225,41 @@ describe('slot', () => {
       ),
       {status: 'fulfilled', value: {value: 105}},
     )
+  });
+
+  // TODO: for this to work, we need to dedupe codeReferenceScopeP
+  it.failing('does not re-run when irrelevant varBindings change', () => {
+    let runs = 0;
+    let varBindings = makeVarBindings({
+      IDincrementRuns000000: {value: (x: any) => { runs++; return x; }},
+      IDrelevant000000: {value: 1},
+      IDirrelevant000000: {value: 2},
+    });
+    const program = {
+      toolName: 'slot',
+      modeName: 'code',
+      code: 'IDincrementRuns000000(IDrelevant000000)',
+    }
+    const memory = MentoMemory.create();
+    function runProgram() {
+      return EngraftPromise.state(
+        runTool(memory, {
+          program,
+          varBindings,
+          updateProgram: noOp,
+        }).outputP
+      );
+    }
+
+    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
+    expectToEqual(runs, 1);
+    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
+    expectToEqual(runs, 1);
+    varBindings = update(varBindings, {IDrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 2})}}});
+    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
+    expectToEqual(runs, 2);
+    varBindings = update(varBindings, {IDirrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 100})}}});
+    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
+    expectToEqual(runs, 2);
   });
 });
