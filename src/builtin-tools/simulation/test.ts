@@ -6,7 +6,7 @@ import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { empty, noOp } from 'src/util/noOp';
+import { noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
 import { computeReferences, Program } from './index';
 

@@ -57,7 +57,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
 export const computeReferences: ComputeReferences<Program> = (program) =>
   difference(
     union(...Object.values(program.cells).map(cell => references(cell.program))),
-    Object.keys(program.cells)
+    union(Object.keys(program.cells), [program.prevVar.id])
   );
 
 
@@ -98,10 +98,18 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           const updateCell = hookUpdateAtIndex(updateCells, i);
           const [cellProgram, updateCellProgram] = hookAt(cell, updateCell, 'program');
 
+          const cellVarBindings = i === 0 ? allVarBindings : {
+            ...allVarBindings,
+            [program.prevVar.id]: {
+              var_: program.prevVar,
+              outputP: cellOutputVarBindings[cells[i - 1].var_.id].outputP,
+            }
+          };
+
           const { outputP, view } = hookRunTool({
             program: cellProgram,
             updateProgram: updateCellProgram,
-            varBindings: allVarBindings,
+            varBindings: cellVarBindings,
           });
           // TODO: inelegance because synchronous-promise isn't good at resolving with promises
           outputP.then(cellOutputVarBindings[cell.var_.id].outputP.resolve, cellOutputVarBindings[cell.var_.id].outputP.reject);

@@ -7,10 +7,14 @@ import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
+import { slotSetTo } from '../slot';
 import { Program } from './index';
+
+const tool = toolFromModule(require('.'));
 
 registerTool(toolFromModule(require('.')));
 registerTool(toolFromModule(require('../test-value')));
+registerTool(toolFromModule(require('../slot')));
 
 describe('notebook', () => {
   // TODO: We need to be smarter about wiring notebook cells together for this to work.
@@ -66,5 +70,48 @@ describe('notebook', () => {
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 3}});
     expectToEqual(cell1Runs, 1);
     expectToEqual(cell2Runs, 2);
+  });
+
+  it('prev works', () => {
+    const prevVar = newVar('prev');
+
+    let program: Program = {
+      toolName: 'notebook',
+      cells: [
+        {
+          var_: newVar('cell1'),
+          program: slotSetTo('100'),
+          outputManualHeight: undefined,
+        },
+        {
+          var_: newVar('cell2'),
+          program: slotSetTo(`${prevVar.id} + 1`),
+          outputManualHeight: undefined,
+        },
+      ],
+      prevVar
+    };
+
+    expectToEqual(
+      EngraftPromise.state(
+        runTool(MentoMemory.create(), {
+          program,
+          varBindings: empty,
+          updateProgram: noOp,
+        }).outputP
+      ),
+      {
+        status: 'fulfilled',
+        value: {
+          value: 101,
+          alreadyDisplayed: true,
+        },
+      }
+    );
+
+    expectToEqual(
+      tool.computeReferences(program),
+      new Set()
+    );
   });
 });
