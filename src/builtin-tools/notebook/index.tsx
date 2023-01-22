@@ -76,10 +76,9 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       })))
     )
   , [cells]);
-  const { sorted, cyclic } = hookMemo(() => {
+  const { cyclic } = hookMemo(() => {
     return toposort([...cellIds], interCellReferences);
   }, [cells, interCellReferences, cellIds]);
-  console.log(sorted, cyclic);
 
   // TODO: For now, we'll just wire all cells up to all cells, without any special accounting for
   // topological order. This is probably very inefficient.
@@ -122,7 +121,11 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     if (!lastCellResult) {
       throw new Error("no cells");
     }
-    return lastCellResult.outputP;
+    const lastOutputP = lastCellResult.outputP;
+    return hookMemo(() => {
+      // mark the output as already displayed
+      return lastOutputP.then((output) => ({...output, alreadyDisplayed: true}));
+    }, [lastOutputP]);
   }), [cellResults]);
 
   const view = hookMemo(() => ({

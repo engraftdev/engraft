@@ -26,7 +26,7 @@ export type ToolResult = {
 
 export type ToolOutput = {
   value: unknown;
-  alreadyDisplayed?: boolean;  // TODO: wrong place? it's persisted too far
+  alreadyDisplayed?: boolean;  // TODO: wrong place? it's persisted too far (put into ToolResult?)
 };
 
 export type ToolView = {
