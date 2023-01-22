@@ -80,19 +80,22 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     return toposort([...cellIds], interCellReferences);
   }, [cells, interCellReferences, cellIds]);
 
-  // TODO: For now, we'll just wire all cells up to all cells, without any special accounting for
-  // topological order. This is probably very inefficient.
-  const cellOutputVarBindings = hookMemo(() =>
-    Object.fromEntries(cells.map((cell) => [cell.var_.id, {var_: cell.var_, outputP: EngraftPromise.unresolved<ToolOutput>()}] as const))
-  , [cells]);
 
-  const allVarBindings: VarBindings = hookMemo(() => ({
-    ...varBindings,
-    ...cellOutputVarBindings,
-  }), [varBindings, cellOutputVarBindings]);
+  const cellResults = hookMemo(() => {
+    // TODO: For now, we'll just wire all cells up to all cells, without any special accounting for
+    // topological order. This is probably very inefficient.
 
-  const cellResults = hookMemo(() =>
-    hookFork((branch) =>
+    const cellOutputVarBindings = Object.fromEntries(cells.map((cell) => [
+      cell.var_.id,
+      {var_: cell.var_, outputP: EngraftPromise.unresolved<ToolOutput>()}
+    ] as const));
+
+    const allVarBindings: VarBindings = {
+      ...varBindings,
+      ...cellOutputVarBindings,
+    };
+
+    return hookFork((branch) =>
       cells.map((cell, i) => branch(cell.var_.id, () => {
         return hookMemo(() => {
           const updateCell = hookUpdateAtIndex(updateCells, i);
@@ -121,8 +124,8 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           }
         }, [cell, updateCells, varBindings, cyclic, i]);
       }))
-    )
-  , [cells, updateCells, varBindings, cyclic, cellOutputVarBindings, allVarBindings]);
+    );
+  }, [cells, updateCells, varBindings, cyclic]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCellResult = cellResults[cellResults.length - 1] as ToolResult | undefined;

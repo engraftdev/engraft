@@ -1,8 +1,9 @@
 import { describe, it } from '@jest/globals';
 import { update } from 'src/deps';
-import { newVar, registerTool } from 'src/engraft';
+import { newVar, registerTool, VarBindings } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { runTool } from 'src/engraft/hooks';
+import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
@@ -111,6 +112,51 @@ describe('notebook', () => {
     expectToEqual(
       tool.computeReferences(program),
       new Set()
+    );
+  });
+
+  it('changing earlier cell through external binding propagates to later cell', () => {
+    const memory = MentoMemory.create();
+    const externalVar = newVar('external');
+    const cell1 = newVar('cell1');
+    const cell2 = newVar('cell2');
+    let program: Program = {
+      toolName: 'notebook',
+      cells: [
+        {
+          var_: cell1,
+          program: slotSetTo(`${externalVar.id} + 10`),
+          outputManualHeight: undefined,
+        },
+        {
+          var_: cell2,
+          program: slotSetTo(`${cell1.id} + 20`),
+          outputManualHeight: undefined,
+        }
+      ],
+      prevVar: newVar('prev')
+    }
+    let varBindings: VarBindings;
+    function runProgram() {
+      return EngraftPromise.state(
+        runTool(memory, {
+          program,
+          varBindings,
+          updateProgram: noOp,
+        }).outputP
+      );
+    }
+
+    varBindings = makeVarBindings({[externalVar.id]: {value: 1}});
+    expectToEqual(
+      runProgram(),
+      {status: 'fulfilled', value: {value: 31}},
+    );
+
+    varBindings = makeVarBindings({[externalVar.id]: {value: 100}});
+    expectToEqual(
+      runProgram(),
+      {status: 'fulfilled', value: {value: 130}},
     );
   });
 });
