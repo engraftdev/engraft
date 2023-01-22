@@ -21,7 +21,7 @@ export function hookRef<T>(init: () => T): {current: T} {
   } else {
     const ref = position.path[position.index] as HookPathStep | undefined;
     if (ref === undefined || !isMemoryRef(ref)) {
-      throw new Error('Expected ref');
+      throw new Error('Hooks: Expected ref, got ' + ref);
     }
     position.index++;
     return ref;
@@ -46,7 +46,7 @@ export function hookForkLater(): ForkAccess {
     } else {
       const fork = position.path[position.index] as HookPathStep | undefined;
       if (fork === undefined || isMemoryRef(fork)) {
-        throw new Error('Expected fork');
+        throw new Error('Hooks: Expected fork, got ' + fork);
       }
       position.index++;
       return fork;
