@@ -12,7 +12,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
 import { hookMemo } from 'src/mento/hookMemo';
-import { hookFork, hookForkLater, hooks } from 'src/mento/hooks';
+import { hookFork, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
 import CodeMirror from 'src/util/CodeMirror';
 import { setup } from "src/util/codeMirrorStuff";
@@ -187,8 +187,6 @@ const runCodeMode = (props: CodeModeProps) => {
   }), [varBindings, codeReferences, subResults]);
 
   const outputP = hookMemo(() => {
-    const valueDedupeFork = hookForkLater();
-
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
       const rand = makeRand();
       const scope = {
@@ -196,16 +194,7 @@ const runCodeMode = (props: CodeModeProps) => {
         ...codeReferenceScope,
         rand
       };
-      const outputValueP = EngraftPromise.resolve(compiled(scope));
-      const dedupedOutputValueP = outputValueP.then((value) => {
-        return valueDedupeFork.branch('dedupe', () => {
-          // TODO: extra layer of deduplication of value using deep equality, probably unnecessary / undesired
-          const dedupedValue = hookMemo(() => value, [value], _.isEqual);
-          return {value: dedupedValue};
-        });
-      });
-
-      return dedupedOutputValueP;
+      return EngraftPromise.resolve(compiled(scope)).then((value) => ({value}));
     })
   }, [compiledP, codeReferenceScopeP]);
 
