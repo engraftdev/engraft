@@ -37,7 +37,8 @@ export type Program = {
 type Cell = {
   var_: Var,
   program: ToolProgram,
-  outputManualHeight: number | undefined | 'infinity',  // 'infinity' means 'show entire output' (not Infinity cuz that isn't JSON-serializable)
+  outputManualHeight: number | undefined | 'infinity',
+    // 'infinity' means 'show entire output' (not Infinity cuz that isn't JSON-serializable)
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultInput) => {
@@ -158,7 +159,8 @@ const View = memo((props: ViewProps) => {
   const notebookMenuMaker: MenuMaker = useCallback((closeMenu) => <>
     <MyContextMenuHeading>Notebook</MyContextMenuHeading>
     <div className="MenuItem">
-      <input type="checkbox" checked={outputBelowInput} onChange={(ev) => updateOutputBelowInput(() => ev.target.checked)}/> Output below input
+      <input type="checkbox" checked={outputBelowInput} onChange={(ev) => updateOutputBelowInput(() => ev.target.checked)}/>
+      Output below input
     </div>
   </>, [outputBelowInput, updateOutputBelowInput]);
 
@@ -303,13 +305,21 @@ const CellView = memo(function CellView(props: CellViewProps) {
         <VarDefinition var_={var_} updateVar={updateVar}/>
       </div>
     </div>
-    <div className="NotebookTool-CellView-tool-cell xCol" style={{...(cellShowsOwnOutput || outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
+    <div
+      className="NotebookTool-CellView-tool-cell xCol"
+      style={{...(cellShowsOwnOutput || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}
+      onContextMenu={openMenu}
+    >
       <div className="xStickyTop10" ref={toolRef}>
         <ShowView view={cellResult.view}/>
       </div>
     </div>
     { !cellShowsOwnOutput &&
-      <div className="NotebookTool-CellView-output-cell" style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}} onContextMenu={openMenu}>
+      <div
+        className="NotebookTool-CellView-output-cell"
+        style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}
+        onContextMenu={openMenu}
+      >
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputRef, outputHoverRef])}>
           {/* TODO: clean this up */}
           { outputBelowInput
@@ -320,7 +330,13 @@ const CellView = memo(function CellView(props: CellViewProps) {
                 </ScrollShadow>
                 { isOutputHovered &&
                   <div
-                    style={{position: 'absolute', left: 0, top: 0, height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', pointerEvents: 'none'}}
+                    style={{
+                      position: 'absolute',
+                      left: 0, top: 0,
+                      height: '100%', width: '100%',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end',
+                      pointerEvents: 'none'
+                    }}
                   >
                     <div
                       className="xRow xAlignRight"
