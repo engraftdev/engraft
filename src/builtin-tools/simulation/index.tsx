@@ -43,8 +43,6 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   );
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  console.log("running simulation tool")
-
   const { program, updateProgram, varBindings } = props;
 
   const initResult = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'initProgram' });
@@ -89,8 +87,6 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
 }
 
 const View = memo((props: ViewProps) => {
-  console.log("rendering simulation view")
-
   const { program, updateProgram, varBindings, autoFocus, onTickResults } = props;
 
   let [selectedTick, setSelectedTick] = useStateSetOnly(() => 0);
@@ -108,7 +104,8 @@ const View = memo((props: ViewProps) => {
   }), [varBindings, program.stateVar, tickOutputP]);
   const toDrawResult = useMento(runTool, { program: toDrawProgram, updateProgram: updateToDrawProgram, varBindings: toDrawVarBindings });
   const toDrawOutputState = usePromiseState(toDrawResult.outputP);
-  const beforeSelectedTickOutputState = usePromiseState(selectedTick === 0 ? EngraftPromise.unresolved<ToolOutput>() : onTickResults[selectedTick-1].outputP);
+  const unresolvedP = useMemo(() => EngraftPromise.unresolved<ToolOutput>(), []);
+  const beforeSelectedTickOutputState = usePromiseState(selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP);
   const afterSelectedTickOutputState = usePromiseState(onTickResults[selectedTick].outputP);
 
   return (
