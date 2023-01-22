@@ -89,6 +89,15 @@ pre {
 .xRow.xAlignHCenter {
   justify-content: center;
 }
+.xRow > .xAlignSelfTop {
+  align-self: flex-start;
+}
+.xRow > .xAlignSelfBottom {
+  align-self: flex-end;
+}
+.xRow > .xAlignSelfVCenter {
+  align-self: center;
+}
 
 .xCol {
   display: flex;
@@ -112,6 +121,15 @@ pre {
 }
 .xCol.xAlignVCenter {
   justify-content: center;
+}
+.xCol > .xAlignSelfLeft {
+  align-self: flex-start;
+}
+.xCol > .xAlignSelfRight {
+  align-self: flex-end;
+}
+.xCol > .xAlignSelfHCenter {
+  align-self: center;
 }
 
 .xCenter {
