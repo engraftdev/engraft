@@ -69,22 +69,18 @@ const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onCha
     }
   }, 100);
 
-  // TODO:
-  // ok this REALLY SUCKS but apparently if you nest code inside of two layers of notebooks...
-  // and type fast...
-  // you get feedback loops from this.
-  // clearly this should be fixed. for now: we comment it out.
-
-  // useEffect(() => {
-  //   const view = viewRef.current;
-  //   if (!viewRef.current) { return; }
-  //   const currentText = view ? view.state.doc.toString() : '';
-  //   if (view && text !== currentText) {
-  //     view.dispatch({
-  //       changes: { from: 0, to: currentText.length, insert: text || '' },
-  //     });
-  //   }
-  // }, [text]);
+  // TODO: In the age of reportView, this didn't work. It seems to work now, which is great. But
+  // let's monitor it. (Tests?)
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!viewRef.current) { return; }
+    const currentText = view ? view.state.doc.toString() : '';
+    if (view && text !== currentText) {
+      view.dispatch({
+        changes: { from: 0, to: currentText.length, insert: text || '' },
+      });
+    }
+  }, [text]);
 
   return <div ref={setDiv} className="cm-theme cm-theme-light" style={style}/>
 })
