@@ -2,7 +2,7 @@ import { BabelFileResult } from '@babel/core';
 import { transform } from '@babel/standalone';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
-import { keymap } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
 import _ from 'lodash';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
@@ -267,6 +267,23 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       ]),
       embedsExtension(refSet, refRE),
       autocompletion({override: completions}),
+      EditorView.domEventHandlers({
+        paste(event) {
+          const text = event.clipboardData?.getData('text');
+          if (text) {
+            try {
+              const parsed = JSON.parse(text);
+              if (parsed.toolName) {
+                // TODO: for now, we just replace – someday we should check about insertions
+                updateProgram(() => slotSetTo(parsed));
+                event.preventDefault();
+              }
+            } catch {
+              // totally expected
+            }
+          }
+        }
+      }),
     ];
   }, [program.defaultCode, refSet, updateProgram, updateSubPrograms, varBindingsRef])
 
