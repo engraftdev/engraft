@@ -138,7 +138,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view = hookMemo(() => ({
     render: () => <View {...props} cellResults={cellResults} />,
-    showsOwnOutput: true,
+    showsOwnOutput: cells.length > 0,
   }), [props, cellResults]);
 
   return { outputP, view };

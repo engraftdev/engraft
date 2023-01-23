@@ -9,14 +9,14 @@ import { hookAt } from "src/util/immutable-mento";
 import { slotSetTo } from "../slot";
 
 export type Program = {
-  toolName: 'debug-seeing-double',
+  toolName: 'test-seeing-double',
   subProgram: ToolProgram,
   rerenderOnProgramChange: boolean,
 }
 
 export const tool: Tool<Program> = {
   programFactory: () => ({
-    toolName: 'debug-seeing-double',
+    toolName: 'test-seeing-double',
     subProgram: slotSetTo(''),
     rerenderOnProgramChange: false,
   }),
