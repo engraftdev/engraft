@@ -1,15 +1,18 @@
 import { describe, it } from '@jest/globals';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { MentoMemory } from 'src/mento';
+import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
-import { Program, tool } from '.';
+import * as testValue from '.';
+
+const testValueTool = toolFromModule(testValue);
 
 describe('test-value', () => {
   it('output basically works', () => {
     const memory = MentoMemory.create();
     [1, 2, 3].forEach((value) => {
-      const {outputP} = tool.run(memory, {
+      const {outputP} = testValueTool.run(memory, {
         program: {
           toolName: 'test-value',
           value,
@@ -25,14 +28,14 @@ describe('test-value', () => {
     const memory = MentoMemory.create();
 
     let runs = 0;
-    let program: Program = {
+    let program: testValue.Program = {
       toolName: 'test-value',
       value: 1,
       onRun: () => { runs++ },
     };
     function runProgram() {
       return EngraftPromise.state(
-        tool.run(memory, {
+        testValueTool.run(memory, {
           program,
           varBindings: empty,
           updateProgram: noOp,

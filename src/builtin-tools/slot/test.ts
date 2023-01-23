@@ -1,28 +1,29 @@
 import { describe, it } from '@jest/globals';
 import _ from 'lodash';
 import { update } from 'src/deps';
-import { registerTool, Tool, ToolOutput } from 'src/engraft';
+import { ToolOutput } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { runTool } from 'src/engraft/hooks';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { Program } from '.';
+import * as slot from './index';
 
-const slotTool = toolFromModule(require('./index')) as unknown as Tool<Program>;  // TODO: don't love this dance
-registerTool(slotTool);
+const slotTool = toolFromModule(slot);
 
 describe('slot', () => {
   it('basic code works', () => {
     expectToEqual(
       EngraftPromise.state(
-        runTool(MentoMemory.create(), {
+        slotTool.run(MentoMemory.create(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
             code: '1 + 1',
+            subPrograms: {},
+            defaultCode: undefined,
           },
           varBindings: empty,
           updateProgram: noOp,
@@ -33,11 +34,13 @@ describe('slot', () => {
   });
 
   it('returned promises are resolved into output', async () => {
-    const {outputP} = runTool(MentoMemory.create(), {
+    const {outputP} = slotTool.run(MentoMemory.create(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
         code: 'new Promise((resolve) => setTimeout(() => resolve(2), 10))',
+        subPrograms: {},
+        defaultCode: undefined,
       },
       varBindings: empty,
       updateProgram: noOp,
@@ -113,7 +116,7 @@ describe('slot', () => {
   it('resolves references correctly', () => {
     expectToEqual(
       EngraftPromise.state(
-        runTool(MentoMemory.create(), {
+        slotTool.run(MentoMemory.create(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -133,7 +136,7 @@ describe('slot', () => {
     const foxOutputP = new EngraftPromise<ToolOutput>((resolve) => {
       setTimeout(() => resolve({value: 100}), 10);
     });
-    const { outputP } = runTool(MentoMemory.create(), {
+    const { outputP } = slotTool.run(MentoMemory.create(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
@@ -173,7 +176,7 @@ describe('slot', () => {
     let program: Program;
     function runProgram() {
       return EngraftPromise.state(
-        runTool(memory, {
+        slotTool.run(memory, {
           program,
           varBindings: empty,
           updateProgram: noOp,
@@ -203,7 +206,7 @@ describe('slot', () => {
   it('works with subtools', () => {
     expectToEqual(
       EngraftPromise.state(
-        runTool(MentoMemory.create(), {
+        slotTool.run(MentoMemory.create(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -235,15 +238,17 @@ describe('slot', () => {
       IDrelevant000000: {value: 1},
       IDirrelevant000000: {value: 2},
     });
-    const program = {
+    const program: slot.Program = {
       toolName: 'slot',
       modeName: 'code',
       code: 'IDincrementRuns000000(IDrelevant000000)',
+      subPrograms: {},
+      defaultCode: undefined,
     }
     const memory = MentoMemory.create();
     function runProgram() {
       return EngraftPromise.state(
-        runTool(memory, {
+        slotTool.run(memory, {
           program,
           varBindings,
           updateProgram: noOp,

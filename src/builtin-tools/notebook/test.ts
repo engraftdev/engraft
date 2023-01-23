@@ -2,18 +2,16 @@ import { describe, it } from '@jest/globals';
 import { update } from 'src/deps';
 import { newVar, registerTool, VarBindings } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { runTool } from 'src/engraft/hooks';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
-import { Program } from './index';
+import * as notebook from './index';
 
-const tool = toolFromModule(require('.'));
+const notebookTool = toolFromModule(notebook);
 
-registerTool(toolFromModule(require('.')));
 registerTool(toolFromModule(require('../test-value')));
 registerTool(toolFromModule(require('../slot')));
 
@@ -24,7 +22,7 @@ describe('notebook', () => {
 
     let cell1Runs = 0;
     let cell2Runs = 0;
-    let program: Program = {
+    let program: notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
@@ -50,7 +48,7 @@ describe('notebook', () => {
     }
     function runProgram() {
       return EngraftPromise.state(
-        runTool(memory, {
+        notebookTool.run(memory, {
           program,
           varBindings: empty,
           updateProgram: noOp,
@@ -76,7 +74,7 @@ describe('notebook', () => {
   it('prev works', () => {
     const prevVar = newVar('prev');
 
-    let program: Program = {
+    let program: notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
@@ -95,7 +93,7 @@ describe('notebook', () => {
 
     expectToEqual(
       EngraftPromise.state(
-        runTool(MentoMemory.create(), {
+        notebookTool.run(MentoMemory.create(), {
           program,
           varBindings: empty,
           updateProgram: noOp,
@@ -110,7 +108,7 @@ describe('notebook', () => {
     );
 
     expectToEqual(
-      tool.computeReferences(program),
+      notebookTool.computeReferences(program),
       new Set()
     );
   });
@@ -120,7 +118,7 @@ describe('notebook', () => {
     const externalVar = newVar('external');
     const cell1 = newVar('cell1');
     const cell2 = newVar('cell2');
-    let program: Program = {
+    let program: notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
@@ -139,7 +137,7 @@ describe('notebook', () => {
     let varBindings: VarBindings;
     function runProgram() {
       return EngraftPromise.state(
-        runTool(memory, {
+        notebookTool.run(memory, {
           program,
           varBindings,
           updateProgram: noOp,

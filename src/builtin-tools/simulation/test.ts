@@ -1,22 +1,21 @@
 import { describe, it } from '@jest/globals';
 import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { runTool } from 'src/engraft/hooks';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
-import { computeReferences, Program } from './index';
+import * as simulation from './index';
 
-registerTool(toolFromModule(require('.')));
+const simulationTool = toolFromModule(simulation);
 registerTool(toolFromModule(require('../slot')));
 
 describe('simulation', () => {
   it('basically works', () => {
     const stateVar = newVar('state');
-    const program: Program = {
+    const program: simulation.Program = {
       toolName: 'simulation',
       ticksCount: 3,
       stateVar,
@@ -27,7 +26,7 @@ describe('simulation', () => {
 
     expectToEqual(
       EngraftPromise.state(
-        runTool(MentoMemory.create(), {
+        simulationTool.run(MentoMemory.create(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
           updateProgram: noOp,
@@ -42,7 +41,7 @@ describe('simulation', () => {
     );
 
     expectToEqual(
-      computeReferences(program),
+      simulationTool.computeReferences(program),
       new Set(['IDone000000'])
     );
   });

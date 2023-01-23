@@ -2,14 +2,13 @@ import { describe, it } from '@jest/globals';
 import { update } from 'src/deps';
 import { registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { runTool } from 'src/engraft/hooks';
 import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
-import { Program } from './index';
+import * as testArray from './index';
 
-registerTool(toolFromModule(require('.')));
+const testArrayTool = toolFromModule(testArray);
 registerTool(toolFromModule(require('../test-value')));
 
 describe('test-array', () => {
@@ -18,7 +17,7 @@ describe('test-array', () => {
 
     let subTool1Runs = 0;
     let subTool2Runs = 0;
-    let program: Program = {
+    let program: testArray.Program = {
       toolName: 'test-array',
       subToolPrograms: [
         {
@@ -35,7 +34,7 @@ describe('test-array', () => {
     };
     function runProgram() {
       return EngraftPromise.state(
-        runTool(memory, {
+        testArrayTool.run(memory, {
           program,
           varBindings: empty,
           updateProgram: noOp,
