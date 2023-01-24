@@ -11,13 +11,14 @@ import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, Tool
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { hookRelevantVarBindings, hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
-import { hookMemo } from 'src/mento/hookMemo';
+import { hookDedupe, hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
 import CodeMirror from 'src/util/CodeMirror';
 import { setup } from "src/util/codeMirrorStuff";
 import { compileExpressionCached } from "src/util/compile";
 import { embedsExtension } from 'src/util/embedsExtension';
+import { objEqWithRefEq } from 'src/util/eq';
 import { newId } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
 import { hookAt, hookUpdateAt } from 'src/util/immutable-mento';
@@ -98,9 +99,7 @@ export const computeReferences = (program: Program) => {
 };
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const {program, updateProgram} = props;
-  const relevantVarBindings = hookRelevantVarBindings(props);
-  // TODO: Where, exactly, does that 'relevantVarBindings' thing belong?
+  const {program, updateProgram, varBindings} = props;
 
   return hookFork((branch) => {
     if (program.modeName === 'code') {
@@ -109,7 +108,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
           ...props,
           program,
           updateProgram: updateProgram as Updater<Program, ProgramCodeMode>,
-          varBindings: relevantVarBindings,
+          varBindings,
         });
       });
     } else {
@@ -118,7 +117,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
           ...props,
           program,
           updateProgram: updateProgram as Updater<Program, ProgramToolMode>,
-          varBindings: relevantVarBindings,
+          varBindings,
         });
       });
     }
@@ -168,7 +167,8 @@ const runCodeMode = (props: CodeModeProps) => {
 
   const [subPrograms, updateSubPrograms] = hookAt(program, updateProgram, 'subPrograms');
 
-  const subResults = hookMemo(() =>
+  // TODO: this hookDedupe doesn't feel great
+  const subResults = hookDedupe(hookMemo(() =>
     hookFork((branch) =>
       _.mapValues(subPrograms, (subProgram, id) => branch(id, () => {
         return hookMemo(() => {
@@ -182,9 +182,12 @@ const runCodeMode = (props: CodeModeProps) => {
         }, [subProgram, updateSubPrograms, varBindings])
       }))
     )
-  , [subPrograms, updateSubPrograms, varBindings]);
+  , [subPrograms, updateSubPrograms, varBindings]), objEqWithRefEq);
 
   const codeReferences = hookMemo(() => referencesFromCode(program.code), [program.code]);
+
+  // TODO: Where, exactly, does this 'relevantVarBindings' thing belong?
+  const relevantVarBindings = hookRelevantVarBindings(props);
 
   const codeReferenceScopeP = hookMemo(() => EngraftPromise.try(() => {
     const codeReferencesArr = Array.from(codeReferences);
@@ -192,8 +195,8 @@ const runCodeMode = (props: CodeModeProps) => {
     const outputValuePs = codeReferencesArr.map((ref) => {
       if (subResults[ref]) {
         return subResults[ref].outputP;
-      } else if (varBindings[ref]) {
-        const binding = varBindings[ref];
+      } else if (relevantVarBindings[ref]) {
+        const binding = relevantVarBindings[ref];
         return binding.outputP.catch(() => {
           throw new Error(`Error from reference ${binding.var_.label}`);
         });
@@ -205,7 +208,7 @@ const runCodeMode = (props: CodeModeProps) => {
     return EngraftPromise.all(outputValuePs).then((outputValues) => {
       return _.zipObject(codeReferencesArr, outputValues.map((v) => v.value));
     });
-  }), [varBindings, codeReferences, subResults]);
+  }), [relevantVarBindings, codeReferences, subResults]);
 
   const outputP = hookMemo(() => {
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
