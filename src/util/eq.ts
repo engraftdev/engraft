@@ -23,6 +23,7 @@ export function objEqWith(eq: Eq<any>): Eq<object> {
     return true;
   }
 }
+export const objEqWithRefEq = objEqWith(refEq);
 
 export function arrEqWith<T, U extends (readonly T[]) | T[]>(eq: Eq<T>): Eq<U> {
   return (a1: unknown, a2: unknown) => {
@@ -39,3 +40,4 @@ export function arrEqWith<T, U extends (readonly T[]) | T[]>(eq: Eq<T>): Eq<U> {
     return true;
   }
 }
+export const arrEqWithRefEq = arrEqWith(refEq);

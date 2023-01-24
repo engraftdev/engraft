@@ -1,4 +1,4 @@
-import { arrEqWith, Eq, refEq } from "../util/eq";
+import { arrEqWithRefEq, Eq } from "../util/eq";
 import { HookMemory, hookRef, runWithHookMemory } from "./hooks";
 
 // Produce a value with a function when a key changes according to a provided equality function.
@@ -24,4 +24,6 @@ export function hookMemo<Key, Return>(f: () => Return, key: Key, eq?: Eq<Key>) {
   return lastCallRef.current[1];
 }
 
-const arrEqWithRefEq = arrEqWith(refEq);
+export function hookDedupe<T>(value: T, eq: Eq<T>): T {
+  return hookMemo(() => value, value, eq);
+}

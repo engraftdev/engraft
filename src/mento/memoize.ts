@@ -1,7 +1,7 @@
-import { arrEqWith, objEqWith, refEq } from "src/util/eq";
+import { arrEqWithRefEq, objEqWithRefEq } from "src/util/eq";
 import { Mento } from ".";
-import { hookMento, hooks } from "./hooks";
 import { hookMemo } from "./hookMemo";
+import { hookMento, hooks } from "./hooks";
 
 // These functions perform single-item LRU caching, like React.memo.
 
@@ -14,7 +14,6 @@ export function memoize<Args extends unknown[], Return>(f: Mento<Args, Return>):
     }, args, arrEqWithRefEq);
   });
 }
-const arrEqWithRefEq = arrEqWith(refEq);
 
 // Memoize a Mento that takes an object as its only argument,
 // using reference equality on each property of the object.
@@ -25,4 +24,3 @@ export function memoizeProps<Props extends object, Return>(f: Mento<[Props], Ret
     }, props, objEqWithRefEq);
   });
 }
-const objEqWithRefEq = objEqWith(refEq);

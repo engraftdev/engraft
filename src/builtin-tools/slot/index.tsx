@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
 import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
+import { hookRelevantVarBindings, hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
 import { hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hooks } from 'src/mento/hooks';
@@ -99,15 +99,27 @@ export const computeReferences = (program: Program) => {
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const {program, updateProgram} = props;
+  const relevantVarBindings = hookRelevantVarBindings(props);
+  // TODO: Where, exactly, does that 'relevantVarBindings' thing belong?
 
   return hookFork((branch) => {
     if (program.modeName === 'code') {
       return branch('code mode', () => {
-        return runCodeMode({...props, program, updateProgram: updateProgram as Updater<Program, ProgramCodeMode>});
+        return runCodeMode({
+          ...props,
+          program,
+          updateProgram: updateProgram as Updater<Program, ProgramCodeMode>,
+          varBindings: relevantVarBindings,
+        });
       });
     } else {
       return branch('tool mode', () => {
-        return runToolMode({...props, program, updateProgram: updateProgram as Updater<Program, ProgramToolMode>});
+        return runToolMode({
+          ...props,
+          program,
+          updateProgram: updateProgram as Updater<Program, ProgramToolMode>,
+          varBindings: relevantVarBindings,
+        });
       });
     }
   });

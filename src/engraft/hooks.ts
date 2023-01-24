@@ -1,7 +1,9 @@
+import { hookDedupe, hookMemo } from "src/mento/hookMemo";
 import { hookFork, hookMento, hooks } from "src/mento/hooks";
+import { objEqWithRefEq } from "src/util/eq";
 import { Updater } from "src/util/immutable";
 import { hookAt } from "src/util/immutable-mento";
-import { lookUpTool, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
+import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
 
 export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults {
   const toolName = props.program.toolName;
@@ -40,4 +42,20 @@ export function hookRunSubTool<P, K extends string & keyof P>(props: UseSubToolP
     updateProgram: updateSubProgram,
     varBindings,
   })
+}
+
+export function hookRelevantVarBindings(props: ToolProps<any>) {
+  const refs = hookMemo(() => {
+    return references(props.program);
+  }, [props.program]);
+
+  const relevantVarBindings = hookMemo(() => {
+    const result: VarBindings = {};
+    for (const ref of refs) {
+      result[ref] = props.varBindings[ref];
+    }
+    return hookDedupe(result, objEqWithRefEq);
+  }, [refs, props.varBindings]);
+
+  return relevantVarBindings;
 }

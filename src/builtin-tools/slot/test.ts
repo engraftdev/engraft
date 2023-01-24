@@ -8,7 +8,6 @@ import { MentoMemory } from 'src/mento';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
-import { Program } from '.';
 import * as slot from './index';
 
 const slotTool = toolFromModule(slot);
@@ -124,7 +123,7 @@ describe('slot', () => {
             code: 'IDfox000000 + 1',
             subPrograms: {},
             defaultCode: undefined,
-          } satisfies Program,
+          } satisfies slot.Program,
           varBindings: makeVarBindings({IDfox000000: {value: 100}}),
           updateProgram: noOp,
         }).outputP
@@ -144,7 +143,7 @@ describe('slot', () => {
         code: 'IDfox000000 + 1',
         subPrograms: {},
         defaultCode: undefined,
-      } satisfies Program,
+      } satisfies slot.Program,
       varBindings: makeVarBindings({IDfox000000: foxOutputP}),
       updateProgram: noOp,
     });
@@ -156,25 +155,26 @@ describe('slot', () => {
   it('switches between code & tool modes without accumulating garbage', async () => {
     const memory = MentoMemory.create();
 
-    const programCode: Program = {
+    const programCode: slot.Program = {
       toolName: 'slot',
       modeName: 'code',
       code: '1 + 1',
       defaultCode: undefined,
       subPrograms: {},
     };
-    const programTool: Program = {
+    const programTool: slot.Program = {
       toolName: 'slot',
       modeName: 'tool',
       subProgram: {
         toolName: 'slot',
         modeName: 'code',
         code: '2 + 2',
+        subPrograms: {},
         defaultCode: undefined,
-      },
+      } satisfies slot.Program,
       defaultCode: undefined,
     }
-    let program: Program;
+    let program: slot.Program;
     function runProgram() {
       return EngraftPromise.state(
         slotTool.run(memory, {
@@ -222,7 +222,7 @@ describe('slot', () => {
               },
             },
             defaultCode: undefined,
-          } satisfies Program,
+          } satisfies slot.Program,
           varBindings: makeVarBindings({IDmoose000000: {value: 100}}),
           updateProgram: noOp,
         }).outputP
@@ -231,8 +231,7 @@ describe('slot', () => {
     )
   });
 
-  // TODO: for this to work, we need to dedupe codeReferenceScopeP
-  it.failing('does not re-run when irrelevant varBindings change', () => {
+  it('does not re-run when irrelevant varBindings change', () => {
     let runs = 0;
     let varBindings = makeVarBindings({
       IDincrementRuns000000: {value: (x: any) => { runs++; return x; }},
