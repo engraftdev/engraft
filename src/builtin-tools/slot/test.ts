@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import _ from 'lodash';
 import { update } from 'src/deps';
-import { ToolOutput } from 'src/engraft';
+import { registerTool, ToolOutput } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { MentoMemory } from 'src/mento';
@@ -12,6 +12,7 @@ import { Program } from '.';
 import * as slot from './index';
 
 const slotTool = toolFromModule(slot);
+registerTool(slotTool);  // we test it embedded in itself
 
 describe('slot', () => {
   it('basic code works', () => {
