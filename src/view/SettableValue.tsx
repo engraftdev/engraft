@@ -1,10 +1,12 @@
 import { memo, useCallback, useMemo, useState } from "react";
-import { hasValue, ToolOutput } from "src/tools-framework/tools";
-import { ToolWithView } from "src/tools-framework/ToolWithView";
-import { slotSetTo } from "src/builtin-tools-disabled/slot";
-import { Setter, useStateSetOnly, useStateUpdateOnly } from "src/util/state";
-import { Value } from "../../src/view/Value";
+import { ToolOutput } from "src/engraft";
+import { Value } from "./Value";
 import { empty } from "src/util/noOp";
+import { slotSetTo } from "src/builtin-tools/slot";
+import { ToolWithView } from "src/engraft/ToolWithView";
+import { Setter } from "src/util/immutable";
+import { useStateUpdateOnly, useStateSetOnly } from "src/util/immutable-react";
+import { PromiseState } from "src/engraft/EngraftPromise";
 
 export type SettableValueProps = {
   value: any,
@@ -22,14 +24,14 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
 
-  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(slotSetTo(''))
-  const [entryOutput, setEntryOutput] = useStateSetOnly<ToolOutput | null>(null)
+  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(() => slotSetTo(''))
+  const [entryOutputState, setEntryOutputState] = useStateSetOnly<PromiseState<ToolOutput> | null>(() => null)
 
   const onClickSet = useCallback(() => {
-    if (hasValue(entryOutput)) {
-      setValue(entryOutput.value);
+    if (entryOutputState?.status === 'fulfilled') {
+      setValue(entryOutputState.value.value);
     }
-  }, [entryOutput, setValue]);
+  }, [entryOutputState, setValue]);
 
   const valueDisplay = useMemo(() => {
     if (displayRaw) {
@@ -51,8 +53,8 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
       {expanded &&
         <>
           <div>←</div>
-          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutput={setEntryOutput} varBindings={empty}/>
-          <button disabled={entryOutput === null} onClick={onClickSet}>set</button>
+          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutputState={setEntryOutputState} varBindings={empty}/>
+          <button disabled={entryOutputState === null} onClick={onClickSet}>set</button>
         </>
       }
     </div>

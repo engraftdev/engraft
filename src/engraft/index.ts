@@ -14,7 +14,7 @@ export type Tool<P extends ToolProgram = ToolProgram> = {
 export type ToolProgram = {
   toolName: string,
   debugId?: string,
-  [others: string]: any,
+  [others: string]: any,  // TODO: idk about this type...
 }
 
 export type ToolRun<P extends ToolProgram> = Mento<[props: ToolProps<P>], ToolResult>;
