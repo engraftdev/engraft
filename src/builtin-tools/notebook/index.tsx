@@ -1,5 +1,4 @@
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
-import { mergeRefs } from "react-merge-refs";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, Var, VarBindings } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
@@ -12,6 +11,7 @@ import { startDrag } from "src/util/drag";
 import { atIndices, removers, Updater } from "src/util/immutable";
 import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
 import { useAt } from "src/util/immutable-react";
+import { mergeRefs } from "src/util/mergeRefs";
 import { difference, intersection, union } from "src/util/sets";
 import { toposort } from "src/util/toposort";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
