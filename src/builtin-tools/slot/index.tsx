@@ -151,10 +151,19 @@ const runCodeMode = (props: CodeModeProps) => {
       throw new Error("Empty code");
     }
 
-    // TODO: better treatment of non-expression code (multiple lines w/return, etc)
-    let transformResult = transformCached("(" + program.code + ")");  // might throw
-    const translated = transformResult.code!.replace(/;$/, "");
-    return compileExpressionCached(translated);  // might throw
+    // TODO: perhaps this is not performant?
+    // TODO: async function bodies?
+    try {
+      // Try to interpret as expression
+      let transformResult = transformCached("(" + program.code + ")");
+      const translated = transformResult.code!.replace(/;$/, "");
+      return compileExpressionCached(translated);
+    } catch {
+      // Try to interpret as function body
+      let transformResult = transformCached("(() => {\n" + program.code + "\n})()");
+      const translated = transformResult.code!.replace(/;$/, "");
+      return compileExpressionCached(translated);
+    }
   }), [program.code])
 
   const [subPrograms, updateSubPrograms] = hookAt(program, updateProgram, 'subPrograms');
