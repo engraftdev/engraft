@@ -15,13 +15,13 @@ import { ToolOutputView } from "src/view/Value";
 import { slotSetTo } from "../slot";
 
 
-export interface Program {
-  toolName: 'simulation';
-  ticksCount: number;
-  stateVar: Var;
-  initProgram: ToolProgram;
-  onTickProgram: ToolProgram;
-  toDrawProgram: ToolProgram;
+export type Program = {
+  toolName: 'simulation',
+  ticksCount: number,
+  stateVar: Var,
+  initProgram: ToolProgram,
+  onTickProgram: ToolProgram,
+  toDrawProgram: ToolProgram,
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {

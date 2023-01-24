@@ -23,7 +23,7 @@ export const runTool = hooks(hookRunTool);
 
 // for the common case where a tool's program is a key in a super-tool's program
 
-export interface UseSubToolProps<P, K extends keyof P> {
+export type HookRunSubToolProps<P, K extends keyof P> = {
   program: P,
   updateProgram: Updater<P>,
   subKey: K,
@@ -32,7 +32,7 @@ export interface UseSubToolProps<P, K extends keyof P> {
 
 // TODO: doesn't check that the sub-program is actually a toolprogram! dang typing
 
-export function hookRunSubTool<P, K extends string & keyof P>(props: UseSubToolProps<P, K>) {
+export function hookRunSubTool<P, K extends string & keyof P>(props: HookRunSubToolProps<P, K>) {
   const {program, updateProgram, subKey, varBindings} = props;
 
   const [subProgram, updateSubProgram] = hookAt(program, updateProgram, subKey);

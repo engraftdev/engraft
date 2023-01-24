@@ -10,12 +10,12 @@ import { useContextMenu } from "src/util/useContextMenu";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 
 
-export interface Program {
-  toolName: 'slider';
-  value: number;
-  min: number;
-  max: number;
-  step: number;
+export type Program = {
+  toolName: 'slider',
+  value: number,
+  min: number,
+  max: number,
+  step: number,
 }
 
 export const tool: Tool<Program> = {

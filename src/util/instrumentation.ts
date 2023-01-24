@@ -24,17 +24,17 @@ function end(node?: est.Node): number | undefined {
   return node === undefined ? undefined : (node as AcornNode).end;
 }
 
-export interface Range {
+export type Range = {
   start: number,
   end: number,
 }
 
-export interface Callbacks {
-  __inst_IfStatement_test(range: Range & {consequentStart: number, consequentEnd: number, alternateStart?: number, alternateEnd?: number}, value: any): any
-  __inst_VariableDeclarator_init(range: Range, value: any): any
-  __inst_AssignmentExpression_right(range: Range, value: any): any
-  __inst_ReturnStatement_argument(range: Range, value: any): any
-  __inst_lineNum(num: number): void
+export type Callbacks = {
+  __inst_IfStatement_test(range: Range & {consequentStart: number, consequentEnd: number, alternateStart?: number, alternateEnd?: number}, value: any): any,
+  __inst_VariableDeclarator_init(range: Range, value: any): any,
+  __inst_AssignmentExpression_right(range: Range, value: any): any,
+  __inst_ReturnStatement_argument(range: Range, value: any): any,
+  __inst_lineNum(num: number): void,
 }
 
 

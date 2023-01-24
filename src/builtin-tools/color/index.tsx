@@ -5,11 +5,11 @@ import { hookMemo } from "src/mento/hookMemo";
 import { hooks } from "src/mento/hooks";
 import { memoizeProps } from "src/mento/memoize";
 
-export interface Program {
-  toolName: 'color';
-  r: number;
-  g: number;
-  b: number;
+export type Program = {
+  toolName: 'color',
+  r: number,
+  g: number,
+  b: number,
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({

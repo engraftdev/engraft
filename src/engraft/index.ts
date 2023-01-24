@@ -33,18 +33,18 @@ export type ToolView = {
   showsOwnOutput?: boolean,
 }
 
-export interface ToolViewRenderProps {
+export type ToolViewRenderProps = {
   autoFocus?: boolean,
   expand?: boolean,
   noFrame?: boolean,  // TODO: this is just for slots, huh?
 }
 
-export interface ToolProps<P extends ToolProgram> {
-  program: P;
-  varBindings: VarBindings;
+export type ToolProps<P extends ToolProgram> = {
+  program: P,
+  varBindings: VarBindings,
 
   // TODO: might belong in view? not sure
-  updateProgram: Updater<P>;
+  updateProgram: Updater<P>,
 }
 
 export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;
@@ -89,17 +89,17 @@ export function registerTool(tool: Tool<any>) {
 
 
 
-export interface VarBinding {
-  var_: Var;
-  outputP: EngraftPromise<ToolOutput>;
+export type VarBinding = {
+  var_: Var,
+  outputP: EngraftPromise<ToolOutput>,
 }
 
 export type VarBindings = {[varId: string]: VarBinding};
 
-export interface Var {
-  id: string;
-  label: string;
-  autoCompleteLabel?: string;
+export type Var = {
+  id: string,
+  label: string,
+  autoCompleteLabel?: string,
 }
 
 export function newVar(label = 'new var') {

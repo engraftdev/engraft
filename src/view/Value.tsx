@@ -18,11 +18,11 @@ import { hasProperty, isObject } from "src/util/hasProperty";
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
 
-export interface ValueFrameProps {
-  children?: ReactNode | undefined;
-  type?: string;
-  innerStyle?: CSSProperties;
-  outerStyle?: CSSProperties;
+export type ValueFrameProps = {
+  children?: ReactNode | undefined,
+  type?: string,
+  innerStyle?: CSSProperties,
+  outerStyle?: CSSProperties,
 }
 
 export const ValueFrame = memo(function ValueFrame({children, type, innerStyle, outerStyle}: ValueFrameProps) {
@@ -65,10 +65,10 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
   </div>;
 });
 
-export interface SubValueHandleProps {
-  value: unknown;
-  path: (string | number)[];
-  children: ReactNode;
+export type SubValueHandleProps = {
+  value: unknown,
+  path: (string | number)[],
+  children: ReactNode,
 }
 
 export const SubValueHandleDefault = memo(function SubValueHandleDefault({path, children}: SubValueHandleProps) {
@@ -79,26 +79,26 @@ export function pathString(path: (string | number)[]) {
   return `$.${path.join('.')}`;
 }
 
-export interface ValueCustomizations {
-  SubValueHandle: ElementType<SubValueHandleProps>;
+export type ValueCustomizations = {
+  SubValueHandle: ElementType<SubValueHandleProps>,
 }
 
-export interface ValueProps {
-  value: unknown;
-  customizations?: ValueCustomizations;
+export type ValueProps = {
+  value: unknown,
+  customizations?: ValueCustomizations,
 }
 
 export const Value = memo(function Value({value, customizations = {SubValueHandle: SubValueHandleDefault}}: ValueProps) {
   return <ValueInternal value={value} path={[]} customizations={customizations} isTopLevel={true} />
 })
 
-export interface ValueInternalProps {
-  value: unknown;
-  path: (string | number)[];
-  prefix?: ReactNode;
-  suffix?: ReactNode;
-  customizations: ValueCustomizations;
-  isTopLevel?: boolean;
+export type ValueInternalProps = {
+  value: unknown,
+  path: (string | number)[],
+  prefix?: ReactNode,
+  suffix?: ReactNode,
+  customizations: ValueCustomizations,
+  isTopLevel?: boolean,
 }
 
 const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations, isTopLevel}: ValueInternalProps) {

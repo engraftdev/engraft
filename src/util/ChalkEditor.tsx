@@ -183,13 +183,13 @@ function valueToString(value: unknown): string {
 
 export type ChalkResult = {value: any} | {error: any};
 
-export interface ChalkEditorProps {
-  code: string;
-  input: any;
-  setCode: Dispatch<string>;
-  reportResult?: (result: ChalkResult) => void;
-  showValues?: boolean;
-  showErrors?: boolean;
+export type ChalkEditorProps = {
+  code: string,
+  input: any,
+  setCode: Dispatch<string>,
+  reportResult?: (result: ChalkResult) => void,
+  showValues?: boolean,
+  showErrors?: boolean,
 }
 
 function ChalkEditor({code, input, setCode, reportResult, showValues = true, showErrors = true}: ChalkEditorProps) {

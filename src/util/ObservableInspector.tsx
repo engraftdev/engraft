@@ -3,8 +3,8 @@ import { memo, useEffect, useState } from 'react';
 
 import css from './ObservableInspector.css';
 
-export interface ObservableInspectorProps {
-  value: any;
+export type ObservableInspectorProps = {
+  value: any,
 }
 
 export const ObservableInspector = memo(({value}: ObservableInspectorProps) => {

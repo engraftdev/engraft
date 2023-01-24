@@ -2,8 +2,8 @@ import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { useWindowEventListener } from "./useEventListener";
 
-export interface UseWindowContainerProps {
-  title?: string
+export type UseWindowContainerProps = {
+  title?: string,
   onClose?: () => void,
 }
 
@@ -40,7 +40,7 @@ export function useWindowContainer({title, onClose}: UseWindowContainerProps): H
 
 
 
-export interface WindowPortalProps extends UseWindowContainerProps {
+export type WindowPortalProps = UseWindowContainerProps & {
   children?: ReactNode,
 }
 

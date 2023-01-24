@@ -7,13 +7,13 @@ import useHover from "src/util/useHover";
 import { ToolInspectorWindow } from "./ToolInspectorWindow";
 
 
-export interface ToolFrameProps {
-  children: ReactNode;
-  expand?: boolean;
-  program: ToolProgram;
-  updateProgram?: Updater<ToolProgram>;
-  onClose?: () => void;
-  varBindings: VarBindings;
+export type ToolFrameProps = {
+  children: ReactNode,
+  expand?: boolean,
+  program: ToolProgram,
+  updateProgram?: Updater<ToolProgram>,
+  onClose?: () => void,
+  varBindings: VarBindings,
 }
 
 const SOFT_STYLE = false as boolean;

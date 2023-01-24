@@ -3,17 +3,17 @@ import { EditorView, ViewUpdate } from '@codemirror/view';
 import { CSSProperties, memo, useEffect, useMemo, useRef, useState } from "react"
 import useInterval from './useInterval';
 
-export interface MyCodeMirrorProps {
-  extensions: Extension[];
-  style?: CSSProperties;
+export type MyCodeMirrorProps = {
+  extensions: Extension[],
+  style?: CSSProperties,
 
-  text: string;
-  onChange: (text: string) => void;
+  text: string,
+  onChange: (text: string) => void,
 
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocus?: () => void,
+  onBlur?: () => void,
 
-  autoFocus?: boolean;
+  autoFocus?: boolean,
 }
 
 const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus}: MyCodeMirrorProps) {
