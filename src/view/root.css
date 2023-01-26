@@ -157,6 +157,9 @@ pre {
 .xInlineBlock {
   display: inline-block;
 }
+.xInlineFlex {
+  display: inline-flex;
+}
 
 .xUnclickable {
   pointer-events: none;

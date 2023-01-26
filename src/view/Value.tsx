@@ -14,6 +14,7 @@ import { inlineBlock } from "./styles";
 import { PromiseState } from "src/engraft/EngraftPromise";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
+import { identity } from "lodash";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -346,10 +347,11 @@ export type ToolOutputViewProps = {
   outputState: PromiseState<ToolOutput>;
   customizations?: ValueCustomizations;
   displayReactElementsDirectly?: boolean;
+  valueWrapper?: (value: ReactNode) => ReactNode;
 }
 
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
-  const {outputState, customizations, displayReactElementsDirectly} = props;
+  const {outputState, customizations, displayReactElementsDirectly, valueWrapper = identity} = props;
 
   return <ToolOutputBuffer
     outputState={outputState}
@@ -361,10 +363,10 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
           maybeElement = (maybeElement as any).view;
         };
         if (isObject(maybeElement) && isValidElement(maybeElement)) {
-          return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
+          return valueWrapper(<ErrorBoundary>{maybeElement}</ErrorBoundary>);
         }
       }
-      return <Value value={value} customizations={customizations}/>;
+      return valueWrapper(<Value value={value} customizations={customizations}/>);
     }}
   />;
 });
@@ -395,12 +397,12 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
       </div>
     : <div
         className="ToolOutputBuffer-no-value"
-        style={{fontSize: 13, fontStyle: 'italic'}}
+        style={{fontSize: 13, fontStyle: 'italic', opacity: 0.3}}
       >
         no value yet
       </div>;
 
-  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xInlineBlock">
+  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xInlineFlex">
     {valueView}
     {outputState.status === 'rejected' && <ErrorView error={(outputState.reason as any).toString()} />}
   </div>
@@ -427,7 +429,7 @@ export const ErrorView = memo(function ErrorView(props: ErrorProps) {
       padding: 5,
       borderRadius: 3,
       color: 'rgba(255, 100, 100, 0.8)',
-      maxWidth: '100px',
+      maxWidth: '100%',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
@@ -441,6 +443,6 @@ export const ErrorView = memo(function ErrorView(props: ErrorProps) {
     }}
     onClick={toggleIsExpanded}
   >
-    ⚠️ {error}
+    ⚠️ <span style={{fontFamily: 'monospace'}}>{error}</span>
   </div>;
 });

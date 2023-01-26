@@ -320,57 +320,64 @@ const CellView = memo(function CellView(props: CellViewProps) {
         style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}
         onContextMenu={openMenu}
       >
-        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputRef, outputHoverRef])}>
+        <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputHoverRef])}>
           {/* TODO: clean this up */}
           { outputBelowInput
             ? <ToolOutputView outputState={cellOutputState}/>
             : <>
-                <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
-                  <ToolOutputView outputState={cellOutputState}/>
-                </ScrollShadow>
-                { isOutputHovered &&
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0, top: 0,
-                      height: '100%', width: '100%',
-                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <div
-                      className="xRow xAlignRight"
-                      style={{
-                        position: 'sticky',
-                        bottom: 5,
-                        width: '100%',
-                        height: 15,
-                        fontSize: 15,
-                        margin: 5,
-                        userSelect: 'none',
-                      }}
-                    >
-                      <div
-                        onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
-                        style={{
-                          cursor: 'pointer',
-                          pointerEvents: 'initial'
-                        }}
-                      >
-                        {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
-                      </div>
-                      <div
-                        onMouseDown={onMouseDownResizer}
-                        style={{
-                          cursor: 'ns-resize',
-                          pointerEvents: 'initial'
-                        }}
-                      >
-                        ↕
-                      </div>
+                <ToolOutputView
+                  outputState={cellOutputState}
+                  valueWrapper={(view) =>
+                    <div style={{position: 'relative'}} ref={outputRef}>
+                      <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
+                        {view}
+                      </ScrollShadow>
+                      { isOutputHovered &&
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0, top: 0,
+                            height: '100%', width: '100%',
+                            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end',
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          <div
+                            className="xRow xAlignRight"
+                            style={{
+                              position: 'sticky',
+                              bottom: 5,
+                              width: '100%',
+                              height: 15,
+                              fontSize: 15,
+                              margin: 5,
+                              userSelect: 'none',
+                            }}
+                          >
+                            <div
+                              onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                              style={{
+                                cursor: 'pointer',
+                                pointerEvents: 'initial'
+                              }}
+                            >
+                              {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+                            </div>
+                            <div
+                              onMouseDown={onMouseDownResizer}
+                              style={{
+                                cursor: 'ns-resize',
+                                pointerEvents: 'initial'
+                              }}
+                            >
+                              ↕
+                            </div>
+                          </div>
+                        </div>
+                      }
                     </div>
-                  </div>
-                }
+                  }
+                />
               </>
           }
         </div>
