@@ -440,7 +440,7 @@ class HTMLWidget extends WidgetType {
 
 const logTheme = EditorView.baseTheme({
   ".chalk-log": {
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(200,200,0,0.2)',
     color: 'rgba(0,0,0,0.8)',
     fontFamily: 'sans-serif',
     fontSize: '80%',
