@@ -1,0 +1,75 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDtractor534012",
+          "label": "multiply by slider"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "function",
+            "vars": [
+              {
+                "id": "IDcare266465",
+                "label": "input 1"
+              }
+            ],
+            "bodyProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDcare266465 * IDski667779",
+              "defaultCode": "IDcare266465",
+              "subPrograms": {
+                "IDski667779": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "slider",
+                    "value": 6,
+                    "min": -10,
+                    "max": 10,
+                    "step": 1
+                  }
+                }
+              }
+            },
+            "examples": [
+              {
+                "id": "IDbarometer380680",
+                "values": [
+                  10
+                ]
+              }
+            ],
+            "activeExampleId": "IDbarometer380680"
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDbreadfruit922299",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "[1,2,3].map(IDtractor534012)",
+          "defaultCode": "IDdoll563868",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVar": {
+      "id": "IDdoll563868",
+      "label": "prev"
+    }
+  }
+}
