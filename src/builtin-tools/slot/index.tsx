@@ -246,16 +246,28 @@ const runCodeMode = (props: CodeModeProps) => {
 
   const outputAndLogsP = hookMemo(() => {
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
-      let lineNum = 1;
-      const __inst_lineNum = (newLineNum: number) => { lineNum = newLineNum; };
+      // To manage logs, we keep one special global:
+      //   __log: A function which logs using the active slot's line numbers and logs array.
 
+      // TODO: This "temporarily reset global logger" setup doesn't work with asynchronicity at all.
+      //   (IDK how to do dynamic scope with asynchronicity...)
+
+      let lineNum = 1;
       let logs: {lineNum: number, text: string}[] = [];
-      const log = (...vals: any[]) => {
+
+      // Reset the global logger to user our versions of `lineNum` and `logs`.
+      (window as any).__log = (...vals: any[]) => {
         const text = vals.map((v) => objectInspect(v)).join(", ");
         logs.push({lineNum, text});
         return vals[vals.length - 1];
       };
 
+      const __inst_lineNum = (newLineNum: number) => {
+        lineNum = newLineNum;
+      };
+      const log = (...vals: any[]) => {
+        (window as any).__log(...vals);
+      };
       const rand = makeRand();
       const scope = {
         ...globals,
