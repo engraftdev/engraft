@@ -332,9 +332,15 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const logDecorations = useMemo(() => {
     if (logsState.status !== 'fulfilled') { return []; }
 
-    return EditorView.decorations.of(RangeSet.of(logsState.value.map(({lineNum, text}) => {
+    try {
+      return EditorView.decorations.of(RangeSet.of(logsState.value.map(({lineNum, text}) => {
         return logDecoration(text, cmText.line(lineNum).to);
       }), true));
+    } catch {
+      // TODO: cmText.line can fail when logs and cmText get out of sync; should probably get them
+      // back into sync, but for now, catch the error.
+      return [];
+    }
   }, [logsState, cmText]);
 
   const extensions = useMemo(() => {
