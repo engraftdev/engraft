@@ -7,6 +7,11 @@ import { createElementFromReact } from "src/util/createElementFrom";
 import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
+import { toolFromModule } from 'src/toolFromModule';
+import * as slider from 'src/builtin-tools/slider';
+import { EngraftPromise } from 'src/engraft/EngraftPromise';
+
+const sliderTool = toolFromModule(slider);
 
 
 // Here's where I'll throw ad-hoc things I want to have available in every code editor.
@@ -31,7 +36,11 @@ export const globals = {
     createMemory: MentoMemory.create,
     hookMemo,
     hookMento,
-  }
+  },
+  Meta: {
+    sliderTool,
+  },
+  EngraftPromise,
 };
 
 // For quick debugging-Engraft-inside-Engraft applications...

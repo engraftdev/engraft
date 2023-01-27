@@ -1,0 +1,69 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDtuba501846",
+          "label": "result"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "const program = Meta.sliderTool.programFactory()\n\nconst mem = Mento.createMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program\n})\n\nreturn result",
+          "defaultCode": "",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDwheel403634",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "EngraftPromise.state(IDtuba501846.outputP)",
+          "defaultCode": "IDresonance061062",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDwinterberry362424",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "const Component = () => {\n  const [program, updateProgram] = React.useState(\n    Meta.sliderTool.programFactory()\n  );\n  const mem = Mento.createMemory();\n  const result = Meta.sliderTool.run(mem, {\n    program,\n    updateProgram,\n  });\n  return <div>\n    {result.view.render()}\n  </div>;\n}\n\nreturn <Component/>",
+          "defaultCode": "IDresonance061062",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDmuseum703632",
+          "label": "mem"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "const program = Meta.sliderTool.programFactory()\n\nconst mem = Mento.createMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program\n})\n\nreturn mem",
+          "defaultCode": "IDresonance061062",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVar": {
+      "id": "IDresonance061062",
+      "label": "prev"
+    }
+  }
+}
