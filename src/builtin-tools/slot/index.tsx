@@ -1,29 +1,34 @@
-import { BabelFileResult } from '@babel/core';
+import { NodePath, PluginItem } from '@babel/core';
 import { transform } from '@babel/standalone';
+import template from '@babel/template';
+import babelTypes from '@babel/types';
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorState, RangeSet } from '@codemirror/state';
+import { Decoration, EditorView, keymap, WidgetType } from '@codemirror/view';
 import _ from 'lodash';
+import objectInspect from 'object-inspect';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
 import { cN } from 'src/deps';
 import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
+import { usePromiseState } from 'src/engraft/EngraftPromise.react';
 import { hookRelevantVarBindings, hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
 import { hookDedupe, hookMemo } from 'src/mento/hookMemo';
 import { hookFork, hooks } from 'src/mento/hooks';
 import { memoizeProps } from 'src/mento/memoize';
+import { cache } from 'src/util/cache';
 import CodeMirror from 'src/util/CodeMirror';
 import { setup } from "src/util/codeMirrorStuff";
-import { compileExpressionCached } from "src/util/compile";
+import { compileBodyCached, compileExpressionCached } from "src/util/compile";
 import { embedsExtension } from 'src/util/embedsExtension';
 import { objEqWithRefEq } from 'src/util/eq';
 import { newId } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
 import { hookAt, hookUpdateAt } from 'src/util/immutable-mento';
 import { useAt, useUpdateAt } from 'src/util/immutable-react';
-import { OrError } from 'src/util/OrError';
 import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
 import { difference, union } from 'src/util/sets';
@@ -129,13 +134,41 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 // CODE MODE //
 ///////////////
 
-let _transformCachedCache: {[code: string]: OrError<BabelFileResult>} = {};
-function transformCached(code: string) {
-  if (!_transformCachedCache[code]) {
-    _transformCachedCache[code] = OrError.catch(() => transform(code, { presets: ["react"] }));
-  }
-  return OrError.throw(_transformCachedCache[code]);
+const lineNumTemplate = template(`
+  __inst_lineNum(%%num%%);
+`);
+
+const lineNumPlugin: PluginItem = function({types: t}: {types: typeof babelTypes}) {
+  let nodesToSkip = new Set<babelTypes.Node>();
+  return {
+    visitor: {
+      Statement: {
+        exit(path: NodePath<babelTypes.Statement>) {
+          if (nodesToSkip.has(path.node)) { return; }
+          if (!path.node.loc) { return; }
+          const newNode = lineNumTemplate({num: t.numericLiteral(path.node.loc.end.line)}) as babelTypes.Statement;
+          nodesToSkip.add(newNode);
+          path.insertBefore(newNode);
+        }
+      },
+    },
+  };
 }
+
+const transformExpressionCached = cache((code: string) => {
+  return transform(code, {
+    presets: ["react"],
+  });
+});
+
+const transformBodyCached = cache((code: string) => {
+  return transform(code, {
+    presets: ["react"],
+    plugins: [lineNumPlugin],
+    parserOpts: { allowReturnOutsideFunction: true },
+    generatorOpts: { retainLines: true }
+  });
+});
 
 type CodeModeProps = Replace<ToolProps<Program>, {
   program: ProgramCodeMode,
@@ -150,18 +183,20 @@ const runCodeMode = (props: CodeModeProps) => {
       throw new Error("Empty code");
     }
 
-    // TODO: perhaps this is not performant?
-    // TODO: async function bodies?
+    // TODO: this split between "expression" and "body" pipelines is wrong. (e.g., logs in .map callbacks of expressions fail.)
+    //       really, we should parse everything as body and then identify single-expression bodies which need "return" added.
+    // TODO: it probably isn't performant either.
+    // TODO: async function bodies? low priority
     try {
       // Try to interpret as expression
-      let transformResult = transformCached("(" + program.code + ")");
-      const translated = transformResult.code!.replace(/;$/, "");
-      return compileExpressionCached(translated);
+      let transformed = transformExpressionCached("(" + program.code + ")").code!
+      transformed = transformed.replace(/;$/, "");
+      return compileExpressionCached(transformed);
     } catch {
       // Try to interpret as function body
-      let transformResult = transformCached("(() => {\n" + program.code + "\n})()");
-      const translated = transformResult.code!.replace(/;$/, "");
-      return compileExpressionCached(translated);
+      let transformed = transformBodyCached(program.code).code!;
+      console.log(transformed);
+      return compileBodyCached(transformed);
     }
   }), [program.code])
 
@@ -210,17 +245,40 @@ const runCodeMode = (props: CodeModeProps) => {
     });
   }), [relevantVarBindings, codeReferences, subResults]);
 
-  const outputP = hookMemo(() => {
+  const outputAndLogsP = hookMemo(() => {
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
+      let lineNum = 1;
+      const __inst_lineNum = (newLineNum: number) => { lineNum = newLineNum; };
+
+      let logs: {lineNum: number, text: string}[] = [];
+      const log = (...vals: any[]) => {
+        const text = vals.map((v) => objectInspect(v)).join(", ");
+        logs.push({lineNum, text});
+        return vals[vals.length - 1];
+      };
+
       const rand = makeRand();
       const scope = {
         ...globals,
         ...codeReferenceScope,
-        rand
+        rand,
+        __inst_lineNum,
+        log,
       };
-      return EngraftPromise.resolve(compiled(scope)).then((value) => ({value}));
+
+      return EngraftPromise.resolve(compiled(scope)).then((value) => {
+        return [{value}, logs] as const;
+      });
     })
   }, [compiledP, codeReferenceScopeP]);
+
+  const outputP = hookMemo(() => {
+    return outputAndLogsP.then(([output, _]) => output);
+  }, [outputAndLogsP]);
+
+  const logsP = hookMemo(() => {
+    return outputAndLogsP.then(([_, logs]) => logs);
+  }, [outputAndLogsP]);
 
   const subViews = hookMemo(() => {
     return _.mapValues(subResults, (subResult, id) => {
@@ -233,6 +291,7 @@ const runCodeMode = (props: CodeModeProps) => {
       <CodeModeView
         {...props} {...viewProps}
         subViews={subViews}
+        logsP={logsP}
       />
   }), [props]);
 
@@ -241,16 +300,31 @@ const runCodeMode = (props: CodeModeProps) => {
 
 type CodeModeViewProps = CodeModeProps & ToolViewRenderProps & {
   subViews: {[id: string]: ToolView},
+  logsP: EngraftPromise<{lineNum: number, text: string}[]>,
 };
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, subViews} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, subViews, logsP} = props;
   const varBindingsRef = useRefForCallback(varBindings);
   const updateSubPrograms = useUpdateAt(updateProgram, 'subPrograms');
 
   const [showInspector, setShowInspector] = useState(false);
 
   const [refSet, refs] = usePortalSet<{id: string}>();
+
+  const logsState = usePromiseState(logsP);
+
+  const cmText = useMemo(() => {
+    return EditorState.create({doc: program.code}).doc;
+  }, [program.code])
+
+  const logDecorations = useMemo(() => {
+    if (logsState.status !== 'fulfilled') { return []; }
+
+    return EditorView.decorations.of(RangeSet.of(logsState.value.map(({lineNum, text}) => {
+        return logDecoration(text, cmText.line(lineNum).to);
+      }), true));
+  }, [logsState, cmText]);
 
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
@@ -297,8 +371,10 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
           }
         }
       }),
+      logTheme,
+      logDecorations,
     ];
-  }, [program.defaultCode, refSet, updateProgram, updateSubPrograms, varBindingsRef])
+  }, [refSet, logDecorations, updateSubPrograms, updateProgram, program.defaultCode, varBindingsRef])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));
@@ -341,6 +417,42 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       />
     </div>
   );
+});
+
+function logDecoration(text: string, offset: number) {
+  return Decoration.widget({
+    widget: new HTMLWidget(`<span class="chalk-log">${text}</span>`),
+    side: 1,
+  }).range(offset);
+}
+
+class HTMLWidget extends WidgetType {
+  constructor(readonly html: string) { super() }
+
+  eq(other: HTMLWidget) { return other.html === this.html }
+
+  toDOM() {
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = this.html.trim();
+
+    return tempDiv.firstElementChild as HTMLElement;
+  }
+}
+
+const logTheme = EditorView.baseTheme({
+  ".chalk-log": {
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    color: 'rgba(0,0,0,0.8)',
+    fontFamily: 'sans-serif',
+    fontSize: '80%',
+    borderRadius: '5px',
+    marginLeft: '15px',
+    paddingLeft: '5px',
+    paddingRight: '5px',
+  },
+  ".chalk-log + .chalk-log": {
+    marginLeft: '5px',
+  },
 });
 
 

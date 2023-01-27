@@ -4,7 +4,10 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.20.12",
+    "@babel/parser": "^7.20.13",
     "@babel/standalone": "^7.20.12",
+    "@babel/template": "^7.20.7",
+    "@babel/traverse": "^7.20.13",
     "@codemirror/lang-javascript": "^6.0.2",
     "@codemirror/lang-markdown": "^6.0.1",
     "@codemirror/state": "^6.1.1",
@@ -40,6 +43,7 @@
     "lodash": "^4.17.21",
     "markdown-it": "^12.3.2",
     "object-inspect": "^1.12.0",
+    "process": "^0.11.10",
     "prop-types": "^15.8.1",
     "prosemirror-example-setup": "^1.2.1",
     "prosemirror-model": "^1.18.1",

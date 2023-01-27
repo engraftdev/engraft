@@ -6,17 +6,15 @@ import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
 
 
-// Here's where I'll throw ad-hoc things I want to have available in every code editor
+// Here's where I'll throw ad-hoc things I want to have available in every code editor.
+// TODO: Someday maybe there will be a principled approach to this...
 
 function html(s: string) {
   return <div dangerouslySetInnerHTML={{__html: s}}/>
 }
 
-
-// These are available in every code editor
-
 export const globals = {
-  React,
+  React,  // JSX in slots is transformed by Babel into code that refers to `React`
   createElementFromReact,
   DOM,
   update,
@@ -24,3 +22,8 @@ export const globals = {
   html,
   Diagram,
 };
+
+// For quick debugging-Engraft-inside-Engraft applications...
+export function addToSlotGlobals(obj: object) {
+  Object.assign(globals, obj);
+}

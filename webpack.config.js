@@ -3,6 +3,7 @@ const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
+const { ProvidePlugin } = require('webpack');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const disableMinification = true;
@@ -94,6 +95,9 @@ function makeConfig(name) {
             new ForkTsCheckerWebpackPlugin({ typescript: { configFile: 'tsconfig.json' } }),
             isDevelopment && new ReactRefreshWebpackPlugin({
                 overlay: false
+            }),
+            new ProvidePlugin({
+                process: 'process',  // for babel things outside of standalone
             }),
         ].filter(Boolean),
         optimization: {
