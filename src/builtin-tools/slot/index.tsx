@@ -195,7 +195,6 @@ const runCodeMode = (props: CodeModeProps) => {
     } catch {
       // Try to interpret as function body
       let transformed = transformBodyCached(program.code).code!;
-      console.log(transformed);
       return compileBodyCached(transformed);
     }
   }), [program.code])
