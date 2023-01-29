@@ -8,13 +8,13 @@ import { union } from "src/util/sets";
 import { slotSetTo } from "../slot";
 
 export type Program = {
-  toolName: 'adder';
+  toolName: 'toy-adder';
   xProgram: ToolProgram;
   yProgram: ToolProgram;
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({
-  toolName: 'adder',
+  toolName: 'toy-adder',
   xProgram: slotSetTo(''),
   yProgram: slotSetTo(''),
 });
