@@ -1,8 +1,8 @@
 import update from 'immutability-helper';
 import React from "react";
-import { MentoMemory } from 'src/mento';
-import { hookMemo } from 'src/mento/hookMemo';
-import { hookFork, hookMento, hookRef, hooks } from 'src/mento/hooks';
+import { Incr } from 'src/incr';
+import { hookMemo } from 'src/incr/hookMemo';
+import { hookFork, hookIncr, hookRef, hooks } from 'src/incr/hooks';
 import { createElementFromReact } from "src/util/createElementFrom";
 import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
@@ -29,13 +29,13 @@ export const globals = {
   GoogleMap,
   html,
   Diagram,
-  Mento: {
+  Incr: {
     hooks,
     hookRef,
     hookFork,
-    createMemory: MentoMemory.create,
+    createMemory: Incr.createMemory,
     hookMemo,
-    hookMento,
+    hookIncr,
   },
   Meta: {
     sliderTool,

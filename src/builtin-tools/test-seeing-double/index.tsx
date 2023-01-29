@@ -2,10 +2,10 @@ import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { references, Tool, ToolProgram } from "src/engraft";
 import { hookRunSubTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
-import { hookMemo } from "src/mento/hookMemo";
-import { hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
-import { hookAt } from "src/util/immutable-mento";
+import { hookMemo } from "src/incr/hookMemo";
+import { hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
+import { hookAt } from "src/util/immutable-incr";
 import { slotSetTo } from "../slot";
 
 export type Program = {

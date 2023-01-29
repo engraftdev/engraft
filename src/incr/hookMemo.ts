@@ -1,5 +1,5 @@
 import { arrEqWithRefEq, Eq } from "../util/eq";
-import { HookMemory, hookRef, runWithHookMemory } from "./hooks";
+import { createHookPath, HookPath, hookRef, runWithPath } from "./hooks";
 
 // Produce a value with a function when a key changes according to a provided equality function.
 // If an equality function is not provided, hookMemo acts like React.useMemo,
@@ -14,11 +14,13 @@ export function hookMemo<Key, Return>(f: () => Return, key: Key, eq?: Eq<Key>) {
     eq = arrEqWithRefEq as unknown as Eq<Key>;
   }
 
-  const lastCallRef = hookRef<[Key, Return, HookMemory] | null>(() => null);
+  const lastCallRef = hookRef<[Key, Return, HookPath] | null>(() => null, 'hookMemo');
 
   if (lastCallRef.current === null || !eq(lastCallRef.current[0], key)) {
-    const memory: HookMemory = lastCallRef.current?.[2] || {};
-    lastCallRef.current = [key, runWithHookMemory(f, memory), memory];
+    let path = lastCallRef.current?.[2];
+    if (!path) { path = createHookPath(); }
+    const result = runWithPath(f, path);
+    lastCallRef.current = [key, result, path];
   }
 
   return lastCallRef.current[1];

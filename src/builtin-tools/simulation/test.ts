@@ -2,7 +2,7 @@ import { describe, it } from '@jest/globals';
 import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
-import { MentoMemory } from 'src/mento';
+import { Incr } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { noOp } from 'src/util/noOp';
@@ -26,7 +26,7 @@ describe('simulation', () => {
 
     expectToEqual(
       EngraftPromise.state(
-        simulationTool.run(MentoMemory.create(), {
+        simulationTool.run(Incr.createMemory(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
           updateProgram: noOp,

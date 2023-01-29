@@ -4,7 +4,7 @@ import { update } from 'src/deps';
 import { registerTool, ToolOutput } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
-import { MentoMemory } from 'src/mento';
+import { Incr } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
@@ -17,7 +17,7 @@ describe('slot', () => {
   it('basic code works', () => {
     expectToEqual(
       EngraftPromise.state(
-        slotTool.run(MentoMemory.create(), {
+        slotTool.run(Incr.createMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -34,7 +34,7 @@ describe('slot', () => {
   });
 
   it('returned promises are resolved into output', async () => {
-    const {outputP} = slotTool.run(MentoMemory.create(), {
+    const {outputP} = slotTool.run(Incr.createMemory(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
@@ -116,7 +116,7 @@ describe('slot', () => {
   it('resolves references correctly', () => {
     expectToEqual(
       EngraftPromise.state(
-        slotTool.run(MentoMemory.create(), {
+        slotTool.run(Incr.createMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -136,7 +136,7 @@ describe('slot', () => {
     const foxOutputP = new EngraftPromise<ToolOutput>((resolve) => {
       setTimeout(() => resolve({value: 100}), 10);
     });
-    const { outputP } = slotTool.run(MentoMemory.create(), {
+    const { outputP } = slotTool.run(Incr.createMemory(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
@@ -153,7 +153,7 @@ describe('slot', () => {
   });
 
   it('switches between code & tool modes without accumulating garbage', async () => {
-    const memory = MentoMemory.create();
+    const memory = Incr.createMemory();
 
     const programCode: slot.Program = {
       toolName: 'slot',
@@ -207,7 +207,7 @@ describe('slot', () => {
   it('works with subtools', () => {
     expectToEqual(
       EngraftPromise.state(
-        slotTool.run(MentoMemory.create(), {
+        slotTool.run(Incr.createMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -245,7 +245,7 @@ describe('slot', () => {
       subPrograms: {},
       defaultCode: undefined,
     }
-    const memory = MentoMemory.create();
+    const memory = Incr.createMemory();
     function runProgram() {
       return EngraftPromise.state(
         slotTool.run(memory, {

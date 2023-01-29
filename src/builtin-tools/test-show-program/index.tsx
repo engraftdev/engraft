@@ -1,10 +1,10 @@
 import { ComputeReferences, ProgramFactory, ToolProgram, ToolRun, ToolView } from "src/engraft";
 import { hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
-import { hookMemo } from "src/mento/hookMemo";
-import { hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
-import { hookAt } from "src/util/immutable-mento";
+import { hookMemo } from "src/incr/hookMemo";
+import { hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
+import { hookAt } from "src/util/immutable-incr";
 import { ValueEditable } from 'src/view/ValueEditable';
 import { slotSetTo } from '../slot';
 

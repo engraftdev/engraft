@@ -9,7 +9,7 @@ import { usePromiseState } from './engraft/EngraftPromise.react';
 import { runTool } from './engraft/hooks';
 import { ShowView } from './engraft/ShowView';
 import { examples } from './examples/examples';
-import { useMento } from './mento/react';
+import { useIncr } from './incr/react';
 import { Updater } from './util/immutable';
 import { useStateSetOnly, useStateUpdateOnly } from './util/immutable-react';
 import range from './util/range';
@@ -142,7 +142,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
-  const {outputP, view} = useMento(runTool, { program, varBindings, updateProgram });
+  const {outputP, view} = useIncr(runTool, { program, varBindings, updateProgram });
   const outputState = usePromiseState(outputP);
 
   const [showTool, setShowTool] = useStateSetOnly(() => true);

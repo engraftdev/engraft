@@ -1,4 +1,4 @@
-import { hookMemo } from "src/mento/hookMemo";
+import { hookMemo } from "src/incr/hookMemo";
 import { at, atIndex, Setter, Updater, updaterToSetter } from "./immutable";
 
 export function hookUpdateAt<T, K extends string & keyof T>(update: Updater<T>, key: K): Updater<T[K]> {

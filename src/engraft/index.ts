@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { Mento } from "src/mento";
+import { Incr } from "src/incr";
 import { newId } from "src/util/id";
 import { Updater } from "src/util/immutable";
 import { EngraftPromise } from "./EngraftPromise";
@@ -17,7 +17,7 @@ export type ToolProgram = {
   [others: string]: any,  // TODO: idk about this type...
 }
 
-export type ToolRun<P extends ToolProgram> = Mento<[props: ToolProps<P>], ToolResult>;
+export type ToolRun<P extends ToolProgram> = Incr<[props: ToolProps<P>], ToolResult>;
 
 export type ToolResult = {
   outputP: EngraftPromise<ToolOutput>,

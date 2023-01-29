@@ -1,10 +1,10 @@
 import { ComputeReferences, ProgramFactory, ToolRun } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { hookMemo } from "src/mento/hookMemo";
-import { hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
+import { hookMemo } from "src/incr/hookMemo";
+import { hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
 import { ControlledTextInput } from 'src/util/ControlledTextInput';
-import { hookAt } from 'src/util/immutable-mento';
+import { hookAt } from 'src/util/immutable-incr';
 
 export type Program = {
   toolName: 'npm',

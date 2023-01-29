@@ -5,10 +5,10 @@ import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunSubTool, runTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
-import { hookMemo } from "src/mento/hookMemo";
-import { hookFork, hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
-import { useMento } from "src/mento/react";
+import { hookMemo } from "src/incr/hookMemo";
+import { hookFork, hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
+import { useIncr } from "src/incr/react";
 import { useAt, useStateSetOnly } from "src/util/immutable-react";
 import { difference, union } from "src/util/sets";
 import { ToolOutputView } from "src/view/Value";
@@ -102,7 +102,7 @@ const View = memo((props: ViewProps) => {
     ...varBindings,
     [program.stateVar.id]: { var_: program.stateVar, outputP: tickOutputP },
   }), [varBindings, program.stateVar, tickOutputP]);
-  const toDrawResult = useMento(runTool, { program: toDrawProgram, updateProgram: updateToDrawProgram, varBindings: toDrawVarBindings });
+  const toDrawResult = useIncr(runTool, { program: toDrawProgram, updateProgram: updateToDrawProgram, varBindings: toDrawVarBindings });
   const toDrawOutputState = usePromiseState(toDrawResult.outputP);
   const unresolvedP = useMemo(() => EngraftPromise.unresolved<ToolOutput>(), []);
   const beforeSelectedTickOutputState = usePromiseState(selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP);

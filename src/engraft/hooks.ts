@@ -1,8 +1,8 @@
-import { hookDedupe, hookMemo } from "src/mento/hookMemo";
-import { hookFork, hookMento, hooks } from "src/mento/hooks";
+import { hookDedupe, hookMemo } from "src/incr/hookMemo";
+import { hookFork, hookIncr, hooks } from "src/incr/hooks";
 import { objEqWithRefEq } from "src/util/eq";
 import { Updater } from "src/util/immutable";
-import { hookAt } from "src/util/immutable-mento";
+import { hookAt } from "src/util/immutable-incr";
 import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
 
 export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults {
@@ -13,7 +13,7 @@ export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolRes
   // TODO: hookKeyed?
   return hookFork((branch) =>
     branch(toolName, () => {
-      return hookMento(tool.run, props);
+      return hookIncr(tool.run, props);
     })
   );
 }

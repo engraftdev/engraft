@@ -1,9 +1,9 @@
 import { RgbColorPicker } from 'react-colorful';
 import { ComputeReferences, ProgramFactory, ToolRun } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { hookMemo } from "src/mento/hookMemo";
-import { hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
+import { hookMemo } from "src/incr/hookMemo";
+import { hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
 
 export type Program = {
   toolName: 'color',

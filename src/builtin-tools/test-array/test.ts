@@ -2,7 +2,7 @@ import { describe, it } from '@jest/globals';
 import { update } from 'src/deps';
 import { registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { MentoMemory } from 'src/mento';
+import { Incr } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
@@ -13,7 +13,7 @@ registerTool(toolFromModule(require('../test-value')));
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
-    const memory = MentoMemory.create();
+    const memory = Incr.createMemory();
 
     let subTool1Runs = 0;
     let subTool2Runs = 0;

@@ -1,7 +1,7 @@
 import { ToolProgram, Var, VarBindings } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { runTool } from "src/engraft/hooks";
-import { MentoMemory } from "src/mento";
+import { Incr } from "src/incr";
 
 export type Closure = {
   vars: Var[],
@@ -30,7 +30,7 @@ export function closureToSyncFunction(closure: Closure) {
     const varBindings = valuesToVarBindings(args, vars);
 
     const result = runTool(
-      MentoMemory.create(),  // no incrementality
+      Incr.createMemory(),  // no incrementality
       {
         program: bodyProgram,
         varBindings: {

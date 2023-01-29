@@ -12,7 +12,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "Mento.hooks((x) => {\n  log('squaring', x)\n  return x * x;\n})",
+          "code": "Incr.hooks((x) => {\n  log('squaring', x)\n  return x * x;\n})",
           "defaultCode": "",
           "subPrograms": {}
         }
@@ -25,7 +25,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "var mem = Mento.createMemory();\nlog(IDcourse420341(mem, 3));\nlog(IDcourse420341(mem, 3));\nlog(IDcourse420341(mem, 4));\nlog(IDcourse420341(mem, 4));\nreturn mem;",
+          "code": "var mem = Incr.createMemory();\nlog(IDcourse420341(mem, 3));\nlog(IDcourse420341(mem, 3));\nlog(IDcourse420341(mem, 4));\nlog(IDcourse420341(mem, 4));\nreturn mem;",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         }
@@ -38,7 +38,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "Mento.hooks((x) => {\n  const squared = Mento.hookMemo(() => {\n    log('squaring', x)\n    return x * x;\n  }, [x]);\n  return squared;\n})",
+          "code": "Incr.hooks((x) => {\n  const squared = Incr.hookMemo(() => {\n    log('squaring', x)\n    return x * x;\n  }, [x]);\n  return squared;\n})",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         }
@@ -51,7 +51,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "var mem = Mento.createMemory();\nlog(IDviper061728(mem, 3));\nlog(IDviper061728(mem, 3));\nlog(IDviper061728(mem, 4));\nlog(IDviper061728(mem, 4));\nreturn mem;",
+          "code": "var mem = Incr.createMemory();\nlog(IDviper061728(mem, 3));\nlog(IDviper061728(mem, 3));\nlog(IDviper061728(mem, 4));\nlog(IDviper061728(mem, 4));\nreturn mem;",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         },
@@ -65,7 +65,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "Mento.hooks((x, y) => {\n  const xSquared = Mento.hookMento(IDviper061728, x);\n  const ySquared = Mento.hookMento(IDviper061728, y);\n  return [xSquared, ySquared];\n})",
+          "code": "Incr.hooks((x, y) => {\n  const xSquared = Incr.hookIncr(IDviper061728, x);\n  const ySquared = Incr.hookIncr(IDviper061728, y);\n  return [xSquared, ySquared];\n})",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         }
@@ -78,7 +78,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "var mem = Mento.createMemory();\nlog(IDpath451236(mem, 3, 4));\nlog(IDpath451236(mem, 3, 4));\nlog(IDpath451236(mem, 3, 5));\nreturn mem;",
+          "code": "var mem = Incr.createMemory();\nlog(IDpath451236(mem, 3, 4));\nlog(IDpath451236(mem, 3, 4));\nlog(IDpath451236(mem, 3, 5));\nreturn mem;",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         },
@@ -92,7 +92,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "Mento.hooks((nums) => {\n  const results = {};\n  Mento.hookFork((branch) =>\n    Object.entries(nums).forEach(([key, num]) =>\n      branch(key, () => {\n        results[key] = Mento.hookMento(IDviper061728, num);\n      })\n    )\n  )\n  return results;\n})",
+          "code": "Incr.hooks((nums) => {\n  const results = {};\n  Incr.hookFork((branch) =>\n    Object.entries(nums).forEach(([key, num]) =>\n      branch(key, () => {\n        results[key] = Incr.hookIncr(IDviper061728, num);\n      })\n    )\n  )\n  return results;\n})",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         }
@@ -105,7 +105,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "var mem = Mento.createMemory();\nlog(IDbeaufort269849(mem, {a: 3, b: 4}));\nlog(IDbeaufort269849(mem, {a: 3, b: 4}));\nlog(IDbeaufort269849(mem, {a: 3, b: 5}));\nreturn mem;",
+          "code": "var mem = Incr.createMemory();\nlog(IDbeaufort269849(mem, {a: 3, b: 4}));\nlog(IDbeaufort269849(mem, {a: 3, b: 4}));\nlog(IDbeaufort269849(mem, {a: 3, b: 5}));\nreturn mem;",
           "defaultCode": "IDauroraceratops452408",
           "subPrograms": {}
         },

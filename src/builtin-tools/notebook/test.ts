@@ -3,7 +3,7 @@ import { update } from 'src/deps';
 import { newVar, registerTool, VarBindings } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
-import { MentoMemory } from 'src/mento';
+import { Incr } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
@@ -18,7 +18,7 @@ registerTool(toolFromModule(require('../slot')));
 describe('notebook', () => {
   // TODO: We need to be smarter about wiring notebook cells together for this to work.
   it.failing('output basically works; no unnecessary runs of cells', () => {
-    const memory = MentoMemory.create();
+    const memory = Incr.createMemory();
 
     let cell1Runs = 0;
     let cell2Runs = 0;
@@ -93,7 +93,7 @@ describe('notebook', () => {
 
     expectToEqual(
       EngraftPromise.state(
-        notebookTool.run(MentoMemory.create(), {
+        notebookTool.run(Incr.createMemory(), {
           program,
           varBindings: empty,
           updateProgram: noOp,
@@ -114,7 +114,7 @@ describe('notebook', () => {
   });
 
   it('changing earlier cell through external binding propagates to later cell', () => {
-    const memory = MentoMemory.create();
+    const memory = Incr.createMemory();
     const externalVar = newVar('external');
     const cell1 = newVar('cell1');
     const cell2 = newVar('cell2');

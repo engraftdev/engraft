@@ -2,8 +2,8 @@ import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps, 
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookRunSubTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
-import { hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
+import { hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
 import { union } from "src/util/sets";
 import { slotSetTo } from "../slot";
 

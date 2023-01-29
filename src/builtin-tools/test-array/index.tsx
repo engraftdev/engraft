@@ -2,10 +2,10 @@ import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps }
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
-import { hookMemo } from "src/mento/hookMemo";
-import { hookFork, hooks } from "src/mento/hooks";
-import { memoizeProps } from "src/mento/memoize";
-import { hookAt, hookUpdateAtIndex } from "src/util/immutable-mento";
+import { hookMemo } from "src/incr/hookMemo";
+import { hookFork, hooks } from "src/incr/hooks";
+import { memoizeProps } from "src/incr/memoize";
+import { hookAt, hookUpdateAtIndex } from "src/util/immutable-incr";
 import { union } from "src/util/sets";
 
 export type Program = {
