@@ -2,6 +2,7 @@ import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps, 
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookRunSubTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
+import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { union } from "src/util/sets";
@@ -28,13 +29,13 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const {outputP: xOutputP, view: xView} = hookRunSubTool({program, updateProgram, subKey: 'xProgram', varBindings});
   const {outputP: yOutputP, view: yView} = hookRunSubTool({program, updateProgram, subKey: 'yProgram', varBindings});
 
-  const outputP = EngraftPromise.all([xOutputP, yOutputP]).then(([xOutput, yOutput]) => {
+  const outputP = hookMemo(() => EngraftPromise.all([xOutputP, yOutputP]).then(([xOutput, yOutput]) => {
     if (typeof xOutput.value !== 'number') { throw new Error('x must be a number'); }
     if (typeof yOutput.value !== 'number') { throw new Error('y must be a number'); }
     return {value: xOutput.value + yOutput.value};
-  });
+  }), [xOutputP, yOutputP]);
 
-  const view: ToolView = {
+  const view: ToolView = hookMemo(() => ({
     render: ({autoFocus}) =>
       <div className="xCol xGap10 xPad10">
         <div className="xRow xGap10">
@@ -47,7 +48,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           <ShowView view={yView} />
         </div>
       </div>,
-  };
+  }), [xView, yView]);
 
   return {outputP, view};
 }));
