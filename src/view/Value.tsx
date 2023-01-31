@@ -68,7 +68,7 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
 
 export type SubValueHandleProps = {
   value: unknown,
-  path: (string | number)[],
+  path?: (string | number)[],
   children: ReactNode,
 }
 
@@ -95,7 +95,7 @@ export const Value = memo(function Value({value, customizations = {SubValueHandl
 
 export type ValueInternalProps = {
   value: unknown,
-  path: (string | number)[],
+  path?: (string | number)[],
   prefix?: ReactNode,
   suffix?: ReactNode,
   customizations: ValueCustomizations,
@@ -134,6 +134,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   if (value instanceof EngraftPromise) {
+
     const promise = value as EngraftPromise<any>;
     const state = EngraftPromise.state(promise);
     const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
@@ -294,7 +295,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
               suffix={
                 <div style={{fontSize: 0}}>,</div>
               }
-              path={[...path, key]}
+              path={path && [...path, key]}
               customizations={customizations}
             />
           </div>

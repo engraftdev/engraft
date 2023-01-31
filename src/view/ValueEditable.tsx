@@ -25,7 +25,7 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
   const [hoverRef, isHovered, elem] = useHover();
 
   const onClick = useCallback((ev: MouseEvent) => {
-    if (!updater) { return false; }
+    if (!updater || !path) { return false; }
     ev.preventDefault();
     let defaultStr: string | undefined = undefined;
     try {
@@ -42,6 +42,10 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
     }
     return false;
   }, [elem, path, updater, value])
+
+  if (!path) {
+    return <>{children}</>;
+  }
 
   return <div
     ref={hoverRef}
