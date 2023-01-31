@@ -15,6 +15,7 @@ import { EngraftPromise, PromiseState } from "src/engraft/EngraftPromise";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
 import { identity } from "lodash";
+import { usePromiseState } from "src/engraft/EngraftPromise.react";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -134,21 +135,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   if (value instanceof EngraftPromise) {
-
-    const promise = value as EngraftPromise<any>;
-    const state = EngraftPromise.state(promise);
-    const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
-    const newPrefix = <div className="xRow">
-      {prefix}
-      <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5}}>{'Promise'}</div>
-      <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5, opacity: 0.6, color}}>{`<${state.status}>`}</div>
-    </div>;
-    if (state.status === 'pending') {
-      return newPrefix;
-    } else {
-      const value = state.status === 'fulfilled' ? state.value : state.reason;
-      return <ValueInternal value={value} path={path} prefix={newPrefix} customizations={customizations} />;
-    }
+    return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} customizations={customizations} />;
   }
 
   const maybeElement = value as {} | null | undefined;
@@ -356,6 +343,28 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
     }/>
   }
 })
+
+const ValuePromise = memo(function ValuePromise(props: {
+  value: EngraftPromise<any>,
+  prefix?: ReactNode,
+  customizations: ValueCustomizations,
+}) {
+  const {value, prefix, customizations} = props;
+
+  const state = usePromiseState(value);
+  const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
+  const newPrefix = <div className="xRow">
+    {prefix}
+    <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5}}>{'Promise'}</div>
+    <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5, opacity: 0.6, color}}>{`<${state.status}>`}</div>
+  </div>;
+  if (state.status === 'pending') {
+    return newPrefix;
+  } else {
+    const value = state.status === 'fulfilled' ? state.value : state.reason;
+    return <ValueInternal value={value} prefix={newPrefix} customizations={customizations} />;
+  }
+});
 
 
 
