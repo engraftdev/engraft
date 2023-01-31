@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { refEq } from 'src/util/eq';
-import { Incr } from '.';
+import { IncrMemory } from '.';
 import { hookMemo } from './hookMemo';
 import { hooks } from './hooks';
 
@@ -15,7 +15,7 @@ describe('hookMemo without equality function', () => {
 
   it('does not re-run when arguments stay the same', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 5)).toBe(5);
@@ -24,7 +24,7 @@ describe('hookMemo without equality function', () => {
 
   it('does re-run when arguments change', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 6)).toBe(4);
@@ -43,7 +43,7 @@ describe('hookMemo with equality function', () => {
 
   it('does not re-run when arguments stay the same', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     const props = {x: 10, y: 5}
     expect(minus(memory, props)).toBe(5);
     expect(minusRuns).toBe(1);
@@ -53,7 +53,7 @@ describe('hookMemo with equality function', () => {
 
   it('does re-run when arguments change', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, {x: 10, y: 5})).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, {x: 10, y: 5})).toBe(5);

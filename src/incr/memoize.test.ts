@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { Incr } from '.';
+import { Incr, IncrMemory } from '.';
 import { memoize, memoizeProps } from './memoize';
 
 describe('memoize', () => {
@@ -11,7 +11,7 @@ describe('memoize', () => {
 
   it('does not re-run when arguments stay the same', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 5)).toBe(5);
@@ -20,7 +20,7 @@ describe('memoize', () => {
 
   it('does re-run when arguments change', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 6)).toBe(4);
@@ -37,7 +37,7 @@ describe('memoizeProps', () => {
 
   it('does not re-run when props stay the same', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, {x: 10, y: 5})).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, {x: 10, y: 5})).toBe(5);
@@ -46,7 +46,7 @@ describe('memoizeProps', () => {
 
   it('does re-run when props change', () => {
     minusRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expect(minus(memory, {x: 10, y: 5})).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, {x: 10, y: 6})).toBe(4);

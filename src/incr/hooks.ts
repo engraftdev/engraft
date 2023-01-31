@@ -1,28 +1,29 @@
-import { Incr, Ref } from ".";
+import { Incr, IncrMemory } from ".";
 
 // a way to make mentos using React-hook-like sugar
 
 export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): Incr<Args, Return> {
-  return (memory: Ref<HookPath | undefined>, ...args) => {
-    if (!memory.current) {
-      memory.current = createHookPath();
+  return (memory: IncrMemory, ...args) => {
+    const memoryForHooks = memory as IncrMemory & { path?: HookPath };
+    if (!memoryForHooks.path) {
+      memoryForHooks.path = new HookPath();
     }
-    return runWithPath(() => f(...args), memory.current);
+    return runWithPath(() => f(...args), memoryForHooks.path);
   };
 }
 
 // fundamental hook
 
-export function hookRef<T>(init: () => T, label?: string): Ref<T> {
+export function hookRef<T>(init: () => T, label?: string): HookRef<T> {
   const position = getPathPosition();
 
   if (position.path.firstRun) {
-    const ref: Ref = { label, current: init() };
+    const ref: HookRef = new HookRef(init(), label);
     position.path.refs[position.index] = ref;
     position.index++;
     return ref;
   } else {
-    const ref: Ref | undefined = position.path.refs[position.index];
+    const ref: HookRef | undefined = position.path.refs[position.index];
     if (!ref) {
       throw new Error(`Hooks: Ran off end of path with ${position.index + 1} refs`);
     }
@@ -32,20 +33,25 @@ export function hookRef<T>(init: () => T, label?: string): Ref<T> {
 };
 
 
+export class HookRef<T = any> {
+  label?: string;
+  current: T;
+
+  constructor(current: T, label?: string) {
+    this.label = label;
+    this.current = current;
+  }
+}
+
+
+
 ////////////////////
 // INTERNAL TYPES //
 ////////////////////
 
-export type HookPath = {
-  firstRun?: true,
-  refs: Ref[]
-};
-
-export function createHookPath(): HookPath {
-  return {
-    firstRun: true,
-    refs: [],
-  };
+export class HookPath {
+  firstRun?: true = true;
+  refs: HookRef[] = [];
 }
 
 
@@ -102,7 +108,7 @@ export type ForkAccess = {
 type ForkBranchFunction = <Return>(key: string, f: () => Return) => Return;
 
 export function hookForkLater(): ForkAccess {
-  const forkRef: Ref<HookFork> = hookRef(() => ({}), 'hookFork');
+  const forkRef: HookRef<HookFork> = hookRef(() => ({}), 'hookFork');
   const fork = forkRef.current;
 
   let keysUsed: {[key: string]: true} = {};
@@ -114,7 +120,7 @@ export function hookForkLater(): ForkAccess {
       }
       keysUsed[key] = true;
 
-      if (!fork[key]) { fork[key] = createHookPath(); }
+      if (!fork[key]) { fork[key] = new HookPath(); }
       return runWithPath(f, fork[key]);
     },
     done(): void {
@@ -140,6 +146,6 @@ export function hookFork<Return>(f: (branch: ForkBranchFunction) => Return): Ret
 
 // Run an arbitrary incr in a hooky function, keeping its memory between runs.
 export function hookIncr<Args extends unknown[], Return>(incr: Incr<Args, Return>, ...args: Args): Return {
-  const memory = hookRef(() => undefined, 'hookIncr');
-  return incr(memory, ...args);
+  const memory = hookRef(() => new IncrMemory(), 'hookIncr');
+  return incr(memory.current, ...args);
 }

@@ -1,6 +1,6 @@
 import { describe, it } from '@jest/globals';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { Incr } from 'src/incr';
+import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
@@ -10,7 +10,7 @@ const testValueTool = toolFromModule(testValue);
 
 describe('test-value', () => {
   it('output basically works', () => {
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     [1, 2, 3].forEach((value) => {
       const {outputP} = testValueTool.run(memory, {
         program: {
@@ -25,7 +25,7 @@ describe('test-value', () => {
   });
 
   it('onRun basically works', () => {
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
 
     let runs = 0;
     let program: testValue.Program = {

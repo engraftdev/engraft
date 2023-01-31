@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { Incr } from ".";
+import { Incr, IncrMemory } from ".";
 
 export function useIncr<Args extends any[], Return>(incr: Incr<Args, Return>, ...args: Args) {
-  const memoryRef = useRef(Incr.createMemory());
+  const memoryRef = useRef(new IncrMemory());
   return incr(memoryRef.current, ...args);
 }

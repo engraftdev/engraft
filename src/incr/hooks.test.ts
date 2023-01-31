@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import _ from 'lodash';
 import { expectToEqual, expectToNotEqual } from 'src/util/expectToEqual';
-import { Incr } from '.';
+import { IncrMemory } from '.';
 import { hookFork, hookIncr, hookRef, hooks } from './hooks';
 
 let squareRuns = 0;
@@ -20,7 +20,7 @@ const square = hooks((x: number) => {
 describe('hookRef', () => {
   it('single hookRef works (square)', () => {
     squareRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expectToEqual(square(memory, 10), 100);
     expectToEqual(squareRuns, 1);
     expectToEqual(square(memory, 10), 100);
@@ -47,7 +47,7 @@ describe('hookFork', () => {
 
   it('basically works', () => {
     squareRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
     expectToEqual(squareRuns, 2);
     expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
@@ -58,7 +58,7 @@ describe('hookFork', () => {
 
   it('cleans up appropriately (check 1)', () => {
     squareRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expectToEqual(squareEach(memory, {x: 1, y: 2}), {x: 1, y: 4});
     expectToEqual(squareRuns, 2);
     expectToEqual(squareEach(memory, {x: 1}), {x: 1});
@@ -69,7 +69,7 @@ describe('hookFork', () => {
 
   it('cleans up appropriately (check 2)', () => {
     squareRuns = 0;
-    const memory = Incr.createMemory();
+    const memory = new IncrMemory();
     expectToEqual(squareEach(memory, {x: 1}), {x: 1});
     expectToEqual(squareRuns, 1);
     const memoryAfterJustX = _.cloneDeep(memory);

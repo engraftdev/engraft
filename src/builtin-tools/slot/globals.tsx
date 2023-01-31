@@ -1,15 +1,15 @@
 import update from 'immutability-helper';
 import React from "react";
-import { Incr } from 'src/incr';
+import * as slider from 'src/builtin-tools/slider';
+import { EngraftPromise } from 'src/engraft/EngraftPromise';
+import { IncrMemory } from 'src/incr';
 import { hookMemo } from 'src/incr/hookMemo';
 import { hookFork, hookIncr, hookRef, hooks } from 'src/incr/hooks';
+import { toolFromModule } from 'src/toolFromModule';
 import { createElementFromReact } from "src/util/createElementFrom";
 import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
 import { GoogleMap } from 'src/view/GoogleMap';
-import { toolFromModule } from 'src/toolFromModule';
-import * as slider from 'src/builtin-tools/slider';
-import { EngraftPromise } from 'src/engraft/EngraftPromise';
 
 const sliderTool = toolFromModule(slider);
 
@@ -33,10 +33,10 @@ export const globals = {
     hooks,
     hookRef,
     hookFork,
-    createMemory: Incr.createMemory,
     hookMemo,
     hookIncr,
   },
+  IncrMemory,
   Meta: {
     sliderTool,
   },
