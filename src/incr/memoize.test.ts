@@ -1,10 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
-import { Incr, IncrMemory } from '.';
+import { IncrFunction, IncrMemory } from '.';
 import { memoize, memoizeProps } from './memoize';
 
 describe('memoize', () => {
   let minusRuns = 0;
-  const minus = memoize(Incr.fromFunction((x: number, y: number) => {
+  const minus = memoize(IncrFunction.fromFunction((x: number, y: number) => {
     minusRuns++;
     return x - y;
   }));
@@ -30,7 +30,7 @@ describe('memoize', () => {
 
 describe('memoizeProps', () => {
   let minusRuns = 0;
-  const minus = memoizeProps(Incr.fromFunction(({x, y}: {x: number, y: number}) => {
+  const minus = memoizeProps(IncrFunction.fromFunction(({x, y}: {x: number, y: number}) => {
     minusRuns++;
     return x - y;
   }));

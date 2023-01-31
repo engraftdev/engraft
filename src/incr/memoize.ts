@@ -1,5 +1,5 @@
 import { arrEqWithRefEq, objEqWithRefEq } from "src/util/eq";
-import { Incr } from ".";
+import { IncrFunction } from ".";
 import { hookMemo } from "./hookMemo";
 import { hookIncr, hooks } from "./hooks";
 
@@ -7,7 +7,7 @@ import { hookIncr, hooks } from "./hooks";
 
 // Memoize an incr that takes any number of arguments,
 // using reference equality on each argument.
-export function memoize<Args extends unknown[], Return>(f: Incr<Args, Return>): Incr<Args, Return> {
+export function memoize<Args extends unknown[], Return>(f: IncrFunction<Args, Return>): IncrFunction<Args, Return> {
   return hooks((...args: Args) => {
     return hookMemo(() => {
       return hookIncr(f, ...args);
@@ -17,7 +17,7 @@ export function memoize<Args extends unknown[], Return>(f: Incr<Args, Return>): 
 
 // Memoize an incr that takes an object as its only argument,
 // using reference equality on each property of the object.
-export function memoizeProps<Props extends object, Return>(f: Incr<[Props], Return>): Incr<[Props], Return> {
+export function memoizeProps<Props extends object, Return>(f: IncrFunction<[Props], Return>): IncrFunction<[Props], Return> {
   return hooks((props: Props) => {
     return hookMemo(() => {
       return hookIncr(f, props);

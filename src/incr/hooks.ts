@@ -1,8 +1,8 @@
-import { Incr, IncrMemory } from ".";
+import { IncrFunction, IncrMemory } from ".";
 
 // a way to make mentos using React-hook-like sugar
 
-export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): Incr<Args, Return> {
+export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): IncrFunction<Args, Return> {
   return (memory: IncrMemory, ...args) => {
     const memoryForHooks = memory as IncrMemory & { path?: HookPath };
     if (!memoryForHooks.path) {
@@ -145,7 +145,7 @@ export function hookFork<Return>(f: (branch: ForkBranchFunction) => Return): Ret
 }
 
 // Run an arbitrary incr in a hooky function, keeping its memory between runs.
-export function hookIncr<Args extends unknown[], Return>(incr: Incr<Args, Return>, ...args: Args): Return {
+export function hookIncr<Args extends unknown[], Return>(incr: IncrFunction<Args, Return>, ...args: Args): Return {
   const memory = hookRef(() => new IncrMemory(), 'hookIncr');
   return incr(memory.current, ...args);
 }
