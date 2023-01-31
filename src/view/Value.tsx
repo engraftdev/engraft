@@ -11,7 +11,7 @@ import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
 import { inlineBlock } from "./styles";
 // import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
-import { PromiseState } from "src/engraft/EngraftPromise";
+import { EngraftPromise, PromiseState } from "src/engraft/EngraftPromise";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
 import { identity } from "lodash";
@@ -131,6 +131,23 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
     return wrapInline(
       <Diagram width={130} height={130} diagram={value} />
     );
+  }
+
+  if (value instanceof EngraftPromise) {
+    const promise = value as EngraftPromise<any>;
+    const state = EngraftPromise.state(promise);
+    const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
+    const newPrefix = <div className="xRow">
+      {prefix}
+      <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5}}>{'Promise'}</div>
+      <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre', marginRight: 5, opacity: 0.6, color}}>{`<${state.status}>`}</div>
+    </div>;
+    if (state.status === 'pending') {
+      return newPrefix;
+    } else {
+      const value = state.status === 'fulfilled' ? state.value : state.reason;
+      return <ValueInternal value={value} path={path} prefix={newPrefix} customizations={customizations} />;
+    }
   }
 
   const maybeElement = value as {} | null | undefined;
