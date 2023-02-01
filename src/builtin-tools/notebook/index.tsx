@@ -1,5 +1,5 @@
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
-import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, Var, VarBindings } from "src/engraft";
+import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunTool } from "src/engraft/hooks";
@@ -8,14 +8,13 @@ import { hookMemo } from "src/incr/hookMemo";
 import { hookFork, hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { startDrag } from "src/util/drag";
-import { atIndices, removers, Updater } from "src/util/immutable";
-import { hookAt, hookUpdateAtIndex } from "src/util/immutable-incr";
-import { useAt } from "src/util/immutable-react";
+import { Updater } from "src/util/immutable";
 import { mergeRefs } from "src/util/mergeRefs";
 import { difference, intersection, union } from "src/util/sets";
 import { toposort } from "src/util/toposort";
 import { alphaLabels, unusedLabel } from "src/util/unusedLabel";
-import { updateF } from "src/util/updateF";
+import { UpdateProxyRemovable } from "src/util/UpdateProxy";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { Use } from "src/util/Use";
 import { MenuMaker, useContextMenu } from "src/util/useContextMenu";
 import useHover from "src/util/useHover";
@@ -63,9 +62,8 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, updateProgram, varBindings } = props;
-
-  const [cells, updateCells] = hookAt(program, updateProgram, 'cells');
+  const { program, varBindings } = props;
+  const { cells } = program;
 
   const cellIds = hookMemo(() => new Set(cells.map(cell => cell.var_.id)), [cells]);
   const interCellReferences = hookMemo(() =>
@@ -99,9 +97,6 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     return hookFork((branch) =>
       cells.map((cell, i) => branch(cell.var_.id, () => {
         return hookMemo(() => {
-          const updateCell = hookUpdateAtIndex(updateCells, i);
-          const [cellProgram, updateCellProgram] = hookAt(cell, updateCell, 'program');
-
           const cellVarBindings = i === 0 ? allVarBindings : {
             ...allVarBindings,
             [program.prevVar.id]: {
@@ -111,8 +106,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           };
 
           const { outputP, view } = hookRunTool({
-            program: cellProgram,
-            updateProgram: updateCellProgram,
+            program: cell.program,
             varBindings: cellVarBindings,
           });
           // TODO: inelegance because synchronous-promise isn't good at resolving with promises
@@ -123,10 +117,10 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
               : outputP,
             view,
           }
-        }, [cell, updateCells, varBindings, cyclic, i]);
+        }, [cell, varBindings, cyclic, i]);
       }))
     );
-  }, [cells, updateCells, varBindings, cyclic]);
+  }, [cells, varBindings, cyclic]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCellResult = cellResults[cellResults.length - 1] as ToolResult | undefined;
@@ -136,42 +130,37 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     return lastCellResult.outputP;
   }), [cellResults]);
 
-  const view = hookMemo(() => ({
-    render: () => <View {...props} cellResults={cellResults} />,
+  const view: ToolView<Program> = hookMemo(() => ({
+    render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
     showsOwnOutput: cells.length > 0,
   }), [props, cellResults]);
 
   return { outputP, view };
 }));
 
-type ViewProps = ToolProps<Program> & {
+type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
   cellResults: ToolResult[],
 }
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, cellResults } = props;
+  const programUP = useUpdateProxy(updateProgram);
 
-  const [outputBelowInput, updateOutputBelowInput] = useAt(program, updateProgram, 'outputBelowInput');
-  const [cells, updateCells] = useAt(program, updateProgram, 'cells');
-
-  const smallestUnusedLabel = unusedLabel(alphaLabels, cells.map(cell => cell.var_.label)) || 'ZZZ';
+  const smallestUnusedLabel = unusedLabel(alphaLabels, program.cells.map(cell => cell.var_.label)) || 'ZZZ';
 
   const notebookMenuMaker: MenuMaker = useCallback((closeMenu) => <>
     <MyContextMenuHeading>Notebook</MyContextMenuHeading>
     <div className="MenuItem">
-      <input type="checkbox" checked={outputBelowInput} onChange={(ev) => updateOutputBelowInput(() => ev.target.checked)}/>
+      <input type="checkbox" checked={program.outputBelowInput} onChange={(ev) => programUP.outputBelowInput.$set(ev.target.checked)}/>
       Output below input
     </div>
-  </>, [outputBelowInput, updateOutputBelowInput]);
+  </>, [program.outputBelowInput, programUP.outputBelowInput]);
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
       {notebookMenuMaker(closeMenu)}
     </MyContextMenu>
   , [notebookMenuMaker]));
-
-  const cellUpdaters = useMemo(() => atIndices(updateCells, cells.length), [cells.length, updateCells]);
-  const cellRemovers = useMemo(() => removers(updateCells, cells.length), [cells.length, updateCells]);
 
   return (
     <div className="NotebookTool xPadH10" onContextMenu={openMenu}>
@@ -180,19 +169,17 @@ const View = memo((props: ViewProps) => {
         style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
         }}>
-        {cells.map((cell, i) =>
+        {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
-            <RowDivider i={i} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
-            <CellView cell={cell}
-              updateCell={cellUpdaters[i]}
-              removeCell={cellRemovers[i]}
+            <RowDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+            <CellView cell={cell} cellUP={programUP.cells[i]}
               cellResult={cellResults[i]}
               notebookMenuMaker={notebookMenuMaker}
-              outputBelowInput={outputBelowInput || false}
+              outputBelowInput={program.outputBelowInput || false}
             />
           </Fragment>
         )}
-        <RowDivider i={cells.length} updateCells={updateCells} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+        <RowDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
       </div>
     </div>
   );
@@ -240,11 +227,9 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
 
 type CellViewProps = {
   cell: Cell,
-  updateCell: Updater<Cell>,
+  cellUP: UpdateProxyRemovable<Cell>,
 
   cellResult: ToolResult,
-
-  removeCell: () => void,
 
   notebookMenuMaker: MenuMaker,
 
@@ -252,8 +237,8 @@ type CellViewProps = {
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {cell, updateCell, cellResult, removeCell, notebookMenuMaker, outputBelowInput} = props;
-  const [var_, updateVar] = useAt(cell, updateCell, 'var_');
+  const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput} = props;
+
   const cellOutputState = usePromiseState(cellResult.outputP);
   const cellShowsOwnOutput = cellResult.view.showsOwnOutput;
 
@@ -262,7 +247,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       <MyContextMenuHeading>Notebook Cell</MyContextMenuHeading>
       <button
         onClick={() => {
-          removeCell();
+          cellUP.$remove();
           closeMenu();
         }}
       >
@@ -270,7 +255,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       </button>
       {notebookMenuMaker(closeMenu)}
     </MyContextMenu>
-  , [notebookMenuMaker, removeCell]));
+  , [cellUP, notebookMenuMaker]));
 
   const [toolRef, toolSize] = useSize();
 
@@ -291,18 +276,18 @@ const CellView = memo(function CellView(props: CellViewProps) {
     },
     move({startHeight}) {
       const newHeight = startHeight + this.event.clientY - this.startEvent.clientY;
-      updateCell(updateF({ outputManualHeight: {$set: newHeight} }));
+      cellUP.outputManualHeight.$set(newHeight);
     },
     done() {},
     keepCursor: true,
-  }), [updateCell]);
+  }), [cellUP.outputManualHeight]);
 
   return <>
     {menuNode}
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
       <div className="xRow xStickyTop10" style={{marginTop: 4}}>
         <div className="xExpand"/>
-        <VarDefinition var_={var_} updateVar={updateVar}/>
+        <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$apply}/>
       </div>
     </div>
     <div
@@ -311,7 +296,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       onContextMenu={openMenu}
     >
       <div className="xStickyTop10" ref={toolRef}>
-        <ShowView view={cellResult.view}/>
+        <ShowView view={cellResult.view} updateProgram={cellUP.program.$apply}/>
       </div>
     </div>
     { !cellShowsOwnOutput &&
@@ -355,7 +340,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
                             }}
                           >
                             <div
-                              onClick={() => updateCell(updateF({outputManualHeight: (old) => old === 'infinity' ? undefined : 'infinity'}))}
+                              onClick={() => cellUP.outputManualHeight.$apply((old) => old === 'infinity' ? undefined : 'infinity')}
                               style={{
                                 cursor: 'pointer',
                                 pointerEvents: 'initial'

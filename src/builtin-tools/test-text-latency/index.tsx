@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { Tool, ToolProps } from "src/engraft";
+import { Tool, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
@@ -31,16 +31,18 @@ export const tool: Tool<Program> = {
       value: program.text
     }), [program.text]);
 
-    const view = hookMemo(() => ({
-      render: () => <View {...props} />
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: (renderProps) => <View {...props} {...renderProps} />
     }), [props]);
 
     return { outputP, view };
   })),
 };
 
-const View = memo((props: ToolProps<Program>) => {
+const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const {program, updateProgram} = props;
+
+  // TODO: programUP
 
   console.log("render test-text view");
 

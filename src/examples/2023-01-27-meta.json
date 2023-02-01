@@ -40,7 +40,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    Meta.sliderTool.programFactory()\n  );\n  const mem = new IncrMemory();\n  const result = Meta.sliderTool.run(mem, {\n    program,\n    updateProgram,\n  });\n  return <div>\n    {result.view.render()}\n  </div>;\n}\n\nreturn <Component/>",
+          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    Meta.sliderTool.programFactory()\n  );\n  const mem = new IncrMemory();\n  const result = Meta.sliderTool.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },

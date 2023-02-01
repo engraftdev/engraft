@@ -1,24 +1,23 @@
-import React, { memo, useEffect } from "react";
-import { createContext, useCallback, useContext, useState } from "react";
-import { references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
+import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
+import { slotSetTo } from "src/builtin-tools/slot";
+import { references, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
+import { usePromiseState } from "src/engraft/EngraftPromise.react";
+import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { newId } from "src/util/id";
-import { useAt } from "src/util/immutable-react";
 import { noOp } from "src/util/noOp";
 import { RowToCol } from "src/util/RowToCol";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { Use } from "src/util/Use";
 import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "src/view/Value";
-import { slotSetTo } from "src/builtin-tools/slot";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
-import { hookRunSubTool } from "src/engraft/hooks";
-import { usePromiseState } from "src/engraft/EngraftPromise.react";
 
 interface PatternWithId {
   id: string;
@@ -43,15 +42,15 @@ export const tool: Tool<Program> = {
   computeReferences: (program) => references(program.inputProgram),
 
   run: memoizeProps(hooks((props) => {
-    const { program, updateProgram, varBindings } = props;
-    const { outputP: inputOutputP, view: inputView } = hookRunSubTool({ program, updateProgram, subKey: 'inputProgram', varBindings })
+    const { program, varBindings } = props;
+    const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
     const { patternsWithIds } = program;
 
     const mergedPatterns = hookMemo(() => {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
     }, [patternsWithIds])
-    
-    const outputP = hookMemo(() => EngraftPromise.resolve(inputOutputP.then((res)=>{
+
+    const outputP = hookMemo(() => EngraftPromise.resolve(inputResult.outputP.then((res)=>{
       if (!mergedPatterns) {
         return {value: null};
       }
@@ -59,13 +58,13 @@ export const tool: Tool<Program> = {
       if (Array.isArray(value)) {
         // TODO: not sure what this behavior should be in general
         value = value.flat(Infinity);
-      }        
+      }
       return {value};
-    })), [inputOutputP, mergedPatterns]);
+    })), [inputResult.outputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
-      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutputP}/>
-    }), [props, inputOutputP, inputView]);
+      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>
+    }), [props, inputResult]);
 
     return { outputP, view };
   })),
@@ -246,16 +245,14 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
 })
 
 
-interface ExtractorToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
-  inputView: ToolView;
-  inputOutputP: EngraftPromise<ToolOutput>;
+type ExtractorToolViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
+  inputResult: ToolResult,
 }
 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
-  const { program, updateProgram, autoFocus, inputView, inputOutputP } = props;
-
-  const [patternsWithIds, updatePatternsWithIds] = useAt(program, updateProgram, 'patternsWithIds');
-  const [minimized, updateMinimized] = useAt(program, updateProgram, 'minimized');
+  const { program, updateProgram, autoFocus, inputResult } = props;
+  const { patternsWithIds, minimized } = program;
+  const programUP = useUpdateProxy(updateProgram);
 
   const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
 
@@ -267,7 +264,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
 
 
   const setActivePattern = useCallback((pattern: Pattern) => {
-    updatePatternsWithIds((oldPatternsWithIds) => {
+    programUP.patternsWithIds.$apply((oldPatternsWithIds) => {
       let newPatternsWithIds = oldPatternsWithIds.slice();
       let activePatternWithId = newPatternsWithIds[activePatternIndex];
       if (!activePatternWithId) {
@@ -277,7 +274,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       }
       return newPatternsWithIds;
     })
-  }, [activePatternIndex, updatePatternsWithIds])
+  }, [activePatternIndex, programUP])
 
   const [hoverRef, isTopLevelHovered] = useHover();
   const isShiftHeld = useKeyHeld("Shift");
@@ -287,12 +284,12 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
   const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
-  const inputOutputState = usePromiseState(inputOutputP)
+  const inputOutputState = usePromiseState(inputResult.outputP)
 
   // todo: very hacky
   if (minimized) {
     return <div className="xRow xAlignVCenter" style={{padding: 2}}>
-      <ShowView view={inputView} autoFocus={autoFocus} />
+      <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
       <div className="xCol">
         {patternsWithIds.map(({pattern, id}) =>
           <div key={id} style={{fontFamily: 'monospace', whiteSpace: 'nowrap'}}>
@@ -304,7 +301,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         style={{marginLeft: 8, cursor: 'pointer'}}
         onClick={(ev) => {
           ev.preventDefault();
-          updateMinimized(() => false);
+          programUP.minimized.$set(false);
         }}
       >
         ⊕
@@ -331,13 +328,13 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
           onClick={(ev) => {
             ev.preventDefault();
-            updateMinimized(() => true);
+            programUP.minimized.$set(true);
           }}
         >
           ⊖
         </div>
         <RowToCol className="ExtractorTool-input xGap10" minRowWidth={200}>
-          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
+          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
         </RowToCol>
         <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>patterns</span>
@@ -364,7 +361,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
                     key={patternWithId.id}
                     pattern={patternWithId.pattern}
                     onStepToWildcard={(stepIdx) => {
-                      updatePatternsWithIds((oldPatternsWithIds) => {
+                      programUP.patternsWithIds.$apply((oldPatternsWithIds) => {
                         let newPatternsWithIds = [...oldPatternsWithIds];
                         // TODO agggrh this isn't enve correnct arrrrgh
                         newPatternsWithIds[patternIdx].pattern[stepIdx] = {wildcard: true};
@@ -372,7 +369,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
                       })
                     }}
                     onRemove={() => {
-                      updatePatternsWithIds((oldPatternsWithIds) => {
+                      programUP.patternsWithIds.$apply((oldPatternsWithIds) => {
                         let newPatternsWithIds = [...oldPatternsWithIds];
                         newPatternsWithIds.splice(patternIdx, 1);
                         return newPatternsWithIds;

@@ -3,14 +3,15 @@ import { memo, useMemo } from "react";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
-import { hookRunSubTool, runTool } from "src/engraft/hooks";
+import { hookRunTool, runTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookFork, hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { useIncr } from "src/incr/react";
-import { useAt, useStateSetOnly } from "src/util/immutable-react";
+import { useStateSetOnly } from "src/util/immutable-react";
 import { difference, union } from "src/util/sets";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { ToolOutputView } from "src/view/Value";
 import { slotSetTo } from "../slot";
 
@@ -43,9 +44,9 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   );
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, updateProgram, varBindings } = props;
+  const { program, varBindings } = props;
 
-  const initResult = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'initProgram' });
+  const initResult = hookRunTool({ program: program.initProgram, varBindings });
 
   const onTickResults = hookFork((branch) => {
     // Even if the tick function is async, we can synchronously construct the computation graph.
@@ -58,7 +59,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         [program.stateVar.id]: { var_: program.stateVar, outputP: _.last(onTickResults)!.outputP }
       };
       const onTickResult = branch(`${i}`, () => {
-        return hookRunSubTool({ program, updateProgram, varBindings: varBindingsWithState, subKey: 'onTickProgram' });
+        return hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState });
       });
       onTickResults.push(onTickResult);
     }
@@ -69,7 +70,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     return {value: tickOutputs.map(tickOutput => tickOutput.value)};
   });
 
-  const view: ToolView = hookMemo(() => ({
+  const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View
       {...props}
       {...renderProps}
@@ -81,13 +82,14 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return { outputP, view };
 }));
 
-type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
+type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   initResult: ToolResult,
   onTickResults: ToolResult[],
 }
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, autoFocus, onTickResults } = props;
+  const programUP = useUpdateProxy(updateProgram);
 
   let [selectedTick, setSelectedTick] = useStateSetOnly(() => 0);
   if (selectedTick > program.ticksCount) {
@@ -96,13 +98,12 @@ const View = memo((props: ViewProps) => {
 
   // TODO: Interesting pattern – viewProgram is only being used in the view, not in the output, so
   // the program is run BY the view. Hmm!
-  const [toDrawProgram, updateToDrawProgram] = useAt(program, updateProgram, 'toDrawProgram');
   const tickOutputP = useMemo(() => onTickResults[selectedTick].outputP, [onTickResults, selectedTick]);
   const toDrawVarBindings = useMemo(() => ({
     ...varBindings,
     [program.stateVar.id]: { var_: program.stateVar, outputP: tickOutputP },
   }), [varBindings, program.stateVar, tickOutputP]);
-  const toDrawResult = useIncr(runTool, { program: toDrawProgram, updateProgram: updateToDrawProgram, varBindings: toDrawVarBindings });
+  const toDrawResult = useIncr(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings });
   const toDrawOutputState = usePromiseState(toDrawResult.outputP);
   const unresolvedP = useMemo(() => EngraftPromise.unresolved<ToolOutput>(), []);
   const beforeSelectedTickOutputState = usePromiseState(selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP);
@@ -134,7 +135,11 @@ const View = memo((props: ViewProps) => {
               </div>
               <div>↓</div>
             </>}
-            <ShowView view={onTickResults[selectedTick].view} autoFocus={autoFocus} />
+            <ShowView
+              view={onTickResults[selectedTick].view}
+              updateProgram={selectedTick === 0 ? programUP.initProgram.$apply : programUP.onTickProgram.$apply}
+              autoFocus={autoFocus}
+            />
             {!onTickResults[selectedTick].view.showsOwnOutput && <>
               <div>↓</div>
               <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
@@ -145,7 +150,7 @@ const View = memo((props: ViewProps) => {
         </div>
         <div className="xRow xGap10">
           <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>to-draw</div>
-          <ShowView view={toDrawResult.view} />
+          <ShowView view={toDrawResult.view} updateProgram={programUP.toDrawProgram.$apply} />
         </div>
       </div>
     </div>

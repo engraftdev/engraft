@@ -5,7 +5,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { empty, noOp } from 'src/util/noOp';
+import { empty } from 'src/util/noOp';
 import * as testArray from './index';
 
 const testArrayTool = toolFromModule(testArray);
@@ -37,7 +37,6 @@ describe('test-array', () => {
         testArrayTool.run(memory, {
           program,
           varBindings: empty,
-          updateProgram: noOp,
         }).outputP
       );
     }

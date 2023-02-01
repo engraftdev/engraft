@@ -1,8 +1,11 @@
-import { ReactElement } from "react";
+import { ReactElement, useContext, useState } from "react";
 
-export function Use<T>({hook, children}: {hook: () => T, children: (t: T) => ReactElement}) {
-  const t = hook();
-  return children(t);
+export function Use<Return>(props: {hook: () => Return, children: (ret: Return) => ReactElement}): ReactElement;
+export function Use<Args extends any[], Return>(props: {hook: (...args: Args) => Return, args: Args, children: (ret: Return) => ReactElement}): ReactElement;
+export function Use<Args extends any[], Return>(props: {hook: (...args: Args) => Return, args?: Args, children: (ret: Return) => ReactElement}) {
+  const {hook, args, children} = props;
+  const ret = hook(...args || ([] as any as Args));
+  return children(ret);
 }
 
 export function hookToComponent<T>(hook: () => T) {

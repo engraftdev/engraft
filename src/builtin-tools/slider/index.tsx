@@ -1,11 +1,10 @@
 import { memo, useCallback } from "react";
-import { Tool, ToolProps } from "src/engraft";
+import { Tool, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { useAt } from "src/util/immutable-react";
-import { updateF } from "src/util/updateF";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { useContextMenu } from "src/util/useContextMenu";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 
@@ -36,42 +35,39 @@ export const tool: Tool<Program> = {
       value: program.value
     }), [program.value]);
 
-    const view = hookMemo(() => ({
-      render: () => <View {...props} />
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: (renderProps) => <View {...props} {...renderProps} />
     }), [props]);
 
     return { outputP, view };
   })),
 };
 
-const View = memo((props: ToolProps<Program>) => {
+const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const { program, updateProgram } = props;
-
-  const [ min, , setMin ] = useAt(program, updateProgram, 'min');
-  const [ max, , setMax ] = useAt(program, updateProgram, 'max');
-  const [ step, , setStep ] = useAt(program, updateProgram, 'step');
+  const programUP = useUpdateProxy(updateProgram);
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
       <MyContextMenuHeading>Slider</MyContextMenuHeading>
       <div>
-        <input type='number' value={min} onChange={(ev) => setMin(+ev.target.value)} /> min
+        <input type='number' value={program.min} onChange={(ev) => programUP.min.$set(+ev.target.value)} /> min
       </div>
       <div>
-        <input type='number' value={max} onChange={(ev) => setMax(+ev.target.value)} /> max
+        <input type='number' value={program.max} onChange={(ev) => programUP.max.$set(+ev.target.value)} /> max
       </div>
       <div>
-        <input type='number' value={step} onChange={(ev) => setStep(+ev.target.value)} /> step
+        <input type='number' value={program.step} onChange={(ev) => programUP.step.$set(+ev.target.value)} /> step
       </div>
     </MyContextMenu>
-  , [min, max, step, setMin, setMax, setStep]));
+  , [program.min, program.max, program.step, programUP.min, programUP.max, programUP.step]));
 
   return <div style={{padding: 10}} onContextMenu={openMenu}>
     {menuNode}
     <input
       type="range"
       value={program.value}
-      onChange={(e) => updateProgram(updateF({ value: {$set: +e.target.value }}))}
+      onChange={(e) => programUP.value.$set(+e.target.value)}
       min={program.min} max={program.max} step={program.step}/>
     {' '}
     <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{program.value}</div>

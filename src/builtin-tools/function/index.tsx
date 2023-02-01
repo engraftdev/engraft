@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { memo, useCallback, useEffect, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
@@ -10,11 +10,11 @@ import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { objEqWithRefEq } from "src/util/eq";
 import { newId } from "src/util/id";
-import { atAllIndices, atIndexZip, removers, Updater } from "src/util/immutable";
-import { useAt } from "src/util/immutable-react";
 import { noOp } from "src/util/noOp";
 import { difference } from "src/util/sets";
 import { updateF } from "src/util/updateF";
+import { UpdateProxy } from "src/util/UpdateProxy";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { useContextMenu } from "src/util/useContextMenu";
 import { MyContextMenu, MyContextMenuHeading } from "src/view/MyContextMenu";
 import { SettableValue } from "src/view/SettableValue";
@@ -70,7 +70,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
     return EngraftPromise.resolve({value: syncFunction});
   }, [syncFunction]);
 
-  const view: ToolView = hookMemo(() => ({
+  const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) =>
       <View {...props} {...renderProps} syncFunction={syncFunction}/>
   }), [props]);
@@ -79,65 +79,23 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 }));
 
 
-type ViewProps = ToolProps<Program> & ToolViewRenderProps & {
+type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   syncFunction: (...args: unknown[]) => unknown,
 }
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, syncFunction } = props;
 
-  const [ bodyProgram, updateBodyProgram ] = useAt(program, updateProgram, 'bodyProgram');
-
-  const [ vars, updateVars ] = useAt(program, updateProgram, 'vars');
-  const varsZipped = useMemo(() => atIndexZip(vars, updateVars), [vars, updateVars]);
-
-  const [ examples, updateExamples ] = useAt(program, updateProgram, 'examples');
-  const examplesZipped = useMemo(() => atIndexZip(examples, updateExamples), [examples, updateExamples]);
-
-  const [ activeExampleId, updateActiveExampleId ] = useAt(program, updateProgram, 'activeExampleId');
-
-  const varRemovers = useMemo(() => Array.from({length: vars.length}, (_, i) =>
-    () => {
-      updateVars(updateF({$splice: [[i, 1]]}));
-      // omg this updater situation is anarchy
-      atAllIndices(updateExamples)(updateF({values: {$splice: [[i, 1]]}}));
-    }
-  ), [updateExamples, updateVars, vars.length]);
-
-  const varInserters = useMemo(() => Array.from({length: vars.length}, (_, i) =>
-    () => {
-      updateVars(updateF({$splice: [[i + 1, 0, newVar(`input ${i + 2}`)]]}));
-      // omg this updater situation is anarchy
-      atAllIndices(updateExamples)(updateF({values: {$splice: [[i + 1, 0, '']]}}));
-    }
-  ), [updateExamples, updateVars, vars.length]);
-
-  const exampleRemovers = useMemo(() => removers(updateExamples, examples.length), [examples.length, updateExamples]);
-  useEffect(() => {
-    if (!_.find(examples, {id: activeExampleId})) {
-      updateActiveExampleId(() => examples[0].id);
-    }
-  }, [activeExampleId, examples, updateActiveExampleId])
-
-  const exampleInserters = useMemo(() => Array.from({length: examples.length}, (_, i) =>
-    () => {
-      const newExample: Example = {
-        id: newId(),
-        values: Array.from({length: vars.length}, () => undefined),
-      };
-      updateExamples(updateF({$splice: [[i + 1, 0, newExample]]}));
-      updateActiveExampleId(() => newExample.id);
-    }
-  ), [examples.length, updateActiveExampleId, updateExamples, vars.length]);
+  const programUP = useUpdateProxy(updateProgram);
 
   const bodyVarBindings = useMemo(() => {
-    const activeExample = _.find(examples, {id: activeExampleId})!;
+    const activeExample = _.find(program.examples, {id: program.activeExampleId})!;
 
     return {
       ...varBindings,
-      ...valuesToVarBindings(activeExample.values, vars),
+      ...valuesToVarBindings(activeExample.values, program.vars),
     };
-  }, [activeExampleId, examples, varBindings, vars]);
+  }, [program.activeExampleId, program.examples, program.vars, varBindings]);
 
   return <div className="xCol xGap10 xPad10">
     <div className="xRow xGap10">
@@ -145,11 +103,10 @@ const View = memo((props: ViewProps) => {
         <thead>
           <tr>
             <td>{/* for option buttons */}</td>
-            {varsZipped.map(([var_, updateVar], i) =>
+            {program.vars.map((var_, i) =>
               <VarHeading key={var_.id}
-                var_={var_} updateVar={updateVar}
-                removeVar={vars.length > 1 ? varRemovers[i] : undefined}
-                insertVar={varInserters[i]}
+                var_={var_} index={i}
+                programUP={programUP}
               />
             )}
             <td style={{fontSize: '80%'}}>
@@ -158,12 +115,12 @@ const View = memo((props: ViewProps) => {
           </tr>
         </thead>
         <tbody>
-          {examplesZipped.map(([example, updateExample], i) =>
+          {program.examples.map((example, i) =>
             <ExampleRow key={example.id}
-              example={example} updateExample={updateExample}
-              activeExampleId={activeExampleId} updateActiveExampleId={updateActiveExampleId}
-              removeExample={examples.length > 1 ? exampleRemovers[i] : undefined}
-              insertExample={exampleInserters[i]}
+              example={example} index={i}
+              programUP={programUP}
+              numVars={program.vars.length}
+              activeExampleId={program.activeExampleId}
               syncFunction={syncFunction}
             />)}
         </tbody>
@@ -171,7 +128,7 @@ const View = memo((props: ViewProps) => {
     </div>
 
     <div className="xRow xGap10">
-      <ToolWithView program={bodyProgram} updateProgram={updateBodyProgram} reportOutputState={noOp} varBindings={bodyVarBindings}/>
+      <ToolWithView program={program.bodyProgram} updateProgram={programUP.bodyProgram.$apply} reportOutputState={noOp} varBindings={bodyVarBindings}/>
     </div>
 
   </div>;
@@ -179,14 +136,20 @@ const View = memo((props: ViewProps) => {
 
 type VarHeadingProps = {
   var_: Var,
-  updateVar: Updater<Var>,
-
-  removeVar?: () => void,
-  insertVar: () => void,
+  index: number,
+  programUP: UpdateProxy<Program>,
 };
 
 const VarHeading = memo((props: VarHeadingProps) => {
-  const {var_, updateVar, removeVar, insertVar} = props;
+  const {var_, index, programUP} = props;
+
+  const varUP = programUP.vars[index];
+
+  const insertVarAfter = useCallback(() => {
+    programUP.vars.$apply(updateF({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]}));
+    programUP.examples.$all.values.$apply(updateF({$splice: [[index + 1, 0, '']]}));
+  }, [index, programUP]);
+
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -194,17 +157,17 @@ const VarHeading = memo((props: VarHeadingProps) => {
       <div>
         <button
           onClick={() => {
-            insertVar();
+            insertVarAfter();
             closeMenu();
           }}
         >
           Insert after
         </button>
       </div>
-      {removeVar && <div>
+      {<div>
         <button
           onClick={() => {
-            removeVar();
+            varUP.$remove();
             closeMenu();
           }}
         >
@@ -212,42 +175,57 @@ const VarHeading = memo((props: VarHeadingProps) => {
         </button>
       </div>}
     </MyContextMenu>
-  , [insertVar, removeVar]));
+  , [insertVarAfter, varUP]));
 
   return <td onContextMenu={openMenu}>
     {menuNode}
-    <VarDefinition key={var_.id} var_={var_} updateVar={updateVar}/>
+    <VarDefinition key={var_.id} var_={var_} updateVar={varUP.$apply}/>
   </td>
 });
 
 
 type ExampleRowProps = {
   example: Example,
-  updateExample: Updater<Example>,
+  index: number,
+  programUP: UpdateProxy<Program>,
 
+  numVars: number,
   activeExampleId: string,
-  updateActiveExampleId: Updater<string>,
-
-  removeExample?: () => void,
-  insertExample: () => void,
-
   syncFunction: (...args: unknown[]) => unknown,
 };
 
 const ExampleRow = memo((props: ExampleRowProps) => {
-  const { example, updateExample, activeExampleId, updateActiveExampleId, removeExample, insertExample, syncFunction } = props;
+  const { example, index, programUP, numVars, activeExampleId, syncFunction } = props;
+
+  const exampleUP = programUP.examples[index];
+
+  const removeExample = useCallback(() => {
+    exampleUP.$remove();
+    programUP.$apply((oldProgram) => {
+      if (oldProgram.activeExampleId === example.id) {
+        return {...oldProgram, activeExampleId: oldProgram.examples[0].id};
+      }
+      return oldProgram;
+    });
+  }, [example.id, exampleUP, programUP]);
+
+  const insertExampleAfter = useCallback(() => {
+    const newExample: Example = {
+      id: newId(),
+      values: Array.from({length: numVars}, () => undefined),
+    };
+    programUP.examples.$apply(updateF({$splice: [[index + 1, 0, newExample]]}));
+    programUP.activeExampleId.$set(newExample.id);
+  }, [index, numVars, programUP.activeExampleId, programUP.examples]);
 
   const output = useMemo(() => EngraftPromise.try(() => {
     return {value: syncFunction(...example.values)};
   }), [example.values, syncFunction]);
   const outputState = usePromiseState(output);
 
-  const [ values, updateValues ] = useAt(example, updateExample, 'values');
-  const valuesZipped = useMemo(() => atIndexZip(values, updateValues), [values, updateValues]);
-
   const makeThisRowActive = useCallback(() => {
-    updateActiveExampleId(() => example.id);
-  }, [example.id, updateActiveExampleId]);
+    programUP.activeExampleId.$set(example.id);
+  }, [example.id, programUP]);
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -255,7 +233,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
       <div>
         <button
           onClick={() => {
-            insertExample();
+            insertExampleAfter();
             closeMenu();
           }}
         >
@@ -273,7 +251,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
         </button>
       </div>}
     </MyContextMenu>
-  , [insertExample, removeExample]));
+  , [insertExampleAfter, removeExample]));
 
   return <tr onContextMenu={openMenu} style={{...example.id === activeExampleId && {background: '#eee'}}}>
     {menuNode}
@@ -284,9 +262,9 @@ const ExampleRow = memo((props: ExampleRowProps) => {
         onChange={makeThisRowActive}
       />
     </td>
-    {valuesZipped.map(([value, updateValue], i) =>
+    {example.values.map((value, i) =>
       <td key={i}>
-        <SettableValue value={value} setValue={(v) => updateValue(() => v)}/>
+        <SettableValue value={value} setValue={exampleUP.values[i].$set}/>
       </td>
     )}
     <td>

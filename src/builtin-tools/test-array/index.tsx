@@ -1,12 +1,12 @@
-import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps } from "src/engraft";
+import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps, ToolView } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookFork, hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { hookAt, hookUpdateAtIndex } from "src/util/immutable-incr";
 import { union } from "src/util/sets";
+import { UseUpdateProxy } from "src/util/UpdateProxy.react";
 
 export type Program = {
   toolName: 'test-array',
@@ -24,27 +24,21 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   union(...program.subToolPrograms.map(subToolProgram => references(subToolProgram)));
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  // console.log("running array with props", props)
-
-  const { program, updateProgram, varBindings } = props;
-
-  const [subToolPrograms, updateSubToolPrograms] = hookAt(program, updateProgram, 'subToolPrograms');
+  const { program, varBindings } = props;
 
   const subToolResults = hookMemo(() =>
     hookFork((branch) =>
-      subToolPrograms.map((subToolProgram, i) => branch(`${i}`, () => {
+      program.subToolPrograms.map((subToolProgram, i) => branch(`${i}`, () => {
+        // TODO: does this memo (& others like it) still make sense?
         return hookMemo(() => {
-          const updateSubToolProgram = hookUpdateAtIndex(updateSubToolPrograms, i);
-
           return hookRunTool({
             program: subToolProgram,
-            updateProgram: updateSubToolProgram,
             varBindings,
           });
-        }, [subToolProgram, updateSubToolPrograms, varBindings])
+        }, [subToolProgram, varBindings])
       }))
     )
-  , [subToolPrograms, updateSubToolPrograms, varBindings]);
+  , [program.subToolPrograms, varBindings]);
 
   const subToolOutputPs = subToolResults.map(result => result.outputP);
   const subToolViews = subToolResults.map(result => result.view);
@@ -55,11 +49,15 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     }))
   , subToolOutputPs);
 
-  const view = hookMemo(() => ({
-    render: () =>
-      <div className="ArrayTool">
-        {subToolViews.map((view, i) => <ShowView key={i} view={view} />)}
-      </div>
+  const view: ToolView<Program> = hookMemo(() => ({
+    render: ({updateProgram}) =>
+      <UseUpdateProxy updater={updateProgram} children={(programUP) =>
+        <div className="ArrayTool">
+          {subToolViews.map((view, i) =>
+            <ShowView key={i} view={view} updateProgram={programUP.subToolPrograms[i].$apply} />
+          )}
+        </div>
+      } />
   }), subToolViews);
 
   return { outputP, view };

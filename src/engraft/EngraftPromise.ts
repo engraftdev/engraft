@@ -153,6 +153,10 @@ export type PromiseOutcome<T> =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EngraftPromise = Object.assign(SynchronousPromise as any as SynchronousPromiseConstructor2, {
   state<T>(promise: EngraftPromise<T>): PromiseState<T> {
+    if (!(promise instanceof EngraftPromise)) {
+      throw new TypeError('EngraftPromise.state() can only be called on EngraftPromise objects');
+    }
+
     let result: PromiseState<T> = {status: 'pending'};
 
     // We are using synchronous promises, so if the promise is fulfilled this will set the variable immediately.

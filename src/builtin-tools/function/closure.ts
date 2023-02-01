@@ -37,7 +37,6 @@ export function closureToSyncFunction(closure: Closure) {
           ...closureVarBindings,
           ...varBindings,
         },
-        updateProgram: () => { throw new Error(`Cannot update program in closure`); },
       }
     );
     const outputState = EngraftPromise.state(result.outputP);

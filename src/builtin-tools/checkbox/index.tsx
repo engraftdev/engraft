@@ -1,4 +1,4 @@
-import { Tool } from "src/engraft";
+import { Tool, ToolView } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
@@ -18,14 +18,14 @@ export const tool: Tool<Program> = {
   computeReferences: () => new Set(),
 
   run: memoizeProps(hooks((props) => {
-    const { program, updateProgram } = props;
+    const { program } = props;
 
     const outputP = hookMemo(() => EngraftPromise.resolve({
       value: program.checked
     }), [program.checked]);
 
-    const view = hookMemo(() => ({
-      render: () =>
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: ({updateProgram}) =>
         <input
           type="checkbox"
           checked={program.checked}
@@ -33,7 +33,7 @@ export const tool: Tool<Program> = {
             updateProgram((old) => ({...old, checked: e.target.checked}))
           }}
         />
-    }), [program.checked, updateProgram]);
+    }), [program.checked]);
 
     return { outputP, view };
   })),

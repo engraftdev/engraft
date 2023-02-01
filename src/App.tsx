@@ -142,7 +142,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
-  const {outputP, view} = useIncr(runTool, { program, varBindings, updateProgram });
+  const {outputP, view} = useIncr(runTool, { program, varBindings });
   const outputState = usePromiseState(outputP);
 
   const [showTool, setShowTool] = useStateSetOnly(() => true);
@@ -161,7 +161,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         resetKeys={[program]}
       >
         <IsolateStyles>
-          <ShowView view={view} autoFocus={true} />
+          <ShowView view={view} updateProgram={updateProgram} autoFocus={true} />
         </IsolateStyles>
       </ErrorBoundary>
     </div>

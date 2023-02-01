@@ -7,7 +7,7 @@ import { makeVarBindings } from 'src/engraft/test-utils';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { empty, noOp } from 'src/util/noOp';
+import { empty } from 'src/util/noOp';
 import * as slot from './index';
 
 const slotTool = toolFromModule(slot);
@@ -26,7 +26,6 @@ describe('slot', () => {
             defaultCode: undefined,
           },
           varBindings: empty,
-          updateProgram: noOp,
         }).outputP
       ),
       {status: 'fulfilled', value: {value: 2}},
@@ -43,7 +42,6 @@ describe('slot', () => {
         defaultCode: undefined,
       },
       varBindings: empty,
-      updateProgram: noOp,
     });
     expectToEqual(EngraftPromise.state(outputP), {status: 'pending'});
     const value = await outputP;
@@ -125,7 +123,6 @@ describe('slot', () => {
             defaultCode: undefined,
           } satisfies slot.Program,
           varBindings: makeVarBindings({IDfox000000: {value: 100}}),
-          updateProgram: noOp,
         }).outputP
       ),
       {status: 'fulfilled', value: {value: 101}},
@@ -145,7 +142,6 @@ describe('slot', () => {
         defaultCode: undefined,
       } satisfies slot.Program,
       varBindings: makeVarBindings({IDfox000000: foxOutputP}),
-      updateProgram: noOp,
     });
     expectToEqual(EngraftPromise.state(outputP), {status: 'pending'});
     const value = await outputP;
@@ -180,7 +176,6 @@ describe('slot', () => {
         slotTool.run(memory, {
           program,
           varBindings: empty,
-          updateProgram: noOp,
         }).outputP
       );
     }
@@ -224,7 +219,6 @@ describe('slot', () => {
             defaultCode: undefined,
           } satisfies slot.Program,
           varBindings: makeVarBindings({IDmoose000000: {value: 100}}),
-          updateProgram: noOp,
         }).outputP
       ),
       {status: 'fulfilled', value: {value: 105}},
@@ -251,7 +245,6 @@ describe('slot', () => {
         slotTool.run(memory, {
           program,
           varBindings,
-          updateProgram: noOp,
         }).outputP
       );
     }

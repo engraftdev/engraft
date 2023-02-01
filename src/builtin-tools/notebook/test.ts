@@ -6,7 +6,7 @@ import { makeVarBindings } from 'src/engraft/test-utils';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { empty, noOp } from 'src/util/noOp';
+import { empty } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
 import * as notebook from './index';
 
@@ -51,7 +51,6 @@ describe('notebook', () => {
         notebookTool.run(memory, {
           program,
           varBindings: empty,
-          updateProgram: noOp,
         }).outputP
       );
     }
@@ -96,7 +95,6 @@ describe('notebook', () => {
         notebookTool.run(new IncrMemory(), {
           program,
           varBindings: empty,
-          updateProgram: noOp,
         }).outputP
       ),
       {
@@ -140,7 +138,6 @@ describe('notebook', () => {
         notebookTool.run(memory, {
           program,
           varBindings,
-          updateProgram: noOp,
         }).outputP
       );
     }

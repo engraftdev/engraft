@@ -1,11 +1,11 @@
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
-import { references, Tool, ToolProgram } from "src/engraft";
-import { hookRunSubTool } from "src/engraft/hooks";
+import { references, Tool, ToolProgram, ToolView } from "src/engraft";
+import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { hookAt } from "src/util/immutable-incr";
+import { UseUpdateProxy } from "src/util/UpdateProxy.react";
 import { slotSetTo } from "../slot";
 
 export type Program = {
@@ -24,33 +24,34 @@ export const tool: Tool<Program> = {
   computeReferences: (program) => references(program.subProgram),
 
   run: memoizeProps(hooks((props) => {
-    const { program, updateProgram, varBindings } = props;
+    const { program, varBindings } = props;
 
-    const { outputP: subOutputP, view: subView } = hookRunSubTool({program, updateProgram, subKey: 'subProgram', varBindings});
-    const [rerenderOnProgramChange, updateRerenderOnProgramChange] = hookAt(program, updateProgram, 'rerenderOnProgramChange');
+    const { outputP: subOutputP, view: subView } = hookRunTool({program: program.subProgram, varBindings});
 
     const outputP = subOutputP;
 
-    const view = hookMemo(() => ({
-      render: () =>
-        <div className="xCol xGap10 xPad10">
-          <ShowView view={subView} />
-          { rerenderOnProgramChange
-          ? <RerenderOn value={program.subProgram}>
-              <ShowView view={subView} />
-            </RerenderOn>
-          : <ShowView view={subView} />
-          }
-          <div className="xRow xGap10">
-            <input
-              type="checkbox"
-              checked={rerenderOnProgramChange}
-              onChange={(e) => updateRerenderOnProgramChange(() => e.target.checked)}
-            />
-            <span>rerender view 2 on program change</span>
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: ({updateProgram}) =>
+        <UseUpdateProxy updater={updateProgram} children={(programUP) =>
+          <div className="xCol xGap10 xPad10">
+            <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+            { program.rerenderOnProgramChange
+            ? <RerenderOn value={program.subProgram}>
+                <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+              </RerenderOn>
+            : <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+            }
+            <div className="xRow xGap10">
+              <input
+                type="checkbox"
+                checked={program.rerenderOnProgramChange}
+                onChange={(e) => programUP.rerenderOnProgramChange.$set(e.target.checked)}
+              />
+              <span>rerender view 2 on program change</span>
+            </div>
           </div>
-        </div>
-    }), [program.subProgram, rerenderOnProgramChange, subView, updateRerenderOnProgramChange]);
+        } />
+    }), [program.subProgram, program.rerenderOnProgramChange, subView]);
 
     return { outputP, view };
   })),

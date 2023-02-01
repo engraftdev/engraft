@@ -17,23 +17,24 @@ export type ToolProgram = {
   [others: string]: any,  // TODO: idk about this type...
 }
 
-export type ToolRun<P extends ToolProgram> = IncrFunction<[props: ToolProps<P>], ToolResult>;
+export type ToolRun<P extends ToolProgram> = IncrFunction<[props: ToolProps<P>], ToolResult<P>>;
 
-export type ToolResult = {
+export type ToolResult<P extends ToolProgram = ToolProgram> = {
   outputP: EngraftPromise<ToolOutput>,
-  view: ToolView,
+  view: ToolView<P>,
 };
 
 export type ToolOutput = {
   value: unknown;
 };
 
-export type ToolView = {
-  render: (props: ToolViewRenderProps) => ReactElement<any, any> | null
+export type ToolView<P extends ToolProgram> = {
+  render: (props: ToolViewRenderProps<P>) => ReactElement<any, any> | null
   showsOwnOutput?: boolean,
 }
 
-export type ToolViewRenderProps = {
+export type ToolViewRenderProps<P> = {
+  updateProgram: Updater<P>,
   autoFocus?: boolean,
   expand?: boolean,
   noFrame?: boolean,  // TODO: this is just for slots, huh?
@@ -42,9 +43,6 @@ export type ToolViewRenderProps = {
 export type ToolProps<P extends ToolProgram> = {
   program: P,
   varBindings: VarBindings,
-
-  // TODO: might belong in view? not sure
-  updateProgram: Updater<P>,
 }
 
 export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;

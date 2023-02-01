@@ -5,7 +5,6 @@ import { makeVarBindings } from 'src/engraft/test-utils';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';
 
@@ -29,7 +28,6 @@ describe('simulation', () => {
         simulationTool.run(new IncrMemory(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
-          updateProgram: noOp,
         }).outputP
       ),
       {

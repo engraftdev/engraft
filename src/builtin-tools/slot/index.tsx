@@ -14,7 +14,7 @@ import { cN } from 'src/deps';
 import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "src/engraft";
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { usePromiseState } from 'src/engraft/EngraftPromise.react';
-import { hookRelevantVarBindings, hookRunSubTool, hookRunTool } from 'src/engraft/hooks';
+import { hookRelevantVarBindings, hookRunTool } from 'src/engraft/hooks';
 import { ShowView } from 'src/engraft/ShowView';
 import { hookDedupe, hookMemo } from 'src/incr/hookMemo';
 import { hookFork, hooks } from 'src/incr/hooks';
@@ -27,13 +27,12 @@ import { embedsExtension } from 'src/util/embedsExtension';
 import { objEqWithRefEq } from 'src/util/eq';
 import { newId } from 'src/util/id';
 import { Updater } from 'src/util/immutable';
-import { hookAt, hookUpdateAt } from 'src/util/immutable-incr';
-import { useAt, useUpdateAt } from 'src/util/immutable-react';
 import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
 import { difference, union } from 'src/util/sets';
 import { Replace } from 'src/util/types';
 import { updateF } from 'src/util/updateF';
+import { useUpdateProxy } from 'src/util/UpdateProxy.react';
 import { useRefForCallback } from 'src/util/useRefForCallback';
 import IsolateStyles from 'src/view/IsolateStyles';
 import { ToolFrame } from 'src/view/ToolFrame';
@@ -104,7 +103,7 @@ export const computeReferences = (program: Program) => {
 };
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const {program, updateProgram, varBindings} = props;
+  const {program, varBindings} = props;
 
   return hookFork((branch) => {
     if (program.modeName === 'code') {
@@ -112,7 +111,6 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         return runCodeMode({
           ...props,
           program,
-          updateProgram: updateProgram as Updater<Program, ProgramCodeMode>,
           varBindings,
         });
       });
@@ -121,7 +119,6 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         return runToolMode({
           ...props,
           program,
-          updateProgram: updateProgram as Updater<Program, ProgramToolMode>,
           varBindings,
         });
       });
@@ -172,11 +169,10 @@ const transformBodyCached = cache((code: string) => {
 
 type CodeModeProps = Replace<ToolProps<Program>, {
   program: ProgramCodeMode,
-  updateProgram: Updater<Program, ProgramCodeMode>,
 }>
 
 const runCodeMode = (props: CodeModeProps) => {
-  const { program, updateProgram, varBindings } = props;
+  const { program, varBindings } = props;
 
   const compiledP = hookMemo(() => EngraftPromise.try(() => {
     if (program.code === '') {
@@ -199,24 +195,19 @@ const runCodeMode = (props: CodeModeProps) => {
     }
   }), [program.code])
 
-  const [subPrograms, updateSubPrograms] = hookAt(program, updateProgram, 'subPrograms');
-
   // TODO: this hookDedupe doesn't feel great
   const subResults = hookDedupe(hookMemo(() =>
     hookFork((branch) =>
-      _.mapValues(subPrograms, (subProgram, id) => branch(id, () => {
+      _.mapValues(program.subPrograms, (subProgram, id) => branch(id, () => {
         return hookMemo(() => {
-          const updateSubProgram = hookUpdateAt(updateSubPrograms, id);
-
           return hookRunTool({
             program: subProgram,
-            updateProgram: updateSubProgram,
             varBindings,
           });
-        }, [subProgram, updateSubPrograms, varBindings])
+        }, [subProgram, varBindings])
       }))
     )
-  , [subPrograms, updateSubPrograms, varBindings]), objEqWithRefEq);
+  , [program.subPrograms, varBindings]), objEqWithRefEq);
 
   const codeReferences = hookMemo(() => referencesFromCode(program.code), [program.code]);
 
@@ -297,10 +288,10 @@ const runCodeMode = (props: CodeModeProps) => {
     });
   }, [subResults]);
 
-  const view = hookMemo(() => ({
-    render: (viewProps: ToolViewRenderProps) =>
+  const view: ToolView<Program> = hookMemo(() => ({
+    render: (viewProps) =>
       <CodeModeView
-        {...props} {...viewProps}
+        {...props} {...viewProps} updateProgram={viewProps.updateProgram as Updater<Program, ProgramCodeMode>}
         subViews={subViews}
         logsP={logsP}
       />
@@ -309,15 +300,17 @@ const runCodeMode = (props: CodeModeProps) => {
   return {outputP, view};
 };
 
-type CodeModeViewProps = CodeModeProps & ToolViewRenderProps & {
-  subViews: {[id: string]: ToolView},
+type CodeModeViewProps = CodeModeProps & ToolViewRenderProps<Program> & {
+  subViews: {[id: string]: ToolView<any>},
   logsP: EngraftPromise<{lineNum: number, text: string}[]>,
+  updateProgram: Updater<Program, ProgramCodeMode>,
 };
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const {program, varBindings, updateProgram, expand, autoFocus, subViews, logsP} = props;
+  const programUP = useUpdateProxy(updateProgram);
+
   const varBindingsRef = useRefForCallback(varBindings);
-  const updateSubPrograms = useUpdateAt(updateProgram, 'subPrograms');
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -347,7 +340,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     function insertTool(tool: Tool) {
       const id = newId();
       const newProgram = slotSetTo(tool.programFactory());
-      updateSubPrograms(updateF({[id]: {$set: newProgram}}));
+      program.subPrograms[id].$set(newProgram);
       // TODO: we never remove these! lol
       return id;
     };
@@ -391,7 +384,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       logTheme,
       logDecorations,
     ];
-  }, [refSet, logDecorations, updateSubPrograms, updateProgram, program.defaultCode, varBindingsRef])
+  }, [refSet, logDecorations, program.subPrograms, program.defaultCode, updateProgram, varBindingsRef])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));
@@ -419,7 +412,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         return ReactDOM.createPortal(
           subViews[id]
           ? <IsolateStyles style={{display: 'inline-block'}}>
-              <ShowView view={subViews[id]} />
+              <ShowView view={subViews[id]} updateProgram={programUP.subPrograms[id].$apply} />
             </IsolateStyles>
           : <VarUse key={id} varBinding={varBindings[id] as VarBinding | undefined} />,
           elem
@@ -479,16 +472,18 @@ const logTheme = EditorView.baseTheme({
 
 type ToolModeProps = Replace<ToolProps<Program>, {
   program: ProgramToolMode,
-  updateProgram: Updater<Program, ProgramToolMode>,
 }>
 
 const runToolMode = (props: ToolModeProps) => {
-  const { program, updateProgram, varBindings } = props;
+  const { program, varBindings } = props;
 
-  const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, varBindings, subKey: 'subProgram' });
+  const { outputP: subOutputP, view: subView } = hookRunTool({ program: program.subProgram, varBindings });
 
-  const view = hookMemo(() => ({
-    render: () => <ToolModeView {...props} subView={subView} />,
+  const view: ToolView<Program> = hookMemo(() => ({
+    render: (renderProps) => <ToolModeView
+      {...props} {...renderProps} updateProgram={renderProps.updateProgram as Updater<Program, ProgramToolMode>}
+      subView={subView}
+    />,
     showsOwnOutput: subView.showsOwnOutput,
     // TODO: what happens if we add more properties to ToolView?
   }), [subView]);
@@ -496,14 +491,14 @@ const runToolMode = (props: ToolModeProps) => {
   return { outputP: subOutputP, view };
 };
 
-type ToolModeViewProps = ToolModeProps & ToolViewRenderProps & {
-  subView: ToolView,
+type ToolModeViewProps = ToolModeProps & ToolViewRenderProps<Program> & {
+  subView: ToolView<any>,
+  updateProgram: Updater<Program, ProgramToolMode>,
 };
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView} = props;
-
-  const [subProgram, updateSubProgram] = useAt(program, updateProgram, 'subProgram');
+  const programUP = useUpdateProxy(updateProgram);
 
   const onCloseFrame = useCallback(() => {
     updateProgram(() => ({
@@ -516,14 +511,14 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   }, [program.defaultCode, updateProgram]);
 
   if (noFrame) {
-    return <ShowView view={subView} autoFocus={autoFocus} />;
+    return <ShowView view={subView} updateProgram={programUP.subProgram.$apply} autoFocus={autoFocus} />;
   } else {
     return <ToolFrame
       expand={expand}
-      program={subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
+      program={program.subProgram} updateProgram={programUP.subProgram.$apply} varBindings={varBindings}
       onClose={onCloseFrame}
     >
-      <ShowView view={subView} autoFocus={autoFocus} />
+      <ShowView view={subView} updateProgram={programUP.subProgram.$apply} autoFocus={autoFocus} />
     </ToolFrame>;
   }
 });

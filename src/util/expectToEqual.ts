@@ -22,3 +22,8 @@ function fixStackTrace(wrapper: Function, f: () => void) {
     throw error;
   }
 }
+
+// for testing types
+export function valueOfType<T>(): T {
+  return undefined as T;
+}

@@ -1,23 +1,17 @@
 import { slotSetTo } from "src/builtin-tools/slot";
-import { RowToCol } from "src/util/RowToCol";
-import { union } from "src/util/sets";
 import {
-  references,
-  ProgramFactory,
-  ComputeReferences,
-  ToolProgram,
-  ToolProps,
-  ToolView,
-  ToolRun,
-  ToolOutput,
+  ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram,
+  ToolProps, ToolRun, ToolView
 } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { hookRunSubTool } from "src/engraft/hooks";
+import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
+import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { hookMemo } from "src/incr/hookMemo";
-import { hookAt } from "src/util/immutable-incr";
+import { RowToCol } from "src/util/RowToCol";
+import { union } from "src/util/sets";
+import { UseUpdateProxy } from "src/util/UpdateProxy.react";
 
 export type Program = {
   toolName: "request";
@@ -43,32 +37,16 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 
 export const run: ToolRun<Program> = memoizeProps(
   hooks((props: ToolProps<Program>) => {
-    const { program, updateProgram, varBindings } = props;
-    const [pauseRequest, updatePauseRequest] = hookAt(
-      program,
-      updateProgram,
-      "pauseRequest"
-    );
+    const { program, varBindings } = props;
 
-    const { view: urlView, outputP: urlOutputP } = hookRunSubTool({
-      program,
-      updateProgram,
-      subKey: "urlProgram",
-      varBindings,
-    });
-
-    const { view: paramsView, outputP: paramsOutputP } = hookRunSubTool({
-      program,
-      updateProgram,
-      subKey: "paramsProgram",
-      varBindings,
-    });
+    const urlResult = hookRunTool({program: program.urlProgram, varBindings});
+    const paramsResult = hookRunTool({program: program.paramsProgram, varBindings});
 
     const outputP = hookMemo(
       () =>
-        EngraftPromise.all([urlOutputP, paramsOutputP]).then(
+        EngraftPromise.all([urlResult.outputP, paramsResult.outputP]).then(
           async ([urlOutput, paramsOutput]) => {
-            if (pauseRequest) {
+            if (program.pauseRequest) {
               return EngraftPromise.unresolved<ToolOutput>();
             }
             if (typeof urlOutput.value !== "string") {
@@ -92,35 +70,35 @@ export const run: ToolRun<Program> = memoizeProps(
             return { value: data };
           }
         ),
-      [urlOutputP, paramsOutputP, pauseRequest]
+      [urlResult.outputP, paramsResult.outputP, program.pauseRequest]
     );
 
-    const view: ToolView = hookMemo(
+    const view: ToolView<Program> = hookMemo(
       () => ({
-        render: () => (
-          <>
+        render: ({updateProgram}) => (
+          <UseUpdateProxy updater={updateProgram} children={(programUP) =>
             <div className="xCol xGap10 xPad10 xWidthFitContent">
               <RowToCol minRowWidth={200} className="xGap10" autoFocus={true}>
-                <b>url</b> <ShowView view={urlView} />
+                <b>url</b> <ShowView view={urlResult.view} updateProgram={programUP.urlProgram.$apply} />
               </RowToCol>
               <RowToCol minRowWidth={200} className="xGap10">
-                <b>params</b> <ShowView view={paramsView} />
+                <b>params</b> <ShowView view={paramsResult.view} updateProgram={programUP.paramsProgram.$apply} />
               </RowToCol>
               <div>
                 <input
                   type="checkbox"
-                  checked={pauseRequest}
+                  checked={program.pauseRequest}
                   onChange={() =>
-                    updatePauseRequest((pauseRequest) => !pauseRequest)
+                    programUP.pauseRequest.$apply((pauseRequest) => !pauseRequest)
                   }
                 ></input>
                 Pause request
               </div>
             </div>
-          </>
+          } />
         ),
       }),
-      [urlView, paramsView, pauseRequest]
+      [urlResult.view, paramsResult.view, program.pauseRequest]
     );
 
     return { view, outputP };

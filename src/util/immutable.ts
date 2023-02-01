@@ -5,6 +5,7 @@ import { updateF } from './updateF';
 
 export type Setter<T> = (newT: T) => void;
 export type Updater<T, U extends T = T> = (f: (oldU: U) => T) => void;
+// use U for when you know the updater is coming from an even narrower type than the output
 
 export function updaterToSetter<T, U extends T = T>(updater: Updater<T, U>): Setter<T> {
   return (newT) => updater(() => newT);
