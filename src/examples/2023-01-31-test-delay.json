@@ -1,0 +1,71 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDwedge863786",
+          "label": "slider"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "slider",
+            "value": -5,
+            "min": -10,
+            "max": 10,
+            "step": 1
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDmitten898481",
+          "label": "delayed slider"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "test-delay",
+            "delayProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "1000",
+              "defaultCode": "1000",
+              "subPrograms": {}
+            },
+            "actualProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDwedge863786",
+              "defaultCode": "",
+              "subPrograms": {}
+            }
+          }
+        }
+      },
+      {
+        "var_": {
+          "id": "IDpullover379603",
+          "label": "glitch?"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDwedge863786 - IDmitten898481",
+          "defaultCode": "IDelement769034",
+          "subPrograms": {}
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDelement769034",
+      "label": "prev"
+    }
+  }
+}
