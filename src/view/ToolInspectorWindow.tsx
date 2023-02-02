@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { references, ToolProgram, VarBindings } from "src/engraft";
+import { runtimeObjectId } from "src/util/id";
 import { Updater } from "src/util/immutable";
 import { updateF } from "src/util/updateF";
 import { WindowPortal } from "src/util/WindowPortal";
@@ -41,10 +42,13 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
         <ValueEditable value={program} updater={updateProgram}/> :
         <Value value={program}/>
       }
+      <div><small>Object reference ID: <code>{runtimeObjectId(program)}</code></small></div>
+      <h3>Program updater</h3>
+      <div><small>Object reference ID: <code>{runtimeObjectId(updateProgram)}</code></small></div>
       <h3>References</h3>
       <ul>
         { [...references(program)].map((ref) =>
-          <li key={ref}>{ref}</li>
+          <li key={ref}><small><code>{ref}</code></small></li>
         ) }
       </ul>
       <h3>Variable bindings</h3>
