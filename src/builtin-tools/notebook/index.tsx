@@ -258,9 +258,10 @@ const CellView = memo(function CellView(props: CellViewProps) {
   , [cellUP, notebookMenuMaker]));
 
   const [toolRef, toolSize] = useSize();
+  const [outputContentRef, outputContentSize] = useSize();
 
   const [outputHoverRef, isOutputHovered] = useHover()
-  const outputRef = useRef<HTMLDivElement>(null);
+  const outputOuterRef = useRef<HTMLDivElement>(null);
 
   const outputMaxHeight: number | undefined = (() => {
     // TODO: draggable height
@@ -272,7 +273,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const onMouseDownResizer = useMemo(() => startDrag({
     init() {
-      return {startHeight: outputRef.current!.clientHeight};
+      return {startHeight: outputOuterRef.current!.clientHeight};
     },
     move({startHeight}) {
       const newHeight = startHeight + this.event.clientY - this.startEvent.clientY;
@@ -313,11 +314,14 @@ const CellView = memo(function CellView(props: CellViewProps) {
                 <ToolOutputView
                   outputState={cellOutputState}
                   valueWrapper={(view) =>
-                    <div style={{position: 'relative'}} ref={outputRef}>
-                      <ScrollShadow innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}>
+                    <div style={{position: 'relative'}} ref={outputOuterRef}>
+                      <ScrollShadow
+                        innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}
+                        contentRef={outputContentRef}
+                      >
                         {view}
                       </ScrollShadow>
-                      { isOutputHovered &&
+                      { isOutputHovered && outputContentSize && toolSize && outputContentSize.height > toolSize.height &&
                         <div
                           style={{
                             position: 'absolute',
@@ -336,6 +340,9 @@ const CellView = memo(function CellView(props: CellViewProps) {
                               height: 15,
                               fontSize: 15,
                               margin: 5,
+                              ...outputMaxHeight && outputMaxHeight < outputContentSize.height && {
+                                marginRight: 15,  // shift over to make room for scroll-bar
+                              },
                               userSelect: 'none',
                             }}
                           >

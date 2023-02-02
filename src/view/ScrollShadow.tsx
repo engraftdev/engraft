@@ -1,4 +1,5 @@
-import { CSSProperties, HTMLProps, ReactNode, UIEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { CSSProperties, HTMLProps, ReactNode, Ref, UIEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { mergeRefs } from "src/util/mergeRefs";
 
 interface Props extends Omit<HTMLProps<HTMLDivElement>, 'style'> {
   children: ReactNode;
@@ -8,6 +9,7 @@ interface Props extends Omit<HTMLProps<HTMLDivElement>, 'style'> {
   shadowMargin?: number;
   innerStyle?: CSSProperties;
   outerStyle?: CSSProperties;
+  contentRef?: Ref<HTMLDivElement>;
 }
 
 type ScrollInfo = {
@@ -26,7 +28,9 @@ export default function ScrollShadow(props: Props) {
     shadowBlur = 8,
     shadowSpread = 10,
     shadowMargin = 0,
-    innerStyle, outerStyle, ...restProps} = props;
+    innerStyle, outerStyle,
+    contentRef,
+    ...restProps} = props;
   const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
   const [content, setContent] = useState<HTMLDivElement | null>(null);
   const [scrollInfo, setScrollInfo] = useState<ScrollInfo | null>(null);
@@ -55,7 +59,7 @@ export default function ScrollShadow(props: Props) {
       observer.observe(content);
       return () => observer.disconnect();
     }
-  }, [content, updateScrollInfo])
+  }, [content, scroller, updateScrollInfo])
 
   const boxShadow = useMemo(() => {
     if (!scrollInfo) { return undefined; }
@@ -91,7 +95,7 @@ export default function ScrollShadow(props: Props) {
     <div className="ScrollShadow-scroller" ref={setScroller} onScroll={onScroll} style={{
       ...innerStyle,
     }}>
-      <div className="ScrollShadow-content" ref={setContent}>
+      <div className="ScrollShadow-content" ref={mergeRefs([setContent, contentRef || null])}>
         {children}
       </div>
     </div>
