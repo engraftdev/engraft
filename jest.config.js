@@ -4,8 +4,9 @@ const { compilerOptions } = require('./tsconfig')
 module.exports = {
   testEnvironment: 'jsdom',
   modulePaths: [compilerOptions.baseUrl],
+  setupFilesAfterEnv: ['<rootDir>/tests/setupFileAfterEnv.js'],
   moduleNameMapper: {
-    '\\.css$': '<rootDir>/__mocks__/styleMock.js',
+    '\\.css$': '<rootDir>/tests/mockStyle.js',
   },
   transformIgnorePatterns: [
     "<rootDir>/node_modules/(?!(isoformat)/)",
