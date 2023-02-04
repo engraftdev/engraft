@@ -63,6 +63,9 @@ const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onCha
     }
   });
 
+  // TODO: I can't remember exactly why I added this. Looks like it was added when I was working on
+  // notebook-canvas. It would be nice to track down exacly why it is needed, and ideally replace it
+  // with a more targetted solution.
   useInterval(() => {
     if (viewRef.current) {
       viewRef.current.requestMeasure();
