@@ -1,13 +1,15 @@
+import _ from "lodash";
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
-import { hookMemo } from "src/incr/hookMemo";
-import { hookFork, hooks } from "src/incr/hooks";
-import { memoizeProps } from "src/incr/memoize";
+import { hookDedupe, hookMemo } from "src/incr/hookMemo";
+import { hookFork, hooks, hookSharedIncr } from "src/incr/hooks";
+import { memoizeForever, memoizeProps } from "src/incr/memoize";
 import { startDrag } from "src/util/drag";
+import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "src/util/eq";
 import { Updater } from "src/util/immutable";
 import { mergeRefs } from "src/util/mergeRefs";
 import { difference, intersection, union } from "src/util/sets";
@@ -65,8 +67,10 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { cells } = program;
 
-  const cellIds = hookMemo(() => new Set(cells.map(cell => cell.var_.id)), [cells]);
-  const interCellReferences = hookMemo(() =>
+  const cellIds = hookMemo(() =>
+    new Set(cells.map(cell => cell.var_.id)
+  ), [cells]);
+  const interCellReferencesByCell = hookDedupe(hookMemo(() =>
     hookFork((branch) =>
       Object.fromEntries(cells.map((cell) => branch(cell.var_.id, () => {
         return hookMemo(() => {
@@ -74,56 +78,93 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         }, [cell]);
       })))
     )
-  , [cells]);
-  const { cyclic } = hookMemo(() => {
-    return toposort([...cellIds], interCellReferences);
-  }, [cells, interCellReferences, cellIds]);
+  , [cells]), objEqWith(setEqWithRefEq));
+  const { sorted, cyclic } = hookDedupe(hookMemo(() => {
+    return toposort([...cellIds], interCellReferencesByCell);
+  }, [cells, interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq, cyclic: setEqWithRefEq<string>}));
 
+  // Make a little placeholder for every cell which will be used when a cell doesn't refer to it yet
+  // TODO: this is kinda a "possibleVarBindings" thing; idk how it should really work.
+
+  const makePlaceholder = hookSharedIncr(memoizeForever((var_: Var) => {
+    return {var_, outputP: EngraftPromise.reject<ToolOutput>(new Error("just a placeholder"))};
+  }));
+
+  const cellOutputPlaceholderVarBindings: VarBindings = hookMemo(() =>
+    Object.fromEntries(cells.map(cell => [cell.var_.id, makePlaceholder(cell.var_)])
+  ), [cells]);
+
+  // hookLogChanges({cellIds, interCellReferencesByCell, sorted, cyclic, cellOutputPlaceholderVarBindings}, 'notebook');
 
   const cellResults = hookMemo(() => {
-    // TODO: For now, we'll just wire all cells up to all cells, without any special accounting for
-    // topological order. This is probably very inefficient.
+    // The plan: Loop through cells in sorted order. Build up a set of output promises.
+    let cellResults: {[cellId: string]: ToolResult} = {};
 
-    const cellOutputVarBindings = Object.fromEntries(cells.map((cell) => [
-      cell.var_.id,
-      {var_: cell.var_, outputP: EngraftPromise.unresolved<ToolOutput>()}
-    ] as const));
+    hookFork((branch) => {
+      sorted.forEach((cellId) => branch(cellId, () => {
+        // The bindings for this cell will consist of:
+        //  * varBindings (into the notebook from above)
+        //  * actual output var bindings (for references)
+        //  * placeholder output var bindings (for other cells)
+        //  * `prev`
 
-    const allVarBindings: VarBindings = {
-      ...varBindings,
-      ...cellOutputVarBindings,
-    };
+        // TODO: oh, one reason for a "possibleVarBindings" thing is to prevent churn when
+        // irrelevant vars change... or should that be a tool's responsibility, hookRelevantVars
+        // style? except tools still need to pass down possibleVarBindings to their children, right?
+        // idk man.
 
-    return hookFork((branch) =>
-      cells.map((cell, i) => branch(cell.var_.id, () => {
-        return hookMemo(() => {
-          const cellVarBindings = i === 0 ? allVarBindings : {
-            ...allVarBindings,
+        const i = cells.findIndex(cell => cell.var_.id === cellId);
+        const cell = cells[i];
+        const interCellReferences = interCellReferencesByCell[cellId];
+
+        const actualVarBindings: VarBindings = hookDedupe(
+          _.mapValues(_.pick(cellResults, [...interCellReferences]), ({outputP}) => ({var_: cell.var_, outputP}))
+        , objEqWith(objEqWithRefEq));
+
+        const placeholderVarBindings: VarBindings = hookDedupe(hookMemo(() =>
+          _.omit(cellOutputPlaceholderVarBindings, [...interCellReferences])
+        , [cellOutputPlaceholderVarBindings, interCellReferences]), objEqWithRefEq);
+
+        const prevVarBindings: VarBindings = hookDedupe((() => {
+          if (i === 0) { return {}; }
+          const prevCell = cells[i - 1];
+          return {
             [program.prevVar.id]: {
               var_: program.prevVar,
-              outputP: cellOutputVarBindings[cells[i - 1].var_.id].outputP,
+              outputP: cellResults[prevCell.var_.id]?.outputP || placeholderVarBindings[prevCell.var_.id].outputP,
             }
-          };
-
-          const { outputP, view } = hookRunTool({
-            program: cell.program,
-            varBindings: cellVarBindings,
-          });
-          // TODO: inelegance because synchronous-promise isn't good at resolving with promises
-          outputP.then(cellOutputVarBindings[cell.var_.id].outputP.resolve, cellOutputVarBindings[cell.var_.id].outputP.reject);
-          return {
-            outputP: cyclic.has(cell.var_.id)
-              ? EngraftPromise.reject<ToolOutput>(new Error("cyclic"))
-              : outputP,
-            view,
           }
-        }, [cell, varBindings, cyclic, i]);
-      }))
-    );
-  }, [cells, varBindings, cyclic]);
+        })(), objEqWith(objEqWithRefEq));
+
+        const cellVarBindings = hookMemo(() => ({
+          ...varBindings,
+          ...actualVarBindings,
+          ...placeholderVarBindings,
+          ...prevVarBindings,
+        }), [varBindings, actualVarBindings, placeholderVarBindings, prevVarBindings]);
+
+        // hookLogChanges({actualVarBindings, placeholderVarBindings, prevVarBindings, cellVarBindings}, 'notebook ' + cellId)
+
+        const { outputP, view } = hookRunTool({
+          program: cell.program,
+          varBindings: cellVarBindings,
+        });
+
+        cellResults[cellId] = {
+          outputP: cyclic.has(cell.var_.id)
+            ? EngraftPromise.reject(new Error("cyclic"))
+            : outputP,
+          view,
+        }
+      }));
+    });
+
+    return cellResults;
+  }, [cells, varBindings, interCellReferencesByCell, cellOutputPlaceholderVarBindings, program.prevVar.id, sorted, cyclic]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
-    const lastCellResult = cellResults[cellResults.length - 1] as ToolResult | undefined;
+    const lastCell = _.last(cells);
+    const lastCellResult = lastCell && cellResults[lastCell.var_.id];
     if (!lastCellResult) {
       throw new Error("no cells");
     }
@@ -139,7 +180,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 }));
 
 type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
-  cellResults: ToolResult[],
+  cellResults: {[id: string]: ToolResult},
 }
 
 const View = memo((props: ViewProps) => {
@@ -173,7 +214,7 @@ const View = memo((props: ViewProps) => {
           <Fragment key={cell.var_.id}>
             <RowDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
             <CellView cell={cell} cellUP={programUP.cells[i]}
-              cellResult={cellResults[i]}
+              cellResult={cellResults[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
               outputBelowInput={program.outputBelowInput || false}
             />

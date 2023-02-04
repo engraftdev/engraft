@@ -17,7 +17,7 @@ registerTool(toolFromModule(require('../slot')));
 
 describe('notebook', () => {
   // TODO: We need to be smarter about wiring notebook cells together for this to work.
-  it.failing('output basically works; no unnecessary runs of cells', () => {
+  it('output basically works; no unnecessary runs of cells', () => {
     const memory = new IncrMemory();
 
     let cell1Runs = 0;
@@ -26,7 +26,7 @@ describe('notebook', () => {
       toolName: 'notebook',
       cells: [
         {
-          var_: newVar('cell1'),
+          var_: {id: 'cell1', label: ''},
           program: {
             toolName: 'test-value',
             value: 1,
@@ -35,7 +35,7 @@ describe('notebook', () => {
           outputManualHeight: undefined,
         },
         {
-          var_: newVar('cell2'),
+          var_: {id: 'cell2', label: ''},
           program: {
             toolName: 'test-value',
             value: 2,
@@ -44,7 +44,7 @@ describe('notebook', () => {
           outputManualHeight: undefined,
         },
       ],
-      prevVar: newVar('prev')
+      prevVar:  {id: 'prev', label: ''}
     }
     function runProgram() {
       return EngraftPromise.state(
@@ -55,15 +55,21 @@ describe('notebook', () => {
       );
     }
 
+    // console.log("run 1");
+
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
     expectToEqual(cell1Runs, 1);
     expectToEqual(cell2Runs, 1);
+
+    // console.log("run 2");
 
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
     expectToEqual(cell1Runs, 1);
     expectToEqual(cell2Runs, 1);
 
     program = update(program, {cells: {1: {program: {value: {$set: 3}}}}});
+
+    // console.log("run 3");
 
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 3}});
     expectToEqual(cell1Runs, 1);
