@@ -31,3 +31,15 @@ export function cache<Return>(f: (arg: string) => Return): (arg: string) => Retu
     return OrError.orThrow(cached);
   }
 }
+
+export function weakMapCache<Arg extends object, Return>(f: (arg: Arg) => Return): (arg: Arg) => Return {
+  const _cache = new WeakMap<Arg, OrError<Return>>();
+  return (arg: Arg) => {
+    let cached = _cache.get(arg);
+    if (!cached) {
+      cached = OrError.try(() => f(arg));
+      _cache.set(arg, cached);
+    }
+    return OrError.orThrow(cached);
+  }
+}

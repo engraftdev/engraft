@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { IncrFunction } from "src/incr";
+import { weakMapCache } from "src/util/cache";
 import { newId } from "src/util/id";
 import { Updater } from "src/util/immutable";
 import { EngraftPromise } from "./EngraftPromise";
@@ -104,11 +105,12 @@ export function newVar(label = 'new var') {
   return {id: newId(), label};
 }
 
-// TODO: cache with a WeakMap?
-export function references(program: ToolProgram): Set<string> {
+export const references = weakMapCache((program: ToolProgram): Set<string> => {
+  // TODO: The one risk of caching this is that lookUpTool might produce varying results if someday
+  // the registry changes.
   const tool = lookUpTool(program.toolName);
   return tool.computeReferences(program);
-}
+});
 
 export function programSummary(program: ToolProgram): string {
   let summary = program.toolName;
