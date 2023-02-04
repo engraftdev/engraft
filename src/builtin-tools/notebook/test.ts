@@ -16,7 +16,6 @@ registerTool(toolFromModule(require('../test-value')));
 registerTool(toolFromModule(require('../slot')));
 
 describe('notebook', () => {
-  // TODO: We need to be smarter about wiring notebook cells together for this to work.
   it('output basically works; no unnecessary runs of cells', () => {
     const memory = new IncrMemory();
 
@@ -83,12 +82,12 @@ describe('notebook', () => {
       toolName: 'notebook',
       cells: [
         {
-          var_: newVar('cell1'),
+          var_: {id: 'cell1', label: ''},
           program: slotSetTo('100'),
           outputManualHeight: undefined,
         },
         {
-          var_: newVar('cell2'),
+          var_: {id: 'cell2', label: ''},
           program: slotSetTo(`${prevVar.id} + 1`),
           outputManualHeight: undefined,
         },

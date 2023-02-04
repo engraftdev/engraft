@@ -128,10 +128,13 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         const prevVarBindings: VarBindings = hookDedupe((() => {
           if (i === 0) { return {}; }
           const prevCell = cells[i - 1];
+
           return {
             [program.prevVar.id]: {
               var_: program.prevVar,
-              outputP: cellResults[prevCell.var_.id]?.outputP || placeholderVarBindings[prevCell.var_.id].outputP,
+              outputP: references(cell.program).has(program.prevVar.id)
+                ? cellResults[prevCell.var_.id].outputP
+                : cellOutputPlaceholderVarBindings[prevCell.var_.id].outputP,
             }
           }
         })(), objEqWith(objEqWithRefEq));
