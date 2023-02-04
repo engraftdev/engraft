@@ -47,7 +47,7 @@ export const tool: Tool<Program> = {
     const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, subKey: 'inputProgram', varBindings })
     const { patternsWithIds } = program;
 
-    const mergedPatterns = useMemo(() => {
+    const mergedPatterns = hookMemo(() => {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
     }, [patternsWithIds])
     
@@ -349,7 +349,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           ⊖
         </div>
         <RowToCol className="ExtractorTool-input xGap10" minRowWidth={200}>
-          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView ? inputView : undefined} autoFocus={autoFocus} />
+          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
         </RowToCol>
 
         <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
