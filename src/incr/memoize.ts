@@ -1,5 +1,5 @@
 import { arrEqWithRefEq, objEqWithRefEq } from "src/util/eq";
-import { IncrFunction } from ".";
+import { IncrFunction, IncrMemory } from ".";
 import { hookMemo } from "./hookMemo";
 import { hookIncr, hooks } from "./hooks";
 
@@ -23,4 +23,22 @@ export function memoizeProps<Props extends object, Return>(f: IncrFunction<[Prop
       return hookIncr(f, props);
     }, props, objEqWithRefEq);
   });
+}
+
+// This function performs perform forever-caching of a normal function, using an object key.
+export function memoizeForever<Arg extends object, Return>(f: (obj: Arg) => Return): IncrFunction<[Arg], Return> {
+  // Just for fun, let's implement this one without hooks.
+  return (mem: IncrMemory, obj: Arg) => {
+    let cache: WeakMap<Arg, Return> | undefined = (mem as any).cache;
+    if (!cache) {
+      cache = (mem as any).cache = new WeakMap();
+    }
+
+    let result = cache.get(obj);
+    if (!result) {
+      result = f(obj);
+      cache.set(obj, result);
+    }
+    return result;
+  }
 }

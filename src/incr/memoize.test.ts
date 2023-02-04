@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
+import { expectToEqual } from 'src/util/expectToEqual';
 import { IncrFunction, IncrMemory } from '.';
-import { memoize, memoizeProps } from './memoize';
+import { memoize, memoizeForever, memoizeProps } from './memoize';
 
 describe('memoize', () => {
   let minusRuns = 0;
@@ -51,5 +52,26 @@ describe('memoizeProps', () => {
     expect(minusRuns).toBe(1);
     expect(minus(memory, {x: 10, y: 6})).toBe(4);
     expect(minusRuns).toBe(2);
+  });
+});
+
+describe('memoizeForever', () => {
+  it('basically works', () => {
+    let runs = 0;
+    const square = memoizeForever((o: {a: number}) => {
+      runs++;
+      return o.a ** 2;
+    });
+
+    const obj1 = {a: 1};
+    const obj2 = {a: 2};
+
+    const memory = new IncrMemory();
+    expectToEqual(square(memory, obj1), 1);
+    expect(runs).toBe(1);
+    expectToEqual(square(memory, obj2), 4);
+    expect(runs).toBe(2);
+    expectToEqual(square(memory, obj1), 1);
+    expect(runs).toBe(2);
   });
 });

@@ -149,3 +149,9 @@ export function hookIncr<Args extends unknown[], Return>(incr: IncrFunction<Args
   const memory = hookRef(() => new IncrMemory(), 'hookIncr');
   return incr(memory.current, ...args);
 }
+
+// Establish a persistent memory for a shared IncrFunction that can be used multiple times.
+export function hookSharedIncr<Args extends unknown[], Return>(incr: IncrFunction<Args, Return>): (...args: Args) => Return {
+  const memory = hookRef(() => new IncrMemory(), 'hookSharedIncr');
+  return (...args: Args) => incr(memory.current, ...args);
+}
