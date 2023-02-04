@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { compare } from "src/util/compare";
 import { hookRef } from "./hooks";
 
 // Not especially pure; probably shouldn't be used outside of debug contexts?
@@ -18,33 +19,7 @@ export function hookLogChanges(values: any, label?: string) {
   for (const key in values) {
     if (values[key] !== prevValues[key]) {
       console.log(`${label ? `(${label}) ` : ''}${key}: ${prevValues[key]} → ${values[key]}`);
-      console.log(comparison(prevValues[key], values[key]));
+      console.log(compare(prevValues[key], values[key]));
     }
   }
-}
-
-function comparison(a: any, b: any): any {
-  return JSON.stringify(comparisonObj(a, b), null, 2);
-}
-
-function comparisonObj(a: any, b: any, topLevel = true): any {
-  if (topLevel && !_.isEqual(a, b)) { return '[not deep-equal]'; }
-
-  // ok so now we know they're deep-equal...
-  // are they ref-equal?
-
-  if (a === b) { return '[ref-equal]'; }
-
-  // ok so they're deep-equal but not ref-equal
-  // they must either be both arrays or both objects
-
-  if (Array.isArray(a)) {
-    return a.map((a, i) => comparisonObj(a, b[i], false));
-  }
-
-  const result: any = {};
-  for (const key in a) {
-    result[key] = comparisonObj(a[key], b[key], false);
-  }
-  return result;
 }

@@ -1,3 +1,4 @@
+import { compare } from "./compare";
 import { usePrevious } from "./usePrevious";
 
 // Utility for debugging what might be causing a component to re-render.
@@ -9,6 +10,7 @@ export function useLogChanges(values: any, label?: string) {
   for (const key in values) {
     if (prevValues && values[key] !== prevValues[key]) {
       console.log(`${label ? `(${label}) ` : ''}${key}: ${prevValues[key]} → ${values[key]}`);
+      console.log(compare(prevValues[key], values[key]));
     }
   }
 }
