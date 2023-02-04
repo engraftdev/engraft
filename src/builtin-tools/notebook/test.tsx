@@ -1,17 +1,21 @@
 import { describe, it } from '@jest/globals';
+import React from 'react';
+import TestRenderer from 'react-test-renderer';
 import { update } from 'src/deps';
 import { newVar, registerTool, VarBindings } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
+import { ToolWithView } from 'src/engraft/ToolWithView';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
-import { empty } from 'src/util/noOp';
+import { empty, noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
 import * as notebook from './index';
 
 const notebookTool = toolFromModule(notebook);
 
+registerTool(notebookTool);
 registerTool(toolFromModule(require('../test-value')));
 registerTool(toolFromModule(require('../slot')));
 
@@ -158,5 +162,66 @@ describe('notebook', () => {
       runProgram(),
       {status: 'fulfilled', value: {value: 130}},
     );
+  });
+
+  it('no unnecessary renders of cells', () => {
+    let cell1ViewRenders = 0;
+    let cell2ViewRenders = 0;
+    let program: notebook.Program = {
+      toolName: 'notebook',
+      cells: [
+        {
+          var_: {id: 'cell1', label: ''},
+          program: {
+            toolName: 'test-value',
+            value: 1,
+            onViewRender: () => { cell1ViewRenders++ },
+          },
+          outputManualHeight: undefined,
+        },
+        {
+          var_: {id: 'cell2', label: ''},
+          program: {
+            toolName: 'test-value',
+            value: 2,
+            onViewRender: () => { cell2ViewRenders++ },
+          },
+          outputManualHeight: undefined,
+        },
+      ],
+      prevVar:  {id: 'prev', label: ''}
+    }
+
+    const component = TestRenderer.create(<React.Fragment/>);
+    function runProgram() {
+      component.update(
+        <ToolWithView
+          program={program}
+          varBindings={empty}
+          updateProgram={noOp}
+          reportOutputState={noOp}
+        />
+      );
+    }
+
+    // console.log("run 1");
+
+    runProgram();
+    expectToEqual(cell1ViewRenders, 1);
+    expectToEqual(cell2ViewRenders, 1);
+
+    // console.log("run 2");
+
+    runProgram();
+    expectToEqual(cell1ViewRenders, 1);
+    expectToEqual(cell2ViewRenders, 1);
+
+    program = update(program, {cells: {1: {program: {value: {$set: 3}}}}});
+
+    // console.log("run 3");
+
+    runProgram();
+    expectToEqual(cell1ViewRenders, 1);
+    expectToEqual(cell2ViewRenders, 2);
   });
 });

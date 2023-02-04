@@ -8,6 +8,7 @@ export type Program = {
   toolName: 'test-value',
   value: unknown,
   onRun?: () => void,  // TODO: for testing, breaks serialization
+  onViewRender?: () => void,  // TODO: for testing, breaks serialization
 }
 
 export const tool: Tool<Program> = {
@@ -20,7 +21,7 @@ export const tool: Tool<Program> = {
 
   run: memoizeProps(hooks((props) => {
     const { program } = props;
-    const { value, onRun } = program;
+    const { value, onRun, onViewRender } = program;
 
     if (onRun) { onRun(); }
 
@@ -29,8 +30,11 @@ export const tool: Tool<Program> = {
     }), [value]);
 
     const view = hookMemo(() => ({
-      render: () => null  // TODO: add a view
-    }), []);
+      render: () => {
+        if (onViewRender) { onViewRender(); }
+        return <div className="TestValue">{JSON.stringify(program.value)}</div>;
+      }
+    }), [program.value]);
 
     return { outputP, view };
   })),
