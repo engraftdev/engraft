@@ -57,7 +57,7 @@ export const tool: Tool<Program> = {
             return null;
           }
           try {
-            let value = mergedPatterns(res);
+            let value = mergedPatterns(res.value);
             if (Array.isArray(value)) {
               // TODO: not sure what this behavior should be in general
               value = value.flat(Infinity);
@@ -67,7 +67,7 @@ export const tool: Tool<Program> = {
             console.warn(e);
             return null;
           }
-        }).then(res => res)
+        })
     }), [_props, subOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
