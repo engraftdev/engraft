@@ -69,7 +69,7 @@ export const Indent = memo(function Indent({children, style}: {children: ReactNo
 
 export type SubValueHandleProps = {
   value: unknown,
-  path?: (string | number)[],
+  path: (string | number)[],
   children: ReactNode,
 }
 
@@ -90,13 +90,17 @@ export type ValueProps = {
   customizations?: ValueCustomizations,
 }
 
-export const Value = memo(function Value({value, customizations = {SubValueHandle: SubValueHandleDefault}}: ValueProps) {
+const defaultCustomizations: ValueCustomizations = {
+  SubValueHandle: SubValueHandleDefault,
+};
+
+export const Value = memo(function Value({value, customizations = defaultCustomizations}: ValueProps) {
   return <ValueInternal value={value} path={[]} customizations={customizations} isTopLevel={true} />
 })
 
 export type ValueInternalProps = {
   value: unknown,
-  path?: (string | number)[],
+  path: (string | number)[],
   prefix?: ReactNode,
   suffix?: ReactNode,
   customizations: ValueCustomizations,
@@ -135,7 +139,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   if (value instanceof EngraftPromise) {
-    return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} customizations={customizations} />;
+    return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} />;
   }
 
   const maybeElement = value as {} | null | undefined;
@@ -347,9 +351,8 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 const ValuePromise = memo(function ValuePromise(props: {
   value: EngraftPromise<any>,
   prefix?: ReactNode,
-  customizations: ValueCustomizations,
 }) {
-  const {value, prefix, customizations} = props;
+  const {value, prefix} = props;
 
   const state = usePromiseState(value);
   const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
@@ -362,7 +365,7 @@ const ValuePromise = memo(function ValuePromise(props: {
     return newPrefix;
   } else {
     const value = state.status === 'fulfilled' ? state.value : state.reason;
-    return <ValueInternal value={value} prefix={newPrefix} customizations={customizations} />;
+    return <ValueInternal value={value} path={[]} prefix={newPrefix} customizations={defaultCustomizations} />;
   }
 });
 
