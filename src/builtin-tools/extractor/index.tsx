@@ -1,5 +1,5 @@
-import React, { memo, useEffect, useMemo } from "react";
-import { createContext, ReactNode, useCallback, useContext, useState } from "react";
+import React, { memo, useEffect } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { ShowView } from "src/engraft/ShowView";
@@ -14,7 +14,7 @@ import { Use } from "src/util/Use";
 import { useWindowEventListener } from "src/util/useEventListener";
 import useHover from "src/util/useHover";
 import { useKeyHeld } from "src/util/useKeyHeld";
-import { ToolOutputView, ValueCustomizations } from "src/view/Value";
+import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "src/view/Value";
 import { slotSetTo } from "src/builtin-tools/slot";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
 import { hookRunSubTool } from "src/engraft/hooks";
@@ -67,7 +67,7 @@ export const tool: Tool<Program> = {
             console.warn(e);
             return null;
           }
-        })
+        }).then(res => res)
     }), [_props, subOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
@@ -92,10 +92,6 @@ const ExtractorContext = createContext<ExtractorContextValue>({
   multiSelectMode: false,
 });
 
-interface SubValueHandleProps {
-  path: (string | number)[],
-  children: ReactNode,
-}
 
 function pathMatchesPattern(path: Path, pattern: Pattern): boolean {
   if (path.length !== pattern.length) {
@@ -193,9 +189,9 @@ export const SubValueHandle = memo(function SubValueHandle({path, children}: Sub
   }/>
 })
 
-// const customizations: ValueCustomizations = {
-//   SubValueHandle
-// }
+const customizations: ValueCustomizations = {
+  SubValueHandle
+}
 
 interface PatternProps {
   pattern: Pattern;
@@ -351,7 +347,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         <RowToCol className="ExtractorTool-input xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputView} autoFocus={autoFocus} />
         </RowToCol>
-
         <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>patterns</span>
           <div className="xCol">
@@ -406,8 +401,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <div style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ToolOutputView outputState={inputOutputState}  />
-          {/* customizations={customizations} */}
+          <ToolOutputView outputState={inputOutputState}  customizations={customizations} />
         </ExtractorContext.Provider>
       </div>
     </div>
