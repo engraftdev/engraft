@@ -20,17 +20,6 @@ import { memoizeProps } from "src/incr/memoize";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookAt } from "src/util/immutable-incr";
 
-const offlineDataContext = require.context(
-  "./offline-data",
-  true,
-  /\.\/(.*)\.json$/
-);
-const offlineData = Object.fromEntries(
-  offlineDataContext
-    .keys()
-    .map((id) => [id.match(/\.\/(.*)$/)![1], offlineDataContext(id)])
-);
-
 export type Program = {
   toolName: "request";
   urlProgram: ToolProgram;
