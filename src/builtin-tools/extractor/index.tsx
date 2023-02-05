@@ -51,24 +51,22 @@ export const tool: Tool<Program> = {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
     }, [patternsWithIds])
     
-    const outputP = hookMemo(() => EngraftPromise.resolve({
-      value: subOutputP.then((res)=>{
-          if (!mergedPatterns) {
-            return null;
-          }
-          try {
-            let value = mergedPatterns(res.value);
-            if (Array.isArray(value)) {
-              // TODO: not sure what this behavior should be in general
-              value = value.flat(Infinity);
-            }
-            return { value };
-          } catch (e) {
-            console.warn(e);
-            return null;
-          }
-        })
-    }), [_props, subOutputP, mergedPatterns]);
+    const outputP = hookMemo(() => EngraftPromise.resolve(subOutputP.then((res)=>{
+      if (!mergedPatterns) {
+        return {value: null};
+      }
+      try {
+        let value = mergedPatterns(res.value);
+        if (Array.isArray(value)) {
+          // TODO: not sure what this behavior should be in general
+          value = value.flat(Infinity);
+        }
+        return { value: value };
+      } catch (e) {
+        console.warn(e);
+        return {value: null};
+      }
+    })), [_props, subOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
       render: (viewProps : any) => <ExtractorToolView {..._props} {...viewProps} inputView={subView} inputOutput={subOutputP}/>
