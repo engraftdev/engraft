@@ -139,12 +139,10 @@ type ViewProps = ToolViewRenderProps &
   ToolProps<Program> & {
     urlView: ToolView | null;
     paramsView: ToolView | null;
-    isPending: boolean;
-    response: Response | null;
   };
 
 const View = memo((props: ViewProps) => {
-  const { autoFocus, urlView, paramsView, response } = props;
+  const { autoFocus, urlView, paramsView } = props;
   return (
     <div className="xCol xGap10 xPad10 xWidthFitContent">
       <RowToCol minRowWidth={200} className="xGap10">
