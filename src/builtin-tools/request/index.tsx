@@ -106,7 +106,6 @@ export const run = memoizeProps(
       [urlOutputP, paramsOutputP, autoSend]
     );
 
-    // Question for Josh -- should this "pause" request toggle be here, or in the view below?
     const view: ToolView = hookMemo(
       () => ({
         render: (viewProps) => (
