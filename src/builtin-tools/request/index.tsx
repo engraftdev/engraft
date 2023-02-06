@@ -9,7 +9,6 @@ import {
   ToolProgram,
   ToolProps,
   ToolView,
-  ToolViewRenderProps,
   ToolRun,
 } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
@@ -99,16 +98,24 @@ export const run: ToolRun<Program> = memoizeProps(
 
     const view: ToolView = hookMemo(
       () => ({
-        render: (viewProps) => (
+        render: () => (
           <>
-            <View
-              {...props}
-              {...viewProps}
-              urlView={urlView}
-              paramsView={paramsView}
-              autoSend={autoSend}
-              toggleAutosend={toggleAutosend}
-            />
+            <div className="xCol xGap10 xPad10 xWidthFitContent">
+              <RowToCol minRowWidth={200} className="xGap10" autoFocus={true}>
+                <b>url</b> <ShowView view={urlView} />
+              </RowToCol>
+              <RowToCol minRowWidth={200} className="xGap10">
+                <b>params</b> <ShowView view={paramsView} />
+              </RowToCol>
+              <div>
+                <input
+                  type="checkbox"
+                  checked={autoSend}
+                  onChange={() => toggleAutosend((autoSend) => !autoSend)}
+                ></input>
+                Pause request
+              </div>
+            </div>
           </>
         ),
       }),
@@ -118,37 +125,3 @@ export const run: ToolRun<Program> = memoizeProps(
     return { view, outputP };
   })
 );
-
-type ViewProps = ToolViewRenderProps &
-  ToolProps<Program> & {
-    urlView: ToolView;
-    paramsView: ToolView;
-    autoSend: boolean;
-    toggleAutosend: Updater<boolean, boolean>;
-  };
-
-const View = memo((props: ViewProps) => {
-  const { autoFocus, urlView, paramsView, autoSend, toggleAutosend } = props;
-  return (
-    <div className="xCol xGap10 xPad10 xWidthFitContent">
-      <RowToCol minRowWidth={200} className="xGap10">
-        <b>url</b> <ShowView view={urlView} autoFocus={autoFocus} />
-      </RowToCol>
-      <RowToCol minRowWidth={200} className="xGap10">
-        <b>params</b> <ShowView view={paramsView} />
-      </RowToCol>
-      <div>
-        <input
-          type="checkbox"
-          checked={autoSend}
-          onChange={() => toggleAutosend((autoSend) => !autoSend)}
-        ></input>
-        Pause request
-      </div>
-
-      <div className="xRow xGap10">
-        <div className="xExpand" />
-      </div>
-    </div>
-  );
-});
