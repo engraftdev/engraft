@@ -18,7 +18,6 @@ import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookAt } from "src/util/immutable-incr";
-import { update } from "lodash";
 
 export type Program = {
   toolName: "request";
