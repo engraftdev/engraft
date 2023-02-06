@@ -1,4 +1,3 @@
-import { memo } from "react";
 import { slotSetTo } from "src/builtin-tools/slot";
 import { RowToCol } from "src/util/RowToCol";
 import { union } from "src/util/sets";
@@ -18,7 +17,6 @@ import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookAt } from "src/util/immutable-incr";
-import { Updater } from "src/util/immutable";
 
 export type Program = {
   toolName: "request";
