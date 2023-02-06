@@ -9,6 +9,7 @@ import {
   ToolProps,
   ToolView,
   ToolRun,
+  ToolOutput,
 } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookRunSubTool } from "src/engraft/hooks";
@@ -17,6 +18,7 @@ import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
 import { hookMemo } from "src/incr/hookMemo";
 import { hookAt } from "src/util/immutable-incr";
+import { update } from "lodash";
 
 export type Program = {
   toolName: "request";
@@ -28,7 +30,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = () => {
   return {
     toolName: "request",
-    urlProgram: slotSetTo("{}"),
+    urlProgram: slotSetTo('"https://httpbin.org/get"'),
     paramsProgram: slotSetTo(paramsDefault),
     autoSend: true,
   };
@@ -43,7 +45,7 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 export const run: ToolRun<Program> = memoizeProps(
   hooks((props: ToolProps<Program>) => {
     const { program, updateProgram, varBindings } = props;
-    const [autoSend, toggleAutosend] = hookAt(
+    const [pauseRequest, updatePauseRequest] = hookAt(
       program,
       updateProgram,
       "autoSend"
@@ -67,8 +69,8 @@ export const run: ToolRun<Program> = memoizeProps(
       () =>
         EngraftPromise.all([urlOutputP, paramsOutputP]).then(
           async ([urlOutput, paramsOutput]) => {
-            if (autoSend) {
-              return { value: null };
+            if (pauseRequest) {
+              return EngraftPromise.unresolved<ToolOutput>();
             }
             if (typeof urlOutput.value !== "string") {
               throw new Error("url must be a string");
@@ -91,7 +93,7 @@ export const run: ToolRun<Program> = memoizeProps(
             return { value: data };
           }
         ),
-      [urlOutputP, paramsOutputP, autoSend]
+      [urlOutputP, paramsOutputP, pauseRequest]
     );
 
     const view: ToolView = hookMemo(
@@ -108,8 +110,10 @@ export const run: ToolRun<Program> = memoizeProps(
               <div>
                 <input
                   type="checkbox"
-                  checked={autoSend}
-                  onChange={() => toggleAutosend((autoSend) => !autoSend)}
+                  checked={pauseRequest}
+                  onChange={() =>
+                    updatePauseRequest((pauseRequest) => !pauseRequest)
+                  }
                 ></input>
                 Pause request
               </div>
@@ -117,7 +121,7 @@ export const run: ToolRun<Program> = memoizeProps(
           </>
         ),
       }),
-      [urlView, paramsView, autoSend]
+      [urlView, paramsView, pauseRequest]
     );
 
     return { view, outputP };
