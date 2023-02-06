@@ -23,7 +23,7 @@ export type Program = {
   toolName: "request";
   urlProgram: ToolProgram;
   paramsProgram: ToolProgram;
-  autoSend: boolean;
+  pauseRequest: boolean;
 };
 
 export const programFactory: ProgramFactory<Program> = () => {
@@ -31,7 +31,7 @@ export const programFactory: ProgramFactory<Program> = () => {
     toolName: "request",
     urlProgram: slotSetTo('"https://httpbin.org/get"'),
     paramsProgram: slotSetTo(paramsDefault),
-    autoSend: true,
+    pauseRequest: false,
   };
 };
 const paramsDefault = `{
@@ -47,7 +47,7 @@ export const run: ToolRun<Program> = memoizeProps(
     const [pauseRequest, updatePauseRequest] = hookAt(
       program,
       updateProgram,
-      "autoSend"
+      "pauseRequest"
     );
 
     const { view: urlView, outputP: urlOutputP } = hookRunSubTool({
