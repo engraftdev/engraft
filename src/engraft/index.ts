@@ -105,6 +105,12 @@ export function newVar(label = 'new var') {
   return {id: newId(), label};
 }
 
+export function varBindingsValid(varBindings: VarBindings): boolean {
+  return Object.entries(varBindings).every(([varId, binding]) => {
+    return binding.var_.id === varId;
+  });
+}
+
 export const references = weakMapCache((program: ToolProgram): Set<string> => {
   // TODO: The one risk of caching this is that lookUpTool might produce varying results if someday
   // the registry changes.
