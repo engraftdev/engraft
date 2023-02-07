@@ -118,7 +118,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         const interCellReferences = interCellReferencesByCell[cellId];
 
         const actualVarBindings: VarBindings = hookDedupe(
-          _.mapValues(_.pick(cellResults, [...interCellReferences]), ({outputP}) => ({var_: cell.var_, outputP}))
+          _.mapValues(_.pick(cellResults, [...interCellReferences]), ({outputP}, cellId) => ({var_: cells.find((cell) => cell.var_.id === cellId)!.var_, outputP}))
         , objEqWith(objEqWithRefEq));
 
         const placeholderVarBindings: VarBindings = hookDedupe(hookMemo(() =>
