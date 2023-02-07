@@ -1,3 +1,4 @@
+import immutabilityHelper, { Spec } from "immutability-helper";
 import _ from "lodash";
 import { Updater } from "./immutable";
 
@@ -6,8 +7,10 @@ export type UpdateProxy<T> =
       [K in keyof T]-?: Omit<T, K> extends T ? UpdateProxyRemovable<T[K]> : UpdateProxy<T[K]>
     }
   & {
-      $apply: (f: (oldT: T) => T) => void;
-      $set: (newT: T) => void;
+      $: (f: (oldT: T) => T) => void,  // shorthand for $apply
+      $apply: (f: (oldT: T) => T) => void,
+      $set: (newT: T) => void,
+      $helper: (spec: Spec<T>) => void,
     }
   & (
       T extends (infer E)[]
@@ -32,8 +35,10 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
   // won't particularly try.
 
   return new Proxy<UpdateProxy<T>>({
+    $: updater,
     $apply: updater,
     $set: (newT) => updater(() => newT),
+    $helper: (spec) => updater((oldT) => immutabilityHelper(oldT, spec)),
     ...remover && {$remove: remover},
   } as UpdateProxy<T>, {
     get(target, key) {
