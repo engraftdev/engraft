@@ -340,17 +340,17 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     function insertTool(tool: Tool) {
       const id = newId();
       const newProgram = slotSetTo(tool.programFactory());
-      program.subPrograms[id].$set(newProgram);
+      programUP.subPrograms[id].$set(newProgram);
       // TODO: we never remove these! lol
       return id;
     };
     function replaceWithTool(tool: Tool) {
-      updateProgram(() => ({
+      programUP.$as<Program>().$set({
         toolName: 'slot',
         modeName: 'tool',
         subProgram: tool.programFactory(program.defaultCode),
         defaultCode: program.defaultCode
-      }));
+      });
     };
     const completions = [
       refCompletions(() => varBindingsRef.current),
@@ -384,7 +384,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       logTheme,
       logDecorations,
     ];
-  }, [refSet, logDecorations, program.subPrograms, program.defaultCode, updateProgram, varBindingsRef])
+  }, [refSet, logDecorations, programUP, program.defaultCode, varBindingsRef, updateProgram])
 
   const onChange = useCallback((value: string) => {
     updateProgram(updateF({code: {$set: value}}));

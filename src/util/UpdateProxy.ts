@@ -11,6 +11,7 @@ export type UpdateProxy<T> =
       $apply: (f: (oldT: T) => T) => void,
       $set: (newT: T) => void,
       $helper: (spec: Spec<T>) => void,
+      $as: <U>(u?: U) => UpdateProxy<U>,
     }
   & (
       T extends (infer E)[]
@@ -34,11 +35,12 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
   // make its internals safely typed because of the weakness of Proxy's handler types (etc). So we
   // won't particularly try.
 
-  return new Proxy<UpdateProxy<T>>({
+  const up: UpdateProxy<T> = new Proxy<UpdateProxy<T>>({
     $: updater,
     $apply: updater,
     $set: (newT) => updater(() => newT),
     $helper: (spec) => updater((oldT) => immutabilityHelper(oldT, spec)),
+    $as: <U extends T>(u?: U) => up as unknown as UpdateProxy<U>,
     ...remover && {$remove: remover},
   } as UpdateProxy<T>, {
     get(target, key) {
@@ -67,6 +69,8 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
       return propProxy;
     }
   });
+
+  return up;
 }
 
 function atObjOrArray<T, K extends keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
