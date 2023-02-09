@@ -55,17 +55,12 @@ export const tool: Tool<Program> = {
       if (!mergedPatterns) {
         return {value: null};
       }
-      try {
-        let value = mergedPatterns(res.value);
-        if (Array.isArray(value)) {
-          // TODO: not sure what this behavior should be in general
-          value = value.flat(Infinity);
-        }
-        return { value: value };
-      } catch (e) {
-        console.warn(e);
-        return {value: null};
-      }
+      let value = mergedPatterns(res.value);
+      if (Array.isArray(value)) {
+        // TODO: not sure what this behavior should be in general
+        value = value.flat(Infinity);
+      }        
+      return { value: value };
     })), [props, inputOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
