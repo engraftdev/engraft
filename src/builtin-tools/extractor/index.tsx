@@ -1,6 +1,6 @@
 import React, { memo, useEffect } from "react";
 import { createContext, useCallback, useContext, useState } from "react";
-import { Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
+import { references, Tool, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
@@ -40,7 +40,7 @@ export const tool: Tool<Program> = {
     minimized: false,
   }),
 
-  computeReferences: (program) => new Set(),
+  computeReferences: (program) => references(program.inputProgram),
 
   run: memoizeProps(hooks((props) => {
     const { program, updateProgram, varBindings } = props;
