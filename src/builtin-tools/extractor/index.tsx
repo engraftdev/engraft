@@ -33,17 +33,17 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: (_defaultInputCode) => ({
+  programFactory: (defaultInputCode) => ({
     toolName: 'extractor',
-    inputProgram: slotSetTo(_defaultInputCode || ''),
+    inputProgram: slotSetTo(defaultInputCode || ''),
     patternsWithIds: [],
     minimized: false,
   }),
 
-  computeReferences: (_program) => new Set(),
+  computeReferences: (program) => new Set(),
 
-  run: memoizeProps(hooks((_props) => {
-    const { program, updateProgram, varBindings } = _props;
+  run: memoizeProps(hooks((props) => {
+    const { program, updateProgram, varBindings } = props;
     const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, subKey: 'inputProgram', varBindings })
     const { patternsWithIds } = program;
 
@@ -66,11 +66,11 @@ export const tool: Tool<Program> = {
         console.warn(e);
         return {value: null};
       }
-    })), [_props, subOutputP, mergedPatterns]);
+    })), [props, subOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
-      render: (viewProps : any) => <ExtractorToolView {..._props} {...viewProps} inputView={subView} inputOutput={subOutputP}/>
-    }), [_props, subOutputP, subView]);
+      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputView={subView} inputOutput={subOutputP}/>
+    }), [props, subOutputP, subView]);
 
     return { outputP, view };
   })),
