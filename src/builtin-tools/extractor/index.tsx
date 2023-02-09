@@ -44,14 +44,14 @@ export const tool: Tool<Program> = {
 
   run: memoizeProps(hooks((props) => {
     const { program, updateProgram, varBindings } = props;
-    const { outputP: subOutputP, view: subView } = hookRunSubTool({ program, updateProgram, subKey: 'inputProgram', varBindings })
+    const { outputP: inputOutputP, view: inputView } = hookRunSubTool({ program, updateProgram, subKey: 'inputProgram', varBindings })
     const { patternsWithIds } = program;
 
     const mergedPatterns = hookMemo(() => {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
     }, [patternsWithIds])
     
-    const outputP = hookMemo(() => EngraftPromise.resolve(subOutputP.then((res)=>{
+    const outputP = hookMemo(() => EngraftPromise.resolve(inputOutputP.then((res)=>{
       if (!mergedPatterns) {
         return {value: null};
       }
@@ -66,11 +66,11 @@ export const tool: Tool<Program> = {
         console.warn(e);
         return {value: null};
       }
-    })), [props, subOutputP, mergedPatterns]);
+    })), [props, inputOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
-      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputView={subView} inputOutput={subOutputP}/>
-    }), [props, subOutputP, subView]);
+      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutputP}/>
+    }), [props, inputOutputP, inputView]);
 
     return { outputP, view };
   })),
