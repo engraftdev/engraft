@@ -129,7 +129,6 @@ function generalize(path: Path, pattern: Pattern): Pattern | undefined {
   return generalization;
 }
 
-// fix memo
 export const SubValueHandle = memo(function SubValueHandle({path, children}: SubValueHandleProps) {
   const { activePattern, setActivePattern, otherPatterns, multiSelectMode } = useContext(ExtractorContext);
 
