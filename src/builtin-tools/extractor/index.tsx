@@ -254,11 +254,11 @@ const PatternView = memo(function Pattern({pattern, onStepToWildcard, onRemove}:
 
 interface ExtractorToolViewProps extends ToolProps<Program>, ToolViewRenderProps {
   inputView: ToolView;
-  inputOutput: EngraftPromise<ToolOutput>;
+  inputOutputP: EngraftPromise<ToolOutput>;
 }
 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
-  const { program, updateProgram, autoFocus, inputView, inputOutput } = props;
+  const { program, updateProgram, autoFocus, inputView, inputOutputP } = props;
 
   const [patternsWithIds, updatePatternsWithIds] = useAt(program, updateProgram, 'patternsWithIds');
   const [minimized, updateMinimized] = useAt(program, updateProgram, 'minimized');
@@ -293,7 +293,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
   const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
-  const inputOutputState = usePromiseState(inputOutput)
+  const inputOutputState = usePromiseState(inputOutputP)
 
   // todo: very hacky
   if (minimized) {
