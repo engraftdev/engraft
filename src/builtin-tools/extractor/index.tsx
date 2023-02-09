@@ -60,8 +60,8 @@ export const tool: Tool<Program> = {
         // TODO: not sure what this behavior should be in general
         value = value.flat(Infinity);
       }        
-      return { value: value };
-    })), [props, inputOutputP, mergedPatterns]);
+      return {value};
+    })), [inputOutputP, mergedPatterns]);
 
     const view = hookMemo(() => ({
       render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputView={inputView} inputOutput={inputOutputP}/>
