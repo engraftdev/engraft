@@ -15,7 +15,7 @@ export type Tool<P extends ToolProgram = ToolProgram> = {
 export type ToolProgram = {
   toolName: string,
   debugId?: string,
-  [others: string]: any,  // TODO: idk about this type...
+  [others: string]: unknown,
 }
 
 export type ToolRun<P extends ToolProgram> = IncrFunction<[props: ToolProps<P>], ToolResult<P>>;
