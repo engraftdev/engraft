@@ -187,7 +187,7 @@ type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
 }
 
 const View = memo((props: ViewProps) => {
-  const { program, updateProgram, cellResults } = props;
+  const { program, updateProgram, cellResults, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const smallestUnusedLabel = unusedLabel(alphaLabels, program.cells.map(cell => cell.var_.label)) || 'ZZZ';
@@ -220,6 +220,7 @@ const View = memo((props: ViewProps) => {
               cellResult={cellResults[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
               outputBelowInput={program.outputBelowInput || false}
+              autoFocus={i === 0 && autoFocus}
             />
           </Fragment>
         )}
@@ -278,10 +279,12 @@ type CellViewProps = {
   notebookMenuMaker: MenuMaker,
 
   outputBelowInput: boolean,
+
+  autoFocus?: boolean,
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput} = props;
+  const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput, autoFocus} = props;
 
   const cellOutputState = usePromiseState(cellResult.outputP);
   const cellShowsOwnOutput = cellResult.view.showsOwnOutput;
@@ -341,7 +344,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       onContextMenu={openMenu}
     >
       <div className="xStickyTop10" ref={toolRef}>
-        <ShowView view={cellResult.view} updateProgram={cellUP.program.$apply}/>
+        <ShowView view={cellResult.view} updateProgram={cellUP.program.$apply} autoFocus={autoFocus}/>
       </div>
     </div>
     { !cellShowsOwnOutput &&
