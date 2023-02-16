@@ -11,6 +11,7 @@ import { memoizeForever, memoizeProps } from "src/incr/memoize";
 import { startDrag } from "src/util/drag";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "src/util/eq";
 import { Updater } from "src/util/immutable";
+import { useStateSetOnly } from "src/util/immutable-react";
 import { mergeRefs } from "src/util/mergeRefs";
 import { difference, intersection, union } from "src/util/sets";
 import { toposort } from "src/util/toposort";
@@ -215,7 +216,7 @@ const View = memo((props: ViewProps) => {
         }}>
         {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
-            <RowDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
             <CellView cell={cell} cellUP={programUP.cells[i]}
               cellResult={cellResults[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
@@ -224,20 +225,20 @@ const View = memo((props: ViewProps) => {
             />
           </Fragment>
         )}
-        <RowDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
       </div>
     </div>
   );
 })
 
-type RowDividerProps = {
+const CellDivider = memo((props: {
   i: number,
   updateCells: Updater<Cell[]>,
   smallestUnusedLabel: string,
   prevVar: Var,
-}
+}) => {
+  const { i, updateCells, smallestUnusedLabel, prevVar } = props;
 
-const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel, prevVar}: RowDividerProps) {
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
@@ -250,18 +251,30 @@ const RowDivider = memo(function RowDivider({i, updateCells, smallestUnusedLabel
     })
   }, [i, prevVar.id, smallestUnusedLabel, updateCells]);
 
+  const [isFocused, setIsFocused] = useStateSetOnly(() => false);
+
   return <Use hook={useHover}>
     {([hoverRef, isHovered]) =>
       <div ref={hoverRef} className="xCol xAlignVCenter xClickable"
         style={{gridColumn: '1/4', height: 10}}
         onClick={onClick}
+        tabIndex={0}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onKeyDown={(ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            onClick();
+            ev.preventDefault();
+            ev.stopPropagation();
+          }
+        }}
       >
-        {isHovered &&
+        {(isHovered || isFocused) &&
           <div className="xCenter"
-            style={{borderTop: isHovered ? `1px solid rgba(0,0,0,0.5)` : '1px solid rgba(0,0,0,0.2)', height: 0}}
+            style={{borderTop: `1px solid rgba(0,0,0,0.5)`, height: 0}}
           >
             <div style={{background: 'white', color: 'rgba(0,0,0,0.4)', position: 'relative', top: -3, pointerEvents: 'none'}}>
-              insert row
+              new cell
             </div>
           </div>
         }
