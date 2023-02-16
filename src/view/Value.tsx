@@ -436,16 +436,29 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
 
   return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xInlineFlex">
     {valueView}
-    {outputState.status === 'rejected' && <ErrorView error={(outputState.reason as any).toString()} />}
+    {outputState.status === 'rejected' && <ErrorView error={outputState.reason} />}
   </div>
 });
 
-export type ErrorProps = {
-  error: string;  // TODO: ErrorView should take mysterious error objects, not strings
-}
-
-export const ErrorView = memo(function ErrorView(props: ErrorProps) {
+export const ErrorView = memo(function ErrorView(props: {
+  error: unknown
+}) {
   const {error} = props;
+
+  let message: string = '[unknown error]'
+  let stack: string | undefined = undefined;
+  if (error instanceof Error) {
+    message = error.message;
+    stack = error.stack;
+  } else if (hasProperty(error, 'toString') && typeof error.toString === 'function') {
+    const maybeMessage = error.toString();
+    if (typeof maybeMessage === 'string') {
+      message = maybeMessage;
+    }
+  }
+
+  const messageFirstNewline = message.indexOf("\n");
+  const messageFirstLine = messageFirstNewline === -1 ? message : message.slice(0, messageFirstNewline);
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -475,6 +488,12 @@ export const ErrorView = memo(function ErrorView(props: ErrorProps) {
     }}
     onClick={toggleIsExpanded}
   >
-    ⚠️ <span style={{fontFamily: 'monospace'}}>{error}</span>
+    ⚠️ <span style={{fontFamily: 'monospace'}}>{isExpanded ? message : messageFirstLine}</span>
+    { isExpanded && stack && <details>
+      <summary onClick={(e) => e.stopPropagation()}>
+        Stack
+      </summary>
+      <span style={{fontFamily: 'monospace'}}>{stack}</span>
+    </details>}
   </div>;
 });
