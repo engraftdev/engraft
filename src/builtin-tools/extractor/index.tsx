@@ -284,8 +284,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
   const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
-  const inputOutputState = usePromiseState(inputResult.outputP)
-
   // todo: very hacky
   if (minimized) {
     return <div className="xRow xAlignVCenter" style={{padding: 2}}>
@@ -390,7 +388,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <div style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ToolOutputView outputState={inputOutputState}  customizations={customizations} />
+          <ToolOutputView outputP={inputResult.outputP}  customizations={customizations} />
         </ExtractorContext.Provider>
       </div>
     </div>

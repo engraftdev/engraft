@@ -104,14 +104,13 @@ const View = memo((props: ViewProps) => {
     [program.stateVar.id]: { var_: program.stateVar, outputP: tickOutputP },
   }), [varBindings, program.stateVar, tickOutputP]);
   const toDrawResult = useIncr(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings });
-  const toDrawOutputState = usePromiseState(toDrawResult.outputP);
   const unresolvedP = useMemo(() => EngraftPromise.unresolved<ToolOutput>(), []);
-  const beforeSelectedTickOutputState = usePromiseState(selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP);
-  const afterSelectedTickOutputState = usePromiseState(onTickResults[selectedTick].outputP);
+  const beforeSelectedTickOutputP = selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP;
+  const afterSelectedTickOutputP = onTickResults[selectedTick].outputP;
 
   return (
     <div className="xRow xGap10" style={{padding: 10}}>
-      <ToolOutputView outputState={toDrawOutputState} displayReactElementsDirectly={true}/>
+      <ToolOutputView outputP={toDrawResult.outputP} displayReactElementsDirectly={true}/>
       <div className="step-rows xCol xGap10">
         <div className="xRow xGap10">
         <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>tick</div>
@@ -131,7 +130,7 @@ const View = memo((props: ViewProps) => {
             {selectedTick > 0 && <>
               {/* an elegant, pastel rectangle with rounded corners */}
               <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
-                <ToolOutputView outputState={beforeSelectedTickOutputState} />
+                <ToolOutputView outputP={beforeSelectedTickOutputP} />
               </div>
               <div>↓</div>
             </>}
@@ -143,7 +142,7 @@ const View = memo((props: ViewProps) => {
             {!onTickResults[selectedTick].view.showsOwnOutput && <>
               <div>↓</div>
               <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
-                <ToolOutputView outputState={afterSelectedTickOutputState} />
+                <ToolOutputView outputP={afterSelectedTickOutputP} />
               </div>
             </>}
           </div>

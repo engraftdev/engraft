@@ -374,14 +374,16 @@ const ValuePromise = memo(function ValuePromise(props: {
 
 
 export type ToolOutputViewProps = {
-  outputState: PromiseState<ToolOutput>;
+  outputP: EngraftPromise<ToolOutput>;
   customizations?: ValueCustomizations;
   displayReactElementsDirectly?: boolean;
   valueWrapper?: (value: ReactNode) => ReactNode;
 }
 
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
-  const {outputState, customizations, displayReactElementsDirectly, valueWrapper = identity} = props;
+  const {outputP, customizations, displayReactElementsDirectly, valueWrapper = identity} = props;
+
+  const outputState = usePromiseState(outputP);
 
   return <ToolOutputBuffer
     outputState={outputState}

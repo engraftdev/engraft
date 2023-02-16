@@ -143,7 +143,6 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
   ]), []);
 
   const {outputP, view} = useIncr(runTool, { program, varBindings });
-  const outputState = usePromiseState(outputP);
 
   const [showTool, setShowTool] = useStateSetOnly(() => true);
   const [showOutput, setShowOutput] = useStateSetOnly(() => false);
@@ -167,7 +166,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     </div>
     <br/>
     <br/>
-    {showOutput && <ToolOutputView outputState={outputState} />}
+    {showOutput && <ToolOutputView outputP={outputP} />}
     <br/>
     <br/>
     <div>

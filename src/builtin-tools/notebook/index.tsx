@@ -286,7 +286,6 @@ type CellViewProps = {
 const CellView = memo(function CellView(props: CellViewProps) {
   const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput, autoFocus} = props;
 
-  const cellOutputState = usePromiseState(cellResult.outputP);
   const cellShowsOwnOutput = cellResult.view.showsOwnOutput;
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
@@ -356,10 +355,10 @@ const CellView = memo(function CellView(props: CellViewProps) {
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputHoverRef])}>
           {/* TODO: clean this up */}
           { outputBelowInput
-            ? <ToolOutputView outputState={cellOutputState}/>
+            ? <ToolOutputView outputP={cellResult.outputP}/>
             : <>
                 <ToolOutputView
-                  outputState={cellOutputState}
+                  outputP={cellResult.outputP}
                   valueWrapper={(view) =>
                     <div style={{position: 'relative'}} ref={outputOuterRef}>
                       <ScrollShadow

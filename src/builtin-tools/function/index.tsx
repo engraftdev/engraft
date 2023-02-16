@@ -218,10 +218,9 @@ const ExampleRow = memo((props: ExampleRowProps) => {
     programUP.activeExampleId.$set(newExample.id);
   }, [index, numVars, programUP.activeExampleId, programUP.examples]);
 
-  const output = useMemo(() => EngraftPromise.try(() => {
+  const outputP = useMemo(() => EngraftPromise.try(() => {
     return {value: syncFunction(...example.values)};
   }), [example.values, syncFunction]);
-  const outputState = usePromiseState(output);
 
   const makeThisRowActive = useCallback(() => {
     programUP.activeExampleId.$set(example.id);
@@ -268,7 +267,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
       </td>
     )}
     <td>
-      <ToolOutputView outputState={outputState}/>
+      <ToolOutputView outputP={outputP}/>
     </td>
   </tr>
 });
