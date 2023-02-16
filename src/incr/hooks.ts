@@ -144,6 +144,12 @@ export function hookFork<Return>(f: (branch: ForkBranchFunction) => Return): Ret
   return result;
 }
 
+export function hookLater(): <Return>(f: () => Return) => Return {
+  const group = hookForkLater();
+  return (f) => group.branch('', f)
+  // We never call group.done – by construction, this fork will only ever have a single branch.
+}
+
 // Run an arbitrary incr in a hooky function, keeping its memory between runs.
 export function hookIncr<Args extends unknown[], Return>(incr: IncrFunction<Args, Return>, ...args: Args): Return {
   const memory = hookRef(() => new IncrMemory(), 'hookIncr');
