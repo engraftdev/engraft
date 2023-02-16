@@ -82,16 +82,18 @@ export function runWithPath<Return>(f: () => Return, path: HookPath): Return {
   const newPosition = { path, index: 0 };
   GLOBAL_PATH_POSITION = newPosition;
 
-  try {
-    return f();
-  } finally {
-    GLOBAL_PATH_POSITION = oldPosition;
+  let result = f();
 
-    if (!path.firstRun && newPosition.index !== newPosition.path.refs.length) {
-      throw new Error(`Function changed number of steps between runs: ${newPosition.path.refs.length} => ${newPosition.index}`);
-    }
-    delete path.firstRun;
+  // TODO: figure out how error-handling should work for hooky functions (incr functions in general?)
+
+  GLOBAL_PATH_POSITION = oldPosition;
+
+  if (!path.firstRun && newPosition.index !== newPosition.path.refs.length) {
+    throw new Error(`Function changed number of steps between runs: ${newPosition.path.refs.length} => ${newPosition.index}`);
   }
+  delete path.firstRun;
+
+  return result;
 }
 
 
