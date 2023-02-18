@@ -168,6 +168,16 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
     return result;
   },
 
+  fromState<T>(state: PromiseState<T>): EngraftPromise<T> {
+    if (state.status === 'pending') {
+      return EngraftPromise.unresolved();
+    } else if (state.status === 'fulfilled') {
+      return EngraftPromise.resolve(state.value);
+    } else {
+      return EngraftPromise.reject(state.reason);
+    }
+  },
+
   looksLikeAPromise<T>(value: unknown): value is EngraftPromise<T> {
     return hasProperty(value, 'then') && typeof value.then === 'function';
   },
