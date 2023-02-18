@@ -12,6 +12,7 @@ import { isObject } from "src/util/hasProperty";
 import { useStateSetOnly } from "src/util/immutable-react";
 import { difference, union } from "src/util/sets";
 import { updateProxy } from "src/util/UpdateProxy";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { ErrorView, ToolOutputView } from "src/view/Value";
 import { VarDefinition } from "src/view/Vars";
 import { slotSetTo } from "../slot";
@@ -99,7 +100,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   itemResultsP: EngraftPromise<ToolResult<ToolProgram>[]>,
 }) => {
   const { program, updateProgram, autoFocus, inputResult, itemResultsP } = props;
-  const programUP = updateProxy(updateProgram);
+  const programUP = useUpdateProxy(updateProgram);
 
   const [selectedIndex, setSelectedIndex] = useStateSetOnly(() => 0);
   const [hoveredIndex, setHoveredIndex] = useStateSetOnly(() => 0 as number | null);

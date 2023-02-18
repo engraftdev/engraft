@@ -1,0 +1,88 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDaluminum108228",
+          "label": "num points"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "slider",
+            "value": 1,
+            "min": 1,
+            "max": 100,
+            "step": 1
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDhearing648069",
+          "label": "data"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "_.range(-10, 10, 20 / IDaluminum108228).map(x => ({x, y: x ** 2}))",
+          "defaultCode": "",
+          "subPrograms": {
+            "IDfisher960095": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "slider",
+                "value": 0.64,
+                "min": 0.1,
+                "max": 3,
+                "step": 0.01
+              }
+            }
+          }
+        },
+        "outputManualHeight": 12
+      },
+      {
+        "var_": {
+          "id": "IDcontinent252359",
+          "label": "chart"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDimpatiens686173",
+              "defaultCode": "IDimpatiens686173",
+              "subPrograms": {}
+            },
+            "mark": "point",
+            "xChannel": {
+              "field": "x",
+              "type": "quantitative"
+            },
+            "yChannel": {
+              "field": "y",
+              "type": "quantitative"
+            }
+          },
+          "defaultCode": "IDimpatiens686173"
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVar": {
+      "id": "IDimpatiens686173",
+      "label": "prev"
+    }
+  }
+}
