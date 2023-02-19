@@ -1,12 +1,8 @@
 import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
-import { compileExpressionCached } from 'src/util/compile';
 import { hashId, updateById } from 'src/util/id';
-import { Updater } from 'src/util/state';
 import { updateF } from "src/util/updateF";
 import { Use } from 'src/util/Use';
 import useHover from 'src/util/useHover';
-import update from 'immutability-helper';
-import { noOp } from 'src/util/noOp';
 
 
 // **************
@@ -20,24 +16,20 @@ export type FormatterElement = {
   id: string,
   scope?: string,
 } & (
-  {
-    type: 'element',
-    tag: string,
-    style: CSSProperties,
-    className: string,
-    children: FormatterElement[],
-  } | {
-    type: 'for-each',
-    item: FormatterElement,
-  } | {
-    type: 'text',
-    rawHtml: boolean,
-  } | {
-    type: 'control',
-    controlType: 'checkbox' | 'text',
-    name: string,
-    keyFuncCode: string,
-  }
+  | {
+      type: 'element',
+      tag: string,
+      className: string,
+      children: FormatterElement[],
+    }
+  | {
+      type: 'for-each',
+      item: FormatterElement,
+    }
+  | {
+      type: 'text',
+      rawHtml: boolean,
+    }
 )
 
 export type FormatterElementOf<T> = FormatterElement & { type: T };
@@ -95,18 +87,6 @@ export function renderElementToNode(element: FormatterElement, data: any, parent
       break;
     case 'text':
       break;
-    case 'control':
-      try {
-        const compileResult = compileExpressionCached(element.keyFuncCode);
-        if ('error' in compileResult) {
-          throw compileResult.error;
-        }
-        const keyValue = (compileResult({}) as (data: any) => string)(node.innerData);
-        node.controlKey = typeof keyValue === 'string' ? keyValue : JSON.stringify(keyValue);
-      } catch (e) {
-        console.warn(e);
-      }
-      break;
     default:
       throw new Error('waaaaat');
   }
@@ -133,7 +113,6 @@ function makeGhostElements(element: FormatterElement, innerData: any, id: string
           type: 'element',
           tag: 'div',
           id: hashId(id, 'for-each-div'),
-          style: {},
           className: '',
           children: [],
         },
@@ -151,7 +130,6 @@ function makeGhostElements(element: FormatterElement, innerData: any, id: string
           type: 'element',
           tag: 'div',
           id: hashId(id, 'key', key),
-          style: {},
           className: '',
           children: [],
         }
@@ -217,23 +195,17 @@ function keysShown(element: FormatterElement, preScope: boolean): Set<string> {
 // * VIEW STUFF *
 // **************
 
-export type FormatterContextInfo = {
-  controlValues: ControlValues,
-  updateControlValues: Updater<ControlValues>,
-} & (
-  {
-    editMode: false,
-  } | {
-    editMode: true,
-
-    selectedNodeId: string | null,
-    setSelectedNodeId: (selectedNodeId: string | null) => void,
-  }
-);
+export type FormatterContextInfo =
+  | {
+      editMode: false,
+    }
+  | {
+      editMode: true,
+      selectedNodeId: string | null,
+      setSelectedNodeId: (selectedNodeId: string | null) => void,
+    };
 
 export const FormatterContext = createContext<FormatterContextInfo>({
-  controlValues: {},
-  updateControlValues: noOp,
   editMode: false,
 });
 
@@ -261,7 +233,7 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
     case 'element':
       const Tag = element.tag as keyof JSX.IntrinsicElements;
       inner = (
-        <Tag style={element.style} className={element.className}>
+        <Tag className={element.className}>
           {node.children.map((child, i) =>
             <FormatterNodeView key={i} node={child}/>
           )}
@@ -284,37 +256,6 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
         inner = <span style={innerStyle} dangerouslySetInnerHTML={{__html: text}} />;
       } else {
         inner = <span style={innerStyle}>{text}</span>;
-      }
-      break;
-    case 'control':
-      const name = element.name;
-      const key = node.controlKey;
-      const value = key && (context.controlValues[name] || {})[key];
-      switch (element.controlType) {
-        case 'checkbox': {
-          const onChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-            if (!key) { return; }
-            context.updateControlValues((controlValues) => {
-              if (!controlValues[name]) {
-                controlValues = update(controlValues, {[name]: {$set: {}}});
-              }
-              controlValues = update(controlValues, {[name]: {[key]: {$set: ev.target.checked}}});
-              return controlValues;
-            });
-          };
-          inner = <input type="checkbox" checked={value} onChange={onChange} disabled={!key}/>;
-        } break;
-        case 'text': {
-          const onChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-            if (!key) { return; }
-            context.updateControlValues(
-              updateF({[name]: updateF({[key]: ev.target.value}, {})})
-            )
-          };
-          inner = <input type="text" value={value} onChange={onChange} disabled={!key}/>;
-        } break;
-        default:
-          throw new Error('waaaaat');
       }
       break;
     default:
@@ -360,6 +301,7 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
               color: isSelected ? '#44f' : isHovered ? "#000" : "#aaa",
               backgroundColor: 'white',
               userSelect: 'none',
+              whiteSpace: 'nowrap',
             }}
             onClick={() => {
               context.setSelectedNodeId(node.id)
