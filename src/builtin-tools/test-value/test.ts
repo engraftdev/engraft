@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { IncrMemory } from 'src/incr';
-import { toolFromModule } from 'src/toolFromModule';
+import { toolFromModule } from 'src/engraft/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty } from 'src/util/noOp';
 import * as testValue from '.';

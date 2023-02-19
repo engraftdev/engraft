@@ -7,7 +7,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { ToolWithView } from 'src/engraft/ToolWithView';
 import { IncrMemory } from 'src/incr';
-import { toolFromModule } from 'src/toolFromModule';
+import { toolFromModule } from 'src/engraft/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';

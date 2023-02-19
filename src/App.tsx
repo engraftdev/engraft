@@ -1,11 +1,10 @@
 import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css';
+import { builtinTools } from "./builtin-tools";
 import { slotSetTo } from './builtin-tools/slot';
-import { builtinTools } from "./builtinTools";
 import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';
 import { EngraftPromise } from './engraft/EngraftPromise';
-import { usePromiseState } from './engraft/EngraftPromise.react';
 import { runTool } from './engraft/hooks';
 import { ShowView } from './engraft/ShowView';
 import { examples } from './examples/examples';

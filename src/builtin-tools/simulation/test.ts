@@ -3,7 +3,7 @@ import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';
 import { IncrMemory } from 'src/incr';
-import { toolFromModule } from 'src/toolFromModule';
+import { toolFromModule } from 'src/engraft/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';

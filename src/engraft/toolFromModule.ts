@@ -1,5 +1,5 @@
-import { Tool, ToolProgram } from "./engraft";
-import { hasProperty } from "./util/hasProperty";
+import { Tool, ToolProgram } from ".";
+import { hasProperty } from "../util/hasProperty";
 
 export function toolFromModule<P extends ToolProgram>(module: Tool<P> | { default: Tool<P> } | { tool: Tool<P> }) {
   if (hasProperty(module, "tool")) {

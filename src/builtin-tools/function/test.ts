@@ -2,7 +2,7 @@ import { describe, it } from '@jest/globals';
 import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { IncrMemory } from 'src/incr';
-import { toolFromModule } from 'src/toolFromModule';
+import { toolFromModule } from 'src/engraft/toolFromModule';
 import { empty } from 'src/util/noOp';
 import * as functionM from '.';
 import { slotSetTo } from '../slot';

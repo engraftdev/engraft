@@ -5,7 +5,7 @@ import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { IncrMemory } from 'src/incr';
 import { hookMemo } from 'src/incr/hookMemo';
 import { hookFork, hookIncr, hookRef, hooks } from 'src/incr/hooks';
-import { toolFromModule } from 'src/toolFromModule';
+import { toolFromModule } from 'src/engraft/toolFromModule';
 import { createElementFromReact } from "src/util/createElementFrom";
 import Diagram from 'src/util/Diagram';
 import { DOM } from "src/util/DOM";
