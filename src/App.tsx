@@ -12,13 +12,12 @@ import { useIncr } from './incr/react';
 import { Updater } from './util/immutable';
 import { useStateSetOnly, useStateUpdateOnly } from './util/immutable-react';
 import range from './util/range';
+import { useLocalStorage } from './util/useLocalStorage';
 import IsolateStyles from './view/IsolateStyles';
 import { ToolOutputView } from './view/Value';
 import { ValueEditable } from './view/ValueEditable';
 
 builtinTools.map(registerTool);
-
-const localStorageKey = 'live-compose-v1';
 
 const defaultProgram = lookUpTool('slot')!.programFactory();
 
@@ -33,25 +32,12 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
-  const [program, updateProgram] = useStateUpdateOnly<ToolProgram>(() => {
-    try {
-      const programJson = window.localStorage.getItem(localStorageKey)
-      if (programJson) {
-        return JSON.parse(programJson);
-      }
-    } catch {}
-    return defaultProgram;
-  });
+  const [program, updateProgram] = useLocalStorage('engraft-2022-testbed', () => defaultProgram);
+  const [darkMode, updateDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
 
   useEffect(() => {
-    try {
-      if (program !== null) {
-        window.localStorage.setItem(localStorageKey, JSON.stringify(program));
-      }
-    } catch (e) {
-      console.warn("error saving to local storage", e);
-    }
-  }, [program])
+    window.document.firstElementChild!.classList.toggle('darkMode', darkMode);
+  }, [darkMode]);
 
   const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly(() => '');
 
@@ -123,6 +109,11 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     <br/>
     <div>
       <button onClick={incrementVersion}>Redraw</button>
+    </div>
+    <br/>
+    <div>
+      <input type='checkbox' checked={darkMode} onChange={(ev) => updateDarkMode(() => ev.target.checked)}/>
+      <label>Dark mode</label>
     </div>
   </Fragment>
 });

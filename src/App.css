@@ -1,3 +1,8 @@
 body {
   margin: 100px;
 }
+
+html.darkMode {
+  background-color: white;
+  filter: invert() contrast(0.7);
+}
