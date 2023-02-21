@@ -1,7 +1,7 @@
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
-import { references, ProgramFactory, ComputeReferences, ToolOutput, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, ToolResult } from "src/engraft";
+import { ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunTool } from "src/engraft/hooks";
@@ -9,8 +9,7 @@ import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { updateF } from "src/util/updateF";
-import { updateProxy, UpdateProxy } from "src/util/UpdateProxy";
+import { UpdateProxy } from "src/util/UpdateProxy";
 import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { slotSetTo } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
@@ -354,7 +353,3 @@ export const formatOptionLabel = ({icon, label}: OptionWithIcon<any>) => (
     {label}
   </div>
 );
-function hookTool(arg0: { program: Program; updateProgram: any; subKey: string; varBindings: import("src/engraft").VarBindings; }): [any, any, any] {
-  throw new Error("Function not implemented.");
-}
-

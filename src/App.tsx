@@ -10,7 +10,7 @@ import { ShowView } from './engraft/ShowView';
 import { examples } from './examples/examples';
 import { useIncr } from './incr/react';
 import { Updater } from './util/immutable';
-import { useStateSetOnly, useStateUpdateOnly } from './util/immutable-react';
+import { useStateSetOnly } from './util/immutable-react';
 import range from './util/range';
 import { useLocalStorage } from './util/useLocalStorage';
 import IsolateStyles from './view/IsolateStyles';

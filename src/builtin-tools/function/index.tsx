@@ -2,7 +2,6 @@ import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRelevantVarBindings } from "src/engraft/hooks";
 import { ToolWithView } from "src/engraft/ToolWithView";
 import { hookDedupe, hookMemo } from "src/incr/hookMemo";

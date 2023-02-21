@@ -29,7 +29,7 @@ export function useLocalStorage<T>(
     } catch (e) {
       console.warn("error saving to local storage", e);
     }
-  }, [t]);
+  }, [key, stringify, t]);
 
   return [t, updateT];
 }

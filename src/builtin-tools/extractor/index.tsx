@@ -2,7 +2,6 @@ import React, { createContext, memo, useCallback, useContext, useEffect, useStat
 import { slotSetTo } from "src/builtin-tools/slot";
 import { references, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "src/engraft";
 import { EngraftPromise } from "src/engraft/EngraftPromise";
-import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import { hookRunTool } from "src/engraft/hooks";
 import { ShowView } from "src/engraft/ShowView";
 import { hookMemo } from "src/incr/hookMemo";

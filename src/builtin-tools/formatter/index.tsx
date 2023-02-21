@@ -49,7 +49,6 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
-  const { rootElement } = program;
 
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() => inputResult.outputP.then((inputOutput) => {
     const renderedNode = renderElementToNode(program.rootElement, inputOutput.value, '', false);
@@ -114,7 +113,6 @@ const View = memo(function FormatterToolView(props: ViewProps) {
               ? <SelectionInspector
                   key={selectedNodeId}
                   selectedNodeId={selectedNodeId}
-                  rootElement={rootElement}
                   rootElementUP={programUP.rootElement}
                   rootNode={rootNodeWithGhostsState.value}
                 />
@@ -149,13 +147,12 @@ const View = memo(function FormatterToolView(props: ViewProps) {
 
 type SelectionInspectorProps = {
   selectedNodeId: string,
-  rootElement: FormatterElement,
   rootElementUP: UpdateProxy<FormatterElement>,
   rootNode: FormatterNode,
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
-  const { selectedNodeId, rootElementUP, rootNode, rootElement } = props;
+  const { selectedNodeId, rootElementUP, rootNode } = props;
 
   const node: FormatterNode | undefined = getById(rootNode, selectedNodeId);
 

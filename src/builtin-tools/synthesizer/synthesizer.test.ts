@@ -1,6 +1,6 @@
 import { describe, it } from '@jest/globals';
 import { compileExpression } from 'src/util/compile';
-import { expectToEqual, expectToNotEqual } from 'src/util/expectToEqual';
+import { expectToEqual } from 'src/util/expectToEqual';
 import { runToCompletion } from 'src/util/Task';
 import { synthesizeGen } from './synthesizer';
 

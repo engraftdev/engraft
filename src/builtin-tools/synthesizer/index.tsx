@@ -1,14 +1,6 @@
-import { closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete"
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
-import { javascript } from "@codemirror/lang-javascript"
-import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, syntaxHighlighting } from "@codemirror/language"
-import { lintKeymap } from "@codemirror/lint"
-import { EditorState } from "@codemirror/state"
-import { drawSelection, dropCursor, highlightSpecialChars, keymap } from "@codemirror/view"
-import update from "immutability-helper"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolRun, ToolView, ToolOutput, ToolViewRenderProps, ToolProps, ToolResult } from "src/engraft"
+import { ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps } from "src/engraft"
 import { EngraftPromise, PromiseState } from "src/engraft/EngraftPromise"
 import { usePromiseState } from "src/engraft/EngraftPromise.react"
 import { hookRunTool } from "src/engraft/hooks"
@@ -18,11 +10,10 @@ import { hooks } from "src/incr/hooks"
 import { memoizeProps } from "src/incr/memoize"
 import CodeMirror from "src/util/CodeMirror"
 import { setup } from "src/util/codeMirrorStuff"
-import { compileExpression, compileExpressionCached } from "src/util/compile"
+import { compileExpressionCached } from "src/util/compile"
 import { newId } from "src/util/id"
-import { Updater } from "src/util/immutable"
 import { Task } from "src/util/Task"
-import { UpdateProxy, updateProxy, UpdateProxyRemovable } from "src/util/UpdateProxy"
+import { updateProxy, UpdateProxyRemovable } from "src/util/UpdateProxy"
 import { slotSetTo } from "../slot"
 import { SynthesisState, synthesizeGen } from "./synthesizer"
 
@@ -62,13 +53,13 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
     const compiled = compileExpressionCached(program.code);
     return (input: any) => compiled({input});
   }), [program.code]);
-  
+
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() =>
     EngraftPromise.all(inputResult.outputP, funcP).then(([inputOutput, func]) => {
       return { value: func(inputOutput.value) };
     }),
   [inputResult.outputP, funcP]);
-  
+
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} inputResult={inputResult} funcP={funcP}/>
   }), [props]);
