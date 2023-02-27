@@ -31,7 +31,6 @@ import { usePortalSet } from 'src/util/PortalWidget';
 import { makeRand } from 'src/util/rand';
 import { difference, union } from 'src/util/sets';
 import { Replace } from 'src/util/types';
-import { updateF } from 'src/util/updateF';
 import { useUpdateProxy } from 'src/util/UpdateProxy.react';
 import { useRefForCallback } from 'src/util/useRefForCallback';
 import IsolateStyles from 'src/view/IsolateStyles';
@@ -387,8 +386,8 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   }, [refSet, logDecorations, programUP, program.defaultCode, varBindingsRef, updateProgram])
 
   const onChange = useCallback((value: string) => {
-    updateProgram(updateF({code: {$set: value}}));
-  }, [updateProgram]);
+    programUP.code.$set(value);
+  }, [programUP.code]);
 
   return (
     <div

@@ -2,7 +2,6 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps } from "src/engraft";
 import { Details } from "src/util/Details";
 import { getById, updateById } from "src/util/id";
-import { updateF } from "src/util/updateF";
 import { Value } from "src/view/Value";
 import { slotSetTo } from "../slot";
 import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
@@ -197,7 +196,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   const onChangeTag = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     rootElementUP.$apply((rootElement) =>
       updateById<FormatterElementOf<'element'>>(rootElement, element.id,
-        updateF({tag: {$set: e.target.value}})
+        (old) => ({...old, tag: e.target.value})
       )
     )
   }, [element.id, rootElementUP]);
@@ -205,7 +204,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   const onChangeClasses = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     rootElementUP.$apply((rootElement) =>
       updateById<FormatterElementOf<'element'>>(rootElement, element.id,
-        updateF({className: {$set: e.target.value}})
+        (old) => ({...old, className: e.target.value})
       )
     );
   }, [element.id, rootElementUP]);
@@ -234,7 +233,7 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
   const onChangeRawHtml = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     rootElementUP.$apply((rootElement) =>
       updateById<FormatterElementOf<'text'>>(rootElement, element.id,
-        updateF({rawHtml: {$set: e.target.checked}})
+        (old) => ({...old, rawHtml: e.target.checked})
       )
     );
   }, [element.id, rootElementUP]);

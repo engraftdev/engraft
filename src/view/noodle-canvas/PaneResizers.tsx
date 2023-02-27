@@ -1,21 +1,20 @@
 import { CSSProperties, memo, useMemo, useState } from "react";
-import { combineDrags, startDrag, someDrag } from "src/util/drag";
-import { Updater } from "src/util/immutable";
-import { updateF } from "src/util/updateF";
+import { combineDrags, someDrag, startDrag } from "src/util/drag";
+import { UpdateProxy } from "src/util/UpdateProxy";
 import useHover from "src/util/useHover";
 import { useRefForCallback } from "src/util/useRefForCallback";
 import { PaneGeo, roundTo } from "./model";
 
 export type PaneResizersProps = {
   geo: PaneGeo,
-  updateGeo: Updater<PaneGeo>,
+  geoUP: UpdateProxy<PaneGeo>,
   minWidth?: number,
   minHeight?: number,
   scale: number,
 }
 
 export const PaneResizers = memo(function PaneResizers(props: PaneResizersProps) {
-  const { geo, updateGeo, minWidth, minHeight, scale } = props;
+  const { geo, geoUP, minWidth, minHeight, scale } = props;
   const geoRef = useRefForCallback(geo);
 
   const [draggingL, setDraggingL] = useState(false);
@@ -33,13 +32,14 @@ export const PaneResizers = memo(function PaneResizers(props: PaneResizersProps)
       const newX = roundTo(startGeo.x + deltaX, 16);
       const newWidth = Math.max(startRight - newX, minWidth || 0);
       const actualNewX = startRight - newWidth;
-      updateGeo(updateF({ x: {$set: actualNewX}, width: {$set: newWidth} }));
+      geoUP.x.$set(actualNewX);
+      geoUP.width.$set(newWidth);
     },
     done() {
       setDraggingL(false);
     },
     keepCursor: true,
-  }), [geoRef, minWidth, scale, updateGeo]);
+  }), [geoRef, geoUP, minWidth, scale]);
 
   const rightDrag = useMemo(() => someDrag({
     init() {
@@ -49,13 +49,13 @@ export const PaneResizers = memo(function PaneResizers(props: PaneResizersProps)
     move({startGeo}) {
       const deltaX = this.startDeltaX / scale;
       const newWidth = Math.max(roundTo(startGeo.width + deltaX, 16), minWidth || 0);
-      updateGeo(updateF({ width: {$set: newWidth} }));
+      geoUP.width.$set(newWidth);
     },
     done() {
       setDraggingR(false);
     },
     keepCursor: true,
-  }), [geoRef, minWidth, scale, updateGeo]);
+  }), [geoRef, geoUP, minWidth, scale]);
 
   const bottomDrag = useMemo(() => someDrag({
     init() {
@@ -65,13 +65,13 @@ export const PaneResizers = memo(function PaneResizers(props: PaneResizersProps)
     move({startGeo}) {
       const deltaY = this.startDeltaY / scale;
       const newHeight = Math.max(roundTo(startGeo.height + deltaY, 16), minHeight || 0);
-      updateGeo(updateF({ height: {$set: newHeight} }));
+      geoUP.height.$set(newHeight);
     },
     done() {
       setDraggingB(false);
     },
     keepCursor: true,
-  }), [geoRef, minHeight, scale, updateGeo]);
+  }), [geoRef, geoUP, minHeight, scale]);
 
   const onMouseDownLeft = useMemo(() => startDrag(leftDrag), [leftDrag]);
   const onMouseDownRight = useMemo(() => startDrag(rightDrag), [rightDrag]);

@@ -4,7 +4,7 @@ import { EngraftPromise } from "src/engraft/EngraftPromise";
 import { hookMemo } from "src/incr/hookMemo";
 import { hooks } from "src/incr/hooks";
 import { memoizeProps } from "src/incr/memoize";
-import { updateF } from "src/util/updateF";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 
 // A testbed for debugging the cursor-jumping-to-end-of-text problem.
 
@@ -41,8 +41,7 @@ export const tool: Tool<Program> = {
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const {program, updateProgram} = props;
-
-  // TODO: programUP
+  const programUP = useUpdateProxy(updateProgram);
 
   console.log("render test-text view");
 
@@ -56,7 +55,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
           type="text"
           value={program.text}
           onChange={(e) => {
-            updateProgram(updateF({text: {$set: e.target.value}}))
+            programUP.text.$set(e.target.value)
             console.log('onChange program')
             requestAnimationFrame(() => {
               console.log('onChange program + 1')

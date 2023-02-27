@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from "react";
 import { startDrag } from "src/util/drag";
-import { updateF } from "src/util/updateF";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { useRefForCallback } from "src/util/useRefForCallback";
 
 
@@ -22,6 +22,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
   const updateGeo = useCallback((f: (old: PaneGeo) => PaneGeo) => {
     updatePaneGeoById(pane.id, f);
   }, [updatePaneGeoById, pane.id]);
+  const geoUP = useUpdateProxy(updateGeo);
 
   const onMouseDownDragPane = useMemo(() => startDrag({
     init() {
@@ -30,11 +31,12 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
     move({startGeo}) {
       const newX = roundTo(startGeo.x + this.startDeltaX / scale, 16);
       const newY = roundTo(startGeo.y + this.startDeltaY / scale, 16);
-      updateGeo(updateF({ x: {$set: newX}, y: {$set: newY} }));
+      geoUP.x.$set(newX);
+      geoUP.y.$set(newY);
     },
     done() {},
     cursor: "grabbing",
-  }), [geoRef, scale, updateGeo]);
+  }), [geoRef, scale, geoUP]);
 
   return (
     <div
@@ -60,7 +62,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
       >
         <PaneResizers
           geo={pane.geo}
-          updateGeo={updateGeo}
+          geoUP={geoUP}
           minWidth={minWidth}
           minHeight={minHeight}
           scale={scale}

@@ -9,13 +9,12 @@ import { saveFile } from "src/util/saveFile";
 import { Use } from "src/util/Use";
 import useHover from "src/util/useHover";
 import ScrollShadow from './ScrollShadow';
-import { inlineBlock } from "./styles";
 // import { isProbablyFunctionThing } from "src/builtin-tools-disabled/function";
+import { identity } from "lodash";
 import { EngraftPromise, PromiseState } from "src/engraft/EngraftPromise";
+import { usePromiseState } from "src/engraft/EngraftPromise.react";
 import Diagram from "src/util/Diagram";
 import { hasProperty, isObject } from "src/util/hasProperty";
-import { identity } from "lodash";
-import { usePromiseState } from "src/engraft/EngraftPromise.react";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -278,7 +277,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
                 !isArray &&
                 <div
                   className='prefix-with-key'
-                  style={{...inlineBlock(), ...valueFont, marginRight: 5, whiteSpace: 'nowrap'}}
+                  style={{display: 'inline-block', ...valueFont, marginRight: 5, whiteSpace: 'nowrap'}}
                 >
                   {key}:
                 </div>

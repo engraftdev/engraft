@@ -1,6 +1,3 @@
-import { updateF } from './updateF';
-
-
 // these utilities are for working with Setters and Updaters
 
 export type Setter<T> = (newT: T) => void;
@@ -27,28 +24,4 @@ export function atIndex<T>(update: Updater<T[]>, index: number): Updater<T> {
       return newTs;
     });
   };
-}
-
-export function atIndexZip<T>(ts: T[], updateTs: Updater<T[]>): [T, Updater<T>][] {
-  return ts.map((t, i) => [t, atIndex(updateTs, i)]);
-}
-
-export function atIndices<T>(update: Updater<T[]>, length: number): Updater<T>[] {
-  return Array.from({length}, (_, i) => atIndex(update, i));
-}
-
-export function atAllIndices<T>(update: Updater<T[]>): Updater<T> {
-  return (f: (oldT: T) => T) => {
-    update((oldTs) => oldTs.map(f));
-  };
-}
-
-export function remover(updateArray: Updater<any[]>, index: number) {
-  return () => {
-    updateArray(updateF({$splice: [[index, 1]]}));
-  };
-}
-
-export function removers(updateArray: Updater<any[]>, length: number) {
-  return Array.from({length}, (_, i) => remover(updateArray, i));
 }

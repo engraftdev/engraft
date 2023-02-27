@@ -1,6 +1,5 @@
 import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
 import { hashId, updateById } from 'src/util/id';
-import { updateF } from "src/util/updateF";
 import { Use } from 'src/util/Use';
 import useHover from 'src/util/useHover';
 
@@ -72,7 +71,7 @@ export function renderElementToNode(element: FormatterElement, data: any, parent
           const realizeChild = (rootElement: FormatterElement) => {
             const updatedUpToParent = ghostInfo ? ghostInfo.realize(rootElement) : rootElement;
             return updateById<FormatterElementOf<'element'>>(updatedUpToParent, node.element.id,
-              updateF({children: {$push: [ghostElement]}})
+              (old) => ({...old, children: [...old.children, ghostElement]})
             );
           };
           return renderElementToNode(ghostElement, innerData, node.id, useGhosts, { realize: realizeChild });

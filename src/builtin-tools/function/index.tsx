@@ -11,7 +11,6 @@ import { objEqWithRefEq } from "src/util/eq";
 import { newId } from "src/util/id";
 import { noOp } from "src/util/noOp";
 import { difference } from "src/util/sets";
-import { updateF } from "src/util/updateF";
 import { UpdateProxy } from "src/util/UpdateProxy";
 import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { useContextMenu } from "src/util/useContextMenu";
@@ -145,8 +144,8 @@ const VarHeading = memo((props: VarHeadingProps) => {
   const varUP = programUP.vars[index];
 
   const insertVarAfter = useCallback(() => {
-    programUP.vars.$apply(updateF({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]}));
-    programUP.examples.$all.values.$apply(updateF({$splice: [[index + 1, 0, '']]}));
+    programUP.vars.$helper({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]});
+    programUP.examples.$all.values.$helper({$splice: [[index + 1, 0, '']]});
   }, [index, programUP]);
 
 
@@ -213,7 +212,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
       id: newId(),
       values: Array.from({length: numVars}, () => undefined),
     };
-    programUP.examples.$apply(updateF({$splice: [[index + 1, 0, newExample]]}));
+    programUP.examples.$helper({$splice: [[index + 1, 0, newExample]]});
     programUP.activeExampleId.$set(newExample.id);
   }, [index, numVars, programUP.activeExampleId, programUP.examples]);
 

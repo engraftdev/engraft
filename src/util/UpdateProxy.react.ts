@@ -2,8 +2,10 @@ import { useMemo } from "react";
 import { Updater } from "./immutable";
 import { updateProxy, UpdateProxy } from "./UpdateProxy";
 
-export function useUpdateProxy<T>(updater: Updater<T>): UpdateProxy<T> {
-  return useMemo(() => updateProxy(updater), [updater]);
+export function useUpdateProxy<T>(updater: Updater<T>): UpdateProxy<T>;
+export function useUpdateProxy<T>(updater: Updater<T> | undefined): UpdateProxy<T> | undefined;
+export function useUpdateProxy<T>(updater: Updater<T> | undefined): UpdateProxy<T> | undefined {
+  return useMemo(() => updater && updateProxy(updater), [updater]);
 }
 
 // no reason to `memo()` this; the `children` function will always be fresh anyway

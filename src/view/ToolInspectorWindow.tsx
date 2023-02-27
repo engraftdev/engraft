@@ -2,7 +2,7 @@ import { memo } from "react";
 import { references, ToolProgram, VarBindings } from "src/engraft";
 import { runtimeObjectId } from "src/util/id";
 import { Updater } from "src/util/immutable";
-import { updateF } from "src/util/updateF";
+import { useUpdateProxy } from "src/util/UpdateProxy.react";
 import { WindowPortal } from "src/util/WindowPortal";
 import IsolateStyles from "./IsolateStyles";
 import { Value } from "./Value";
@@ -19,6 +19,7 @@ export type ToolInspectorWindowProps = {
 
 export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspectorWindowProps) {
   const {program, updateProgram, varBindings, show, onClose} = props;
+  const programUP = useUpdateProxy(updateProgram);
 
   if (!show) return null;
 
@@ -29,10 +30,10 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
     <IsolateStyles>
       <div className="xRow xGap10">
         Debug ID
-        { updateProgram ?
+        { programUP ?
           <input
             value={program.debugId || ""}
-            onChange={(e) => updateProgram(updateF({debugId: {$set: e.target.value.length > 0 ? e.target.value : undefined}}))}
+            onChange={(e) => programUP.debugId.$set(e.target.value.length > 0 ? e.target.value : undefined)}
           /> :
           <span>{(program as any).debugId}</span>
         }
