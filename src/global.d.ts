@@ -29,10 +29,10 @@ declare module 'internmap' {
 declare module '@observablehq/inspector' {
   export class Inspector {
     constructor(elem: HTMLElement)
-    fulfilled(value: any)
+    fulfilled(value: any): void
   }
 }
 
 declare module 'isoformat' {
-  export function format(date: Date, orElse: string)
+  export function format(date: Date, orElse: string): string
 }
