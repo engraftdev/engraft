@@ -1,6 +1,9 @@
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import { memo, useEffect, useState } from "react";
 
+// idk if this line actually works, but you get the idea:
+/// <reference types="@types/google.maps" />
+
 const API_KEY = 'AIzaSyCrF84lWLiQ6A2oo9oEMDORmx0Atdzra4U';
 
 export type GoogleMapProps = {
