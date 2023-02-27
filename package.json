@@ -81,6 +81,7 @@
     "@types/seedrandom": "^3.0.2",
     "@typescript-eslint/parser": "^5.48.2",
     "@vitest/browser": "^0.29.1",
+    "@vitest/coverage-c8": "^0.29.1",
     "@vitest/ui": "^0.29.1",
     "cors-anywhere": "^0.4.4",
     "eslint": "^8.12.0",
