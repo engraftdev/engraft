@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import { compileExpression } from 'src/util/compile';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { runToCompletion } from 'src/util/Task';

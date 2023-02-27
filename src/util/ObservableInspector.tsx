@@ -1,7 +1,7 @@
 import { Inspector } from '@observablehq/inspector';
 import { memo, useEffect, useState } from 'react';
 
-import css from './ObservableInspector.css';
+import css from './ObservableInspector.css?inline';
 
 export type ObservableInspectorProps = {
   value: any,

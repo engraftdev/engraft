@@ -30,7 +30,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
     // TODO: The `import` below doesn't work in lib2 output... hmm...
     // const url = `https://cdn.skypack.dev/${name}`;
     const url = `https://esm.sh/${program.packageName}`;
-    return import(/*webpackIgnore: true*/ url).then((module) => ({value: module}));
+    return import(/* @vite-ignore */ url).then((module) => ({value: module}));
   }), [program.packageName]);
 
   const view: ToolView<Program> = hookMemo(() => ({

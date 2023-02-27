@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/engraft/toolFromModule';

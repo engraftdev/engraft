@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import { update } from 'src/deps';
 import { registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';

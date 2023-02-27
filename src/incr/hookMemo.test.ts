@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { refEq } from 'src/util/eq';
 import { IncrMemory } from '.';
 import { hookMemo } from './hookMemo';

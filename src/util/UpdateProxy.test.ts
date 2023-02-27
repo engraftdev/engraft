@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { expectToEqual, valueOfType } from 'src/util/expectToEqual';
 import { Updater } from './immutable';
 import { updateProxy } from './UpdateProxy';

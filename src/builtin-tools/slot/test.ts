@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import _ from 'lodash';
 import { update } from 'src/deps';
 import { registerTool, ToolOutput } from 'src/engraft';

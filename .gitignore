@@ -10,9 +10,7 @@
 /coverage
 
 # production
-/build
-/public/js
-/lib
+/dist
 
 # misc
 .DS_Store

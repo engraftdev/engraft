@@ -7,7 +7,6 @@
       "esnext"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -22,10 +21,11 @@
     "paths": {
       "src/*": ["./src/*"]
     },
-    "outDir": "lib",
     "sourceMap": true,
-    "declaration": true,
-    "emitDeclarationOnly": true
+    "noEmit": true,
+    "types": [
+      "vite/client"
+    ]
   },
   "include": [
     "src"

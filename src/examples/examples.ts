@@ -1,7 +1,6 @@
-const examplesContext = require.context('.', true, /\.\/(.*)\.json$/);
-
+const modules = import.meta.glob('./*.json', { eager: true });
 export const examples =
-  examplesContext.keys().map(id => ({
-    name: id.match(/\.\/(.*)\.json$/)![1],
-    program: examplesContext(id)
+  Object.entries(modules).map(([filename, program]) => ({
+    name: filename.match(/\.\/(.*)\.json$/)![1],
+    program
   }));

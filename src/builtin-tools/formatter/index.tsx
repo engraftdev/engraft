@@ -14,7 +14,7 @@ import { hooks } from 'src/incr/hooks';
 import { memoizeProps } from 'src/incr/memoize';
 import { UpdateProxy } from 'src/util/UpdateProxy';
 import { useUpdateProxy } from 'src/util/UpdateProxy.react';
-import builtinStyles from './builtin.css';
+import builtinStyles from './builtin.css?inline';
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.

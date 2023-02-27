@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { IncrFunction, IncrMemory } from '.';
 import { memoize, memoizeForever, memoizeProps } from './memoize';

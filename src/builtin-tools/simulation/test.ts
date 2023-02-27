@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
 import { makeVarBindings } from 'src/engraft/test-utils';

@@ -1,6 +1,6 @@
 import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import appCss from './App.css';
+import appCss from './App.css?inline';
 import { builtinTools } from "./builtin-tools";
 import { slotSetTo } from './builtin-tools/slot';
 import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';

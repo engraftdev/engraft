@@ -1,6 +1,7 @@
 import { toolFromModule } from "../engraft/toolFromModule";
 
-// this matches "./[something]/index.tsx"
-const toolsContext = require.context('.', true, /^\.\/([^/]*)\/index\.tsx$/);
-
-export const builtinTools = toolsContext.keys().map(id => toolFromModule(toolsContext(id)));
+const modules = import.meta.glob('./*/index.tsx', { eager: true });
+export const builtinTools =
+  Object.values(modules).map((module) =>
+    toolFromModule(module as any)
+  );

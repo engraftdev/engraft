@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
 import { update } from 'src/deps';
