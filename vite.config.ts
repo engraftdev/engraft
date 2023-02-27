@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import { checker } from "vite-plugin-checker";
 
@@ -19,4 +20,10 @@ export default defineConfig({
   // build: {
   //   minify: false,
   // },
+  test: {
+    include: [
+      '**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      '**/test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+    ],
+  },
 });

@@ -12,12 +12,16 @@ import { expectToEqual } from 'src/util/expectToEqual';
 import { empty, noOp } from 'src/util/noOp';
 import { slotSetTo } from '../slot';
 import * as notebook from './index';
+import * as testValue from '../test-value';
+import * as slot from '../slot';
+
+// @vitest-environment happy-dom
 
 const notebookTool = toolFromModule(notebook);
 
 registerTool(notebookTool);
-registerTool(toolFromModule(require('../test-value')));
-registerTool(toolFromModule(require('../slot')));
+registerTool(toolFromModule(testValue));
+registerTool(toolFromModule(slot));
 
 describe('notebook', () => {
   it('output basically works; no unnecessary runs of cells', () => {

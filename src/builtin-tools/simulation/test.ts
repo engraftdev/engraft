@@ -7,9 +7,12 @@ import { toolFromModule } from 'src/engraft/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';
+import * as slot from '../slot';
+
+// @vitest-environment happy-dom
 
 const simulationTool = toolFromModule(simulation);
-registerTool(toolFromModule(require('../slot')));
+registerTool(toolFromModule(slot));
 
 describe('simulation', () => {
   it('basically works', () => {

@@ -10,6 +10,8 @@ import { expectToEqual } from 'src/util/expectToEqual';
 import { empty } from 'src/util/noOp';
 import * as slot from './index';
 
+// @vitest-environment happy-dom
+
 const slotTool = toolFromModule(slot);
 registerTool(slotTool);  // we test it embedded in itself
 

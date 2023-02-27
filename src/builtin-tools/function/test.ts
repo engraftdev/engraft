@@ -1,16 +1,19 @@
-import { describe, it, expect } from 'vitest';
 import { newVar, registerTool } from 'src/engraft';
 import { EngraftPromise } from 'src/engraft/EngraftPromise';
-import { IncrMemory } from 'src/incr';
 import { toolFromModule } from 'src/engraft/toolFromModule';
+import { IncrMemory } from 'src/incr';
 import { empty } from 'src/util/noOp';
+import { describe, expect, it } from 'vitest';
 import * as functionM from '.';
+import * as slot from '../slot';
 import { slotSetTo } from '../slot';
+
+// @vitest-environment happy-dom
 
 const functionTool = toolFromModule(functionM);
 
 registerTool(functionTool);
-registerTool(toolFromModule(require('../slot')));
+registerTool(toolFromModule(slot));
 
 describe('function', () => {
   it('output works', () => {

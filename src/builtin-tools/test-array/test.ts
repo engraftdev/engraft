@@ -7,9 +7,12 @@ import { toolFromModule } from 'src/engraft/toolFromModule';
 import { expectToEqual } from 'src/util/expectToEqual';
 import { empty } from 'src/util/noOp';
 import * as testArray from './index';
+import * as testValue from '../test-value'
+
+// @vitest-environment happy-dom
 
 const testArrayTool = toolFromModule(testArray);
-registerTool(toolFromModule(require('../test-value')));
+registerTool(toolFromModule(testValue));
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
