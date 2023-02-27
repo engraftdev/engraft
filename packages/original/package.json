@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "original",
+  "name": "@engraft/original",
   "version": "0.0.1",
   "description": "Temporary package to port over old code into the monorepo.",
   "dependencies": {

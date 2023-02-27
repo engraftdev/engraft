@@ -1,21 +1,21 @@
 import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
-import { builtinTools } from "./builtin-tools";
-import { slotSetTo } from './builtin-tools/slot';
-import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from './engraft';
-import { EngraftPromise } from './engraft/EngraftPromise';
-import { runTool } from './engraft/hooks';
-import { ShowView } from './engraft/ShowView';
-import { examples } from './examples/examples';
-import { useIncr } from './incr/react';
-import { Updater } from './util/immutable';
-import { useStateSetOnly } from './util/immutable-react';
-import range from './util/range';
-import { useLocalStorage } from './util/useLocalStorage';
-import IsolateStyles from './view/IsolateStyles';
-import { ToolOutputView } from './view/Value';
-import { ValueEditable } from './view/ValueEditable';
+import { builtinTools } from "@engraft/original/src/builtin-tools";
+import { slotSetTo } from '@engraft/original/src/builtin-tools/slot';
+import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from '@engraft/original/src/engraft';
+import { EngraftPromise } from '@engraft/original/src/engraft/EngraftPromise';
+import { runTool } from '@engraft/original/src/engraft/hooks';
+import { ShowView } from '@engraft/original/src/engraft/ShowView';
+import { examples } from '@engraft/original/src/examples/examples';
+import { useIncr } from '@engraft/original/src/incr/react';
+import { Updater } from '@engraft/original/src/util/immutable';
+import { useStateSetOnly } from '@engraft/original/src/util/immutable-react';
+import range from '@engraft/original/src/util/range';
+import { useLocalStorage } from '@engraft/original/src/util/useLocalStorage';
+import IsolateStyles from '@engraft/original/src/view/IsolateStyles';
+import { ToolOutputView } from '@engraft/original/src/view/Value';
+import { ValueEditable } from '@engraft/original/src/view/ValueEditable';
 
 builtinTools.map(registerTool);
 

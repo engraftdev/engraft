@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "@engraft/testbed",
+  "version": "0.0.1",
+  "description": "Engraft testbed web application.",
+  "dependencies": {
+    "@engraft/original": "file:packages/original"
+  },
+  "devDependencies": {}
+}
