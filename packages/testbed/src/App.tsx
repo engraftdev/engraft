@@ -3,7 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
 import { builtinTools } from "@engraft/original/src/builtin-tools";
 import { slotSetTo } from '@engraft/original/src/builtin-tools/slot';
-import { examples } from '@engraft/original/src/examples/examples';
+import { examples } from './examples';
 import { useIncr } from '@engraft/incr-react';
 import { Updater } from '@engraft/original/src/util/immutable';
 import { useStateSetOnly } from '@engraft/original/src/util/immutable-react';

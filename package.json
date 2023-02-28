@@ -2,6 +2,9 @@
   "private": true,
   "name": "engraft",
   "description": "Engraft monorepo.",
+  "scripts": {
+    "testbed:dev": "lerna run dev --scope @engraft/testbed"
+  },
   "workspaces": [
     "packages/*"
   ],
