@@ -1,9 +1,7 @@
+import { hookMemo, hooks, memoizeProps } from '@engraft/incr';
 import { RgbColorPicker } from 'react-colorful';
-import { ComputeReferences, ProgramFactory, ToolRun, ToolView } from "../../engraft";
+import { ComputeReferences, ProgramFactory, ToolProps, ToolRun, ToolView } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
-import { hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 
 export type Program = {
   toolName: 'color',
@@ -21,7 +19,7 @@ export const programFactory: ProgramFactory<Program> = () => ({
 
 export const computeReferences: ComputeReferences<Program> = (program) => new Set();
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
+export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program } = props;
 
   const outputP = hookMemo(() => EngraftPromise.resolve({

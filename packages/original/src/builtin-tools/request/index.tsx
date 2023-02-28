@@ -1,3 +1,4 @@
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { slotSetTo } from "../../builtin-tools/slot";
 import {
   ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram,
@@ -6,9 +7,6 @@ import {
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { hookRunTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { RowToCol } from "../../util/RowToCol";
 import { union } from "../../util/sets";
 import { UseUpdateProxy } from "../../util/UpdateProxy.react";

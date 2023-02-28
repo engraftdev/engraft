@@ -1,13 +1,11 @@
+import { memoizeProps, hooks, hookFork, hookMemo } from "@engraft/incr";
+import { useIncr } from "@engraft/incr-react";
 import _ from "lodash";
 import { memo, useMemo } from "react";
 import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { hookRunTool, runTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hookFork, hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
-import { useIncr } from "../../incr/react";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "../../util/sets";
 import { useUpdateProxy } from "../../util/UpdateProxy.react";

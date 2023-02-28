@@ -1,10 +1,8 @@
+import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { ComputeReferences, ProgramFactory, references, ToolProgram, ToolProps, ToolView } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { hookRunTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hookFork, hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { union } from "../../util/sets";
 import { UseUpdateProxy } from "../../util/UpdateProxy.react";
 

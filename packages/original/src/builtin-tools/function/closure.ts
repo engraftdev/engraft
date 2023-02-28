@@ -1,7 +1,7 @@
+import { IncrMemory } from "@engraft/incr";
 import { ToolProgram, Var, VarBindings } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { runTool } from "../../engraft/hooks";
-import { IncrMemory } from "../../incr";
 
 export type Closure = {
   vars: Var[],

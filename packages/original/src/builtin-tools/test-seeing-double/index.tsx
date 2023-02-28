@@ -1,10 +1,8 @@
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { references, Tool, ToolProgram, ToolView } from "../../engraft";
 import { hookRunTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { UseUpdateProxy } from "../../util/UpdateProxy.react";
 import { slotSetTo } from "../slot";
 

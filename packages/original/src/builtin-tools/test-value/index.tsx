@@ -1,8 +1,6 @@
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { Tool } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
-import { hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 
 export type Program = {
   toolName: 'test-value',

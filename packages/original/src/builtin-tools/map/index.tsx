@@ -5,9 +5,6 @@ import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { usePromiseState } from "../../engraft/EngraftPromise.react";
 import { hookRunTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hookFork, hookLater, hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { isObject } from "@engraft/shared/src/isObject";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "../../util/sets";
@@ -15,6 +12,7 @@ import { useUpdateProxy } from "../../util/UpdateProxy.react";
 import { ErrorView, ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
 import { slotSetTo } from "../slot";
+import { memoizeProps, hooks, hookMemo, hookLater, hookFork } from "@engraft/incr";
 
 
 export type Program = {

@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 import _ from 'lodash';
 import { expectToEqual, expectToNotEqual } from '@engraft/test-shared/src/expectToEqual';
-import { IncrMemory } from '.';
+import { IncrMemory } from './incr';
 import { hookFork, hookIncr, hookRef, hooks } from './hooks';
 
 let squareRuns = 0;

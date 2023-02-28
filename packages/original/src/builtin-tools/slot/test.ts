@@ -4,11 +4,11 @@ import { update } from '../../deps';
 import { registerTool, ToolOutput } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';
-import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { empty } from '../../util/noOp';
 import * as slot from './index';
+import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

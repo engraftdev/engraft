@@ -1,3 +1,4 @@
+import { useIncr } from '@engraft/incr-react';
 import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
@@ -8,7 +9,6 @@ import { EngraftPromise } from './engraft/EngraftPromise';
 import { runTool } from './engraft/hooks';
 import { ShowView } from './engraft/ShowView';
 import { examples } from './examples/examples';
-import { useIncr } from './incr/react';
 import { Updater } from './util/immutable';
 import { useStateSetOnly } from './util/immutable-react';
 import range from './util/range';

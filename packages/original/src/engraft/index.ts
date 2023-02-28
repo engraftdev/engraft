@@ -1,5 +1,5 @@
+import { IncrFunction } from "@engraft/incr";
 import { ReactElement } from "react";
-import { IncrFunction } from "../incr";
 import { weakMapCache } from "../util/cache";
 import { newId } from "../util/id";
 import { Updater } from "../util/immutable";

@@ -1,0 +1,13 @@
+{
+  "name": "@engraft/incr",
+  "version": "0.0.1",
+  "description": "Library for incremental computation",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run"
+  },
+  "main": "src/index.js",
+  "dependencies": {
+    "@engraft/shared": "^0.0.1"
+  }
+}

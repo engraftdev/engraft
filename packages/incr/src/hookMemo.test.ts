@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { refEq } from '@engraft/shared/src/eq';
-import { IncrMemory } from '.';
+import { IncrMemory } from './incr';
 import { hookMemo } from './hookMemo';
 import { hooks } from './hooks';
 

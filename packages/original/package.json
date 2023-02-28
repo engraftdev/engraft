@@ -51,7 +51,9 @@
     "synchronous-promise": "^2.0.16",
     "vega": "^5.22.1",
     "vega-lite": "^5.6.0",
-    "@engraft/shared": "^0.0.1"
+    "@engraft/shared": "^0.0.1",
+    "@engraft/incr": "^0.0.1",
+    "@engraft/incr-react": "^0.0.1"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

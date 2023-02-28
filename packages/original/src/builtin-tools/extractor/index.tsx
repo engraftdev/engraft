@@ -1,12 +1,10 @@
+import { memoizeProps, hooks, hookMemo } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { slotSetTo } from "../../builtin-tools/slot";
 import { references, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "../../engraft";
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { hookRunTool } from "../../engraft/hooks";
 import { ShowView } from "../../engraft/ShowView";
-import { hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { newId } from "../../util/id";
 import { noOp } from "../../util/noOp";
 import { RowToCol } from "../../util/RowToCol";

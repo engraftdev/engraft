@@ -6,7 +6,6 @@ import { newVar, registerTool, VarBindings } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';
 import { ToolWithView } from '../../engraft/ToolWithView';
-import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { empty, noOp } from '../../util/noOp';
@@ -14,6 +13,7 @@ import { slotSetTo } from '../slot';
 import * as notebook from './index';
 import * as testValue from '../test-value';
 import * as slot from '../slot';
+import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

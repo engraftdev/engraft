@@ -1,5 +1,4 @@
 import { memo, useEffect } from "react";
-import { useIncr } from "../incr/react";
 import { Setter } from "../util/immutable";
 import IsolateStyles from "../view/IsolateStyles";
 import { ToolOutput, ToolProps, ToolViewRenderProps } from ".";
@@ -7,6 +6,7 @@ import { PromiseState } from "./EngraftPromise";
 import { usePromiseState } from "./EngraftPromise.react";
 import { runTool } from "./hooks";
 import { ShowView } from "./ShowView";
+import { useIncr } from "@engraft/incr-react";
 
 type ToolWithViewProps =
   ToolProps<any>

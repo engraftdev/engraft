@@ -9,12 +9,10 @@ import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { usePromiseState } from '../../engraft/EngraftPromise.react';
 import { hookRunTool } from '../../engraft/hooks';
 import { ShowView } from '../../engraft/ShowView';
-import { hookMemo } from '../../incr/hookMemo';
-import { hooks } from '../../incr/hooks';
-import { memoizeProps } from '../../incr/memoize';
 import { UpdateProxy } from '../../util/UpdateProxy';
 import { useUpdateProxy } from '../../util/UpdateProxy.react';
 import builtinStyles from './builtin.css?inline';
+import { memoizeProps, hooks, hookMemo } from "@engraft/incr";
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.

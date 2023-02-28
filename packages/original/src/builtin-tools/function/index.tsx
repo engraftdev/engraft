@@ -4,9 +4,6 @@ import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, Too
 import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { hookRelevantVarBindings } from "../../engraft/hooks";
 import { ToolWithView } from "../../engraft/ToolWithView";
-import { hookDedupe, hookMemo } from "../../incr/hookMemo";
-import { hooks } from "../../incr/hooks";
-import { memoizeProps } from "../../incr/memoize";
 import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import { newId } from "../../util/id";
 import { noOp } from "../../util/noOp";
@@ -20,6 +17,7 @@ import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
 import { slotSetTo } from "../slot";
 import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure";
+import { memoizeProps, hooks, hookDedupe, hookMemo } from "@engraft/incr";
 
 export type Program = {
   toolName: 'function',

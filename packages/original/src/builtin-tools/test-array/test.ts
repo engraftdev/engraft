@@ -2,12 +2,12 @@ import { describe, it } from 'vitest';
 import { update } from '../../deps';
 import { registerTool } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { empty } from '../../util/noOp';
 import * as testArray from './index';
 import * as testValue from '../test-value'
+import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

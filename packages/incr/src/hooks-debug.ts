@@ -1,5 +1,4 @@
-import _ from "lodash";
-import { compare } from "../util/compare";
+import { compare } from "@engraft/shared/src/compare";
 import { hookRef } from "./hooks";
 
 // Not especially pure; probably shouldn't be used outside of debug contexts?

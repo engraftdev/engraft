@@ -1,15 +1,14 @@
+import { hooks, hookRef, hookFork, hookMemo, hookIncr, IncrMemory } from '@engraft/incr';
 import update from 'immutability-helper';
 import React from "react";
 import * as slider from '../../builtin-tools/slider';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { IncrMemory } from '../../incr';
-import { hookMemo } from '../../incr/hookMemo';
-import { hookFork, hookIncr, hookRef, hooks } from '../../incr/hooks';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { createElementFromReact } from "../../util/createElementFrom";
 import Diagram from '../../util/Diagram';
 import { DOM } from "../../util/DOM";
 import { GoogleMap } from '../../view/GoogleMap';
+import _ from 'lodash';
 
 const sliderTool = toolFromModule(slider);
 
@@ -22,6 +21,7 @@ function html(s: string) {
 }
 
 export const globals = {
+  _,
   React,  // JSX in slots is transformed by Babel into code that refers to `React`
   createElementFromReact,
   DOM,

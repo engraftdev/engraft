@@ -1,10 +1,10 @@
 import { describe, it } from 'vitest';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { empty } from '../../util/noOp';
 import * as testValue from '.';
+import { IncrMemory } from '@engraft/incr';
 
 const testValueTool = toolFromModule(testValue);
 

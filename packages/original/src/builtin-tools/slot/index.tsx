@@ -16,9 +16,6 @@ import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { usePromiseState } from '../../engraft/EngraftPromise.react';
 import { hookRelevantVarBindings, hookRunTool } from '../../engraft/hooks';
 import { ShowView } from '../../engraft/ShowView';
-import { hookDedupe, hookMemo } from '../../incr/hookMemo';
-import { hookFork, hooks } from '../../incr/hooks';
-import { memoizeProps } from '../../incr/memoize';
 import { cache } from '../../util/cache';
 import CodeMirror from '../../util/CodeMirror';
 import { setup } from "../../util/codeMirrorStuff";
@@ -40,6 +37,7 @@ import { VarUse } from '../../view/Vars';
 import { refCompletions, toolCompletions } from './autocomplete';
 import { globals } from './globals';
 import { referencesFromCode, refRE } from './refs';
+import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 

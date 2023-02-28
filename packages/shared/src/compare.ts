@@ -1,8 +1,8 @@
-import _ from "lodash";
+import isEqual from "lodash/isEqual";
 import { diff } from "deep-object-diff";
 
 export function compare(a: any, b: any): string {
-  if (!_.isEqual(a, b)) {
+  if (isEqual(a, b)) {
     return "[not deep-equal]: " + JSON.stringify(diff(a, b), null, 2);
   } else {
     return "[deep-equal]: " + JSON.stringify(compareDeepEqualObjectsForReferenceEquality(a, b), null, 2);

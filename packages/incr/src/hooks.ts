@@ -1,4 +1,4 @@
-import { IncrFunction, IncrMemory } from ".";
+import { IncrFunction, IncrMemory } from "./incr";
 
 // a way to make mentos using React-hook-like sugar
 

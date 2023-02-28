@@ -2,12 +2,12 @@ import { describe, it } from 'vitest';
 import { newVar, registerTool } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';
-import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';
 import * as slot from '../slot';
+import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

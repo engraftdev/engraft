@@ -1,5 +1,4 @@
-import { hookDedupe, hookMemo } from "../incr/hookMemo";
-import { hookFork, hookIncr, hooks } from "../incr/hooks";
+import { hookDedupe, hookFork, hookIncr, hookMemo, hooks } from "@engraft/incr";
 import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
 
