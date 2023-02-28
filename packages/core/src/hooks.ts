@@ -1,10 +1,10 @@
 import { hookDedupe, hookFork, hookIncr, hookMemo, hooks } from "@engraft/incr";
 import { objEqWithRefEq } from "@engraft/shared/src/eq";
-import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core";
+import { lookUpToolByProgram, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core";
 
-export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults {
+export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults<P> {
   const toolName = props.program.toolName;
-  const tool = lookUpTool(toolName);
+  const tool = lookUpToolByProgram(props.program);
 
   // Run in a branch keyed by the toolName, so that a new memory is used if toolName changes
   // TODO: hookKeyed?

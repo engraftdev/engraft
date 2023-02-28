@@ -1,4 +1,4 @@
-import { EngraftPromise, getFullToolIndex, lookUpTool, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
+import { EngraftPromise, getFullToolIndex, lookUpToolByName, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
 import { useIncr } from '@engraft/incr-react';
 import { builtinTools } from "@engraft/original/src/builtin-tools";
 import { slotWithProgram } from '@engraft/original/src/builtin-tools/slot';
@@ -16,7 +16,7 @@ import { examples } from './examples';
 
 builtinTools.map(registerTool);
 
-const defaultProgram = lookUpTool('slot')!.programFactory();
+const defaultProgram = lookUpToolByName('slot').programFactory();
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
@@ -95,7 +95,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateProgram(() => slotWithProgram(lookUpTool(ev.target.value).programFactory()));
+          updateProgram(() => slotWithProgram(lookUpToolByName(ev.target.value).programFactory()));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
         {Object.keys(getFullToolIndex()).map((name) =>

@@ -55,7 +55,7 @@ export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<strin
 
 let toolIndex: { [toolName: string]: Tool } = {};
 
-export function lookUpTool(toolName: string): Tool<ToolProgram> {
+export function lookUpToolByName(toolName: string): Tool<ToolProgram> {
   const tool = toolIndex[toolName];
   if (!tool) {
     return toolIndex['not-found'];
@@ -63,12 +63,17 @@ export function lookUpTool(toolName: string): Tool<ToolProgram> {
   return tool;
 }
 
-// intentionally awkward name to remind you to prefer use of lookUpTool
+export function lookUpToolByProgram<P extends ToolProgram>(program: P): Tool<P> {
+  const tool = lookUpToolByName(program.toolName);
+  return tool as any as Tool<P>;  // unless it's a not-found tool (which is also fine), this is safe
+}
+
+// intentionally awkward name to remind you to prefer use of lookUpToolByX
 export function getFullToolIndex(): { [toolName: string]: Tool<ToolProgram> } {
   return toolIndex;
 }
 
-export function registerTool(tool: Tool<ToolProgram>) {
+export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
   // do some checks to make sure the tool is valid
   if (!tool.programFactory) {
     throw new Error(`Tool has no programFactory`);
@@ -86,7 +91,7 @@ export function registerTool(tool: Tool<ToolProgram>) {
   }
 
   const { toolName } = tool.programFactory();
-  toolIndex[toolName] = tool;
+  toolIndex[toolName] = tool as any;  // forget the type parameter
 }
 
 
@@ -114,10 +119,10 @@ export function varBindingsValid(varBindings: VarBindings): boolean {
   });
 }
 
-export const references = weakMapCache((program: ToolProgram): Set<string> => {
+export const references = weakMapCache(<P extends ToolProgram>(program: P): Set<string> => {
   // TODO: The one risk of caching this is that lookUpTool might produce varying results if someday
   // the registry changes.
-  const tool = lookUpTool(program.toolName);
+  const tool = lookUpToolByProgram(program);
   return tool.computeReferences(program);
 });
 
