@@ -2,7 +2,7 @@ import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, referen
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 export type Program = {
   toolName: 'test-delay',
@@ -15,8 +15,8 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => ({
   toolName: 'test-delay',
-  delayProgram: slotSetTo('1000'),
-  actualProgram: slotSetTo(defaultCode || ''),
+  delayProgram: slotWithCode('1000'),
+  actualProgram: slotWithCode(defaultCode || ''),
 });
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {

@@ -2,7 +2,7 @@ import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
 import { builtinTools } from "@engraft/original/src/builtin-tools";
-import { slotSetTo } from '@engraft/original/src/builtin-tools/slot';
+import { slotWithCode } from '@engraft/original/src/builtin-tools/slot';
 import { examples } from './examples';
 import { useIncr } from '@engraft/incr-react';
 import { Updater } from '@engraft/original/src/util/immutable';
@@ -95,7 +95,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateProgram(() => slotSetTo(lookUpTool(ev.target.value).programFactory()));
+          updateProgram(() => slotWithCode(lookUpTool(ev.target.value).programFactory()));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
         {Object.keys(getFullToolIndex()).map((name) =>

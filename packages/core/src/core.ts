@@ -47,7 +47,9 @@ export type ToolProps<P extends ToolProgram> = {
   varBindings: VarBindings,
 }
 
-export type ProgramFactory<P extends ToolProgram> = (defaultInputCode?: string) => P;
+export type ProgramFactory<P extends ToolProgram> = (
+  defaultInputCode?: string,
+) => P;
 
 export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<string>;
 

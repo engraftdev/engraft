@@ -5,7 +5,7 @@ import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
 
 export type Program = {
@@ -22,7 +22,7 @@ const marks: Mark[] = ['bar', 'line', 'area', 'point'];
 export const programFactory: ProgramFactory<Program> = (defaultInputCode?: string) => {
   return {
     toolName: 'simple-chart',
-    dataProgram: slotSetTo(defaultInputCode || ''),
+    dataProgram: slotWithCode(defaultInputCode || ''),
     mark: 'bar',
     xChannel: undefined,
     yChannel: undefined,

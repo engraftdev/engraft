@@ -6,7 +6,7 @@ import { getById, updateById } from "../../util/id";
 import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { Value } from "../../view/Value";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 import builtinStyles from './builtin.css?inline';
 import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
 
@@ -24,7 +24,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
     toolName: 'formatter',
-    inputProgram: slotSetTo(defaultCode || ''),
+    inputProgram: slotWithCode(defaultCode || ''),
     rootElement: {
       id: 'root',
       type: 'element',

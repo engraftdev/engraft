@@ -8,7 +8,7 @@ import { ToolWithView } from '../../view/ToolWithView';
 import { describe, it } from 'vitest';
 import { empty, noOp } from '../../util/noOp';
 import * as slot from '../slot';
-import { slotSetTo } from '../slot';
+import { slotWithCode } from '../slot';
 import * as testValue from '../test-value';
 import * as notebook from './index';
 
@@ -88,12 +88,12 @@ describe('notebook', () => {
       cells: [
         {
           var_: {id: 'cell1', label: ''},
-          program: slotSetTo('100'),
+          program: slotWithCode('100'),
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
-          program: slotSetTo(`${prevVar.id} + 1`),
+          program: slotWithCode(`${prevVar.id} + 1`),
           outputManualHeight: undefined,
         },
       ],
@@ -131,12 +131,12 @@ describe('notebook', () => {
       cells: [
         {
           var_: cell1,
-          program: slotSetTo(`${externalVar.id} + 10`),
+          program: slotWithCode(`${externalVar.id} + 10`),
           outputManualHeight: undefined,
         },
         {
           var_: cell2,
-          program: slotSetTo(`${cell1.id} + 20`),
+          program: slotWithCode(`${cell1.id} + 20`),
           outputManualHeight: undefined,
         }
       ],

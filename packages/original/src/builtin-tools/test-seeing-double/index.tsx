@@ -2,7 +2,7 @@ import { hookRunTool, references, ShowView, Tool, ToolProgram, ToolView } from "
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 export type Program = {
   toolName: 'test-seeing-double',
@@ -13,7 +13,7 @@ export type Program = {
 export const tool: Tool<Program> = {
   programFactory: () => ({
     toolName: 'test-seeing-double',
-    subProgram: slotSetTo(''),
+    subProgram: slotWithCode(''),
     rerenderOnProgramChange: false,
   }),
 

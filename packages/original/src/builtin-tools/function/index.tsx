@@ -13,7 +13,7 @@ import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
 import { SettableValue } from "../../view/SettableValue";
 import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure";
 
 export type Program = {
@@ -35,7 +35,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   return {
     toolName: 'function',
     vars: [var1],
-    bodyProgram: slotSetTo(var1.id),
+    bodyProgram: slotWithCode(var1.id),
     examples: [{id: exampleId, values: [undefined]}],
     activeExampleId: exampleId,
   }

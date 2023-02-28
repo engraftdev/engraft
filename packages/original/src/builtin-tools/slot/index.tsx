@@ -64,20 +64,27 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   subPrograms: {},
 });
 
-// Right now, this is the only reasonable way to make a tool of ANY sort. Why? It provides the
-// ToolFrame, and with it, the ability to switch out of the given tool into a different one.
-export function slotSetTo<P extends ToolProgram | string>(program: P): Program {
-  // TODO: this is a hack, isn't it? (the program.toolName === 'slot' part, I mean)
-  if (typeof program !== 'string' && program.toolName === 'slot') {
+export function slotWithCode(program: string = ''): Program {
+  return {
+    toolName: 'slot',
+    modeName: 'code',
+    code: program,
+    defaultCode: program,
+    subPrograms: {},
+  };
+}
+
+export function slotWithProgram(program: ToolProgram): Program {
+  // TODO: this condition is a hack, isn't it?
+  if (program.toolName === 'slot') {
     return program as Program;
   }
 
   return {
     toolName: 'slot',
-    ...(typeof program === 'string' ?
-        { modeName: 'code', code: program, defaultCode: program, subPrograms: {} } :
-        { modeName: 'tool', subProgram: program, defaultCode: undefined }
-    )
+    modeName: 'tool',
+    subProgram: program,
+    defaultCode: undefined,
   };
 }
 
@@ -331,7 +338,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = randomId();
-      const newProgram = slotSetTo(tool.programFactory());
+      const newProgram = slotWithProgram(tool.programFactory());
       programUP.subPrograms[id].$set(newProgram);
       // TODO: we never remove these! lol
       return id;
@@ -364,7 +371,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
               const parsed = JSON.parse(text);
               if (parsed.toolName) {
                 // TODO: for now, we just replace – someday we should check about insertions
-                updateProgram(() => slotSetTo(parsed));
+                updateProgram(() => slotWithCode(parsed));
                 event.preventDefault();
               }
             } catch {

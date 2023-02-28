@@ -4,7 +4,7 @@ import { EngraftPromise } from '@engraft/core';
 import { makeVarBindings } from '@engraft/core';
 import { toolFromModule } from '@engraft/core';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { slotSetTo } from '../slot';
+import { slotWithCode } from '../slot';
 import * as simulation from './index';
 import * as slot from '../slot';
 import { IncrMemory } from '@engraft/incr';
@@ -21,9 +21,9 @@ describe('simulation', () => {
       toolName: 'simulation',
       ticksCount: 3,
       stateVar,
-      initProgram: slotSetTo(`0`),
-      onTickProgram: slotSetTo(`${stateVar.id} + IDone000000`),
-      toDrawProgram: slotSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+      initProgram: slotWithCode(`0`),
+      onTickProgram: slotWithCode(`${stateVar.id} + IDone000000`),
+      toDrawProgram: slotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
     };
 
     expectToEqual(

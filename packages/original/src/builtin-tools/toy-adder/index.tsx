@@ -2,7 +2,7 @@ import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, referen
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 export type Program = {
   toolName: 'toy-adder';
@@ -12,8 +12,8 @@ export type Program = {
 
 export const programFactory: ProgramFactory<Program> = () => ({
   toolName: 'toy-adder',
-  xProgram: slotSetTo(''),
-  yProgram: slotSetTo(''),
+  xProgram: slotWithCode(''),
+  yProgram: slotWithCode(''),
 });
 
 export const computeReferences: ComputeReferences<Program> = (program) =>

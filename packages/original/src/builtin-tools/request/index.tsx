@@ -3,7 +3,7 @@ import {
   ToolProps, ToolRun, ToolView
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { slotSetTo } from "../../builtin-tools/slot";
+import { slotWithCode } from "../../builtin-tools/slot";
 import { RowToCol } from "../../util/RowToCol";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
@@ -18,8 +18,8 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = () => {
   return {
     toolName: "request",
-    urlProgram: slotSetTo('"https://httpbin.org/get"'),
-    paramsProgram: slotSetTo(paramsDefault),
+    urlProgram: slotWithCode('"https://httpbin.org/get"'),
+    paramsProgram: slotWithCode(paramsDefault),
     pauseRequest: false,
   };
 };

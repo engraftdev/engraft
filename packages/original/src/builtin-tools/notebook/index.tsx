@@ -20,7 +20,7 @@ import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
 import ScrollShadow from "../../view/ScrollShadow";
 import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 
 export type Program = {
@@ -43,7 +43,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
     cells: [
       {
         var_: newVar(alphaLabels[0]),
-        program: slotSetTo(defaultInput || ''),
+        program: slotWithCode(defaultInput || ''),
         outputManualHeight: undefined,
       }
     ],
@@ -238,7 +238,7 @@ const CellDivider = memo((props: {
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
-        program: slotSetTo(i === 0 ? '' : prevVar.id),
+        program: slotWithCode(i === 0 ? '' : prevVar.id),
         outputManualHeight: undefined,
       });
       return newCells;

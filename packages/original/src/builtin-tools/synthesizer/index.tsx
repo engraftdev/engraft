@@ -7,7 +7,7 @@ import { setup } from "../../util/codeMirrorStuff"
 import { compileExpressionCached } from "../../util/compile"
 import { Task } from "../../util/Task"
 import { updateProxy, UpdateProxyRemovable } from "@engraft/update-proxy"
-import { slotSetTo } from "../slot"
+import { slotWithCode } from "../slot"
 import { SynthesisState, synthesizeGen } from "./synthesizer"
 
 
@@ -28,7 +28,7 @@ export type Program = {
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   return {
     toolName: 'synthesizer',
-    inputProgram: slotSetTo(defaultCode || ''),
+    inputProgram: slotWithCode(defaultCode || ''),
     code: 'input',
     inOutPairs: []
   };

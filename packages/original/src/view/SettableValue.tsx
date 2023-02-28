@@ -1,6 +1,6 @@
 import { PromiseState, ToolOutput } from "@engraft/core";
 import { memo, useCallback, useMemo, useState } from "react";
-import { slotSetTo } from "../builtin-tools/slot";
+import { slotWithCode } from "../builtin-tools/slot";
 import { Setter } from "../util/immutable";
 import { useStateSetOnly, useStateUpdateOnly } from "../util/immutable-react";
 import { empty } from "../util/noOp";
@@ -23,7 +23,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
 
-  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(() => slotSetTo(''))
+  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(() => slotWithCode(''))
   const [entryOutputState, setEntryOutputState] = useStateSetOnly<PromiseState<ToolOutput> | null>(() => null)
 
   const onClickSet = useCallback(() => {

@@ -8,7 +8,7 @@ import { difference, union } from "@engraft/shared/src/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ErrorView, ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 
 export type Program = {
@@ -22,9 +22,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   const itemVar = newVar('item');
   return {
     toolName: 'map',
-    inputProgram: slotSetTo(defaultCode || ''),
+    inputProgram: slotWithCode(defaultCode || ''),
     itemVar,
-    perItemProgram: slotSetTo(itemVar.id)
+    perItemProgram: slotWithCode(itemVar.id)
   };
 };
 

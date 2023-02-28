@@ -2,7 +2,7 @@ import { ComputeReferences, hookRunTool, ProgramFactory, ShowView, ToolProgram, 
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { ValueEditable } from '../../view/ValueEditable';
-import { slotSetTo } from '../slot';
+import { slotWithCode } from '../slot';
 
 export type Program = {
   toolName: 'test-show-program',
@@ -11,7 +11,7 @@ export type Program = {
 
 export const programFactory: ProgramFactory<Program> = (defaultInputCode) => ({
   toolName: 'test-show-program',
-  subProgram: slotSetTo(defaultInputCode || ''),
+  subProgram: slotWithCode(defaultInputCode || ''),
 });
 
 export const computeReferences: ComputeReferences<Program> = (program) => new Set();

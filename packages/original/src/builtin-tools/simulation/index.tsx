@@ -7,7 +7,7 @@ import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "@engraft/shared/src/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ToolOutputView } from "../../view/Value";
-import { slotSetTo } from "../slot";
+import { slotWithCode } from "../slot";
 
 
 export type Program = {
@@ -25,9 +25,9 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     toolName: 'simulation',
     ticksCount: 20,
     stateVar,
-    initProgram: slotSetTo('{}'),
-    onTickProgram: slotSetTo(stateVar.id),
-    toDrawProgram: slotSetTo(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+    initProgram: slotWithCode('{}'),
+    onTickProgram: slotWithCode(stateVar.id),
+    toDrawProgram: slotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
   };
 };
 

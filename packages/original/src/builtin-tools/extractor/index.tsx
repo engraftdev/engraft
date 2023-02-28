@@ -1,7 +1,7 @@
 import { EngraftPromise, hookRunTool, randomId, references, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
-import { slotSetTo } from "../../builtin-tools/slot";
+import { slotWithCode } from "../../builtin-tools/slot";
 import { noOp } from "../../util/noOp";
 import { RowToCol } from "../../util/RowToCol";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -27,7 +27,7 @@ export type Program = {
 export const tool: Tool<Program> = {
   programFactory: (defaultInputCode) => ({
     toolName: 'extractor',
-    inputProgram: slotSetTo(defaultInputCode || ''),
+    inputProgram: slotWithCode(defaultInputCode || ''),
     patternsWithIds: [],
     minimized: false,
   }),
