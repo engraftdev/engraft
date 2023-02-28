@@ -4,6 +4,7 @@
   "description": "Engraft monorepo.",
   "scripts": {
     "testbed:dev": "lerna run dev --scope @engraft/testbed",
+    "root:test":  "vitest",
     "all:test":  "lerna run test",
     "all:test:watch":  "lerna run test:watch"
   },
