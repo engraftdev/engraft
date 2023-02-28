@@ -1,7 +1,7 @@
 import { hookRunTool, references, ShowView, Tool, ToolProgram, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
-import { UseUpdateProxy } from "../../util/UpdateProxy.react";
+import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { slotSetTo } from "../slot";
 
 export type Program = {

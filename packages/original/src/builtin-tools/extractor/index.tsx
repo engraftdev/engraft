@@ -4,7 +4,7 @@ import React, { createContext, memo, useCallback, useContext, useEffect, useStat
 import { slotSetTo } from "../../builtin-tools/slot";
 import { noOp } from "../../util/noOp";
 import { RowToCol } from "../../util/RowToCol";
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { Use } from "../../util/Use";
 import { useWindowEventListener } from "../../util/useEventListener";
 import useHover from "../../util/useHover";

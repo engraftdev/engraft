@@ -5,7 +5,7 @@ import _ from "lodash";
 import { CSSProperties, memo, ReactNode } from "react";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "../../util/sets";
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ErrorView, ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
 import { slotSetTo } from "../slot";

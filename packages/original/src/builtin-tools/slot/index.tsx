@@ -24,7 +24,7 @@ import { usePortalSet } from '../../util/PortalWidget';
 import { makeRand } from '../../util/rand';
 import { difference, union } from '../../util/sets';
 import { Replace } from '../../util/types';
-import { useUpdateProxy } from '../../util/UpdateProxy.react';
+import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { useRefForCallback } from '../../util/useRefForCallback';
 import IsolateStyles from '../../view/IsolateStyles';
 import { ToolFrame } from '../../view/ToolFrame';

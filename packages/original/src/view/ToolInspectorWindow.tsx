@@ -2,7 +2,7 @@ import { memo } from "react";
 import { references, ToolProgram, VarBindings } from "@engraft/core";
 import { runtimeObjectId } from "../util/id";
 import { Updater } from "../util/immutable";
-import { useUpdateProxy } from "../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { WindowPortal } from "../util/WindowPortal";
 import IsolateStyles from "./IsolateStyles";
 import { Value } from "./Value";

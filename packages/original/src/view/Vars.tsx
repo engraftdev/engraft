@@ -4,7 +4,7 @@ import { ControlledSpan } from "../util/ControlledTextInput";
 import { Updater } from "../util/immutable";
 import { ObjectInspector } from "react-inspector";
 import { usePromiseState } from "@engraft/core";
-import { useUpdateProxy } from "../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 
 
 interface VarDefinitionProps {

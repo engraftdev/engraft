@@ -2,7 +2,7 @@ import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProp
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 
 export type P = {
   toolName: 'file';

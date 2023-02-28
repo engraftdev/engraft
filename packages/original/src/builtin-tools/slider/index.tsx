@@ -1,7 +1,7 @@
 import { EngraftPromise, Tool, ToolProps, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback } from "react";
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { useContextMenu } from "../../util/useContextMenu";
 import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
 

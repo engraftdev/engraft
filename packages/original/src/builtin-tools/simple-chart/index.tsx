@@ -3,8 +3,8 @@ import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
-import { UpdateProxy } from "../../util/UpdateProxy";
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { UpdateProxy } from "@engraft/update-proxy";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { slotSetTo } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
 

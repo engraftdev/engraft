@@ -1,6 +1,6 @@
 import { CSSProperties, memo, useMemo, useState } from "react";
 import { combineDrags, someDrag, startDrag } from "../../util/drag";
-import { UpdateProxy } from "../../util/UpdateProxy";
+import { UpdateProxy } from "@engraft/update-proxy";
 import useHover from "../../util/useHover";
 import { useRefForCallback } from "../../util/useRefForCallback";
 import { PaneGeo, roundTo } from "./model";

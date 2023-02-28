@@ -1,7 +1,7 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { ControlledTextInput } from '../../util/ControlledTextInput';
-import { UseUpdateProxy } from "../../util/UpdateProxy.react";
+import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {
   toolName: 'npm',

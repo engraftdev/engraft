@@ -6,7 +6,7 @@ import CodeMirror from "../../util/CodeMirror"
 import { setup } from "../../util/codeMirrorStuff"
 import { compileExpressionCached } from "../../util/compile"
 import { Task } from "../../util/Task"
-import { updateProxy, UpdateProxyRemovable } from "../../util/UpdateProxy"
+import { updateProxy, UpdateProxyRemovable } from "@engraft/update-proxy"
 import { slotSetTo } from "../slot"
 import { SynthesisState, synthesizeGen } from "./synthesizer"
 

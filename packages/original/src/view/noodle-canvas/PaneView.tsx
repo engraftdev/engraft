@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from "react";
 import { startDrag } from "../../util/drag";
-import { useUpdateProxy } from "../../util/UpdateProxy.react";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { useRefForCallback } from "../../util/useRefForCallback";
 
 

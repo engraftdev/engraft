@@ -6,7 +6,7 @@ import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { slotSetTo } from "../../builtin-tools/slot";
 import { RowToCol } from "../../util/RowToCol";
 import { union } from "../../util/sets";
-import { UseUpdateProxy } from "../../util/UpdateProxy.react";
+import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {
   toolName: "request";
