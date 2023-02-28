@@ -4,7 +4,7 @@ import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';
 import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
-import { expectToEqual } from '../../util/expectToEqual';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';
 import * as slot from '../slot';

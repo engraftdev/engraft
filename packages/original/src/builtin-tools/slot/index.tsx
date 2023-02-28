@@ -24,7 +24,7 @@ import CodeMirror from '../../util/CodeMirror';
 import { setup } from "../../util/codeMirrorStuff";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile";
 import { embedsExtension } from '../../util/embedsExtension';
-import { objEqWithRefEq } from '../../util/eq';
+import { objEqWithRefEq } from '@engraft/shared/src/eq';
 import { newId } from '../../util/id';
 import { Updater } from '../../util/immutable';
 import { usePortalSet } from '../../util/PortalWidget';

@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import _ from 'lodash';
-import { expectToEqual, expectToNotEqual } from '../util/expectToEqual';
+import { expectToEqual, expectToNotEqual } from '@engraft/test-shared/src/expectToEqual';
 import { IncrMemory } from '.';
 import { hookFork, hookIncr, hookRef, hooks } from './hooks';
 

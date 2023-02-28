@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { expectToEqual } from '../util/expectToEqual';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { SynchronousPromise } from 'synchronous-promise';
 import { EngraftPromise } from './EngraftPromise';
 

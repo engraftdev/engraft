@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import { compileExpression } from '../../util/compile';
-import { expectToEqual } from '../../util/expectToEqual';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { runToCompletion } from '../../util/Task';
 import { synthesizeGen } from './synthesizer';
 

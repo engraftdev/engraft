@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { refEq } from '../util/eq';
+import { refEq } from '@engraft/shared/src/eq';
 import { IncrMemory } from '.';
 import { hookMemo } from './hookMemo';
 import { hooks } from './hooks';

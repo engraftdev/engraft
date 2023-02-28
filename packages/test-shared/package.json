@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "@engraft/test-shared",
+  "version": "0.0.1",
+  "description": "Shared test utilities",
+  "dependencies": {
+  }
+}

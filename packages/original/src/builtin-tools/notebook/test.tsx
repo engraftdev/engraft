@@ -8,7 +8,7 @@ import { makeVarBindings } from '../../engraft/test-utils';
 import { ToolWithView } from '../../engraft/ToolWithView';
 import { IncrMemory } from '../../incr';
 import { toolFromModule } from '../../engraft/toolFromModule';
-import { expectToEqual } from '../../util/expectToEqual';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { empty, noOp } from '../../util/noOp';
 import { slotSetTo } from '../slot';
 import * as notebook from './index';

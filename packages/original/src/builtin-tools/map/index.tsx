@@ -8,7 +8,7 @@ import { ShowView } from "../../engraft/ShowView";
 import { hookMemo } from "../../incr/hookMemo";
 import { hookFork, hookLater, hooks } from "../../incr/hooks";
 import { memoizeProps } from "../../incr/memoize";
-import { isObject } from "../../util/hasProperty";
+import { isObject } from "@engraft/shared/src/isObject";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "../../util/sets";
 import { useUpdateProxy } from "../../util/UpdateProxy.react";

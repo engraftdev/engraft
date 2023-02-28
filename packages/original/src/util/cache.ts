@@ -1,4 +1,4 @@
-import { hasProperty } from "./hasProperty";
+import { hasProperty } from "@engraft/shared/src/hasProperty";
 
 type OrError<T> = {value: T} | {error: unknown};
 

@@ -1,4 +1,4 @@
-import { arrEqWithRefEq, objEqWithRefEq } from "../util/eq";
+import { arrEqWithRefEq, objEqWithRefEq } from "@engraft/shared/src/eq";
 import { IncrFunction, IncrMemory } from ".";
 import { hookMemo } from "./hookMemo";
 import { hookIncr, hooks } from "./hooks";

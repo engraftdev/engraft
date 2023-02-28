@@ -1,6 +1,6 @@
 import { hookDedupe, hookMemo } from "../incr/hookMemo";
 import { hookFork, hookIncr, hooks } from "../incr/hooks";
-import { objEqWithRefEq } from "../util/eq";
+import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
 
 export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults {

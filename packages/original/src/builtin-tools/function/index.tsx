@@ -7,7 +7,7 @@ import { ToolWithView } from "../../engraft/ToolWithView";
 import { hookDedupe, hookMemo } from "../../incr/hookMemo";
 import { hooks } from "../../incr/hooks";
 import { memoizeProps } from "../../incr/memoize";
-import { objEqWithRefEq } from "../../util/eq";
+import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import { newId } from "../../util/id";
 import { noOp } from "../../util/noOp";
 import { difference } from "../../util/sets";

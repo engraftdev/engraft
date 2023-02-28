@@ -1,4 +1,4 @@
-import { isObject } from "./hasProperty";
+import { isObject } from "./isObject";
 
 export type Eq<T> = (x1: T, x2: T) => boolean;
 

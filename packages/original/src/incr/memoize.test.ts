@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { expectToEqual } from '../util/expectToEqual';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { IncrFunction, IncrMemory } from '.';
 import { memoize, memoizeForever, memoizeProps } from './memoize';
 

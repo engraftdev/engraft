@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { expectToEqual, valueOfType } from '../util/expectToEqual';
+import { expectToEqual, valueOfType } from '@engraft/test-shared/src/expectToEqual';
 import { Updater } from './immutable';
 import { updateProxy } from './UpdateProxy';
 

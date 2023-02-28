@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "original",
+  "name": "@engraft/original",
   "version": "0.0.1",
   "description": "Temporary package to port over old code into the monorepo.",
   "scripts": {
@@ -8,7 +8,8 @@
     "test": "vitest run",
     "build": "vite build",
     "preview": "vite preview",
-    "dev": "vite"
+    "dev": "vite",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@babel/core": "^7.20.12",
@@ -48,7 +49,8 @@
     "seedrandom": "^3.0.5",
     "synchronous-promise": "^2.0.16",
     "vega": "^5.22.1",
-    "vega-lite": "^5.6.0"
+    "vega-lite": "^5.6.0",
+    "@engraft/shared": "^0.0.1"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

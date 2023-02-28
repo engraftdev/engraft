@@ -8,7 +8,7 @@ import { hookDedupe, hookMemo } from "../../incr/hookMemo";
 import { hookFork, hooks, hookSharedIncr } from "../../incr/hooks";
 import { memoizeForever, memoizeProps } from "../../incr/memoize";
 import { startDrag } from "../../util/drag";
-import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "../../util/eq";
+import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/src/eq";
 import { Updater } from "../../util/immutable";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { mergeRefs } from "../../util/mergeRefs";

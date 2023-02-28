@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "@engraft/shared",
+  "version": "0.0.1",
+  "description": "Shared utilities (to be inlined into other packages)",
+  "dependencies": {
+  }
+}

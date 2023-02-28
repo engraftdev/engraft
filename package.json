@@ -18,7 +18,8 @@
     "typescript": "^4.9.4",
     "vite": "^4.1.4",
     "vite-plugin-checker": "^0.5.6",
-    "vitest": "^0.29.1"
+    "vitest": "^0.29.1",
+    "@engraft/test-shared": "^0.0.1"
   },
   "eslintConfig": {
     "extends": [

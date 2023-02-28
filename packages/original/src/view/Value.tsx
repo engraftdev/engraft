@@ -14,7 +14,8 @@ import { identity } from "lodash";
 import { EngraftPromise, PromiseState } from "../engraft/EngraftPromise";
 import { usePromiseState } from "../engraft/EngraftPromise.react";
 import Diagram from "../util/Diagram";
-import { hasProperty, isObject } from "../util/hasProperty";
+import { isObject } from "@engraft/shared/src/isObject";
+import { hasProperty } from "@engraft/shared/src/hasProperty";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;

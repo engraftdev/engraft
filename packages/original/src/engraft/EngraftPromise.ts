@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { hasProperty } from "../util/hasProperty";
+import { hasProperty } from "@engraft/shared/src/hasProperty";
 import { SynchronousPromise } from "synchronous-promise";
 
 // In this file, we re-type SynchronousPromise as EngraftPromise, and give it better types.
