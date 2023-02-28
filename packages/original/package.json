@@ -3,6 +3,13 @@
   "name": "original",
   "version": "0.0.1",
   "description": "Temporary package to port over old code into the monorepo.",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev": "vite"
+  },
   "dependencies": {
     "@babel/core": "^7.20.12",
     "@babel/standalone": "^7.20.12",
