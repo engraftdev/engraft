@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import { update } from '../../deps';
+import update from 'immutability-helper';
 import { newVar, registerTool, VarBindings } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';

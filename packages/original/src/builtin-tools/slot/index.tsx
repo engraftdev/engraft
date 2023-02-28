@@ -10,7 +10,6 @@ import _ from 'lodash';
 import objectInspect from 'object-inspect';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
-import { cN } from '../../deps';
 import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "../../engraft";
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { usePromiseState } from '../../engraft/EngraftPromise.react';
@@ -38,6 +37,7 @@ import { refCompletions, toolCompletions } from './autocomplete';
 import { globals } from './globals';
 import { referencesFromCode, refRE } from './refs';
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
+import classNames from 'classnames';
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 
@@ -389,7 +389,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
 
   return (
     <div
-      className={cN('CodeModeView', {xWidthFitContent: !expand})}
+      className={classNames('CodeModeView', {xWidthFitContent: !expand})}
       style={{
         display: 'inline-block',
         minWidth: 20,

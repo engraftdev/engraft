@@ -1,5 +1,5 @@
+import classNames from "classnames";
 import { CSSProperties, memo, ReactNode, useState } from "react";
-import { cN } from "../deps";
 import { ToolProgram, VarBindings } from "../engraft";
 import { Updater } from "../util/immutable";
 import { Use } from "../util/Use";
@@ -24,7 +24,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
   const [showInspector, setShowInspector] = useState(false);
 
   return <div
-    className={cN("ToolFrame", {xWidthFitContent: !expand})}
+    className={classNames("ToolFrame", {xWidthFitContent: !expand})}
     style={{
       ...!SOFT_STYLE && {border: '1px solid #c4c4ff'},
       position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',

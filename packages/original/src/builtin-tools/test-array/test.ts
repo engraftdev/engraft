@@ -1,5 +1,5 @@
 import { describe, it } from 'vitest';
-import { update } from '../../deps';
+import update from 'immutability-helper';
 import { registerTool } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { toolFromModule } from '../../engraft/toolFromModule';

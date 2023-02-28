@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import _ from 'lodash';
-import { update } from '../../deps';
+import update from 'immutability-helper';
 import { registerTool, ToolOutput } from '../../engraft';
 import { EngraftPromise } from '../../engraft/EngraftPromise';
 import { makeVarBindings } from '../../engraft/test-utils';

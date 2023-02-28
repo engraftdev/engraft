@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "@engraft/testbed",
+  "version": "0.0.1",
+  "description": "Engraft testbed web application.",
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@engraft/original": "file:packages/original",
+    "react": "^18.0.0",
+    "react-error-boundary": "^3.1.4",
+    "react-router-dom": "^6.3.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react-dom": "^18.0.0"
+  }
+}
