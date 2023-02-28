@@ -22,7 +22,7 @@ import { embedsExtension } from '../../util/embedsExtension';
 import { Updater } from '../../util/immutable';
 import { usePortalSet } from '../../util/PortalWidget';
 import { makeRand } from '../../util/rand';
-import { difference, union } from '../../util/sets';
+import { difference, union } from '@engraft/shared/src/sets';
 import { Replace } from '../../util/types';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { useRefForCallback } from '../../util/useRefForCallback';

@@ -5,7 +5,7 @@ import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { ToolWithView } from "../../view/ToolWithView";
 import { noOp } from "../../util/noOp";
-import { difference } from "../../util/sets";
+import { difference } from "@engraft/shared/src/sets";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { useContextMenu } from "../../util/useContextMenu";

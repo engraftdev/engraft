@@ -4,7 +4,7 @@ import { isObject } from "@engraft/shared/src/isObject";
 import _ from "lodash";
 import { CSSProperties, memo, ReactNode } from "react";
 import { useStateSetOnly } from "../../util/immutable-react";
-import { difference, union } from "../../util/sets";
+import { difference, union } from "@engraft/shared/src/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ErrorView, ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";

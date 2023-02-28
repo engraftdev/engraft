@@ -7,7 +7,7 @@ import { startDrag } from "../../util/drag";
 import { Updater } from "../../util/immutable";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { mergeRefs } from "../../util/mergeRefs";
-import { difference, intersection, union } from "../../util/sets";
+import { difference, intersection, union } from "@engraft/shared/src/sets";
 import { toposort } from "../../util/toposort";
 import { alphaLabels, unusedLabel } from "../../util/unusedLabel";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
