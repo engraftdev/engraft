@@ -3,7 +3,9 @@
   "name": "engraft",
   "description": "Engraft monorepo.",
   "scripts": {
-    "testbed:dev": "lerna run dev --scope @engraft/testbed"
+    "testbed:dev": "lerna run dev --scope @engraft/testbed",
+    "all:test":  "lerna run test",
+    "all:test:watch":  "lerna run test:watch"
   },
   "workspaces": [
     "packages/*"
