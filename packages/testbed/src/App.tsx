@@ -3,10 +3,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
 import { builtinTools } from "@engraft/original/src/builtin-tools";
 import { slotSetTo } from '@engraft/original/src/builtin-tools/slot';
-import { getFullToolIndex, lookUpTool, registerTool, ToolProgram, VarBinding } from '@engraft/original/src/engraft';
-import { EngraftPromise } from '@engraft/original/src/engraft/EngraftPromise';
-import { runTool } from '@engraft/original/src/engraft/hooks';
-import { ShowView } from '@engraft/original/src/engraft/ShowView';
 import { examples } from '@engraft/original/src/examples/examples';
 import { useIncr } from '@engraft/incr-react';
 import { Updater } from '@engraft/original/src/util/immutable';
@@ -16,6 +12,7 @@ import { useLocalStorage } from '@engraft/original/src/util/useLocalStorage';
 import IsolateStyles from '@engraft/original/src/view/IsolateStyles';
 import { ToolOutputView } from '@engraft/original/src/view/Value';
 import { ValueEditable } from '@engraft/original/src/view/ValueEditable';
+import { EngraftPromise, getFullToolIndex, lookUpTool, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
 
 builtinTools.map(registerTool);
 

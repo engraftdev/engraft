@@ -1,12 +1,10 @@
-import { newVar, registerTool } from '../../engraft';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { toolFromModule } from '../../engraft/toolFromModule';
-import { empty } from '../../util/noOp';
+import { EngraftPromise, newVar, registerTool, toolFromModule } from '@engraft/core';
+import { IncrMemory } from '@engraft/incr';
 import { describe, expect, it } from 'vitest';
 import * as functionM from '.';
+import { empty } from '../../util/noOp';
 import * as slot from '../slot';
 import { slotSetTo } from '../slot';
-import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

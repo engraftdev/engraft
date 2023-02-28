@@ -1,15 +1,10 @@
-import { memoizeProps, hooks, hookMemo } from "@engraft/incr"
+import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, PromiseState, randomId, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import { ComputeReferences, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps } from "../../engraft"
-import { EngraftPromise, PromiseState } from "../../engraft/EngraftPromise"
-import { usePromiseState } from "../../engraft/EngraftPromise.react"
-import { hookRunTool } from "../../engraft/hooks"
-import { ShowView } from "../../engraft/ShowView"
 import CodeMirror from "../../util/CodeMirror"
 import { setup } from "../../util/codeMirrorStuff"
 import { compileExpressionCached } from "../../util/compile"
-import { newId } from "../../util/id"
 import { Task } from "../../util/Task"
 import { updateProxy, UpdateProxyRemovable } from "../../util/UpdateProxy"
 import { slotSetTo } from "../slot"
@@ -93,7 +88,7 @@ export const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Progra
             outCode = 'undefined';
           }
           return {
-            id: newId(),
+            id: randomId(),
             inCode,
             outCode,
           }
@@ -102,7 +97,7 @@ export const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Progra
     } catch {
     }
     return {
-      id: newId(),
+      id: randomId(),
       inCode: '',
       outCode: '',
     };

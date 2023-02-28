@@ -1,7 +1,6 @@
+import { ComputeReferences, EngraftPromise, ProgramFactory, ToolProps, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from '@engraft/incr';
 import { RgbColorPicker } from 'react-colorful';
-import { ComputeReferences, ProgramFactory, ToolProps, ToolRun, ToolView } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
 
 export type Program = {
   toolName: 'color',

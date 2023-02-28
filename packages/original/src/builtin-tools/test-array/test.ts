@@ -1,13 +1,11 @@
-import { describe, it } from 'vitest';
-import update from 'immutability-helper';
-import { registerTool } from '../../engraft';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { toolFromModule } from '../../engraft/toolFromModule';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { empty } from '../../util/noOp';
-import * as testArray from './index';
-import * as testValue from '../test-value'
+import { EngraftPromise, registerTool, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import update from 'immutability-helper';
+import { describe, it } from 'vitest';
+import { empty } from '../../util/noOp';
+import * as testValue from '../test-value';
+import * as testArray from './index';
 
 // @vitest-environment happy-dom
 

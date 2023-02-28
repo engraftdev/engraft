@@ -1,14 +1,11 @@
-import { describe, it } from 'vitest';
-import _ from 'lodash';
-import update from 'immutability-helper';
-import { registerTool, ToolOutput } from '../../engraft';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { makeVarBindings } from '../../engraft/test-utils';
-import { toolFromModule } from '../../engraft/toolFromModule';
+import { EngraftPromise, makeVarBindings, registerTool, toolFromModule, ToolOutput } from '@engraft/core';
+import { IncrMemory } from '@engraft/incr';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import update from 'immutability-helper';
+import _ from 'lodash';
+import { describe, it } from 'vitest';
 import { empty } from '../../util/noOp';
 import * as slot from './index';
-import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 

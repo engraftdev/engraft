@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { ToolViewRenderProps, ToolView, ToolProgram } from ".";
+import { ToolViewRenderProps, ToolView, ToolProgram } from "./core";
 
 export type ShowViewProps<P extends ToolProgram> = ToolViewRenderProps<P> & {
   view: ToolView<P>,

@@ -1,8 +1,7 @@
-import { memoizeProps, hooks, hookMemo } from "@engraft/incr";
+import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo } from "react";
 import Dropzone, { FileRejection } from 'react-dropzone';
-import { ComputeReferences, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
 import { useUpdateProxy } from "../../util/UpdateProxy.react";
 
 export type P = {

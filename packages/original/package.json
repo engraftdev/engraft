@@ -26,7 +26,6 @@
     "@observablehq/inspector": "^3.2.4",
     "classnames": "^2.3.1",
     "deep-object-diff": "^1.1.9",
-    "friendly-words": "^1.2.0",
     "immutability-helper": "^3.1.1",
     "internmap": "^2.0.3",
     "is-valid-identifier": "^2.0.2",
@@ -43,12 +42,12 @@
     "react-test-renderer": "^18.0.0",
     "react-vega": "^7.6.0",
     "seedrandom": "^3.0.5",
-    "synchronous-promise": "^2.0.16",
     "vega": "^5.22.1",
     "vega-lite": "^5.6.0",
     "@engraft/shared": "^0.0.1",
     "@engraft/incr": "^0.0.1",
-    "@engraft/incr-react": "^0.0.1"
+    "@engraft/incr-react": "^0.0.1",
+    "@engraft/core": "^0.0.1"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

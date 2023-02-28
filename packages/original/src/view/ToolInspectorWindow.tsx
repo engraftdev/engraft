@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { references, ToolProgram, VarBindings } from "../engraft";
+import { references, ToolProgram, VarBindings } from "@engraft/core";
 import { runtimeObjectId } from "../util/id";
 import { Updater } from "../util/immutable";
 import { useUpdateProxy } from "../util/UpdateProxy.react";

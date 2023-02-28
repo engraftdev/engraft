@@ -1,6 +1,5 @@
-import { memoizeProps, hooks, hookMemo } from "@engraft/incr";
-import { Tool } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
+import { EngraftPromise, Tool } from "@engraft/core";
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 
 export type Program = {
   toolName: 'hello-world',

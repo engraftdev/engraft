@@ -1,9 +1,8 @@
 import { IncrFunction } from "@engraft/incr";
+import { weakMapCache } from "@engraft/shared/src/cache";
 import { ReactElement } from "react";
-import { weakMapCache } from "../util/cache";
-import { newId } from "../util/id";
-import { Updater } from "../util/immutable";
 import { EngraftPromise } from "./EngraftPromise";
+import { randomId } from './randomId';
 
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
@@ -40,6 +39,8 @@ export type ToolViewRenderProps<P> = {
   expand?: boolean,
   noFrame?: boolean,  // TODO: this is just for slots, huh?
 }
+
+export type Updater<P> = (update: (program: P) => P) => void;
 
 export type ToolProps<P extends ToolProgram> = {
   program: P,
@@ -102,7 +103,7 @@ export type Var = {
 }
 
 export function newVar(label = 'new var') {
-  return {id: newId(), label};
+  return {id: randomId(), label};
 }
 
 export function varBindingsValid(varBindings: VarBindings): boolean {

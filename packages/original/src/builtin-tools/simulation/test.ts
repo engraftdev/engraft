@@ -1,8 +1,8 @@
 import { describe, it } from 'vitest';
-import { newVar, registerTool } from '../../engraft';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { makeVarBindings } from '../../engraft/test-utils';
-import { toolFromModule } from '../../engraft/toolFromModule';
+import { newVar, registerTool } from '@engraft/core';
+import { EngraftPromise } from '@engraft/core';
+import { makeVarBindings } from '@engraft/core';
+import { toolFromModule } from '@engraft/core';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { slotSetTo } from '../slot';
 import * as simulation from './index';

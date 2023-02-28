@@ -6,22 +6,19 @@ import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
 import { EditorState, RangeSet } from '@codemirror/state';
 import { Decoration, EditorView, keymap, WidgetType } from '@codemirror/view';
+import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
+import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
+import { cache } from '@engraft/shared/src/cache';
+import { objEqWithRefEq } from '@engraft/shared/src/eq';
+import classNames from 'classnames';
 import _ from 'lodash';
 import objectInspect from 'object-inspect';
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from 'react-dom';
-import { ProgramFactory, references, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, VarBinding } from "../../engraft";
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { usePromiseState } from '../../engraft/EngraftPromise.react';
-import { hookRelevantVarBindings, hookRunTool } from '../../engraft/hooks';
-import { ShowView } from '../../engraft/ShowView';
-import { cache } from '../../util/cache';
 import CodeMirror from '../../util/CodeMirror';
 import { setup } from "../../util/codeMirrorStuff";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile";
 import { embedsExtension } from '../../util/embedsExtension';
-import { objEqWithRefEq } from '@engraft/shared/src/eq';
-import { newId } from '../../util/id';
 import { Updater } from '../../util/immutable';
 import { usePortalSet } from '../../util/PortalWidget';
 import { makeRand } from '../../util/rand';
@@ -36,8 +33,6 @@ import { VarUse } from '../../view/Vars';
 import { refCompletions, toolCompletions } from './autocomplete';
 import { globals } from './globals';
 import { referencesFromCode, refRE } from './refs';
-import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
-import classNames from 'classnames';
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 
@@ -335,7 +330,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
 
   const extensions = useMemo(() => {
     function insertTool(tool: Tool) {
-      const id = newId();
+      const id = randomId();
       const newProgram = slotSetTo(tool.programFactory());
       programUP.subPrograms[id].$set(newProgram);
       // TODO: we never remove these! lol

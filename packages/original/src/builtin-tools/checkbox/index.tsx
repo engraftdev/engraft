@@ -1,6 +1,5 @@
+import { EngraftPromise, Tool, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { Tool, ToolView } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
 
 export type Program = {
   toolName: 'checkbox',

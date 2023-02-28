@@ -1,6 +1,6 @@
 import { hookDedupe, hookFork, hookIncr, hookMemo, hooks } from "@engraft/incr";
 import { objEqWithRefEq } from "@engraft/shared/src/eq";
-import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from ".";
+import { lookUpTool, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core";
 
 export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolResults {
   const toolName = props.program.toolName;

@@ -1,7 +1,13 @@
 {
   "name": "@engraft/shared",
   "version": "0.0.1",
-  "description": "Shared utilities (to be inlined into other packages)",
+  "description": "Shared utilities",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "tsc": "tsc",
+    "lint": "eslint --ext .ts,.tsx src"
+  },
   "dependencies": {
     "deep-object-diff": "^1.1.9",
     "lodash": "^4.17.21"

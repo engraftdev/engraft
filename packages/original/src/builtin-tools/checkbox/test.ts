@@ -1,9 +1,8 @@
-import { describe, it } from 'vitest';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { toolFromModule } from '../../engraft/toolFromModule';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import * as checkbox from '.';
+import { EngraftPromise, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import { describe, it } from 'vitest';
+import * as checkbox from '.';
 
 const checkboxTool = toolFromModule(checkbox);
 

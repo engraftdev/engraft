@@ -1,9 +1,9 @@
 import { memo, useRef, useState } from "react";
-import { Var, VarBinding } from "../engraft";
+import { Var, VarBinding } from "@engraft/core";
 import { ControlledSpan } from "../util/ControlledTextInput";
 import { Updater } from "../util/immutable";
 import { ObjectInspector } from "react-inspector";
-import { usePromiseState } from "../engraft/EngraftPromise.react";
+import { usePromiseState } from "@engraft/core";
 import { useUpdateProxy } from "../util/UpdateProxy.react";
 
 

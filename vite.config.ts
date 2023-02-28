@@ -23,6 +23,7 @@ export default defineConfig({
       '**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       '**/test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
+    passWithNoTests: true,
     // coverage: {
     //   reporter: ["lcov", "html"],
     // },

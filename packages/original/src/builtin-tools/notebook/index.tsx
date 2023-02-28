@@ -1,11 +1,9 @@
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever, memoizeProps } from "@engraft/incr";
+import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/src/eq";
 import _ from "lodash";
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
-import { ComputeReferences, newVar, ProgramFactory, references, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
-import { hookRunTool } from "../../engraft/hooks";
-import { ShowView } from "../../engraft/ShowView";
 import { startDrag } from "../../util/drag";
-import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/src/eq";
 import { Updater } from "../../util/immutable";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { mergeRefs } from "../../util/mergeRefs";
@@ -23,7 +21,6 @@ import ScrollShadow from "../../view/ScrollShadow";
 import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
 import { slotSetTo } from "../slot";
-import { memoizeProps, hooks, hookMemo, hookDedupe, hookFork, hookSharedIncr, memoizeForever } from "@engraft/incr";
 
 
 export type Program = {

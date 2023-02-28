@@ -1,6 +1,6 @@
 import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
 import { EditorView } from '@codemirror/view';
-import { getFullToolIndex, Tool, VarBindings } from "../../engraft";
+import { getFullToolIndex, Tool, VarBindings } from "@engraft/core";
 import { refCode } from "./refs";
 
 

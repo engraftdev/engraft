@@ -1,7 +1,5 @@
+import { ComputeReferences, hookRunTool, ProgramFactory, ShowView, ToolProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { ComputeReferences, ProgramFactory, ToolProgram, ToolRun, ToolView } from "../../engraft";
-import { hookRunTool } from '../../engraft/hooks';
-import { ShowView } from '../../engraft/ShowView';
 import { UseUpdateProxy } from "../../util/UpdateProxy.react";
 import { ValueEditable } from '../../view/ValueEditable';
 import { slotSetTo } from '../slot';

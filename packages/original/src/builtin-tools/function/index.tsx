@@ -1,11 +1,9 @@
+import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
-import { ComputeReferences, newVar, ProgramFactory, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
-import { hookRelevantVarBindings } from "../../engraft/hooks";
-import { ToolWithView } from "../../engraft/ToolWithView";
-import { objEqWithRefEq } from "@engraft/shared/src/eq";
-import { newId } from "../../util/id";
+import { ToolWithView } from "../../view/ToolWithView";
 import { noOp } from "../../util/noOp";
 import { difference } from "../../util/sets";
 import { UpdateProxy } from "../../util/UpdateProxy";
@@ -17,7 +15,6 @@ import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
 import { slotSetTo } from "../slot";
 import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure";
-import { memoizeProps, hooks, hookDedupe, hookMemo } from "@engraft/incr";
 
 export type Program = {
   toolName: 'function',
@@ -34,7 +31,7 @@ type Example = {
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   const var1 = newVar('input 1')
-  const exampleId = newId();
+  const exampleId = randomId();
   return {
     toolName: 'function',
     vars: [var1],
@@ -207,7 +204,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
 
   const insertExampleAfter = useCallback(() => {
     const newExample: Example = {
-      id: newId(),
+      id: randomId(),
       values: Array.from({length: numVars}, () => undefined),
     };
     programUP.examples.$helper({$splice: [[index + 1, 0, newExample]]});

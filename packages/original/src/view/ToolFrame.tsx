@@ -1,6 +1,6 @@
+import { ToolProgram, VarBindings } from "@engraft/core";
 import classNames from "classnames";
 import { CSSProperties, memo, ReactNode, useState } from "react";
-import { ToolProgram, VarBindings } from "../engraft";
 import { Updater } from "../util/immutable";
 import { Use } from "../util/Use";
 import useHover from "../util/useHover";

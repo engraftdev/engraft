@@ -1,13 +1,8 @@
+import { randomId } from '@engraft/core';
 import seedrandom from 'seedrandom';
-import { objects } from 'friendly-words';
-
-
-export function newId(random: () => number = Math.random): string {
-  return `ID${objects[Math.floor(random() * objects.length)]}${random().toFixed(6).slice(2)}`;
-}
 
 export function hashId(...args: any[]): string {
-  return newId(seedrandom(JSON.stringify(args)));
+  return randomId(seedrandom(JSON.stringify(args)));
 }
 (window as any).hashId = hashId;
 
@@ -22,7 +17,7 @@ export function runtimeObjectId(obj: any): string {
     return fromMap;
   }
 
-  const id = newId();
+  const id = randomId();
   runtimeObjectIdMap.set(obj, id);
   return id;
 }

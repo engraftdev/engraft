@@ -1,4 +1,4 @@
-import { toolFromModule } from "../engraft/toolFromModule";
+import { toolFromModule } from "@engraft/core";
 
 const modules = import.meta.glob('./*/index.tsx', { eager: true });
 export const builtinTools =

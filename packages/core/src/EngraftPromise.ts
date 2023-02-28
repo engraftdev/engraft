@@ -1,4 +1,4 @@
-import _ from "lodash";
+import zipObject from "lodash/zipObject";
 import { hasProperty } from "@engraft/shared/src/hasProperty";
 import { SynchronousPromise } from "synchronous-promise";
 
@@ -207,7 +207,7 @@ export const EngraftPromise = Object.assign(SynchronousPromise as any as Synchro
     const keys = Object.keys(promiseObject);
     const promises = Object.values(promiseObject);
     return EngraftPromise.all(promises).then((values) => {
-      return _.zipObject(keys, values);
+      return zipObject(keys, values);
     });
   },
 

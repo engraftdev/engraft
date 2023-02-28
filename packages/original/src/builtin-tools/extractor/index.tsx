@@ -1,11 +1,7 @@
-import { memoizeProps, hooks, hookMemo } from "@engraft/incr";
+import { EngraftPromise, hookRunTool, randomId, references, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "@engraft/core";
+import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { slotSetTo } from "../../builtin-tools/slot";
-import { references, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "../../engraft";
-import { EngraftPromise } from "../../engraft/EngraftPromise";
-import { hookRunTool } from "../../engraft/hooks";
-import { ShowView } from "../../engraft/ShowView";
-import { newId } from "../../util/id";
 import { noOp } from "../../util/noOp";
 import { RowToCol } from "../../util/RowToCol";
 import { useUpdateProxy } from "../../util/UpdateProxy.react";
@@ -265,7 +261,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       let newPatternsWithIds = oldPatternsWithIds.slice();
       let activePatternWithId = newPatternsWithIds[activePatternIndex];
       if (!activePatternWithId) {
-        newPatternsWithIds[activePatternIndex] = {id: newId(), pattern};
+        newPatternsWithIds[activePatternIndex] = {id: randomId(), pattern};
       } else {
         newPatternsWithIds[activePatternIndex] = {id: activePatternWithId.id, pattern};
       }

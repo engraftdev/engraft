@@ -1,19 +1,16 @@
-import { describe, it } from 'vitest';
+import { EngraftPromise, makeVarBindings, newVar, registerTool, toolFromModule, VarBindings } from '@engraft/core';
+import { IncrMemory } from '@engraft/incr';
+import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import update from 'immutability-helper';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import update from 'immutability-helper';
-import { newVar, registerTool, VarBindings } from '../../engraft';
-import { EngraftPromise } from '../../engraft/EngraftPromise';
-import { makeVarBindings } from '../../engraft/test-utils';
-import { ToolWithView } from '../../engraft/ToolWithView';
-import { toolFromModule } from '../../engraft/toolFromModule';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import { ToolWithView } from 'src/view/ToolWithView';
+import { describe, it } from 'vitest';
 import { empty, noOp } from '../../util/noOp';
-import { slotSetTo } from '../slot';
-import * as notebook from './index';
-import * as testValue from '../test-value';
 import * as slot from '../slot';
-import { IncrMemory } from '@engraft/incr';
+import { slotSetTo } from '../slot';
+import * as testValue from '../test-value';
+import * as notebook from './index';
 
 // @vitest-environment happy-dom
 

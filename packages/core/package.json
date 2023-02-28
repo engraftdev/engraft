@@ -1,8 +1,7 @@
 {
-  "private": true,
-  "name": "@engraft/incr-react",
+  "name": "@engraft/core",
   "version": "0.0.1",
-  "description": "React features for Incr",
+  "description": "Engraft core protocol",
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",
@@ -11,7 +10,9 @@
   },
   "main": "src/index.js",
   "dependencies": {
-    "@engraft/incr": "^0.0.1"
+    "friendly-words": "^1.2.0",
+    "lodash": "^4.17.21",
+    "synchronous-promise": "^2.0.16"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
