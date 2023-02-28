@@ -4,7 +4,7 @@ import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import { ToolWithView } from 'src/view/ToolWithView';
+import { ToolWithView } from '../../view/ToolWithView';
 import { describe, it } from 'vitest';
 import { empty, noOp } from '../../util/noOp';
 import * as slot from '../slot';
