@@ -35,6 +35,20 @@
           "varsIgnorePattern": "^_"
         }
       ]
-    }
+    },
+    "overrides": [
+      {
+        "files": "**/*",
+        "excludedFiles": [
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/test.ts",
+          "**/test.tsx"
+        ],
+        "rules": {
+          "import/no-extraneous-dependencies": [ "warn", { "includeInternal": true } ]
+        }
+      }
+    ]
   }
 }
