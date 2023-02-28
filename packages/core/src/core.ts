@@ -55,7 +55,7 @@ export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<strin
 
 let toolIndex: { [toolName: string]: Tool } = {};
 
-export function lookUpTool(toolName: string): Tool<any> {
+export function lookUpTool(toolName: string): Tool<ToolProgram> {
   const tool = toolIndex[toolName];
   if (!tool) {
     return toolIndex['not-found'];
@@ -64,11 +64,11 @@ export function lookUpTool(toolName: string): Tool<any> {
 }
 
 // intentionally awkward name to remind you to prefer use of lookUpTool
-export function getFullToolIndex(): { [toolName: string]: Tool<any> } {
+export function getFullToolIndex(): { [toolName: string]: Tool<ToolProgram> } {
   return toolIndex;
 }
 
-export function registerTool(tool: Tool<any>) {
+export function registerTool(tool: Tool<ToolProgram>) {
   // do some checks to make sure the tool is valid
   if (!tool.programFactory) {
     throw new Error(`Tool has no programFactory`);

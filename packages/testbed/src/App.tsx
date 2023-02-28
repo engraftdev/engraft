@@ -1,10 +1,7 @@
-import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import appCss from './App.css?inline';
-import { builtinTools } from "@engraft/original/src/builtin-tools";
-import { slotWithCode } from '@engraft/original/src/builtin-tools/slot';
-import { examples } from './examples';
+import { EngraftPromise, getFullToolIndex, lookUpTool, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
 import { useIncr } from '@engraft/incr-react';
+import { builtinTools } from "@engraft/original/src/builtin-tools";
+import { slotWithProgram } from '@engraft/original/src/builtin-tools/slot';
 import { Updater } from '@engraft/original/src/util/immutable';
 import { useStateSetOnly } from '@engraft/original/src/util/immutable-react';
 import range from '@engraft/original/src/util/range';
@@ -12,7 +9,10 @@ import { useLocalStorage } from '@engraft/original/src/util/useLocalStorage';
 import IsolateStyles from '@engraft/original/src/view/IsolateStyles';
 import { ToolOutputView } from '@engraft/original/src/view/Value';
 import { ValueEditable } from '@engraft/original/src/view/ValueEditable';
-import { EngraftPromise, getFullToolIndex, lookUpTool, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
+import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import appCss from './App.css?inline';
+import { examples } from './examples';
 
 builtinTools.map(registerTool);
 
@@ -95,7 +95,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateProgram(() => slotWithCode(lookUpTool(ev.target.value).programFactory()));
+          updateProgram(() => slotWithProgram(lookUpTool(ev.target.value).programFactory()));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
         {Object.keys(getFullToolIndex()).map((name) =>
