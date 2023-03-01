@@ -7,6 +7,7 @@
     "test:watch": "vitest",
     "test": "vitest run",
     "tsc": "tsc",
+    "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --ext .ts,.tsx src",
 
     "build": "vite build --config ../../vite.config.ts",
@@ -15,6 +16,8 @@
   },
   "dependencies": {
     "@engraft/original": "^0.0.1",
+    "@engraft/core": "^0.0.1",
+    "@engraft/incr-react": "^0.0.1",
     "react": "^18.0.0",
     "react-error-boundary": "^3.1.4",
     "react-router-dom": "^6.3.0",

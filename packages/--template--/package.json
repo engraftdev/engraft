@@ -6,10 +6,10 @@
     "test:watch": "vitest",
     "test": "vitest run",
     "tsc": "tsc",
+    "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --ext .ts,.tsx src"
   },
   "main": "src/index.js",
   "dependencies": {
-    "@engraft/shared": "^0.0.1"
   }
 }

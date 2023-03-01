@@ -7,6 +7,7 @@
     "test:watch": "vitest",
     "test": "vitest run",
     "tsc": "tsc",
+    "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --ext .ts,.tsx src"
   },
   "dependencies": {
@@ -25,7 +26,6 @@
     "@googlemaps/react-wrapper": "^1.1.35",
     "@observablehq/inspector": "^3.2.4",
     "classnames": "^2.3.1",
-    "deep-object-diff": "^1.1.9",
     "immutability-helper": "^3.1.1",
     "internmap": "^2.0.3",
     "is-valid-identifier": "^2.0.2",
@@ -44,10 +44,14 @@
     "seedrandom": "^3.0.5",
     "vega": "^5.22.1",
     "vega-lite": "^5.6.0",
+    "react-error-boundary": "^3.1.4",
     "@engraft/shared": "^0.0.1",
     "@engraft/incr": "^0.0.1",
     "@engraft/incr-react": "^0.0.1",
-    "@engraft/core": "^0.0.1"
+    "@engraft/core": "^0.0.1",
+    "@engraft/update-proxy": "^0.0.1",
+    "@engraft/update-proxy-react": "^0.0.1",
+    "@engraft/tool-toy-adder": "^0.0.1"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",

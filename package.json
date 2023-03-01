@@ -4,9 +4,9 @@
   "description": "Engraft monorepo.",
   "scripts": {
     "testbed:dev": "lerna run dev --scope @engraft/testbed",
-    "root:test":  "vitest",
-    "all:test":  "lerna run test",
-    "all:test:watch":  "lerna run test:watch"
+    "root:test": "vitest",
+    "all:test": "lerna run test",
+    "all:test:watch": "lerna run test:watch"
   },
   "workspaces": [
     "packages/*"
@@ -14,9 +14,11 @@
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.18.6",
     "@babel/plugin-transform-react-jsx": "^7.21.0",
+    "@engraft/test-shared": "^0.0.1",
     "@vitest/browser": "^0.29.1",
     "@vitest/coverage-c8": "^0.29.1",
     "@vitest/ui": "^0.29.1",
+    "depcheck": "^1.4.3",
     "eslint": "^8.12.0",
     "eslint-config-react-app": "^7.0.0",
     "happy-dom": "^8.9.0",
@@ -24,8 +26,7 @@
     "typescript": "^4.9.4",
     "vite": "^4.1.4",
     "vite-plugin-checker": "^0.5.6",
-    "vitest": "^0.29.1",
-    "@engraft/test-shared": "^0.0.1"
+    "vitest": "^0.29.1"
   },
   "eslintConfig": {
     "extends": [
@@ -41,20 +42,6 @@
           "varsIgnorePattern": "^_"
         }
       ]
-    },
-    "overrides": [
-      {
-        "files": "**/*",
-        "excludedFiles": [
-          "**/*.test.ts",
-          "**/*.test.tsx",
-          "**/test.ts",
-          "**/test.tsx"
-        ],
-        "rules": {
-          "import/no-extraneous-dependencies": [ "warn", { "includeInternal": true } ]
-        }
-      }
-    ]
+    }
   }
 }
