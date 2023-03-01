@@ -1,12 +1,9 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { union } from "@engraft/shared/src/sets";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { ComputeReferences, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, UseUpdateProxy } from "@engraft/toolkit";
 
 export type Program = {
-  toolName: 'toy-adder';
-  xProgram: ToolProgram;
-  yProgram: ToolProgram;
+  toolName: 'toy-adder',
+  xProgram: ToolProgram,
+  yProgram: ToolProgram,
 }
 
 export const programFactory: ProgramFactory<Program> = () => ({
@@ -16,7 +13,7 @@ export const programFactory: ProgramFactory<Program> = () => ({
 });
 
 export const computeReferences: ComputeReferences<Program> = (program) =>
-  union(references(program.xProgram), references(program.yProgram));
+  SetOps.union(references(program.xProgram), references(program.yProgram));
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

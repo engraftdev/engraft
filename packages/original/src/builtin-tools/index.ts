@@ -1,7 +1,10 @@
-import { toolFromModule } from "@engraft/core";
+import { forgetP, Tool, toolFromModule } from "@engraft/core";
+import * as toolToyAdder from '@engraft/tool-toy-adder';
 
 const modules = import.meta.glob('./*/index.tsx', { eager: true });
-export const builtinTools =
-  Object.values(modules).map((module) =>
+export const builtinTools: Tool[] = [
+  ...Object.values(modules).map((module) =>
     toolFromModule(module as any)
-  );
+  ),
+  forgetP(toolFromModule(toolToyAdder)),
+]

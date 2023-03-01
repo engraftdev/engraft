@@ -53,6 +53,11 @@ export type ProgramFactory<P extends ToolProgram> = (
 
 export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<string>;
 
+// We use Tool<ToolProgram> as the generic tool type, in lieu of existential types.
+export function forgetP<P extends ToolProgram>(tool: Tool<P>): Tool {
+  return tool as any as Tool;
+}
+
 let toolIndex: { [toolName: string]: Tool } = {};
 
 export function lookUpToolByName(toolName: string): Tool<ToolProgram> {
@@ -91,7 +96,7 @@ export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
   }
 
   const { toolName } = tool.programFactory();
-  toolIndex[toolName] = tool as any;  // forget the type parameter
+  toolIndex[toolName] = forgetP(tool);
 }
 
 

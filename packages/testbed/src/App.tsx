@@ -13,7 +13,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
 import { examples } from './examples';
 
-builtinTools.map(registerTool);
+builtinTools.forEach(registerTool);
 
 const defaultProgram = lookUpToolByName('slot').programFactory();
 
