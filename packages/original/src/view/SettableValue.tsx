@@ -1,6 +1,5 @@
-import { PromiseState, ToolOutput } from "@engraft/core";
+import { PromiseState, slotWithCode, ToolOutput } from "@engraft/core";
 import { memo, useCallback, useMemo, useState } from "react";
-import { slotWithCode } from "../builtin-tools/slot";
 import { Setter } from "../util/immutable";
 import { useStateSetOnly, useStateUpdateOnly } from "../util/immutable-react";
 import { empty } from "../util/noOp";

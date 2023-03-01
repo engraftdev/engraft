@@ -1,4 +1,5 @@
 export * from './core';
+export * from './globals';
 export * from './EngraftPromise';
 export * from './EngraftPromise-react';
 export * from './randomId';

@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { useIncr } from "@engraft/incr-react";
 import _ from "lodash";
@@ -7,7 +7,6 @@ import { useStateSetOnly } from "../../util/immutable-react";
 import { difference, union } from "@engraft/shared/src/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ToolOutputView } from "../../view/Value";
-import { slotWithCode } from "../slot";
 
 
 export type Program = {

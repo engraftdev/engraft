@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { objEqWithRefEq } from "@engraft/shared/src/eq";
 import _ from "lodash";
@@ -13,7 +13,6 @@ import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
 import { SettableValue } from "../../view/SettableValue";
 import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotWithCode } from "../slot";
 import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure";
 
 export type Program = {

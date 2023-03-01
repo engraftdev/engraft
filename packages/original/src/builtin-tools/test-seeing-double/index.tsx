@@ -1,8 +1,7 @@
-import { hookRunTool, references, ShowView, Tool, ToolProgram, ToolView } from "@engraft/core";
+import { hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { slotWithCode } from "../slot";
 
 export type Program = {
   toolName: 'test-seeing-double',

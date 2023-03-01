@@ -6,7 +6,7 @@ import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from '@codemirror/lang-javascript';
 import { EditorState, RangeSet } from '@codemirror/state';
 import { Decoration, EditorView, keymap, WidgetType } from '@codemirror/view';
-import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
+import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, setSlotWithCode, setSlotWithProgram, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
 import { cache } from '@engraft/shared/src/cache';
 import { objEqWithRefEq } from '@engraft/shared/src/eq';
@@ -64,7 +64,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   subPrograms: {},
 });
 
-export function slotWithCode(program: string = ''): Program {
+function slotWithCode(program: string = ''): Program {
   return {
     toolName: 'slot',
     modeName: 'code',
@@ -73,8 +73,9 @@ export function slotWithCode(program: string = ''): Program {
     subPrograms: {},
   };
 }
+setSlotWithCode(slotWithCode);
 
-export function slotWithProgram(program: ToolProgram): Program {
+function slotWithProgram(program: ToolProgram): Program {
   // TODO: this condition is a hack, isn't it?
   if (program.toolName === 'slot') {
     return program as Program;
@@ -87,6 +88,7 @@ export function slotWithProgram(program: ToolProgram): Program {
     defaultCode: undefined,
   };
 }
+setSlotWithProgram(slotWithProgram);
 
 export const computeReferences = (program: Program) => {
   if (program.modeName === 'code') {

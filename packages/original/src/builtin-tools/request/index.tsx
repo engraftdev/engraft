@@ -1,9 +1,8 @@
 import {
-  ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolOutput, ToolProgram,
+  ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
   ToolProps, ToolRun, ToolView
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { slotWithCode } from "../../builtin-tools/slot";
 import { RowToCol } from "../../util/RowToCol";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";

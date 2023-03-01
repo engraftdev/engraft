@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo, useState } from "react";
 import { Details } from "../../util/Details";
@@ -6,7 +6,6 @@ import { getById, updateById } from "../../util/id";
 import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { Value } from "../../view/Value";
-import { slotWithCode } from "../slot";
 import builtinStyles from './builtin.css?inline';
 import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
 

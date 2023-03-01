@@ -1,7 +1,6 @@
-import { EngraftPromise, getFullToolIndex, lookUpToolByName, registerTool, runTool, ShowView, ToolProgram, VarBinding } from '@engraft/core';
+import { EngraftPromise, getFullToolIndex, lookUpToolByName, registerTool, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from '@engraft/core';
 import { useIncr } from '@engraft/incr-react';
 import { builtinTools } from "@engraft/original/src/builtin-tools";
-import { slotWithProgram } from '@engraft/original/src/builtin-tools/slot';
 import { Updater } from '@engraft/original/src/util/immutable';
 import { useStateSetOnly } from '@engraft/original/src/util/immutable-react';
 import range from '@engraft/original/src/util/range';

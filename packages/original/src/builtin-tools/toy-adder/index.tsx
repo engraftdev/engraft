@@ -1,8 +1,7 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { slotWithCode } from "../slot";
 
 export type Program = {
   toolName: 'toy-adder';

@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
 import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { isObject } from "@engraft/shared/src/isObject";
 import _ from "lodash";
@@ -8,7 +8,6 @@ import { difference, union } from "@engraft/shared/src/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ErrorView, ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotWithCode } from "../slot";
 
 
 export type Program = {

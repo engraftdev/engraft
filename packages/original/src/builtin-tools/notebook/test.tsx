@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, newVar, registerTool, toolFromModule, VarBindings } from '@engraft/core';
+import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
@@ -8,7 +8,6 @@ import { ToolWithView } from '../../view/ToolWithView';
 import { describe, it } from 'vitest';
 import { empty, noOp } from '../../util/noOp';
 import * as slot from '../slot';
-import { slotWithCode } from '../slot';
 import * as testValue from '../test-value';
 import * as notebook from './index';
 

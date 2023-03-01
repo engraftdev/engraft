@@ -1,11 +1,10 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import Select, { Props as SelectProps } from 'react-select';
 import { VegaLite, VisualizationSpec } from "react-vega";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { slotWithCode } from "../slot";
 import { gearIcon, markIcons, typeIcons } from "./icons";
 
 export type Program = {

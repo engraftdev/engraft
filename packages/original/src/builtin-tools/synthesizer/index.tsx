@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, PromiseState, randomId, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
+import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, PromiseState, randomId, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
@@ -7,7 +7,6 @@ import { setup } from "../../util/codeMirrorStuff"
 import { compileExpressionCached } from "../../util/compile"
 import { Task } from "../../util/Task"
 import { updateProxy, UpdateProxyRemovable } from "@engraft/update-proxy"
-import { slotWithCode } from "../slot"
 import { SynthesisState, synthesizeGen } from "./synthesizer"
 
 

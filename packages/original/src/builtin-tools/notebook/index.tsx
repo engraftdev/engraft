@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever, memoizeProps } from "@engraft/incr";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/src/eq";
 import _ from "lodash";
@@ -20,7 +20,6 @@ import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
 import ScrollShadow from "../../view/ScrollShadow";
 import { ToolOutputView } from "../../view/Value";
 import { VarDefinition } from "../../view/Vars";
-import { slotWithCode } from "../slot";
 
 
 export type Program = {
