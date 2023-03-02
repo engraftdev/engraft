@@ -373,7 +373,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
               const parsed = JSON.parse(text);
               if (parsed.toolName) {
                 // TODO: for now, we just replace – someday we should check about insertions
-                updateProgram(() => slotWithCode(parsed));
+                updateProgram(() => slotWithProgram(parsed));
                 event.preventDefault();
               }
             } catch {
