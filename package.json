@@ -3,11 +3,15 @@
   "name": "engraft",
   "description": "Engraft monorepo.",
   "scripts": {
-    "testbed:dev": "lerna run dev --scope @engraft/testbed",
-    "testbed:build": "lerna run build --scope @engraft/testbed",
     "root:test": "vitest",
     "all:test": "lerna run test",
-    "all:test:watch": "lerna run test:watch"
+    "all:test:watch": "lerna run test:watch",
+
+    "testbed:dev": "lerna run dev --scope @engraft/testbed",
+    "testbed:build": "lerna run build --scope @engraft/testbed",
+
+    "graft-garden:dev": "lerna run dev --scope @engraft/graft-garden",
+    "graft-garden:build": "lerna run build --scope @engraft/graft-garden"
   },
   "workspaces": [
     "packages/*"
