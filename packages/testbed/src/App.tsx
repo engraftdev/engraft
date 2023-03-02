@@ -111,6 +111,10 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       <input type='checkbox' checked={darkMode} onChange={(ev) => updateDarkMode(() => ev.target.checked)}/>
       <label>Dark mode</label>
     </div>
+    <br/>
+    <div style={{color: 'gray'}}>
+      Commit: {import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}
+    </div>
   </Fragment>
 });
 

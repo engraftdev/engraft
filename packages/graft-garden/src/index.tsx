@@ -7,6 +7,8 @@ import { EditPatch } from './EditPatch';
 import { Root } from './Root';
 import { ViewPatch } from './ViewPatch';
 
+console.log(`Commit: ${import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}`);
+
 builtinTools.forEach(registerTool);
 
 const root = createRoot(document.getElementById('root')!);
