@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
 
+      - name: Restore nx cache
+        uses: actions/cache/restore@v3
+        with:
+          path: node_modules/.cache/nx
+          key: nx-cache
+
       - name: Build project
         run: npm run testbed:build
 
@@ -30,3 +36,22 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./packages/testbed/dist
+
+      - name: Clear nx cache
+        id: clearRequest
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: https://api.github.com/repos/${{ github.repository }}/actions/caches?key=nx-cache
+          method: DELETE
+          bearerToken: ${{ secrets.GITHUB_TOKEN }}
+          customHeaders: '{"Accept": "application/vnd.github.v3+json"}'
+
+      - name: Clear nx cache - show response
+        run: |
+          echo ${{ steps.clearRequest.outputs.response }}
+
+      - name: Save nx cache
+        uses: actions/cache/save@v3
+        with:
+          path: node_modules/.cache/nx
+          key: nx-cache
