@@ -28,14 +28,23 @@ jobs:
           path: node_modules/.cache/nx
           key: nx-cache
 
-      - name: Build project
+      - name: Build testbed
         run: npm run testbed:build
+
+      - name: Build graft-garden
+        run: npm run graft-garden:build
+
+      - name: Assemble output
+        run: |
+          mkdir public
+          mv packages/testbed/dist public/testbed
+          mv packages/graft-garden/dist public/graft-garden
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/testbed/dist
+          publish_dir: ./public
 
       - name: Clear nx cache
         id: clearRequest
