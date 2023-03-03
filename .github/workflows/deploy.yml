@@ -36,15 +36,14 @@ jobs:
 
       - name: Assemble output
         run: |
-          mkdir public
-          mv packages/testbed/dist public/testbed
-          mv packages/graft-garden/dist public/graft-garden
+          mv packages/testbed/dist website/testbed
+          mv packages/graft-garden/dist website/graft-garden
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./website
 
       - name: Clear nx cache
         id: clearRequest
