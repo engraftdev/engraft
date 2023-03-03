@@ -1,4 +1,5 @@
 import immutabilityHelper, { Spec } from "immutability-helper";
+import { Updater } from "@engraft/shared/src/Updater";
 
 export type UpdateProxy<T> =
   & {
@@ -25,8 +26,6 @@ export type UpdateProxy<T> =
 export type UpdateProxyRemovable<T> = UpdateProxy<T> & {
   $remove: () => void;
 }
-
-export type Updater<T> = (update: (oldT: T) => T) => void;
 
 export function updateProxy<T>(updater: Updater<T>): UpdateProxy<T>;
 export function updateProxy<T>(updater: Updater<T>, remover: () => void): UpdateProxyRemovable<T>;

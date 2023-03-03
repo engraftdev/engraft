@@ -7,7 +7,7 @@
     "test": "vitest run",
     "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --ext .ts,.tsx src"
+    "lint": "eslint --max-warnings=0 src"
   },
   "main": "src/index.js",
   "dependencies": {

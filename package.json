@@ -9,7 +9,7 @@
     "all:tsc": "lerna run tsc",
     "all:depcheck": "lerna run depcheck",
     "all:lint": "lerna run lint",
-    "all:test:watch": "lerna run test:watch",
+    "all:checks": "lerna run test,tsc,depcheck,lint",
 
     "testbed:dev": "lerna run dev --scope @engraft/testbed",
     "testbed:build": "lerna run build --scope @engraft/testbed",

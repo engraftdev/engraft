@@ -1,4 +1,5 @@
-import { UpdateProxy, Updater } from '@engraft/update-proxy';
+import { UpdateProxy } from '@engraft/update-proxy';
+import { Updater } from '@engraft/shared/src/Updater';
 import { Fragment } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';

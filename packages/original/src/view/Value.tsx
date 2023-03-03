@@ -131,6 +131,15 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   //   );
   // }
 
+  // TODO: special-case hack which needs some generalization
+  if (hasProperty(value, 'gadgetClosure') && value.gadgetClosure) {
+    return wrapInline(
+      <div style={{background: '#e4e4e4', padding: 5, borderRadius: 5, fontSize: 13, color: '#0008'}}>
+        gadget
+      </div>
+    );
+  }
+
   // TODO: an EVEN MORE special-case hack
   if (hasProperty(value, 'isDiagram') && value.isDiagram) {
     return wrapInline(

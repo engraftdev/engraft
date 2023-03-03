@@ -1,7 +1,7 @@
 {
-  "name": "@engraft/tool-toy-adder",
+  "name": "@engraft/tool-gadget",
   "version": "0.0.1",
-  "description": "Toy Engraft tool for adding two numbers",
+  "description": "Engraft tool that allows defining a simple tool and then using it",
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",
@@ -11,7 +11,9 @@
   },
   "main": "src/index.js",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.1"
+    "@engraft/toolkit": "^0.0.1",
+    "@engraft/original": "^0.0.1",
+    "@engraft/core": "^0.0.1"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

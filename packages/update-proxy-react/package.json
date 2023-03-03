@@ -7,11 +7,12 @@
     "test": "vitest run",
     "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --ext .ts,.tsx src"
+    "lint": "eslint --max-warnings=0 src"
   },
   "main": "src/index.js",
   "dependencies": {
-    "@engraft/update-proxy": "^0.0.1"
+    "@engraft/update-proxy": "^0.0.1",
+    "@engraft/shared": "^0.0.1"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

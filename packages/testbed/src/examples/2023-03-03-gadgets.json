@@ -1,0 +1,105 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDmackerel288018",
+          "label": "slider"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-definer",
+            "def": {
+              "initialProgramProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "{x: 20}",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "outputProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "IDshape971727.x",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "viewProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "<input\n  type=\"range\"\n  value={IDshape971727.x}\n  onChange={(e) => IDshovel956707.x.$set(+e.target.value)}\n/>",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "programVar": {
+                "id": "IDshape971727",
+                "label": "program"
+              },
+              "programUPVar": {
+                "id": "IDshovel956707",
+                "label": "programUP"
+              }
+            }
+          }
+        }
+      },
+      {
+        "var_": {
+          "id": "IDchess964524",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-user",
+            "closureProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDmackerel288018",
+              "defaultCode": "",
+              "subPrograms": {}
+            },
+            "gadgetProgram": {
+              "x": 18
+            }
+          },
+          "defaultCode": "IDopportunity128944"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDmozzarella364603",
+          "label": "C"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-user",
+            "closureProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDmackerel288018",
+              "defaultCode": "",
+              "subPrograms": {}
+            },
+            "gadgetProgram": {
+              "x": 48
+            }
+          },
+          "defaultCode": "IDopportunity128944"
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDopportunity128944",
+      "label": "prev"
+    }
+  }
+}

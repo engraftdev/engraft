@@ -7,7 +7,7 @@
     "test": "vitest run",
     "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --ext .ts,.tsx src",
+    "lint": "eslint --max-warnings=0 src",
 
     "build": "vite build --config ../../vite.config.ts",
     "preview": "vite preview --config ../../vite.config.ts",
