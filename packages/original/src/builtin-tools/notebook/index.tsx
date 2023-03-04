@@ -69,13 +69,13 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       Object.fromEntries(cells.map((cell) => branch(cell.var_.id, () => {
         return hookMemo(() => {
           return [cell.var_.id, intersection(references(cell.program), cellIds)] as const;
-        }, [cell]);
+        }, [cell.program, cell.var_.id, cellIds]);
       })))
     )
-  , [cells]), objEqWith(setEqWithRefEq));
+  , [cellIds, cells]), objEqWith(setEqWithRefEq));
   const { sorted, cyclic } = hookDedupe(hookMemo(() => {
     return toposort([...cellIds], interCellReferencesByCell);
-  }, [cells, interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq, cyclic: setEqWithRefEq<string>}));
+  }, [interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq, cyclic: setEqWithRefEq<string>}));
 
   // Make a little placeholder for every cell which will be used when a cell doesn't refer to it yet
   // TODO: this is kinda a "possibleVarBindings" thing; idk how it should really work.
@@ -86,7 +86,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const cellOutputPlaceholderVarBindings: VarBindings = hookMemo(() =>
     Object.fromEntries(cells.map(cell => [cell.var_.id, makePlaceholder(cell.var_)])
-  ), [cells]);
+  ), [cells, makePlaceholder]);
 
   // hookLogChanges({cellIds, interCellReferencesByCell, sorted, cyclic, cellOutputPlaceholderVarBindings}, 'notebook');
 
@@ -157,7 +157,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     });
 
     return cellResults;
-  }, [cells, varBindings, interCellReferencesByCell, cellOutputPlaceholderVarBindings, program.prevVar.id, sorted, cyclic]);
+  }, [sorted, cells, interCellReferencesByCell, cellOutputPlaceholderVarBindings, varBindings, cyclic, program.prevVar]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
@@ -166,12 +166,12 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       throw new Error("no cells");
     }
     return lastCellResult.outputP;
-  }), [cellResults]);
+  }), [cellResults, cells]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
     showsOwnOutput: cells.length > 0,
-  }), [props, cellResults]);
+  }), [cells.length, props, cellResults]);
 
   return { outputP, view };
 }));

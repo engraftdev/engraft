@@ -2,6 +2,7 @@ import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, referen
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/src/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { arrEqWithRefEq } from "@engraft/shared/src/eq";
 
 export type Program = {
   toolName: 'test-array',
@@ -42,7 +43,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     EngraftPromise.all(subToolOutputPs).then(outputs => ({
       value: outputs.map(output => output.value),
     }))
-  , subToolOutputPs);
+  , subToolOutputPs, arrEqWithRefEq);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: ({updateProgram}) =>
@@ -53,7 +54,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           )}
         </div>
       } />
-  }), subToolViews);
+  }), subToolViews, arrEqWithRefEq);
 
   return { outputP, view };
 }));

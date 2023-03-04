@@ -63,7 +63,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} gadgetProgramP={gadgetProgramP} />
-  }), [props]);
+  }), [gadgetProgramP, props]);
 
   return {outputP, view};
 }));

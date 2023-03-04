@@ -79,7 +79,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         inputResult={inputResult}
         itemResultsP={itemResultsP}
       />
-  }), [props]);
+  }), [inputResult, itemResultsP, props]);
 
   return {outputP, view};
 }));

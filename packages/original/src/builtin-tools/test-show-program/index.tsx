@@ -30,7 +30,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
           <ValueEditable value={program.subProgram} updater={programUP.subProgram.$apply}/>
         </div>
       } />
-  }), [program.subProgram]);
+  }), [program.subProgram, subResult.view]);
 
   return { outputP, view };
 }));

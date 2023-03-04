@@ -43,7 +43,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       closureVarBindings: varBindings,
     };
     return {value: gadgetClosure};
-  }), [program]);
+  }), [program.def, varBindings]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} />

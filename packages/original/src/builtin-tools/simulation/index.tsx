@@ -70,7 +70,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       initResult={initResult}
       onTickResults={onTickResults}
     />
-  }), [props, onTickResults]);
+  }), [props, initResult, onTickResults]);
 
   return { outputP, view };
 }));

@@ -54,7 +54,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} inputResult={inputResult} funcP={funcP}/>
-  }), [props]);
+  }), [funcP, inputResult, props]);
 
   return {outputP, view};
 }));

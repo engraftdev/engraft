@@ -31,7 +31,7 @@ export const tool: Tool<Program> = {
         if (onViewRender) { onViewRender(); }
         return <div className="TestValue">{JSON.stringify(program.value)}</div>;
       }
-    }), [program.value]);
+    }), [onViewRender, program.value]);
 
     return { outputP, view };
   })),

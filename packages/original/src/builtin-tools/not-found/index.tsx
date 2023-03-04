@@ -17,11 +17,11 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const outputP = hookMemo(() => EngraftPromise.reject(
     new Error(message)
-  ), []);
+  ), [message]);
 
   const view = hookMemo(() => ({
     render: () => <div className="xPad10">{message}</div>
-  }), []);
+  }), [message]);
 
   return { outputP, view };
 }));
