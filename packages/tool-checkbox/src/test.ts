@@ -1,7 +1,6 @@
 import { EngraftPromise, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import * as checkbox from '.';
 
 const checkboxTool = toolFromModule(checkbox);
@@ -17,7 +16,7 @@ describe('checkbox', () => {
         },
         varBindings: {},
       });
-      expectToEqual(EngraftPromise.state(outputP), {status: 'fulfilled', value: {value: checked}});
+      expect(EngraftPromise.state(outputP)).toEqual({status: 'fulfilled', value: {value: checked}});
     });
   })
 });

@@ -1,12 +1,11 @@
-import { EngraftPromise, Tool, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, ToolView } from "@engraft/toolkit/src";
 
 export type Program = {
   toolName: 'checkbox',
   checked: boolean,
 }
 
-export const tool: Tool<Program> = {
+export default defineTool<Program>({
   programFactory: () => ({
     toolName: 'checkbox',
     checked: false,
@@ -34,5 +33,4 @@ export const tool: Tool<Program> = {
 
     return { outputP, view };
   })),
-};
-
+});

@@ -18,3 +18,12 @@ export function usePromiseState<T>(promise: EngraftPromise<T>): PromiseState<T> 
 
   return state;
 };
+
+// no reason to `memo()` this; the `children` function will always be fresh anyway
+export function UsePromiseState<T>(props: {
+  promise: EngraftPromise<T>,
+  children: (state: PromiseState<T>) => React.ReactElement | null,
+}) {
+  const state = usePromiseState(props.promise);
+  return props.children(state);
+}

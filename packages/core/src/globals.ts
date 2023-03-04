@@ -21,7 +21,7 @@ export function setSlotWithCode(slotWithCodeNew: typeof slotWithCode) {
   _globals.slotWithCode = slotWithCodeNew;
 }
 
-export function slotWithProgram(program: ToolProgram): ToolProgram {
+export function slotWithProgram<P extends ToolProgram>(program: P): ToolProgram {
   if (!_globals.slotWithProgram) {
     throw new Error('slotWithProgram not set yet');
   }

@@ -10,6 +10,7 @@
     "all:depcheck": "lerna run depcheck",
     "all:lint": "lerna run lint",
     "all:checks": "lerna run test,tsc,depcheck,lint",
+    "all:checks:watch": "npm run all:checks; lerna watch -- npm run all:checks",
 
     "testbed:dev": "lerna run dev --scope @engraft/testbed",
     "testbed:build": "lerna run build --scope @engraft/testbed",
