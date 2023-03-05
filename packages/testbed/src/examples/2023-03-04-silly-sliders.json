@@ -1,0 +1,126 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDdiadem642248",
+          "label": "slider"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-definer",
+            "def": {
+              "initialProgramProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "10",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "outputProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "IDlead096238",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "viewProgram": {
+                "toolName": "slot",
+                "modeName": "tool",
+                "subProgram": {
+                  "toolName": "notebook",
+                  "cells": [
+                    {
+                      "var_": {
+                        "id": "IDcougar906518",
+                        "label": "numbers"
+                      },
+                      "program": {
+                        "toolName": "slot",
+                        "modeName": "code",
+                        "code": "_.range(10)",
+                        "defaultCode": "",
+                        "subPrograms": {}
+                      }
+                    },
+                    {
+                      "var_": {
+                        "id": "IDlocket436431",
+                        "label": "A"
+                      },
+                      "program": {
+                        "toolName": "slot",
+                        "modeName": "code",
+                        "code": "<div>\n  {IDcougar906518.map((i) =>\n  <div>\n  <input\n    style={{width: 300}}\n    type=\"range\"\n    value={IDlead096238}\n    onChange={(e) => IDsalute094971.$set(+e.target.value)}\n    min={-(i + 1)}\n    max={(i + 1)}\n    step={0.001}\n  />\n  </div>\n  )}\n</div>",
+                        "defaultCode": "",
+                        "subPrograms": {}
+                      }
+                    }
+                  ],
+                  "prevVar": {
+                    "id": "IDlingonberry379417",
+                    "label": "prev"
+                  }
+                },
+                "defaultCode": ""
+              },
+              "programVar": {
+                "id": "IDlead096238",
+                "label": "program"
+              },
+              "programUPVar": {
+                "id": "IDsalute094971",
+                "label": "program updater"
+              }
+            }
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDbucket630340",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "100",
+          "defaultCode": "IDbackpack320045",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDspruce013158",
+          "label": "C"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-user",
+            "closureProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDdiadem642248",
+              "defaultCode": "",
+              "subPrograms": {}
+            },
+            "gadgetProgram": 1
+          },
+          "defaultCode": "IDbackpack320045"
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDbackpack320045",
+      "label": "prev"
+    }
+  }
+}
