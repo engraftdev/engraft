@@ -1,4 +1,4 @@
-import { NodePath, PluginItem } from '@babel/core';
+import { NodePath, PluginItem, TransformOptions } from '@babel/core';
 import { transform } from '@babel/standalone';
 import template from '@babel/template';
 import babelTypes from '@babel/types';
@@ -10,6 +10,8 @@ import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, r
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
 import { cache } from '@engraft/shared/src/cache';
 import { objEqWithRefEq } from '@engraft/shared/src/eq';
+import { difference, union } from '@engraft/shared/src/sets';
+import { useUpdateProxy } from '@engraft/update-proxy-react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import objectInspect from 'object-inspect';
@@ -22,9 +24,7 @@ import { embedsExtension } from '../../util/embedsExtension';
 import { Updater } from '../../util/immutable';
 import { usePortalSet } from '../../util/PortalWidget';
 import { makeRand } from '../../util/rand';
-import { difference, union } from '@engraft/shared/src/sets';
 import { Replace } from '../../util/types';
-import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { useRefForCallback } from '../../util/useRefForCallback';
 import IsolateStyles from '../../view/IsolateStyles';
 import { ToolFrame } from '../../view/ToolFrame';
@@ -153,19 +153,25 @@ const lineNumPlugin: PluginItem = function({types: t}: {types: typeof babelTypes
   };
 }
 
+const transformExpressionOptions: TransformOptions = {
+  presets: [
+    "react",
+  ],
+};
 const transformExpressionCached = cache((code: string) => {
-  return transform(code, {
-    presets: ["react"],
-  });
+  return transform(code, transformExpressionOptions);
 });
 
+const transformBodyOptions: TransformOptions = {
+  ...transformExpressionOptions,
+  plugins: [
+    lineNumPlugin
+  ],
+  parserOpts: { allowReturnOutsideFunction: true },
+  generatorOpts: { retainLines: true }
+};
 const transformBodyCached = cache((code: string) => {
-  return transform(code, {
-    presets: ["react"],
-    plugins: [lineNumPlugin],
-    parserOpts: { allowReturnOutsideFunction: true },
-    generatorOpts: { retainLines: true }
-  });
+  return transform(code, transformBodyOptions);
 });
 
 type CodeModeProps = Replace<ToolProps<Program>, {

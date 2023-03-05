@@ -31,6 +31,24 @@ describe('slot', () => {
     )
   });
 
+  it('multi-statement code works', () => {
+    expectToEqual(
+      EngraftPromise.state(
+        slotTool.run(new IncrMemory(), {
+          program: {
+            toolName: 'slot',
+            modeName: 'code',
+            code: 'let x = 1; return x + 1',
+            subPrograms: {},
+            defaultCode: undefined,
+          },
+          varBindings: empty,
+        }).outputP
+      ),
+      {status: 'fulfilled', value: {value: 2}},
+    )
+  });
+
   it('returned promises are resolved into output', async () => {
     const {outputP} = slotTool.run(new IncrMemory(), {
       program: {
