@@ -420,13 +420,13 @@ export type ToolOutputBufferProps = {
 export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputBufferProps) {
   const {outputState, renderValue} = props;
 
-  const lastOutputValueRef = useRef<unknown>();
+  const lastOutputRef = useRef<ToolOutput>();
   if (outputState.status === 'fulfilled') {
-    lastOutputValueRef.current = outputState.value.value;
+    lastOutputRef.current = outputState.value;
   }
 
   const valueView =
-    lastOutputValueRef.current !== undefined
+    lastOutputRef.current !== undefined
     ? <div
         className="ToolOutputBuffer-value"
         style={{
@@ -434,7 +434,7 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
           maxWidth: '100%',
         }}
       >
-        {renderValue(lastOutputValueRef.current)}
+        {renderValue(lastOutputRef.current.value)}
       </div>
     : <div
         className="ToolOutputBuffer-no-value"
