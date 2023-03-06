@@ -1,3 +1,5 @@
+/// <reference path="./randomId.d.ts" />
+
 import { objects } from 'friendly-words';
 
 export function randomId(random: () => number = Math.random): string {

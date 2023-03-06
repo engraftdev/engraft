@@ -1,3 +1,5 @@
+/// <reference path="./Value.d.ts" />
+
 import { format } from "isoformat";
 import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useRef, useState } from "react";
 import { ObjectInspector } from 'react-inspector';

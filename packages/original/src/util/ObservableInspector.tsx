@@ -1,3 +1,5 @@
+/// <reference path="./ObservableInspector.d.ts" />
+
 import { Inspector } from '@observablehq/inspector';
 import { memo, useEffect, useState } from 'react';
 
