@@ -78,6 +78,9 @@ describe('updateProxy', () => {
 
       // @ts-expect-error
       xUP.c.$apply(c => c + 1);
+
+      // @ts-expect-error
+      void(xUP.map);
     }
   });
 

@@ -1,10 +1,15 @@
 import immutabilityHelper, { Spec } from "immutability-helper";
 import { Updater } from "@engraft/shared/src/Updater";
 
+export type KeyofWithoutArrayMethods<T> =
+  T extends Array<any> ? keyof T & number : keyof T;
+
 export type UpdateProxy<T> =
+  // sub-UpdateProxies at keys
   & {
-      [K in keyof T]-?: Omit<T, K> extends T ? UpdateProxyRemovable<T[K]> : UpdateProxy<T[K]>
+      [K in KeyofWithoutArrayMethods<T>]-?: Omit<T, K> extends T ? UpdateProxyRemovable<T[K]> : UpdateProxy<T[K]>
     }
+  // general methods
   & {
       $: (f: (oldT: T) => T) => void,  // shorthand for $apply
       $apply: (f: (oldT: T) => T) => void,
@@ -12,11 +17,13 @@ export type UpdateProxy<T> =
       $helper: (spec: Spec<T>) => void,
       $as: <U>(u?: U) => UpdateProxy<U>,
     }
+  // $all for arrays
   & (
       T extends (infer E)[]
       ? { $all: UpdateProxy<E> }
       : {}
     )
+  // $all for objects
   & (
       T extends {[key: string]: infer E}
       ? { $all: UpdateProxy<E> }
@@ -56,7 +63,7 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
       }
 
       // Now we can assume `key` is a key of T and hasn't been cached
-      const keyTyped = key as keyof T;
+      const keyTyped = key as KeyofWithoutArrayMethods<T>;
       const propProxy = updateProxy(
         atObjOrArray(updater, keyTyped),
         // Fun fact: We always provide a remover, even if the property isn't removable.
