@@ -16,7 +16,10 @@
     "testbed:build": "lerna run build --scope @engraft/testbed",
 
     "graft-garden:dev": "lerna run dev --scope @engraft/graft-garden",
-    "graft-garden:build": "lerna run build --scope @engraft/graft-garden"
+    "graft-garden:build": "lerna run build --scope @engraft/graft-garden",
+
+    "use-engraft-demo:dev": "lerna run dev --scope @engraft/use-engraft-demo",
+    "use-engraft-demo:build": "lerna run build --scope @engraft/use-engraft-demo"
   },
   "workspaces": [
     "packages/*"

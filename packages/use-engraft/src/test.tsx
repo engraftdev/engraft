@@ -11,10 +11,12 @@ registerTool(toolFromModule(Slot));
 registerTool(toolFromModule(TestKnownOutput));
 
 describe('useEngraft', () => {
+  // TODO: mock out localStorage to avoid the annoying warning message
+
   it('basically works', () => {
     const MyComponent = (props: {}) => {
       const program = { toolName: 'test-known-output', outputP: EngraftPromise.resolve({value: 10}) } satisfies TestKnownOutput.Program;
-      const value = useEngraft({}, { defaultValue: undefined, program });
+      const value = useEngraft({}, { defaultValue: 20, program, hide: true });
       return <div>{value}</div>;
     };
 
@@ -25,7 +27,7 @@ describe('useEngraft', () => {
   it('can read an incoming var', () => {
     const MyComponent = (props: {}) => {
       const program = slotWithCode('IDx000000');
-      const value = useEngraft({ x: 10 }, { defaultValue: undefined, program });
+      const value = useEngraft({ x: 10 }, { defaultValue: 20, program, hide: true });
       return <div>{value}</div>;
     };
 
@@ -36,7 +38,7 @@ describe('useEngraft', () => {
   it('uses the default value if output is pending', () => {
     const MyComponent = (props: {}) => {
       const program = { toolName: 'test-known-output', outputP: EngraftPromise.unresolved() } satisfies TestKnownOutput.Program;
-      const value = useEngraft({ }, { defaultValue: 20, program });
+      const value = useEngraft({ }, { defaultValue: 20, program, hide: true });
       return <div>{value}</div>;
     };
 
@@ -48,7 +50,7 @@ describe('useEngraft', () => {
     const outputP = EngraftPromise.unresolved<ToolOutput>();
     const MyComponent = (props: {}) => {
       const program = { toolName: 'test-known-output', outputP } satisfies TestKnownOutput.Program;
-      const value = useEngraft({ }, { defaultValue: 20, program });
+      const value = useEngraft({ }, { defaultValue: 20, program, hide: true });
       return <div>{value}</div>;
     };
 

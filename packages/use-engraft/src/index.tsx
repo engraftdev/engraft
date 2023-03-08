@@ -1,14 +1,13 @@
-import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from '@engraft/toolkit';
-import { VarDefinition } from '@engraft/original/src/view/Vars';
-import { ToolOutputView, Value } from '@engraft/original/src/view/Value';
-import { RootStyles } from '@engraft/original/src/view/IsolateStyles';
 import { useDedupe } from '@engraft/original/src/util/useDedupe';
+import { RootStyles } from '@engraft/original/src/view/IsolateStyles';
+import { ToolOutputView, Value } from '@engraft/original/src/view/Value';
+import { VarDefinition } from '@engraft/original/src/view/Vars';
+import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from '@engraft/toolkit';
+import _ from 'lodash';
 import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { DOM } from './DOM';
-
 import css from './index.css?inline';
-import _ from 'lodash';
 
 export interface UseEngraftProps {
   defaultValue: any;
@@ -98,12 +97,11 @@ export function useEngraft(variables: object = {}, props: UseEngraftProps) {
     </>);
   }, [defaultValue, varBindings, newRoot, origContainer, stableVariables, useDefault, view, outputP, show]);
 
-  if (useDefault)
-
-  if (outputState.status === 'fulfilled') {
-    return outputState.value.value;
+  if (useDefault || outputState.status !== 'fulfilled') {
+    return defaultValue;
   }
-  return (!hide && useDefault) || outputState.status !== 'fulfilled' ? defaultValue : outputState.value.value ;
+
+  return outputState.value.value;
 }
 
 const useEngraftDemoKey = 'use-engraft-demo';
@@ -162,7 +160,7 @@ const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
           { defaultValue !== undefined &&
             <div className="xRow xGap10" style={{marginTop: 10}}>
               <input name="inline" type="checkbox" checked={useDefault} onChange={(ev) => setUseDefault(ev.target.checked)}/>
-              <label htmlFor="inline">Use default value</label>
+              <label htmlFor="inline">Paused (use default value)</label>
             </div>
           }
         </div>

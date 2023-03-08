@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "name": "@engraft/use-engraft-demo",
+  "version": "0.0.1",
+  "description": "Synonymizer: demo of useEngraft built with TypeScript",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "tsc": "tsc",
+    "depcheck": "node ../../scripts/our-depcheck.js",
+    "lint": "eslint --max-warnings=0 src",
+
+    "build": "vite build --config ../../vite.config.ts",
+    "preview": "vite preview --config ../../vite.config.ts",
+    "dev": "vite --config ../../vite.config.ts"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-router-dom": "^6.3.0",
+    "react-dom": "^18.0.0",
+    "@engraft/use-engraft": "^0.0.1",
+    "@engraft/core": "^0.0.1",
+    "@engraft/original": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/react-dom": "^18.0.0"
+  }
+}

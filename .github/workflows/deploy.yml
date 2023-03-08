@@ -34,10 +34,14 @@ jobs:
       - name: Build graft-garden
         run: npm run graft-garden:build
 
+      - name: Build use-engraft-demo
+        run: npm run use-engraft-demo:build
+
       - name: Assemble output
         run: |
           mv packages/testbed/dist website/testbed
           mv packages/graft-garden/dist website/graft-garden
+          mv packages/use-engraft-demo/dist website/use-engraft-demo
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
