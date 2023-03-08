@@ -1,0 +1,29 @@
+.UseEngraftEditor {
+  font-family: sans-serif;
+
+  margin: 16px;
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+  /* background: #F0F2F5; */
+}
+
+.UseEngraftEditor > div {
+  margin-bottom: 16px;
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(20,20,20,0.2);
+}
+
+.UseEngraftEditor pre {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.UseEngraftEditor h2 {
+  margin: 0;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
