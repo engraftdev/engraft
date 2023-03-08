@@ -1,37 +1,36 @@
-import { EngraftPromise, Tool } from "@engraft/core";
+import { EngraftPromise, Tool, ToolOutput } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { ToolOutputView } from "../../view/Value";
 
 export type Program = {
-  toolName: 'test-value',
-  value: unknown,
+  toolName: 'test-known-output',
+  outputP: EngraftPromise<ToolOutput>,  // TODO: for testing, breaks serialization
   onRun?: () => void,  // TODO: for testing, breaks serialization
   onViewRender?: () => void,  // TODO: for testing, breaks serialization
 }
 
 export const tool: Tool<Program> = {
   programFactory: () => ({
-    toolName: 'test-value',
-    value: null,
+    toolName: 'test-known-output',
+    outputP: EngraftPromise.unresolved(),
   }),
 
   computeReferences: () => new Set(),
 
   run: memoizeProps(hooks((props) => {
     const { program } = props;
-    const { value, onRun, onViewRender } = program;
+    const { outputP, onRun, onViewRender } = program;
 
     if (onRun) { onRun(); }
-
-    const outputP = hookMemo(() => EngraftPromise.resolve({
-      value
-    }), [value]);
 
     const view = hookMemo(() => ({
       render: () => {
         if (onViewRender) { onViewRender(); }
-        return <div className="TestValue">{JSON.stringify(program.value)}</div>;
+        return <div className="TestKnownOutput">
+          <ToolOutputView outputP={outputP} />
+        </div>;
       }
-    }), [onViewRender, program.value]);
+    }), [onViewRender, outputP]);
 
     return { outputP, view };
   })),

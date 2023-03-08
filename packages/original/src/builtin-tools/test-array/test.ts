@@ -4,13 +4,13 @@ import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
 import { describe, it } from 'vitest';
 import { empty } from '../../util/noOp';
-import * as testValue from '../test-value';
-import * as testArray from './index';
+import * as TestKnownOutput from '../test-known-output';
+import * as TestArray from './index';
 
 // @vitest-environment happy-dom
 
-const testArrayTool = toolFromModule(testArray);
-registerTool(toolFromModule(testValue));
+const testArrayTool = toolFromModule(TestArray);
+registerTool(toolFromModule(TestKnownOutput));
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
@@ -18,17 +18,17 @@ describe('test-array', () => {
 
     let subTool1Runs = 0;
     let subTool2Runs = 0;
-    let program: testArray.Program = {
+    let program: TestArray.Program = {
       toolName: 'test-array',
       subToolPrograms: [
         {
-          toolName: 'test-value',
-          value: 1,
+          toolName: 'test-known-output',
+          outputP: EngraftPromise.resolve({value: 1}),
           onRun: () => { subTool1Runs++ },
         },
         {
-          toolName: 'test-value',
-          value: 2,
+          toolName: 'test-known-output',
+          outputP: EngraftPromise.resolve({value: 2}),
           onRun: () => { subTool2Runs++ },
         },
       ],
@@ -50,7 +50,7 @@ describe('test-array', () => {
     expectToEqual(subTool1Runs, 1);
     expectToEqual(subTool2Runs, 1);
 
-    program = update(program, {subToolPrograms: {0: {value: {$set: 3}}}});
+    program = update(program, {subToolPrograms: {0: {outputP: {$set: EngraftPromise.resolve({value: 3})}}}});
 
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: [3, 2]}});
     expectToEqual(subTool1Runs, 2);

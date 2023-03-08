@@ -1,23 +1,23 @@
 import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import update from 'immutability-helper';
+import { updateWithUP } from '@engraft/update-proxy';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import { ToolWithView } from '../../view/ToolWithView';
 import { describe, it } from 'vitest';
 import { empty, noOp } from '../../util/noOp';
-import * as slot from '../slot';
-import * as testValue from '../test-value';
-import * as notebook from './index';
+import { ToolWithView } from '../../view/ToolWithView';
+import * as Slot from '../slot';
+import * as TestKnownOutput from '../test-known-output';
+import * as Notebook from './index';
 
 // @vitest-environment happy-dom
 
-const notebookTool = toolFromModule(notebook);
+const notebookTool = toolFromModule(Notebook);
 
 registerTool(notebookTool);
-registerTool(toolFromModule(testValue));
-registerTool(toolFromModule(slot));
+registerTool(toolFromModule(TestKnownOutput));
+registerTool(toolFromModule(Slot));
 
 describe('notebook', () => {
   it('output basically works; no unnecessary runs of cells', () => {
@@ -25,25 +25,25 @@ describe('notebook', () => {
 
     let cell1Runs = 0;
     let cell2Runs = 0;
-    let program: notebook.Program = {
+    let program: Notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
           var_: {id: 'cell1', label: ''},
           program: {
-            toolName: 'test-value',
-            value: 1,
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 1 }),
             onRun: () => { cell1Runs++ },
-          },
+          } satisfies TestKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
           program: {
-            toolName: 'test-value',
-            value: 2,
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 2 }),
             onRun: () => { cell2Runs++ },
-          },
+          } satisfies TestKnownOutput.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -70,7 +70,9 @@ describe('notebook', () => {
     expectToEqual(cell1Runs, 1);
     expectToEqual(cell2Runs, 1);
 
-    program = update(program, {cells: {1: {program: {value: {$set: 3}}}}});
+    program = updateWithUP(program, (programUP) => {
+      programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
+    });
 
     // console.log("run 3");
 
@@ -82,7 +84,7 @@ describe('notebook', () => {
   it('prev works', () => {
     const prevVar = newVar('prev');
 
-    let program: notebook.Program = {
+    let program: Notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
@@ -125,7 +127,7 @@ describe('notebook', () => {
     const externalVar = newVar('external');
     const cell1 = newVar('cell1');
     const cell2 = newVar('cell2');
-    let program: notebook.Program = {
+    let program: Notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
@@ -167,25 +169,25 @@ describe('notebook', () => {
   it('no unnecessary renders of cells', () => {
     let cell1ViewRenders = 0;
     let cell2ViewRenders = 0;
-    let program: notebook.Program = {
+    let program: Notebook.Program = {
       toolName: 'notebook',
       cells: [
         {
           var_: {id: 'cell1', label: ''},
           program: {
-            toolName: 'test-value',
-            value: 1,
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 1 }),
             onViewRender: () => { cell1ViewRenders++ },
-          },
+          } satisfies TestKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
           program: {
-            toolName: 'test-value',
-            value: 2,
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 2 }),
             onViewRender: () => { cell2ViewRenders++ },
-          },
+          } satisfies TestKnownOutput.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -216,7 +218,9 @@ describe('notebook', () => {
     expectToEqual(cell1ViewRenders, 1);
     expectToEqual(cell2ViewRenders, 1);
 
-    program = update(program, {cells: {1: {program: {value: {$set: 3}}}}});
+    program = updateWithUP(program, (programUP) => {
+      programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
+    });
 
     // console.log("run 3");
 

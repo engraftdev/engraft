@@ -5,16 +5,18 @@ import { describe, it } from 'vitest';
 import * as testValue from '.';
 import { empty } from '../../util/noOp';
 
+// @vitest-environment happy-dom
+
 const testValueTool = toolFromModule(testValue);
 
-describe('test-value', () => {
+describe('test-known-output', () => {
   it('output basically works', () => {
     const memory = new IncrMemory();
     [1, 2, 3].forEach((value) => {
       const {outputP} = testValueTool.run(memory, {
         program: {
-          toolName: 'test-value',
-          value,
+          toolName: 'test-known-output',
+          outputP: EngraftPromise.resolve({value}),
         },
         varBindings: {},
       });
@@ -27,8 +29,8 @@ describe('test-value', () => {
 
     let runs = 0;
     let program: testValue.Program = {
-      toolName: 'test-value',
-      value: 1,
+      toolName: 'test-known-output',
+      outputP: EngraftPromise.resolve({value: 1}),
       onRun: () => { runs++ },
     };
     function runProgram() {
@@ -46,7 +48,7 @@ describe('test-value', () => {
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
     expectToEqual(runs, 1);
 
-    program = {...program, value: 2};
+    program = {...program, outputP: EngraftPromise.resolve({value: 2})};
 
     expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
     expectToEqual(runs, 2);

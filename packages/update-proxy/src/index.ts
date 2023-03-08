@@ -127,3 +127,10 @@ function atAllObjOrArray<T>(update: Updater<T>): Updater<ObjOrArrayElement<T>> {
     });
   };
 }
+
+export function updateWithUP<T>(oldT: T, callback: (tUP: UpdateProxy<T>) => void): T {
+  let newT = oldT;
+  const tUP = updateProxy<T>((f) => newT = f(newT));
+  callback(tUP);
+  return newT;
+}
