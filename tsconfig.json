@@ -17,7 +17,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "baseUrl": "./",
     "sourceMap": true,
     "noEmit": true,
     "types": [
