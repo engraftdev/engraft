@@ -40,25 +40,5 @@
     "vite-plugin-checker": "^0.5.6",
     "vitest": "^0.29.1",
     "@engraft/eslint-plugin-incr-hooks": "^0.0.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ],
-    "plugins": [
-      "@engraft/incr-hooks"
-    ],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-          "args": "none",
-          "ignoreRestSiblings": true,
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_"
-        }
-      ],
-      "@engraft/incr-hooks/exhaustive-deps": "warn"
-    }
   }
 }
