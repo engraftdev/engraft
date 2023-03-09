@@ -1,4 +1,4 @@
-import { ToolOutputView } from "@engraft/original/src/view/Value";
+import { ToolOutputView } from "@engraft/original/dist/view/Value";
 import { ComputeReferences, defineTool, EngraftPromise, hookIncr, hookLater, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, useIncr, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core";

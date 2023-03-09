@@ -1,8 +1,8 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { union } from "@engraft/shared/src/sets";
+import { union } from "@engraft/shared/dist/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { arrEqWithRefEq } from "@engraft/shared/src/eq";
+import { arrEqWithRefEq } from "@engraft/shared/dist/eq";
 
 export type Program = {
   toolName: 'test-array',

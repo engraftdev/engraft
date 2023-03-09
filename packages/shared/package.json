@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "description": "Shared utilities",
   "scripts": {
+    "build-lib": "tsc && cpy 'src/**/*.css' dist",
     "test:watch": "vitest",
     "test": "vitest run",
-    "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --max-warnings=0 src"
+    "lint": "eslint --max-warnings=0 ."
   },
   "dependencies": {
     "deep-object-diff": "^1.1.9",

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { refEq } from '@engraft/shared/src/eq';
-import { IncrMemory } from '../src/incr';
-import { hookMemo } from '../src/hookMemo';
-import { hooks } from '../src/hooks';
+import { refEq } from '@engraft/shared/dist/eq';
+import { IncrMemory } from '../dist/incr';
+import { hookMemo } from '../dist/hookMemo';
+import { hooks } from '../dist/hooks';
 
 describe('hookMemo without equality function', () => {
   let minusRuns = 0;

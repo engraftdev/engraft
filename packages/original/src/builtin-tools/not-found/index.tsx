@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, ProgramFactory, ToolProps } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 
 export type Program = {
@@ -15,7 +15,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { toolName } = props.program;
   const message = `ToolNotFoundError: ${toolName}`;
 
-  const outputP = hookMemo(() => EngraftPromise.reject(
+  const outputP = hookMemo(() => EngraftPromise.reject<ToolOutput>(
     new Error(message)
   ), [message]);
 

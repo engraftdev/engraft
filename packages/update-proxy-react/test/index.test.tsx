@@ -1,9 +1,9 @@
 import { UpdateProxy } from '@engraft/update-proxy';
-import { Updater } from '@engraft/shared/src/Updater';
+import { Updater } from '@engraft/shared/dist/Updater';
 import { Fragment } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';
-import { UseUpdateProxy, useUpdateProxy } from '../src';
+import { UseUpdateProxy, useUpdateProxy } from '../dist';
 
 describe('useUpdateProxy', () => {
   it('basically works', () => {

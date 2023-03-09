@@ -3,4 +3,4 @@ export * from "@engraft/incr";
 export * from "@engraft/incr-react";
 export * from "@engraft/update-proxy";
 export * from "@engraft/update-proxy-react";
-export * as SetOps from "@engraft/shared/src/sets";
+export * as SetOps from "@engraft/shared/dist/sets";

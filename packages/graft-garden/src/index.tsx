@@ -1,5 +1,4 @@
-import { registerTool } from '@engraft/core';
-import { builtinTools } from '@engraft/original/src/builtin-tools';
+import { registerAllTheTools } from '@engraft/all-the-tools';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from "react-router-dom";
@@ -9,7 +8,7 @@ import { ViewPatch } from './ViewPatch';
 
 console.log(`Commit: ${import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}`);
 
-builtinTools.forEach(registerTool);
+registerAllTheTools();
 
 const root = createRoot(document.getElementById('root')!);
 

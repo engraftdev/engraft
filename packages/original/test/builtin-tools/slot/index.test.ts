@@ -3,8 +3,8 @@ import { IncrMemory } from '@engraft/incr';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import { describe, expect, it } from 'vitest';
-import { empty } from '../../../src/util/noOp';
-import * as slot from '../../../src/builtin-tools/slot/index';
+import { empty } from '../../../dist/util/noOp';
+import * as slot from '../../../dist/builtin-tools/slot/index';
 
 // @vitest-environment happy-dom
 

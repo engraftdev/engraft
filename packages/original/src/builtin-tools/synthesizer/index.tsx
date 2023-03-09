@@ -205,7 +205,7 @@ export const InOutPairView = memo(function InOutPairView(props: {
 
   return <Fragment>
     <CodeMirror
-      extensions={setup}
+      extensions={setup()}
       style={{...fadeStyle, minWidth: 0}}
       text={pair.inCode}
       onChange={pairUP.inCode.$set}
@@ -217,7 +217,7 @@ export const InOutPairView = memo(function InOutPairView(props: {
       →
     </div>
     <CodeMirror
-      extensions={setup}
+      extensions={setup()}
       style={{...fadeStyle, minWidth: 0, ...incorrectStyle}}
       text={pair.outCode}
       onChange={pairUP.outCode.$set}

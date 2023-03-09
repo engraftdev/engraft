@@ -1,19 +1,19 @@
-import { EngraftPromise, getFullToolIndex, lookUpToolByName, registerTool, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from '@engraft/core';
+import { registerAllTheTools } from '@engraft/all-the-tools';
+import { EngraftPromise, getFullToolIndex, lookUpToolByName, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from '@engraft/core';
 import { useIncr } from '@engraft/incr-react';
-import { builtinTools } from "@engraft/original/src/builtin-tools";
-import { Updater } from '@engraft/original/src/util/immutable';
-import { useStateSetOnly } from '@engraft/original/src/util/immutable-react';
-import range from '@engraft/original/src/util/range';
-import { useLocalStorage } from '@engraft/original/src/util/useLocalStorage';
-import IsolateStyles from '@engraft/original/src/view/IsolateStyles';
-import { ToolOutputView } from '@engraft/original/src/view/Value';
-import { ValueEditable } from '@engraft/original/src/view/ValueEditable';
+import { Updater } from '@engraft/original/dist/util/immutable';
+import { useStateSetOnly } from '@engraft/original/dist/util/immutable-react';
+import range from '@engraft/original/dist/util/range';
+import { useLocalStorage } from '@engraft/original/dist/util/useLocalStorage';
+import IsolateStyles from '@engraft/original/dist/view/IsolateStyles';
+import { ToolOutputView } from '@engraft/original/dist/view/Value';
+import { ValueEditable } from '@engraft/original/dist/view/ValueEditable';
 import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import appCss from './App.css?inline';
 import { examples } from './examples';
 
-builtinTools.forEach(registerTool);
+registerAllTheTools();
 
 const defaultProgram = lookUpToolByName('slot').programFactory();
 

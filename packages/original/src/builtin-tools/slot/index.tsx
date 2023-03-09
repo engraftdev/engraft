@@ -8,9 +8,9 @@ import { EditorState, RangeSet } from '@codemirror/state';
 import { Decoration, EditorView, keymap, WidgetType } from '@codemirror/view';
 import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, setSlotWithCode, setSlotWithProgram, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from '@engraft/incr';
-import { cache } from '@engraft/shared/src/cache';
-import { objEqWithRefEq } from '@engraft/shared/src/eq';
-import { difference, union } from '@engraft/shared/src/sets';
+import { cache } from '@engraft/shared/dist/cache';
+import { objEqWithRefEq } from '@engraft/shared/dist/eq';
+import { difference, union } from '@engraft/shared/dist/sets';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -364,7 +364,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       toolCompletions(insertTool, replaceWithTool),
     ];
     return [
-      ...setup,
+      ...setup(),
       javascript({jsx: true}),
       keymap.of([
         {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},

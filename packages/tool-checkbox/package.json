@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "description": "Engraft checkbox tool",
   "scripts": {
+    "build-lib": "tsc && cpy 'src/**/*.css' dist",
     "test:watch": "vitest",
     "test": "vitest run",
-    "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --max-warnings=0 src"
+    "lint": "eslint --max-warnings=0 ."
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "@engraft/toolkit": "^0.0.1"
   },

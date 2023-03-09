@@ -1,5 +1,5 @@
 import immutabilityHelper, { Spec } from "immutability-helper";
-import { Updater } from "@engraft/shared/src/Updater";
+import { Updater } from "@engraft/shared/dist/Updater";
 
 export type KeyofWithoutArrayMethods<T> =
   T extends Array<any> ? keyof T & number : keyof T;

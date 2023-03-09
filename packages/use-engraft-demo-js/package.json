@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "@engraft/use-engraft-demo-js",
+  "version": "0.0.1",
+  "description": "Synonymizer: demo of useEngraft built with JavaScript",
+  "scripts": {
+    "depcheck": "node ../../scripts/our-depcheck.js",
+    "lint": "eslint --max-warnings=0 .",
+    "build-app": "vite build --config ./vite.config.ts",
+    "preview": "vite preview --config ./vite.config.ts",
+    "dev": "vite --config ./vite.config.ts"
+  },
+  "dependencies": {
+    "@engraft/all-the-tools": "^0.0.1",
+    "@engraft/use-engraft": "^0.0.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^3.1.0"
+  }
+}

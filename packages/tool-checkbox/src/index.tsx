@@ -1,4 +1,4 @@
-import { defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, ToolView } from "@engraft/toolkit/src";
+import { defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, ToolView } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'checkbox',

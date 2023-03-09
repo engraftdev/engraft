@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CHANGEME } from '../src/index';
+import { CHANGEME } from '../dist/index';
 
 describe('CHANGEME', () => {
   it('CHANGEME', () => {

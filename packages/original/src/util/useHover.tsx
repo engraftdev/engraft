@@ -1,14 +1,19 @@
 import { useCallback, useLayoutEffect, useState } from "react";
 import { useElementEventListener } from "./useEventListener";
 
+let EVENT_LISTENER_CREATED = false;
 let mouseClientX: number;
 let mouseClientY: number;
-window.addEventListener("mousemove", (ev) => {
-	mouseClientX = ev.clientX;
-  mouseClientY = ev.clientY;
-})
 
 export default function useHover(): [(elem: HTMLElement | null) => void, boolean, HTMLElement | null] {
+  if (!EVENT_LISTENER_CREATED) {
+    EVENT_LISTENER_CREATED = true;
+    document.addEventListener('mousemove', (e) => {
+      mouseClientX = e.clientX;
+      mouseClientY = e.clientY;
+    })
+  }
+
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [elem, setElem] = useState<HTMLElement | null>(null);
 

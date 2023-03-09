@@ -7,6 +7,14 @@ module.exports = {
   plugins: [
     "@engraft/incr-hooks"
   ],
+  settings: {
+    'import/resolver': {
+      typescript: true
+    }
+  },
+  ignorePatterns: [
+    "dist",
+  ],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "warn",
@@ -17,6 +25,17 @@ module.exports = {
         varsIgnorePattern: "^_"
       }
     ],
-    "@engraft/incr-hooks/exhaustive-deps": "warn"
+    "@engraft/incr-hooks/exhaustive-deps": "warn",
+    "import/no-restricted-paths": [
+      "error",
+      {
+        zones: [
+          {
+            target: "./test",
+            from: "./src",
+          }
+        ]
+      }
+    ]
   }
 }

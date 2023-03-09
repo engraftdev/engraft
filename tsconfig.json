@@ -19,6 +19,7 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "noEmit": true,
+    "declaration": true,
     "types": [
       "vite/client"
     ]

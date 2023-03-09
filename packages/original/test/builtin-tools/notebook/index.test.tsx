@@ -4,11 +4,11 @@ import { updateWithUP } from '@engraft/update-proxy';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';
-import { empty, noOp } from '../../../src/util/noOp';
-import { ToolWithView } from '../../../src/view/ToolWithView';
-import * as Slot from '../../../src/builtin-tools/slot';
-import * as TestKnownOutput from '../../../src/builtin-tools/test-known-output';
-import * as Notebook from '../../../src/builtin-tools/notebook/index';
+import { empty, noOp } from '../../../dist/util/noOp';
+import { ToolWithView } from '../../../dist/view/ToolWithView';
+import * as Slot from '../../../dist/builtin-tools/slot';
+import * as TestKnownOutput from '../../../dist/builtin-tools/test-known-output';
+import * as Notebook from '../../../dist/builtin-tools/notebook/index';
 
 // @vitest-environment happy-dom
 

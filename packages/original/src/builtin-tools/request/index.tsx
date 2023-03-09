@@ -4,7 +4,7 @@ import {
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { RowToCol } from "../../util/RowToCol";
-import { union } from "@engraft/shared/src/sets";
+import { union } from "@engraft/shared/dist/sets";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {

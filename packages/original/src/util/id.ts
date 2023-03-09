@@ -4,7 +4,6 @@ import seedrandom from 'seedrandom';
 export function hashId(...args: any[]): string {
   return randomId(seedrandom(JSON.stringify(args)));
 }
-(window as any).hashId = hashId;
 
 // TODO: extended this from a-z so I could shove js variable names in; not great
 export const idRegExp = "ID[a-zA-Z_]*[0-9]{6}";

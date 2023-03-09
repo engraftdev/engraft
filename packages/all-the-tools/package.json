@@ -1,0 +1,21 @@
+{
+  "name": "@engraft/all-the-tools",
+  "version": "0.0.1",
+  "description": "All the Engraft tools made by the Engraft team",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "depcheck": "node ../../scripts/our-depcheck.js",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "dist/index.js",
+  "dependencies": {
+    "@engraft/core": "^0.0.1",
+    "@engraft/original": "^0.0.1",
+    "@engraft/tool-toy-adder": "^0.0.1",
+    "@engraft/tool-gadget": "^0.0.1",
+    "@engraft/tool-hider": "^0.0.1",
+    "@engraft/tool-checkbox": "^0.0.1"
+  }
+}

@@ -1,9 +1,9 @@
 import { EngraftPromise, registerTool, slotWithCode, toolFromModule, ToolOutput } from '@engraft/core';
-import * as Slot from '@engraft/original/src/builtin-tools/slot';
-import * as TestKnownOutput from '@engraft/original/src/builtin-tools/test-known-output';
+import * as Slot from '@engraft/original/dist/builtin-tools/slot';
+import * as TestKnownOutput from '@engraft/original/dist/builtin-tools/test-known-output';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';
-import { useEngraft } from '../src/index';
+import { useEngraft } from '../dist/index';
 
 // @vitest-environment happy-dom
 

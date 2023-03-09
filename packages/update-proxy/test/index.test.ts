@@ -1,6 +1,6 @@
-import { Updater } from '@engraft/shared/src/Updater';
+import { Updater } from '@engraft/shared/dist/Updater';
 import { describe, expect, it } from 'vitest';
-import { updateProxy } from '../src';
+import { updateProxy } from '../dist';
 
 describe('updateProxy', () => {
   it('works directly', () => {

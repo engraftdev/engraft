@@ -1,13 +1,13 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever, memoizeProps } from "@engraft/incr";
-import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/src/eq";
+import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/dist/eq";
 import _ from "lodash";
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
 import { startDrag } from "../../util/drag";
 import { Updater } from "../../util/immutable";
 import { useStateSetOnly } from "../../util/immutable-react";
 import { mergeRefs } from "../../util/mergeRefs";
-import { difference, intersection, union } from "@engraft/shared/src/sets";
+import { difference, intersection, union } from "@engraft/shared/dist/sets";
 import { toposort } from "../../util/toposort";
 import { alphaLabels, unusedLabel } from "../../util/unusedLabel";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";

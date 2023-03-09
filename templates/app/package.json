@@ -4,13 +4,9 @@
   "version": "0.0.1",
   "description": "CHANGEME: package description",
   "scripts": {
-    "test:watch": "vitest",
-    "test": "vitest run",
-    "tsc": "tsc",
     "depcheck": "node ../../scripts/our-depcheck.js",
-    "lint": "eslint --max-warnings=0 src",
-
-    "build": "vite build --config ../../vite.config.ts",
+    "lint": "eslint --max-warnings=0 .",
+    "build-app": "vite build --config ../../vite.config.ts",
     "preview": "vite preview --config ../../vite.config.ts",
     "dev": "vite --config ../../vite.config.ts"
   },

@@ -1,11 +1,10 @@
-import { registerTool } from '@engraft/core';
-import { builtinTools } from "@engraft/original/src/builtin-tools";
+import { registerAllTheTools } from '@engraft/all-the-tools';
 import { useEngraft } from '@engraft/use-engraft';
 import { useEffect, useState } from 'react';
 
 import css from './App.css?inline';
 
-builtinTools.forEach(registerTool);
+registerAllTheTools();
 
 export function App() {
   // set by input field

@@ -4,20 +4,39 @@
       "runner": "nx/tasks-runners/default",
       "options": {
         "cacheableOperations": [
+          "build-lib",
           "test",
-          "tsc",
           "lint",
           "depcheck",
-          "build"
+          "build-app"
         ]
       }
     }
   },
+  "namedInputs": {
+    "sharedGlobals": ["{workspaceRoot}/vite.config.ts", "{workspaceRoot}/tsconfig.json"],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.md"
+    ]
+  },
   "targetDefaults": {
-    "build": {
-      "outputs": [
-        "{projectRoot}/dist"
-      ]
+    "build-lib": {
+      "inputs": [ "production", "^production" ],
+      "dependsOn": [ "^build-lib" ],
+      "outputs": [ "{projectRoot}/dist" ]
+    },
+    "test": {
+      "inputs": [ "default", "^production" ],
+      "dependsOn": [ "build-lib" ]
+    },
+    "depcheck": {
+      "inputs": [ "production" ]
+    },
+    "lint": {
+      "inputs": [ "production", "{workspaceRoot}/.eslintrc.js" ]
     }
   }
 }
