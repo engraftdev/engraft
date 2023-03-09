@@ -1,7 +1,7 @@
 {
-  "name": "@engraft/--template--",
+  "name": "CHANGEME: package name",
   "version": "0.0.1",
-  "description": "DESCRIPTION TODO",
+  "description": "CHANGEME: package description",
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",
