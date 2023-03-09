@@ -42,6 +42,10 @@
       "inputs": [ "production", "^production" ],
       "dependsOn": [ "^build-lib" ],
       "outputs": [ "{projectRoot}/dist" ]
+    },
+    "dev": {
+      "inputs": [ "production", "^production" ],
+      "dependsOn": [ "^build-lib" ]
     }
   }
 }
