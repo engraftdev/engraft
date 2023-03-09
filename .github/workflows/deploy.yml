@@ -40,6 +40,9 @@ jobs:
       - name: Build use-engraft-demo-js
         run: npx lerna run build-app --scope @engraft/use-engraft-demo-js
 
+      - name: Build use-engraft-demo-js
+        run: npm run use-engraft-demo-js:build
+
       - name: Assemble output
         run: |
           mv packages/testbed/dist website/testbed
