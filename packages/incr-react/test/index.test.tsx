@@ -1,5 +1,5 @@
 import { IncrFunction, memoize } from '@engraft/incr';
-import { useIncr } from '.';
+import { useIncr } from '../src';
 import React, { Fragment } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';

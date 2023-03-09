@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isObject } from './isObject';
+import { isObject } from '../src/isObject';
 
 describe('isObject', () => {
   it('basically works', () => {

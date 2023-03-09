@@ -1,8 +1,8 @@
 import { describe, it } from 'vitest';
 import _ from 'lodash';
 import { expectToEqual, expectToNotEqual } from '@engraft/test-shared/src/expectToEqual';
-import { IncrMemory } from './incr';
-import { hookFork, hookIncr, hookRef, hooks } from './hooks';
+import { IncrMemory } from '../src/incr';
+import { hookFork, hookIncr, hookRef, hooks } from '../src/hooks';
 
 let squareRuns = 0;
 const square = hooks((x: number) => {

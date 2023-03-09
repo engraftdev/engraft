@@ -5,11 +5,11 @@ import { updateWithUP } from '@engraft/update-proxy';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, it } from 'vitest';
-import { empty, noOp } from '../../util/noOp';
-import { ToolWithView } from '../../view/ToolWithView';
-import * as Slot from '../slot';
-import * as TestKnownOutput from '../test-known-output';
-import * as Notebook from './index';
+import { empty, noOp } from '../../../src/util/noOp';
+import { ToolWithView } from '../../../src/view/ToolWithView';
+import * as Slot from '../../../src/builtin-tools/slot';
+import * as TestKnownOutput from '../../../src/builtin-tools/test-known-output';
+import * as Notebook from '../../../src/builtin-tools/notebook/index';
 
 // @vitest-environment happy-dom
 

@@ -4,8 +4,8 @@ import { EngraftPromise } from '@engraft/core';
 import { makeVarBindings } from '@engraft/core';
 import { toolFromModule } from '@engraft/core';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import * as simulation from './index';
-import * as slot from '../slot';
+import * as simulation from '../../../src/builtin-tools/simulation/index';
+import * as slot from '../../../src/builtin-tools/slot';
 import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom

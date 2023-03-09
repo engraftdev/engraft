@@ -2,7 +2,7 @@ const depcheck = require('depcheck');
 
 const options = {
   // tests will use devDependencies from the root package.json; ignore them
-  ignorePatterns: ["*.test.ts", "*.test.tsx", "test.ts", "test.tsx"]
+  ignorePatterns: ["/test/**"],
 };
 
 depcheck(process.cwd(), options).then((unused) => {

@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import { RuleTester } from 'eslint';
-import rule from './ExhaustiveDeps';
+import rule from '../src/ExhaustiveDeps';
 
 (RuleTester as any).describe = describe;
 (RuleTester as any).it = it;

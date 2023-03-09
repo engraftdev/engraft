@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { expectToEqual, valueOfType } from '@engraft/test-shared/src/expectToEqual';
-import { updateProxy } from '.';
+import { updateProxy } from '../src';
 import { Updater } from '@engraft/shared/src/Updater';
 
 describe('updateProxy', () => {

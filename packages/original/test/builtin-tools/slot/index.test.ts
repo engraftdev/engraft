@@ -4,8 +4,8 @@ import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import { describe, it } from 'vitest';
-import { empty } from '../../util/noOp';
-import * as slot from './index';
+import { empty } from '../../../src/util/noOp';
+import * as slot from '../../../src/builtin-tools/slot/index';
 
 // @vitest-environment happy-dom
 

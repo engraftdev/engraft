@@ -3,7 +3,7 @@ import * as Slot from '@engraft/original/src/builtin-tools/slot';
 import * as TestKnownOutput from '@engraft/original/src/builtin-tools/test-known-output';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';
-import { useEngraft } from './index';
+import { useEngraft } from '../src/index';
 
 // @vitest-environment happy-dom
 

@@ -1,8 +1,8 @@
 import { describe, it } from 'vitest';
-import { compileExpression } from '../../util/compile';
+import { compileExpression } from '../../../src/util/compile';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { runToCompletion } from '../../util/Task';
-import { synthesizeGen } from './synthesizer';
+import { runToCompletion } from '../../../src/util/Task';
+import { synthesizeGen } from '../../../src/builtin-tools/synthesizer/synthesizer';
 
 describe('synthesizeGen', () => {
   it('synthesizes "adding one"', () => {

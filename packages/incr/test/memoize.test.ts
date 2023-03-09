@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { IncrFunction, IncrMemory } from './incr';
-import { memoize, memoizeForever, memoizeProps } from './memoize';
+import { IncrFunction, IncrMemory } from '../src/incr';
+import { memoize, memoizeForever, memoizeProps } from '../src/memoize';
 
 describe('memoize', () => {
   let minusRuns = 0;

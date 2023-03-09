@@ -2,8 +2,8 @@ import { EngraftPromise, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { describe, it } from 'vitest';
-import * as testValue from '.';
-import { empty } from '../../util/noOp';
+import * as testValue from '../../../src/builtin-tools/test-known-output';
+import { empty } from '../../../src/util/noOp';
 
 // @vitest-environment happy-dom
 

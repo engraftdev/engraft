@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { SynchronousPromise } from 'synchronous-promise';
-import { EngraftPromise } from './EngraftPromise';
+import { EngraftPromise } from '../src/EngraftPromise';
 
 describe('EngraftPromise', () => {
   it('calls `then` synchronously if possible', () => {

@@ -3,9 +3,9 @@ import { IncrMemory } from '@engraft/incr';
 import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
 import { describe, it } from 'vitest';
-import { empty } from '../../util/noOp';
-import * as TestKnownOutput from '../test-known-output';
-import * as TestArray from './index';
+import { empty } from '../../../src/util/noOp';
+import * as TestKnownOutput from '../../../src/builtin-tools/test-known-output';
+import * as TestArray from '../../../src/builtin-tools/test-array/index';
 
 // @vitest-environment happy-dom
 
