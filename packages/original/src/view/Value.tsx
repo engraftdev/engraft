@@ -1,9 +1,6 @@
-/// <reference path="./Value.d.ts" />
-
-import { format } from "isoformat";
+import { ToolOutput } from "@engraft/core";
 import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useRef, useState } from "react";
 import { ObjectInspector } from 'react-inspector';
-import { ToolOutput } from "@engraft/core";
 import { count } from "../util/count";
 import { DOM } from "../util/DOM";
 import { ErrorBoundary } from "../util/ErrorBoundary";
@@ -12,12 +9,12 @@ import { Use } from "../util/Use";
 import useHover from "../util/useHover";
 import ScrollShadow from './ScrollShadow';
 // import { isProbablyFunctionThing } from "../builtin-tools-disabled/function";
-import { identity } from "lodash";
-import { EngraftPromise, PromiseState } from "@engraft/core";
-import { usePromiseState } from "@engraft/core";
-import Diagram from "../util/Diagram";
-import { isObject } from "@engraft/shared/dist/isObject";
+import { EngraftPromise, PromiseState, usePromiseState } from "@engraft/core";
 import { hasProperty } from "@engraft/shared/dist/hasProperty";
+import { isObject } from "@engraft/shared/dist/isObject";
+import { identity } from "lodash";
+import Diagram from "../util/Diagram";
+import { isoformat } from "../util/isoformat";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;
@@ -183,7 +180,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   if (value instanceof Date) {
     return wrapInline(
       <div style={{color: 'rgb(28, 0, 207)', ...valueFont}}>
-        {format(value, "Invalid Date")}
+        {isoformat(value) ?? "Invalid Date"}
       </div>
     );
   }

@@ -1,6 +1,4 @@
-/// <reference path="./patterns.d.ts" />
-
-import { InternMap } from "internmap";
+import { InternMap } from "../../util/internmap";
 import { mapUpdate } from "../../util/mapUpdate";
 
 
