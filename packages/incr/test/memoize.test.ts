@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { IncrFunction, IncrMemory } from '../src/incr';
 import { memoize, memoizeForever, memoizeProps } from '../src/memoize';
 
@@ -67,11 +66,11 @@ describe('memoizeForever', () => {
     const obj2 = {a: 2};
 
     const memory = new IncrMemory();
-    expectToEqual(square(memory, obj1), 1);
+    expect(square(memory, obj1)).toEqual(1);
     expect(runs).toBe(1);
-    expectToEqual(square(memory, obj2), 4);
+    expect(square(memory, obj2)).toEqual(4);
     expect(runs).toBe(2);
-    expectToEqual(square(memory, obj1), 1);
+    expect(square(memory, obj1)).toEqual(1);
     expect(runs).toBe(2);
   });
 });

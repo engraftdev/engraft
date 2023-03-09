@@ -1,7 +1,6 @@
 import { EngraftPromise, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import * as testValue from '../../../src/builtin-tools/test-known-output';
 import { empty } from '../../../src/util/noOp';
 
@@ -20,7 +19,7 @@ describe('test-known-output', () => {
         },
         varBindings: {},
       });
-      expectToEqual(EngraftPromise.state(outputP), {status: 'fulfilled', value: {value}});
+      expect(EngraftPromise.state(outputP)).toEqual({status: 'fulfilled', value: {value}});
     });
   });
 
@@ -42,15 +41,15 @@ describe('test-known-output', () => {
       );
     }
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
-    expectToEqual(runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+    expect(runs).toEqual(1);
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
-    expectToEqual(runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+    expect(runs).toEqual(1);
 
     program = {...program, outputP: EngraftPromise.resolve({value: 2})};
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    expectToEqual(runs, 2);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    expect(runs).toEqual(2);
   });
 });

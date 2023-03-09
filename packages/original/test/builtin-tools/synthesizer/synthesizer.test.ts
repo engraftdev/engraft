@@ -1,6 +1,5 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { compileExpression } from '../../../src/util/compile';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { runToCompletion } from '../../../src/util/Task';
 import { synthesizeGen } from '../../../src/builtin-tools/synthesizer/synthesizer';
 
@@ -12,10 +11,9 @@ describe('synthesizeGen', () => {
     ];
 
     const result = runToCompletion(synthesizeGen(prompt));
-    expectToEqual(
-      compileExpression(result!)({input: 1000}),
-      1001,
-    );
+    expect(
+      compileExpression(result!)({input: 1000})
+    ).toEqual(1001);
   });
 
   it('synthesizes "first letters', () => {
@@ -25,9 +23,8 @@ describe('synthesizeGen', () => {
     ];
 
     const result = runToCompletion(synthesizeGen(prompt));
-    expectToEqual(
-      compileExpression(result!)({input: "Herbie Hancock"}),
-      ["H", "H"],
-    );
+    expect(
+      compileExpression(result!)({input: "Herbie Hancock"})
+    ).toEqual(["H", "H"]);
   });
 });

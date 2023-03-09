@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { SynchronousPromise } from 'synchronous-promise';
 import { EngraftPromise } from '../src/EngraftPromise';
 
@@ -19,30 +18,30 @@ describe('EngraftPromise', () => {
 describe('EngraftPromise.state', () => {
   it('works when fulfilled', () => {
     const promise = EngraftPromise.resolve(100);
-    expectToEqual(EngraftPromise.state(promise), {status: 'fulfilled', value: 100});
+    expect(EngraftPromise.state(promise)).toEqual({status: 'fulfilled', value: 100});
   });
 
   it('works when rejected', () => {
     const promise = EngraftPromise.reject('no good');
-    expectToEqual(EngraftPromise.state(promise), {status: 'rejected', reason: 'no good'});
+    expect(EngraftPromise.state(promise)).toEqual({status: 'rejected', reason: 'no good'});
   });
 
   it('works when pending', () => {
     const promise = new EngraftPromise(() => {});
-    expectToEqual(EngraftPromise.state(promise), {status: 'pending'});
+    expect(EngraftPromise.state(promise)).toEqual({status: 'pending'});
   });
 })
 
 describe('EngraftPromise.try', () => {
   it('works when no error', () => {
     const promise = EngraftPromise.try(() => 100);
-    expectToEqual(EngraftPromise.state(promise), {status: 'fulfilled', value: 100});
+    expect(EngraftPromise.state(promise)).toEqual({status: 'fulfilled', value: 100});
   });
 
   it('works when error', () => {
     // eslint-disable-next-line no-throw-literal
     const promise = EngraftPromise.try(() => { throw 'no good'; });
-    expectToEqual(EngraftPromise.state(promise), {status: 'rejected', reason: 'no good'});
+    expect(EngraftPromise.state(promise)).toEqual({status: 'rejected', reason: 'no good'});
   });
 });
 

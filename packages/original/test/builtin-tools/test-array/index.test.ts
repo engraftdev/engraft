@@ -1,8 +1,7 @@
 import { EngraftPromise, registerTool, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { empty } from '../../../src/util/noOp';
 import * as TestKnownOutput from '../../../src/builtin-tools/test-known-output';
 import * as TestArray from '../../../src/builtin-tools/test-array/index';
@@ -42,18 +41,18 @@ describe('test-array', () => {
       );
     }
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: [1, 2]}});
-    expectToEqual(subTool1Runs, 1);
-    expectToEqual(subTool2Runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: [1, 2]}});
+    expect(subTool1Runs).toEqual(1);
+    expect(subTool2Runs).toEqual(1);
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: [1, 2]}});
-    expectToEqual(subTool1Runs, 1);
-    expectToEqual(subTool2Runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: [1, 2]}});
+    expect(subTool1Runs).toEqual(1);
+    expect(subTool2Runs).toEqual(1);
 
     program = update(program, {subToolPrograms: {0: {outputP: {$set: EngraftPromise.resolve({value: 3})}}}});
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: [3, 2]}});
-    expectToEqual(subTool1Runs, 2);
-    expectToEqual(subTool2Runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: [3, 2]}});
+    expect(subTool1Runs).toEqual(2);
+    expect(subTool2Runs).toEqual(1);
   });
 });

@@ -1,9 +1,8 @@
 import { EngraftPromise, makeVarBindings, registerTool, toolFromModule, ToolOutput } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import update from 'immutability-helper';
 import _ from 'lodash';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { empty } from '../../../src/util/noOp';
 import * as slot from '../../../src/builtin-tools/slot/index';
 
@@ -14,7 +13,7 @@ registerTool(slotTool);  // we test it embedded in itself
 
 describe('slot', () => {
   it('basic code works', () => {
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         slotTool.run(new IncrMemory(), {
           program: {
@@ -27,12 +26,13 @@ describe('slot', () => {
           varBindings: empty,
         }).outputP
       ),
+    ).toEqual(
       {status: 'fulfilled', value: {value: 2}},
     )
   });
 
   it('multi-statement code works', () => {
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         slotTool.run(new IncrMemory(), {
           program: {
@@ -45,6 +45,7 @@ describe('slot', () => {
           varBindings: empty,
         }).outputP
       ),
+    ).toEqual(
       {status: 'fulfilled', value: {value: 2}},
     )
   });
@@ -60,13 +61,13 @@ describe('slot', () => {
       },
       varBindings: empty,
     });
-    expectToEqual(EngraftPromise.state(outputP), {status: 'pending'});
+    expect(EngraftPromise.state(outputP)).toEqual({status: 'pending'});
     const value = await outputP;
-    return expectToEqual(value, { value: 2 });
+    return expect(value).toEqual({ value: 2 });
   });
 
   it('computes references correctly in code-mode', () => {
-    expectToEqual(
+    expect(
       slotTool.computeReferences({
         toolName: 'slot',
         modeName: 'code',
@@ -74,10 +75,11 @@ describe('slot', () => {
         subPrograms: {},
         defaultCode: undefined,
       }),
+    ).toEqual(
       new Set()
     );
 
-    expectToEqual(
+    expect(
       slotTool.computeReferences({
         toolName: 'slot',
         modeName: 'code',
@@ -85,12 +87,13 @@ describe('slot', () => {
         subPrograms: {},
         defaultCode: undefined,
       }),
+    ).toEqual(
       new Set(['IDfox000000'])
     );
   });
 
   it('computes references correctly in code-mode with subprograms', () => {
-    expectToEqual(
+    expect(
       slotTool.computeReferences({
         toolName: 'slot',
         modeName: 'code',
@@ -106,12 +109,13 @@ describe('slot', () => {
         },
         defaultCode: undefined,
       }),
+    ).toEqual(
       new Set(['IDfox000000'])
     );
   });
 
   it('computes references correctly in tool-mode', () => {
-    expectToEqual(
+    expect(
       slotTool.computeReferences({
         toolName: 'slot',
         modeName: 'tool',
@@ -124,12 +128,13 @@ describe('slot', () => {
         },
         defaultCode: undefined,
       }),
+    ).toEqual(
       new Set(['IDfox000000'])
     );
   });
 
   it('resolves references correctly', () => {
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         slotTool.run(new IncrMemory(), {
           program: {
@@ -142,6 +147,7 @@ describe('slot', () => {
           varBindings: makeVarBindings({IDfox000000: {value: 100}}),
         }).outputP
       ),
+    ).toEqual(
       {status: 'fulfilled', value: {value: 101}},
     )
   });
@@ -160,9 +166,9 @@ describe('slot', () => {
       } satisfies slot.Program,
       varBindings: makeVarBindings({IDfox000000: foxOutputP}),
     });
-    expectToEqual(EngraftPromise.state(outputP), {status: 'pending'});
+    expect(EngraftPromise.state(outputP)).toEqual({status: 'pending'});
     const value = await outputP;
-    expectToEqual(value, { value: 101 });
+    expect(value).toEqual({ value: 101 });
   });
 
   it('switches between code & tool modes without accumulating garbage', async () => {
@@ -198,26 +204,26 @@ describe('slot', () => {
     }
 
     program = programCode;
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
     const memoryAfterCode = _.cloneDeep(memory);
 
     program = programTool;
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 4}});
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 4}});
     const memoryAfterTool = _.cloneDeep(memory);
 
     program = programCode;
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    // expectToEqual without stringify fails, probably because of promise-related hijinks
-    expectToEqual(JSON.stringify(memory), JSON.stringify(memoryAfterCode));
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    // expect.toEqual without stringify fails, probably because of promise-related hijinks
+    expect(JSON.stringify(memory)).toEqual(JSON.stringify(memoryAfterCode));
 
     program = programTool;
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 4}});
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 4}});
     // same
-    expectToEqual(JSON.stringify(memory), JSON.stringify(memoryAfterTool));
+    expect(JSON.stringify(memory)).toEqual(JSON.stringify(memoryAfterTool));
   });
 
   it('works with subtools', () => {
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         slotTool.run(new IncrMemory(), {
           program: {
@@ -238,8 +244,7 @@ describe('slot', () => {
           varBindings: makeVarBindings({IDmoose000000: {value: 100}}),
         }).outputP
       ),
-      {status: 'fulfilled', value: {value: 105}},
-    )
+    ).toEqual({status: 'fulfilled', value: {value: 105}});
   });
 
   it('does not re-run when irrelevant varBindings change', () => {
@@ -266,15 +271,15 @@ describe('slot', () => {
       );
     }
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
-    expectToEqual(runs, 1);
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 1}});
-    expectToEqual(runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+    expect(runs).toEqual(1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+    expect(runs).toEqual(1);
     varBindings = update(varBindings, {IDrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 2})}}});
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    expectToEqual(runs, 2);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    expect(runs).toEqual(2);
     varBindings = update(varBindings, {IDirrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 100})}}});
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    expectToEqual(runs, 2);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    expect(runs).toEqual(2);
   });
 });

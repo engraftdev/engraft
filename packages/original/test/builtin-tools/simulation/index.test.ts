@@ -1,12 +1,8 @@
-import { describe, it } from 'vitest';
-import { newVar, registerTool, slotWithCode } from '@engraft/core';
-import { EngraftPromise } from '@engraft/core';
-import { makeVarBindings } from '@engraft/core';
-import { toolFromModule } from '@engraft/core';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
+import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule } from '@engraft/core';
+import { IncrMemory } from '@engraft/incr';
+import { describe, expect, it } from 'vitest';
 import * as simulation from '../../../src/builtin-tools/simulation/index';
 import * as slot from '../../../src/builtin-tools/slot';
-import { IncrMemory } from '@engraft/incr';
 
 // @vitest-environment happy-dom
 
@@ -25,13 +21,14 @@ describe('simulation', () => {
       toDrawProgram: slotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
     };
 
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         simulationTool.run(new IncrMemory(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
         }).outputP
       ),
+    ).toEqual(
       {
         status: 'fulfilled',
         value: {
@@ -40,8 +37,9 @@ describe('simulation', () => {
       }
     );
 
-    expectToEqual(
+    expect(
       simulationTool.computeReferences(program),
+    ).toEqual(
       new Set(['IDone000000'])
     );
   });

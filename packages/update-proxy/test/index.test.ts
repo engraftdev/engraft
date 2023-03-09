@@ -1,7 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { expectToEqual, valueOfType } from '@engraft/test-shared/src/expectToEqual';
-import { updateProxy } from '../src';
 import { Updater } from '@engraft/shared/src/Updater';
+import { describe, expect, it } from 'vitest';
+import { updateProxy } from '../src';
 
 describe('updateProxy', () => {
   it('works directly', () => {
@@ -22,9 +21,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, {a: 0, b: 0, c: {}});
+    expect(x).toEqual({a: 0, b: 0, c: {}});
     xUP.a.$apply(a => a + 1);
-    expectToEqual(x, {a: 1, b: 0, c: {}});
+    expect(x).toEqual({a: 1, b: 0, c: {}});
     expect(x.c).toBe(c);  // make sure c maintains reference equality
   });
 
@@ -33,11 +32,11 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [0, 0, 0]);
+    expect(x).toEqual([0, 0, 0]);
     xUP[1].$apply(a => a + 1);
-    expectToEqual(x, [0, 1, 0]);
+    expect(x).toEqual([0, 1, 0]);
     xUP[2].$apply(a => a + 2);
-    expectToEqual(x, [0, 1, 2]);
+    expect(x).toEqual([0, 1, 2]);
   });
 
   it('preserves reference equality when possible in an array', () => {
@@ -46,9 +45,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [{n: 0}, {n: 0}, {n: 0}]);
+    expect(x).toEqual([{n: 0}, {n: 0}, {n: 0}]);
     xUP[1].n.$apply(n => n + 1);
-    expectToEqual(x, [{n: 0}, {n: 1}, {n: 0}]);
+    expect(x).toEqual([{n: 0}, {n: 1}, {n: 0}]);
     expect(x[2]).toBe(x2);  // make sure x2 maintains reference equality
   });
 
@@ -100,9 +99,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [0, 1, 2]);
+    expect(x).toEqual([0, 1, 2]);
     xUP[1].$remove();
-    expectToEqual(x, [0, 2]);
+    expect(x).toEqual([0, 2]);
   });
 
   it('can remove from object if property is inessential', () => {
@@ -110,18 +109,18 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, {a: 0, b: 1, c: 2});
+    expect(x).toEqual({a: 0, b: 1, c: 2});
     xUP.b.$remove();
-    expectToEqual(x, {a: 0, c: 2});
+    expect(x).toEqual({a: 0, c: 2});
   });
 
   it('only allows `$remove` when it is well-typed', () => {
     if (false) {
       // @ts-expect-error removing at base
-      updateProxy(valueOfType<Updater<{a: number}>>()).$remove();
+      updateProxy(undefined as unknown as Updater<{a: number}>).$remove();
 
       // @ts-expect-error removing essential property
-      updateProxy(valueOfType<Updater<{a: number}>>()).a.$remove();
+      updateProxy(undefined as unknown as Updater<{a: number}>).a.$remove();
     }
   });
 
@@ -131,9 +130,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [{n: 0}, {n: 1}, {n: 2}]);
+    expect(x).toEqual([{n: 0}, {n: 1}, {n: 2}]);
     xUP[1].$remove();
-    expectToEqual(x, [{n: 0}, {n: 2}]);
+    expect(x).toEqual([{n: 0}, {n: 2}]);
     expect(x[1]).toBe(x2);  // make sure x2 maintains reference equality
   });
 
@@ -150,9 +149,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [0, 1, 2]);
+    expect(x).toEqual([0, 1, 2]);
     xUP.$all.$apply(a => a + 1);
-    expectToEqual(x, [1, 2, 3]);
+    expect(x).toEqual([1, 2, 3]);
   });
 
   it('works with $all.prop on arrays', () => {
@@ -160,9 +159,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, [{a: 0}, {a: 1}, {a: 2}]);
+    expect(x).toEqual([{a: 0}, {a: 1}, {a: 2}]);
     xUP.$all.a.$apply(a => a + 1);
-    expectToEqual(x, [{a: 1}, {a: 2}, {a: 3}]);
+    expect(x).toEqual([{a: 1}, {a: 2}, {a: 3}]);
   });
 
   it('works with $all.$all on arrays of arrays', () => {
@@ -171,7 +170,7 @@ describe('updateProxy', () => {
     let xUP = updateProxy(updateX);
 
     xUP.$all.$all.$apply(a => a + 1);
-    expectToEqual(x, [[1, 2], [3, 4, 5], [6, 7, 8, 9]]);
+    expect(x).toEqual([[1, 2], [3, 4, 5], [6, 7, 8, 9]]);
   });
 
   it('works with $all on objects', () => {
@@ -179,9 +178,9 @@ describe('updateProxy', () => {
     let updateX: Updater<typeof x> = (f) => x = f(x);
     let xUP = updateProxy(updateX);
 
-    expectToEqual(x, {a: 0, b: 1, c: 2});
+    expect(x).toEqual({a: 0, b: 1, c: 2});
     xUP.$all.$apply(a => a + 1);
-    expectToEqual(x, {a: 1, b: 2, c: 3});
+    expect(x).toEqual({a: 1, b: 2, c: 3});
   });
 
   it('works with optional properties', () => {
@@ -190,9 +189,9 @@ describe('updateProxy', () => {
     let xUP = updateProxy(updateX);
 
     xUP.b.$apply(b => (b || 0) + 1);
-    expectToEqual(x, {a: 0, b: 1});
+    expect(x).toEqual({a: 0, b: 1});
     xUP.b.$apply(b => (b || 0) + 1);
-    expectToEqual(x, {a: 0, b: 2});
+    expect(x).toEqual({a: 0, b: 2});
 
     if (false) {
       // @ts-expect-error trying to ignore that `b` may be `undefined`.

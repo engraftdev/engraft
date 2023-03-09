@@ -1,10 +1,9 @@
 import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
-import { expectToEqual } from '@engraft/test-shared/src/expectToEqual';
 import { updateWithUP } from '@engraft/update-proxy';
 import React from 'react';
 import TestRenderer from 'react-test-renderer';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { empty, noOp } from '../../../src/util/noOp';
 import { ToolWithView } from '../../../src/view/ToolWithView';
 import * as Slot from '../../../src/builtin-tools/slot';
@@ -60,15 +59,15 @@ describe('notebook', () => {
 
     // console.log("run 1");
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    expectToEqual(cell1Runs, 1);
-    expectToEqual(cell2Runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(1);
 
     // console.log("run 2");
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 2}});
-    expectToEqual(cell1Runs, 1);
-    expectToEqual(cell2Runs, 1);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(1);
 
     program = updateWithUP(program, (programUP) => {
       programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
@@ -76,9 +75,9 @@ describe('notebook', () => {
 
     // console.log("run 3");
 
-    expectToEqual(runProgram(), {status: 'fulfilled', value: {value: 3}});
-    expectToEqual(cell1Runs, 1);
-    expectToEqual(cell2Runs, 2);
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 3}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(2);
   });
 
   it('prev works', () => {
@@ -101,13 +100,14 @@ describe('notebook', () => {
       prevVar
     };
 
-    expectToEqual(
+    expect(
       EngraftPromise.state(
         notebookTool.run(new IncrMemory(), {
           program,
           varBindings: empty,
         }).outputP
       ),
+    ).toEqual(
       {
         status: 'fulfilled',
         value: {
@@ -116,8 +116,9 @@ describe('notebook', () => {
       }
     );
 
-    expectToEqual(
+    expect(
       notebookTool.computeReferences(program),
+    ).toEqual(
       new Set()
     );
   });
@@ -154,14 +155,16 @@ describe('notebook', () => {
     }
 
     varBindings = makeVarBindings({[externalVar.id]: {value: 1}});
-    expectToEqual(
+    expect(
       runProgram(),
+    ).toEqual(
       {status: 'fulfilled', value: {value: 31}},
     );
 
     varBindings = makeVarBindings({[externalVar.id]: {value: 100}});
-    expectToEqual(
+    expect(
       runProgram(),
+    ).toEqual(
       {status: 'fulfilled', value: {value: 130}},
     );
   });
@@ -209,14 +212,14 @@ describe('notebook', () => {
     // console.log("run 1");
 
     runProgram();
-    expectToEqual(cell1ViewRenders, 1);
-    expectToEqual(cell2ViewRenders, 1);
+    expect(cell1ViewRenders).toEqual(1);
+    expect(cell2ViewRenders).toEqual(1);
 
     // console.log("run 2");
 
     runProgram();
-    expectToEqual(cell1ViewRenders, 1);
-    expectToEqual(cell2ViewRenders, 1);
+    expect(cell1ViewRenders).toEqual(1);
+    expect(cell2ViewRenders).toEqual(1);
 
     program = updateWithUP(program, (programUP) => {
       programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
@@ -225,7 +228,7 @@ describe('notebook', () => {
     // console.log("run 3");
 
     runProgram();
-    expectToEqual(cell1ViewRenders, 1);
-    expectToEqual(cell2ViewRenders, 2);
+    expect(cell1ViewRenders).toEqual(1);
+    expect(cell2ViewRenders).toEqual(2);
   });
 });
