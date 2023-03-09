@@ -1,6 +1,7 @@
 {
   "name": "@engraft/shared",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Shared utilities",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

@@ -1,6 +1,7 @@
 {
   "name": "@engraft/incr",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Library for incremental computation",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

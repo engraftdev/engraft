@@ -1,6 +1,7 @@
 {
   "name": "@engraft/tool-toy-adder",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Toy Engraft tool for adding two numbers",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

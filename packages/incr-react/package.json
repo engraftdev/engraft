@@ -2,6 +2,7 @@
   "private": true,
   "name": "@engraft/incr-react",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "React features for Incr",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

@@ -1,6 +1,7 @@
 {
   "name": "@engraft/graft-garden",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "DESCRIPTION TODO",
   "scripts": {
     "depcheck": "node ../../scripts/our-depcheck.js",

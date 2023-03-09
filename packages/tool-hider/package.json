@@ -1,6 +1,7 @@
 {
   "name": "@engraft/tool-hider",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Engraft tool that can hide its child",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

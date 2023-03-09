@@ -1,6 +1,7 @@
 {
   "name": "@engraft/tool-checkbox",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Engraft checkbox tool",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

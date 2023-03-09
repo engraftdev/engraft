@@ -1,6 +1,7 @@
 {
   "name": "@engraft/all-the-tools",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "All the Engraft tools made by the Engraft team",
   "scripts": {
     "test:watch": "vitest",

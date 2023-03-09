@@ -1,6 +1,7 @@
 {
   "name": "@engraft/tool-gadget",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Engraft tool that allows defining a simple tool and then using it",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

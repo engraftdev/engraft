@@ -1,6 +1,7 @@
 {
   "name": "CHANGEME: package name",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "CHANGEME: package description",
   "scripts": {
     "test:watch": "vitest",

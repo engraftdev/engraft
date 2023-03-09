@@ -1,6 +1,7 @@
 {
   "name": "@engraft/use-engraft",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "A React hook for embedding Engraft tools",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

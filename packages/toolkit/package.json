@@ -1,6 +1,7 @@
 {
   "name": "@engraft/toolkit",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "A bundle of libraries needful or helpful for defining Engraft tools",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' dist",

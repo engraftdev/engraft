@@ -1,6 +1,7 @@
 {
   "name": "@engraft/eslint-plugin-incr-hooks",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "ESLint rules for Incr Hooks (adapted from eslint-plugin-react-hooks)",
   "scripts": {
     "test:watch": "vitest",
