@@ -11,12 +11,7 @@
     "all:checks": "lerna run build-lib,test,depcheck,lint",
     "all:checks:watch": "npm run all:checks; lerna watch -- npm run all:checks",
     "all:clean": "lerna exec -- rm -rf dist",
-    "testbed:dev": "lerna run dev --scope @engraft/testbed",
-    "testbed:build": "lerna run build --scope @engraft/testbed",
-    "graft-garden:dev": "lerna run dev --scope @engraft/graft-garden",
-    "graft-garden:build": "lerna run build --scope @engraft/graft-garden",
-    "use-engraft-demo:dev": "lerna run dev --scope @engraft/use-engraft-demo",
-    "use-engraft-demo:build": "lerna run build --scope @engraft/use-engraft-demo"
+    "testbed:dev": "lerna run dev --scope @engraft/testbed"
   },
   "workspaces": [
     "packages/*"

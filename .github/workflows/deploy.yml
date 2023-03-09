@@ -29,19 +29,23 @@ jobs:
           key: nx-cache
 
       - name: Build testbed
-        run: npm run testbed:build
+        run: npx lerna run build-app --scope @engraft/testbed
 
       - name: Build graft-garden
-        run: npm run graft-garden:build
+        run: npx lerna run build-app --scope @engraft/graft-garden
 
       - name: Build use-engraft-demo
-        run: npm run use-engraft-demo:build
+        run: npx lerna run build-app --scope @engraft/use-engraft-demo
+
+      - name: Build use-engraft-demo-js
+        run: npx lerna run build-app --scope @engraft/use-engraft-demo-js
 
       - name: Assemble output
         run: |
           mv packages/testbed/dist website/testbed
           mv packages/graft-garden/dist website/graft-garden
           mv packages/use-engraft-demo/dist website/use-engraft-demo
+          mv packages/use-engraft-demo-js/dist website/use-engraft-demo-js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

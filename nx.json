@@ -37,6 +37,11 @@
     },
     "lint": {
       "inputs": [ "production", "{workspaceRoot}/.eslintrc.js" ]
+    },
+    "build-app": {
+      "inputs": [ "production", "^production" ],
+      "dependsOn": [ "^build-lib" ],
+      "outputs": [ "{projectRoot}/dist" ]
     }
   }
 }
