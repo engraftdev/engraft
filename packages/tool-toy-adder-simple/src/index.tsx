@@ -7,9 +7,9 @@ export default defineSimpleTool({
   },
   subTools: ['x', 'y'] as const,
   compute: ({ fields, subToolOutputs }) => {
-    if (typeof subToolOutputs.x.value !== 'number') { throw new Error('x must be a number'); }
-    if (typeof subToolOutputs.y.value !== 'number') { throw new Error('y must be a number'); }
-    return { value: subToolOutputs.x.value + subToolOutputs.y.value + fields.extra };
+    if (typeof subToolOutputs.x !== 'number') { throw new Error('x must be a number'); }
+    if (typeof subToolOutputs.y !== 'number') { throw new Error('y must be a number'); }
+    return subToolOutputs.x + subToolOutputs.y + fields.extra;
   },
   render: ({ renderSlot, autoFocus, fields, fieldsUP }) => (
     <div className="xCol xGap10 xPad10">

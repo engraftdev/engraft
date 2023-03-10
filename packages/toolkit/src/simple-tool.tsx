@@ -1,4 +1,4 @@
-import { EngraftPromise, hookRunTool, references, ShowView, slotWithCode, Tool, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/dist/sets";
 import { UpdateProxy } from "@engraft/update-proxy";
@@ -28,9 +28,9 @@ export type SimpleToolSpec<Name extends string, Fields, SubToolKey extends strin
   compute: (props: {
     fields: Fields,
     subToolOutputs: {
-      [K in SubToolKey]: ToolOutput
+      [K in SubToolKey]: unknown
     }
-  }) => ToolOutput,
+  }) => unknown,
   render: (props: RenderProps & {
     fields: Fields,
     fieldsUP: UpdateProxy<Fields>,
@@ -75,12 +75,14 @@ export function defineSimpleTool<Name extends string, Fields, SubToolKey extends
       const outputP = hookMemo(() =>
         EngraftPromise.all(subToolOutputPs)
           .then((subToolOutputs) => {
-            return simpleToolSpec.compute({
-              fields: program.fields,
-              subToolOutputs: Object.fromEntries(
-                simpleToolSpec.subTools.map((key, i) => [key, subToolOutputs[i]])
-              ) as Record<SubToolKey, ToolOutput>,
-            });
+            return {
+              value: simpleToolSpec.compute({
+                fields: program.fields,
+                subToolOutputs: Object.fromEntries(
+                  simpleToolSpec.subTools.map((key, i) => [key, subToolOutputs[i].value])
+                ) as Record<SubToolKey, any>,
+              })
+            };
           })
       , [program.fields, subToolOutputPs]);
 
