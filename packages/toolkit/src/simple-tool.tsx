@@ -115,19 +115,20 @@ export function SimpleToolView<Name extends string, Fields, SubToolKey extends s
       subToolViews: Record<SubToolKey, ToolView<ToolProgram>>,
     }
 ) {
-  const {program, updateProgram, simpleToolSpec, subToolViews} = props;
+  const {program, updateProgram, simpleToolSpec, subToolViews, ...renderProps} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   return simpleToolSpec.render({
     ...props,
     fields: program.fields,
     fieldsUP: programUP.fields,
-    renderSlot: (slotName, renderProps) => {
+    renderSlot: (slotName, slotRenderProps) => {
       return <ShowView
         view={subToolViews[slotName]}
         updateProgram={programUP.subTools[slotName].$}
-        {...renderProps}
+        {...slotRenderProps}
       />
     },
+    ...renderProps,
   });
 }
