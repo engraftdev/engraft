@@ -1,6 +1,7 @@
 import { forgetP, registerTool, Tool, toolFromModule } from "@engraft/core";
 import { builtinTools } from "@engraft/original/dist/builtin-tools";
 import ToyAdder from '@engraft/tool-toy-adder';
+import ToyAdderSimple from '@engraft/tool-toy-adder-simple';
 import Checkbox from '@engraft/tool-checkbox';
 import Hider from '@engraft/tool-hider';
 import { GadgetDefiner, GadgetUser } from '@engraft/tool-gadget';
@@ -13,6 +14,7 @@ import { GadgetDefiner, GadgetUser } from '@engraft/tool-gadget';
 export const allTheTools: Tool[] = [
   ...builtinTools,
   forgetP(toolFromModule(ToyAdder)),
+  forgetP(toolFromModule(ToyAdderSimple)),
   forgetP(toolFromModule(Checkbox)),
   forgetP(toolFromModule(Hider)),
   forgetP(toolFromModule(GadgetDefiner)),

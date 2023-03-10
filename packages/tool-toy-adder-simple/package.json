@@ -1,0 +1,20 @@
+{
+  "name": "@engraft/tool-toy-adder-simple",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Toy Engraft tool for adding two numbers, implemented using defineSimpleTool",
+  "scripts": {
+    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "depcheck": "node ../../scripts/our-depcheck.js",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "dist/index.js",
+  "dependencies": {
+    "@engraft/toolkit": "^0.0.1"
+  },
+  "peerDependencies": {
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+  }
+}
