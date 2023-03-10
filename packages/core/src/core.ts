@@ -8,7 +8,7 @@ import { randomId } from './randomId';
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
   programFactory: ProgramFactory<P>;
-  computeReferences: ComputeReferences<P>;  // TODO: separate from `run` because it's supposed to be statically available, but work may be duped
+  computeReferences: ComputeReferences<P>;
   isInternal?: boolean;
 }
 
@@ -18,15 +18,36 @@ export type ToolProgram = {
   [others: string]: unknown,
 }
 
-export type ToolRun<P extends ToolProgram> = IncrFunction<[props: ToolProps<P>], ToolResult<P>>;
+export type ToolRun<P extends ToolProgram> =
+  IncrFunction<[props: ToolProps<P>], ToolResult<P>>;
+
+export type ToolProps<P extends ToolProgram> = {
+  program: P,
+  varBindings: VarBindings,
+}
+
+export type VarBindings = {
+  [varId: string]: VarBinding
+}
+
+export type VarBinding = {
+  var_: Var,
+  outputP: EngraftPromise<ToolOutput>,
+}
+
+export type Var = {
+  id: string,
+  label: string,
+  autoCompleteLabel?: string,
+}
+
+export type ToolOutput = {
+  value: unknown,
+}
 
 export type ToolResult<P extends ToolProgram = ToolProgram> = {
   outputP: EngraftPromise<ToolOutput>,
   view: ToolView<P>,
-};
-
-export type ToolOutput = {
-  value: unknown;
 };
 
 export type ToolView<P extends ToolProgram> = {
@@ -38,19 +59,16 @@ export type ToolViewRenderProps<P> = {
   updateProgram: Updater<P>,
   autoFocus?: boolean,
   expand?: boolean,
-  noFrame?: boolean,  // TODO: this is just for slots, huh?
+  noFrame?: boolean,
 }
 
-export type ToolProps<P extends ToolProgram> = {
-  program: P,
-  varBindings: VarBindings,
-}
+export type ProgramFactory<P extends ToolProgram> =
+  (defaultInputCode?: string) => P;
 
-export type ProgramFactory<P extends ToolProgram> = (
-  defaultInputCode?: string,
-) => P;
+export type ComputeReferences<P extends ToolProgram> =
+  (program: P) => Set<string>;
 
-export type ComputeReferences<P extends ToolProgram> = (program: P) => Set<string>;
+
 
 // We use Tool<ToolProgram> as the generic tool type, in lieu of existential types.
 export function forgetP<P extends ToolProgram>(tool: Tool<P>): Tool {
@@ -96,21 +114,6 @@ export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
 
   const { toolName } = tool.programFactory();
   toolIndex[toolName] = forgetP(tool);
-}
-
-
-
-export type VarBinding = {
-  var_: Var,
-  outputP: EngraftPromise<ToolOutput>,
-}
-
-export type VarBindings = {[varId: string]: VarBinding};
-
-export type Var = {
-  id: string,
-  label: string,
-  autoCompleteLabel?: string,
 }
 
 export function newVar(label = 'new var') {
