@@ -1,4 +1,4 @@
-import { arrEqWithRefEq, Eq } from "@engraft/shared/dist/eq";
+import { arrEqWithRefEq, Eq } from "@engraft/shared/lib/eq";
 import { HookPath, hookRef, runWithPath } from "./hooks";
 
 // Produce a value with a function when a key changes according to a provided equality function.

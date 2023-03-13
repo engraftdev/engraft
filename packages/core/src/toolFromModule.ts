@@ -1,5 +1,5 @@
 import { Tool, ToolProgram } from ".";
-import { hasProperty } from "@engraft/shared/dist/hasProperty";
+import { hasProperty } from "@engraft/shared/lib/hasProperty";
 
 export type ToolModule<P extends ToolProgram = ToolProgram> = Tool<P> | { default: Tool<P> } | { tool: Tool<P> };
 

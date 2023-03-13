@@ -1,4 +1,4 @@
-import { cache } from "@engraft/shared/dist/cache";
+import { cache } from "@engraft/shared/lib/cache";
 
 export function compileExpression(exprCode: string): (context: object) => unknown {
   // eslint-disable-next-line no-new-func

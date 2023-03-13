@@ -4,13 +4,13 @@
   "license": "MIT",
   "description": "React extensions for update-proxy",
   "scripts": {
-    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
     "test": "vitest run",
     "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --max-warnings=0 ."
   },
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "@engraft/update-proxy": "^0.0.1",
     "@engraft/shared": "^0.0.1"

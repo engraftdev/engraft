@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isObject } from '../dist/isObject';
+import { isObject } from '../lib/isObject';
 
 describe('isObject', () => {
   it('basically works', () => {

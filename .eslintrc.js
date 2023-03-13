@@ -14,6 +14,7 @@ module.exports = {
   },
   ignorePatterns: [
     "dist",
+    "lib",
   ],
   rules: {
     "@typescript-eslint/no-unused-vars": [

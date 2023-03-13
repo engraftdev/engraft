@@ -6,11 +6,11 @@
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",
-    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --max-warnings=0 ."
   },
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "@engraft/core": "^0.0.1",
     "@engraft/original": "^0.0.1",

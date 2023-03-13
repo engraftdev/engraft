@@ -1,7 +1,7 @@
 import { slotWithCode } from '@engraft/core';
-import IsolateStyles from '@engraft/original/dist/view/IsolateStyles';
-import { ToolWithView } from '@engraft/original/dist/view/ToolWithView';
-import { ValueEditable } from '@engraft/original/dist/view/ValueEditable';
+import IsolateStyles from '@engraft/original/lib/view/IsolateStyles';
+import { ToolWithView } from '@engraft/original/lib/view/ToolWithView';
+import { ValueEditable } from '@engraft/original/lib/view/ValueEditable';
 import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
 import { doc, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';

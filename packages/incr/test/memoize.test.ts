@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { IncrFunction, IncrMemory } from '../dist/incr';
-import { memoize, memoizeForever, memoizeProps } from '../dist/memoize';
+import { IncrFunction, IncrMemory } from '../lib/incr';
+import { memoize, memoizeForever, memoizeProps } from '../lib/memoize';
 
 describe('memoize', () => {
   let minusRuns = 0;

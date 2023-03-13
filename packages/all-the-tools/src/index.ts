@@ -1,5 +1,5 @@
 import { forgetP, registerTool, Tool, toolFromModule } from "@engraft/core";
-import { builtinTools } from "@engraft/original/dist/builtin-tools";
+import { builtinTools } from "@engraft/original/lib/builtin-tools";
 import ToyAdder from '@engraft/tool-toy-adder';
 import ToyAdderSimple from '@engraft/tool-toy-adder-simple';
 import Checkbox from '@engraft/tool-checkbox';

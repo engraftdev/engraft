@@ -1,6 +1,6 @@
 import { IncrFunction } from "@engraft/incr";
-import { weakMapCache } from "@engraft/shared/dist/cache";
-import { Updater } from "@engraft/shared/dist/Updater";
+import { weakMapCache } from "@engraft/shared/lib/cache";
+import { Updater } from "@engraft/shared/lib/Updater";
 import { ReactElement } from "react";
 import { EngraftPromise } from "./EngraftPromise";
 import { randomId } from './randomId';

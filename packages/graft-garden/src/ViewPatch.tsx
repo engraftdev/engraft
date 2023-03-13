@@ -7,7 +7,7 @@ import { patchesRef } from "./db";
 
 import { runTool, ToolProgram } from '@engraft/core';
 import { useIncr } from '@engraft/incr-react';
-import { ToolOutputView } from '@engraft/original/dist/view/Value';
+import { ToolOutputView } from '@engraft/original/lib/view/Value';
 
 
 export const ViewPatch = memo(function ViewPatch() {

@@ -10,7 +10,7 @@
     "all:lint": "lerna run lint",
     "all:checks": "lerna run build-lib,test,depcheck,lint",
     "all:checks:watch": "npm run all:checks; lerna watch -- npm run all:checks",
-    "all:clean": "lerna exec -- rm -rf dist",
+    "all:clean": "lerna exec -- rm -rf dist; lerna exec -- rm -rf lib",
     "testbed:dev": "lerna run dev --scope @engraft/testbed"
   },
   "workspaces": [

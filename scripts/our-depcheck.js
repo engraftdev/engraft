@@ -2,7 +2,7 @@ const depcheck = require('depcheck');
 
 const options = {
   // tests will use devDependencies from the root package.json; ignore them
-  ignorePatterns: ["/test/**", "/dist/**", "vite.config.ts"],
+  ignorePatterns: ["/test/**", "/dist/**", "/lib/**", "vite.config.ts"],
 };
 
 depcheck(process.cwd(), options).then((unused) => {

@@ -1,9 +1,9 @@
 import { EngraftPromise, newVar, registerTool, slotWithCode, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import { describe, expect, it } from 'vitest';
-import * as functionM from '../../../dist/builtin-tools/function';
-import { empty } from '../../../dist/util/noOp';
-import * as slot from '../../../dist/builtin-tools/slot';
+import * as functionM from '../../../lib/builtin-tools/function';
+import { empty } from '../../../lib/util/noOp';
+import * as slot from '../../../lib/builtin-tools/slot';
 
 // @vitest-environment happy-dom
 

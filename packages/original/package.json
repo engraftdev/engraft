@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "Temporary package to port over old code into the monorepo.",
   "scripts": {
-    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
     "test": "vitest run",
     "depcheck": "node ../../scripts/our-depcheck.js",

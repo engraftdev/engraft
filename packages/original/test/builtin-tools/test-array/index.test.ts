@@ -2,9 +2,9 @@ import { EngraftPromise, registerTool, toolFromModule } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import update from 'immutability-helper';
 import { describe, expect, it } from 'vitest';
-import { empty } from '../../../dist/util/noOp';
-import * as TestKnownOutput from '../../../dist/builtin-tools/test-known-output';
-import * as TestArray from '../../../dist/builtin-tools/test-array/index';
+import { empty } from '../../../lib/util/noOp';
+import * as TestKnownOutput from '../../../lib/builtin-tools/test-known-output';
+import * as TestArray from '../../../lib/builtin-tools/test-array/index';
 
 // @vitest-environment happy-dom
 

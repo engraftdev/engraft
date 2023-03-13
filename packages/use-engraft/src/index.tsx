@@ -1,7 +1,7 @@
-import { useDedupe } from '@engraft/original/dist/util/useDedupe';
-import { RootStyles } from '@engraft/original/dist/view/IsolateStyles';
-import { ToolOutputView, Value } from '@engraft/original/dist/view/Value';
-import { VarDefinition } from '@engraft/original/dist/view/Vars';
+import { useDedupe } from '@engraft/original/lib/util/useDedupe';
+import { RootStyles } from '@engraft/original/lib/view/IsolateStyles';
+import { ToolOutputView, Value } from '@engraft/original/lib/view/Value';
+import { VarDefinition } from '@engraft/original/lib/view/Vars';
 import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from '@engraft/toolkit';
 import _ from 'lodash';
 import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';

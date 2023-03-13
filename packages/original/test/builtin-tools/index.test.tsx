@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { builtinTools } from '../../dist/builtin-tools';
+import { builtinTools } from '../../lib/builtin-tools';
 
 describe('builtinTools', () => {
   it('there are some', () => {

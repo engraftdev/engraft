@@ -4,13 +4,13 @@
   "license": "MIT",
   "description": "A little gadget to make it easier to perform functional updates",
   "scripts": {
-    "build-lib": "tsc && cpy 'src/**/*.css' dist",
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
     "test": "vitest run",
     "depcheck": "node ../../scripts/our-depcheck.js",
     "lint": "eslint --max-warnings=0 ."
   },
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "immutability-helper": "^3.1.1",
     "@engraft/shared": "^0.0.1"

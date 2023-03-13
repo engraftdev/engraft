@@ -26,7 +26,7 @@
     "build-lib": {
       "inputs": [ "production", "^production" ],
       "dependsOn": [ "^build-lib" ],
-      "outputs": [ "{projectRoot}/dist" ]
+      "outputs": [ "{projectRoot}/lib" ]
     },
     "test": {
       "inputs": [ "default", "^production" ],

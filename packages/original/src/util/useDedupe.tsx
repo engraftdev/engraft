@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Eq } from "@engraft/shared/dist/eq";
+import { Eq } from "@engraft/shared/lib/eq";
 
 export function useDedupe<T>(t: T, eq: Eq<T>): T {
   const lastT = useRef<T>();

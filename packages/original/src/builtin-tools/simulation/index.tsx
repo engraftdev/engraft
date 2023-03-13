@@ -4,7 +4,7 @@ import { useIncr } from "@engraft/incr-react";
 import _ from "lodash";
 import { memo, useMemo } from "react";
 import { useStateSetOnly } from "../../util/immutable-react";
-import { difference, union } from "@engraft/shared/dist/sets";
+import { difference, union } from "@engraft/shared/lib/sets";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ToolOutputView } from "../../view/Value";
 

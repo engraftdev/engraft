@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { describe, expect, it } from 'vitest';
-import { hookFork, hookIncr, hookRef, hooks } from '../dist/hooks';
-import { IncrMemory } from '../dist/incr';
+import { hookFork, hookIncr, hookRef, hooks } from '../lib/hooks';
+import { IncrMemory } from '../lib/incr';
 
 let squareRuns = 0;
 const square = hooks((x: number) => {
