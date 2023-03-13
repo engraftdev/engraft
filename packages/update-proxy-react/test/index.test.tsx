@@ -3,7 +3,7 @@ import { Updater } from '@engraft/shared/lib/Updater';
 import { Fragment } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { describe, expect, it } from 'vitest';
-import { UseUpdateProxy, useUpdateProxy } from '../dist';
+import { UseUpdateProxy, useUpdateProxy } from '../lib';
 
 describe('useUpdateProxy', () => {
   it('basically works', () => {
