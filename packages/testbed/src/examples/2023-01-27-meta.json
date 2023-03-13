@@ -6,13 +6,27 @@
     "cells": [
       {
         "var_": {
+          "id": "IDwhitefish971440",
+          "label": "slider program"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "Meta.sliderTool.programFactory()",
+          "defaultCode": "",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
           "id": "IDtuba501846",
           "label": "result"
         },
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// Run the slider tool, to get an output and a view.\n\nconst program = Meta.sliderTool.programFactory()\n\nconst mem = new IncrMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program\n})\n\nreturn result",
+          "code": "// Run the slider tool, to get an output and a view.\n\nconst mem = new IncrMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program: IDwhitefish971440\n})\n\nreturn result",
           "defaultCode": "",
           "subPrograms": {}
         },
@@ -26,7 +40,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// Call the view's render function.\n// We see the slider, but it's not slidable.\n\nIDtuba501846.view.render()",
+          "code": "// Call the view's render function.\n// We see the slider, but it's not slidable.\n\nIDtuba501846.view.render({updateProgram: () => {}})",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },
