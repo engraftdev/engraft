@@ -3,8 +3,8 @@ import {
   ToolProps, ToolRun, ToolView
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { RowToCol } from "../../util/RowToCol";
-import { union } from "@engraft/shared/lib/sets";
+import { RowToCol } from "../../util/RowToCol.js";
+import { union } from "@engraft/shared/lib/sets.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {

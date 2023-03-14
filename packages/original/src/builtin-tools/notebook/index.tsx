@@ -1,25 +1,25 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever, memoizeProps } from "@engraft/incr";
-import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq";
+import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import _ from "lodash";
 import { Fragment, memo, useCallback, useMemo, useRef } from "react";
-import { startDrag } from "../../util/drag";
-import { Updater } from "../../util/immutable";
-import { useStateSetOnly } from "../../util/immutable-react";
-import { mergeRefs } from "../../util/mergeRefs";
-import { difference, intersection, union } from "@engraft/shared/lib/sets";
-import { toposort } from "../../util/toposort";
-import { alphaLabels, unusedLabel } from "../../util/unusedLabel";
+import { startDrag } from "../../util/drag.js";
+import { Updater } from "../../util/immutable.js";
+import { useStateSetOnly } from "../../util/immutable-react.js";
+import { mergeRefs } from "../../util/mergeRefs.js";
+import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
+import { toposort } from "../../util/toposort.js";
+import { alphaLabels, unusedLabel } from "../../util/unusedLabel.js";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { Use } from "../../util/Use";
-import { MenuMaker, useContextMenu } from "../../util/useContextMenu";
-import useHover from "../../util/useHover";
-import useSize from "../../util/useSize";
-import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
-import ScrollShadow from "../../view/ScrollShadow";
-import { ToolOutputView } from "../../view/Value";
-import { VarDefinition } from "../../view/Vars";
+import { Use } from "../../util/Use.js";
+import { MenuMaker, useContextMenu } from "../../util/useContextMenu.js";
+import useHover from "../../util/useHover.js";
+import useSize from "../../util/useSize.js";
+import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu.js";
+import ScrollShadow from "../../view/ScrollShadow.js";
+import { ToolOutputView } from "../../view/Value.js";
+import { VarDefinition } from "../../view/Vars.js";
 
 
 export type Program = {

@@ -1,6 +1,8 @@
-import zipObject from "lodash/zipObject";
-import { hasProperty } from "@engraft/shared/lib/hasProperty";
+import ZipObject from "lodash-es/zipObject.js";
+import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { SynchronousPromise } from "synchronous-promise";
+
+const zipObject = ZipObject.default;
 
 // In this file, we re-type SynchronousPromise as EngraftPromise, and give it better types.
 

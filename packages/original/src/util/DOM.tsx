@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   element: HTMLElement | SVGSVGElement | undefined,

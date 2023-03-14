@@ -1,14 +1,14 @@
-import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
-import { updateWithUP } from '@engraft/update-proxy';
-import React from 'react';
-import TestRenderer from 'react-test-renderer';
-import { describe, expect, it } from 'vitest';
-import { empty, noOp } from '../../../lib/util/noOp';
-import { ToolWithView } from '../../../lib/view/ToolWithView';
-import * as Slot from '../../../lib/builtin-tools/slot';
-import * as TestKnownOutput from '../../../lib/builtin-tools/test-known-output';
-import * as Notebook from '../../../lib/builtin-tools/notebook/index';
+import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
+import { IncrMemory } from "@engraft/incr";
+import { updateWithUP } from "@engraft/update-proxy";
+import React from "react";
+import TestRenderer from "react-test-renderer";
+import { describe, expect, it } from "vitest";
+import { empty, noOp } from "../../../lib/util/noOp.js";
+import { ToolWithView } from "../../../lib/view/ToolWithView.js";
+import * as Slot from "../../../lib/builtin-tools/slot/index.js";
+import * as TestKnownOutput from "../../../lib/builtin-tools/test-known-output/index.js";
+import * as Notebook from "../../../lib/builtin-tools/notebook/index.js";
 
 // @vitest-environment happy-dom
 

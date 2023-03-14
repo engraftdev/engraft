@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { UpdateProxy, updateProxy } from "@engraft/update-proxy";
-import { Updater } from "@engraft/shared/lib/Updater";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 
 export function useUpdateProxy<T>(updater: Updater<T>): UpdateProxy<T>;
 export function useUpdateProxy<T>(updater: Updater<T> | undefined): UpdateProxy<T> | undefined;

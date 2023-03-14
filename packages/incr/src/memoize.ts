@@ -1,7 +1,7 @@
-import { arrEqWithRefEq, objEqWithRefEq } from "@engraft/shared/lib/eq";
-import { IncrFunction, IncrMemory } from "./incr";
-import { hookMemo } from "./hookMemo";
-import { hookIncr, hooks } from "./hooks";
+import { arrEqWithRefEq, objEqWithRefEq } from "@engraft/shared/lib/eq.js";
+import { IncrFunction, IncrMemory } from "./incr.js";
+import { hookMemo } from "./hookMemo.js";
+import { hookIncr, hooks } from "./hooks.js";
 
 // These functions perform single-item LRU caching, like React.memo.
 

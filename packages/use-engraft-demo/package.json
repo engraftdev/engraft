@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "Synonymizer: demo of useEngraft built with TypeScript",
   "scripts": {
-    "depcheck": "node ../../scripts/our-depcheck.js",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 .",
     "build-app": "vite build --config ../../vite.config.ts",
     "preview": "vite preview --config ../../vite.config.ts",

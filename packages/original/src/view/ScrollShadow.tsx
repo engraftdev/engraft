@@ -1,5 +1,5 @@
 import { CSSProperties, HTMLProps, ReactNode, Ref, UIEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { mergeRefs } from "../util/mergeRefs";
+import { mergeRefs } from "../util/mergeRefs.js";
 
 interface Props extends Omit<HTMLProps<HTMLDivElement>, 'style'> {
   children: ReactNode;

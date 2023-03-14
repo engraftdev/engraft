@@ -1,4 +1,4 @@
-import { ToolProgram } from "./core";
+import { ToolProgram } from "./core.js";
 
 // Engraft tools expect access to some features from their environment, like a
 // registry of tools and a way to make slots. Eventually, we will want to handle

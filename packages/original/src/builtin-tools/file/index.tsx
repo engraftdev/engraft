@@ -1,8 +1,10 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo } from "react";
-import Dropzone, { FileRejection } from 'react-dropzone';
+import DropzoneModule, {FileRejection } from "react-dropzone";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+
+const Dropzone = DropzoneModule.default;
 
 export type P = {
   toolName: 'file';

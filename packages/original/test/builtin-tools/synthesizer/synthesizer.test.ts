@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import { compileExpression } from '../../../lib/util/compile';
-import { runToCompletion } from '../../../lib/util/Task';
-import { synthesizeGen } from '../../../lib/builtin-tools/synthesizer/synthesizer';
+import { describe, expect, it } from "vitest";
+import { compileExpression } from "../../../lib/util/compile.js";
+import { runToCompletion } from "../../../lib/util/Task.js";
+import { synthesizeGen } from "../../../lib/builtin-tools/synthesizer/synthesizer.js";
 
 describe('synthesizeGen', () => {
   it('synthesizes "adding one"', () => {

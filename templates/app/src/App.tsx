@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import css from './App.css?inline';
+import { memo } from "react";
+import css from "./App.css?inline";
 
 export const App = memo(function App(props: {}) {
   return <div>

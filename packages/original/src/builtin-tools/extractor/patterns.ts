@@ -1,5 +1,5 @@
-import { InternMap } from "../../util/internmap";
-import { mapUpdate } from "../../util/mapUpdate";
+import { InternMap } from "../../util/internmap.js";
+import { mapUpdate } from "../../util/mapUpdate.js";
 
 
 export const wildcard = {wildcard: true};

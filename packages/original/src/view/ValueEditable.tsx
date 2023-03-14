@@ -1,7 +1,7 @@
 import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
-import { at, atIndex, Updater } from "../util/immutable";
-import useHover from "../util/useHover";
-import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value";
+import { at, atIndex, Updater } from "../util/immutable.js";
+import useHover from "../util/useHover.js";
+import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value.js";
 
 const ValueEditableContext = createContext<Updater<any> | undefined>(undefined);
 

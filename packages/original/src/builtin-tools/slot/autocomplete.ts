@@ -1,7 +1,7 @@
 import { Completion, CompletionContext, CompletionSource, pickedCompletion } from "@codemirror/autocomplete";
-import { EditorView } from '@codemirror/view';
+import { EditorView } from "@codemirror/view";
 import { getFullToolIndex, Tool, VarBindings } from "@engraft/core";
-import { refCode } from "./refs";
+import { refCode } from "./refs.js";
 
 
 // TODO: varBindingsGetter is pretty weird; CodeMirror might have a more idiomatic approach

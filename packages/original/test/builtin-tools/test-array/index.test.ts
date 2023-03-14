@@ -1,10 +1,10 @@
-import { EngraftPromise, registerTool, toolFromModule } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
-import update from 'immutability-helper';
-import { describe, expect, it } from 'vitest';
-import { empty } from '../../../lib/util/noOp';
-import * as TestKnownOutput from '../../../lib/builtin-tools/test-known-output';
-import * as TestArray from '../../../lib/builtin-tools/test-array/index';
+import { EngraftPromise, registerTool, toolFromModule } from "@engraft/core";
+import { IncrMemory } from "@engraft/incr";
+import { updateWithUP } from "@engraft/update-proxy";
+import { describe, expect, it } from "vitest";
+import * as TestArray from "../../../lib/builtin-tools/test-array/index.js";
+import * as TestKnownOutput from "../../../lib/builtin-tools/test-known-output/index.js";
+import { empty } from "../../../lib/util/noOp.js";
 
 // @vitest-environment happy-dom
 
@@ -49,7 +49,7 @@ describe('test-array', () => {
     expect(subTool1Runs).toEqual(1);
     expect(subTool2Runs).toEqual(1);
 
-    program = update(program, {subToolPrograms: {0: {outputP: {$set: EngraftPromise.resolve({value: 3})}}}});
+    program = updateWithUP(program, (up) => up.subToolPrograms[0].outputP.$set(EngraftPromise.resolve({value: 3})));
 
     expect(runProgram()).toEqual({status: 'fulfilled', value: {value: [3, 2]}});
     expect(subTool1Runs).toEqual(2);

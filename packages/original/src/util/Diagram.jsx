@@ -1,7 +1,7 @@
-import * as React from 'react';
+import * as React from "react";
 
-// import PropTypes from 'prop-types'
-// import exact from 'prop-types-exact'
+// import PropTypes from "prop-types"
+// import exact from "prop-types-exact"
 
 class DiagramNode extends React.Component {
   render() {

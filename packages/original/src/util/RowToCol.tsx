@@ -1,6 +1,6 @@
 import { HTMLProps, memo } from "react"
-import { Use } from "./Use"
-import useSize from "./useSize"
+import { Use } from "./Use.js"
+import useSize from "./useSize.js"
 
 export const RowToCol = memo(function RowToCol({children, className, minRowWidth, ...props}: HTMLProps<HTMLDivElement> & {minRowWidth: number}) {
   return <Use hook={useSize} children={([sizeRef, size]) =>

@@ -1,11 +1,11 @@
 import { memo, useCallback, useMemo } from "react";
-import { startDrag } from "../../util/drag";
+import { startDrag } from "../../util/drag.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { useRefForCallback } from "../../util/useRefForCallback";
+import { useRefForCallback } from "../../util/useRefForCallback.js";
 
 
-import { Pane, PaneGeo, roundTo } from "./model";
-import { PaneResizers } from "./PaneResizers";
+import { Pane, PaneGeo, roundTo } from "./model.js";
+import { PaneResizers } from "./PaneResizers.js";
 
 export type PaneViewProps = {
   pane: Pane,

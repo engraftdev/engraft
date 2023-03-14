@@ -1,4 +1,4 @@
-import seedrandom from 'seedrandom';
+import seedrandom from "seedrandom";
 
 export function makeRand(): (...args: unknown[]) => number {
   const generators: { [key: string]: seedrandom.PRNG } = {};

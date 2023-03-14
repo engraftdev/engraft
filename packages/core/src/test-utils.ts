@@ -1,5 +1,5 @@
-import { ToolOutput, VarBindings } from ".";
-import { EngraftPromise } from "./EngraftPromise";
+import { ToolOutput, VarBindings } from "./index.js";
+import { EngraftPromise } from "./EngraftPromise.js";
 
 export function makeVarBindings(values: {[name: string]: ToolOutput | EngraftPromise<ToolOutput>}): VarBindings {
   const bindings: VarBindings = {};

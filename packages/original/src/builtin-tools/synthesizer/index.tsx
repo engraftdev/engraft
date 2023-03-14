@@ -2,12 +2,12 @@ import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, Promise
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import CodeMirror from "../../util/CodeMirror"
-import { setup } from "../../util/codeMirrorStuff"
-import { compileExpressionCached } from "../../util/compile"
-import { Task } from "../../util/Task"
+import CodeMirror from "../../util/CodeMirror.js"
+import { setup } from "../../util/codeMirrorStuff.js"
+import { compileExpressionCached } from "../../util/compile.js"
+import { Task } from "../../util/Task.js"
 import { updateProxy, UpdateProxyRemovable } from "@engraft/update-proxy"
-import { SynthesisState, synthesizeGen } from "./synthesizer"
+import { SynthesisState, synthesizeGen } from "./synthesizer.js"
 
 
 

@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { startDrag } from "../../util/drag";
-import { clientPtRel, Matrix } from "../../util/geom";
-import { Pane, PaneGeo } from "./model";
-import { PaneView } from "./PaneView";
+import { startDrag } from "../../util/drag.js";
+import { clientPtRel, Matrix } from "../../util/geom.js";
+import { Pane, PaneGeo } from "./model.js";
+import { PaneView } from "./PaneView.js";
 
 // todo:
 // [x] display panes

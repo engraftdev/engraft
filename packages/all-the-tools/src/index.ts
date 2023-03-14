@@ -1,10 +1,10 @@
 import { forgetP, registerTool, Tool, toolFromModule } from "@engraft/core";
-import { builtinTools } from "@engraft/original/lib/builtin-tools";
-import ToyAdder from '@engraft/tool-toy-adder';
-import ToyAdderSimple from '@engraft/tool-toy-adder-simple';
-import Checkbox from '@engraft/tool-checkbox';
-import Hider from '@engraft/tool-hider';
-import { GadgetDefiner, GadgetUser } from '@engraft/tool-gadget';
+import { builtinTools } from "@engraft/original/lib/builtin-tools/index.js";
+import ToyAdder from "@engraft/tool-toy-adder";
+import ToyAdderSimple from "@engraft/tool-toy-adder-simple";
+import Checkbox from "@engraft/tool-checkbox";
+import Hider from "@engraft/tool-hider";
+import { GadgetDefiner, GadgetUser } from "@engraft/tool-gadget";
 
 // This package is named somewhat flippantly. We don't yet have a principled way
 // to manage tool dependencies. So this package just contains all the tools.

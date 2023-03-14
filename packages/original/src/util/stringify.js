@@ -1,4 +1,4 @@
-import isValidIdentifier from 'is-valid-identifier';
+import isValidIdentifier from "is-valid-identifier";
 
 // Note: This regex matches even invalid JSON strings, but since we’re
 // working on the output of `JSON.stringify` we know that only valid strings

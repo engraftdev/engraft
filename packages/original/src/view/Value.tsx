@@ -1,20 +1,20 @@
 import { ToolOutput } from "@engraft/core";
 import { CSSProperties, ElementType, isValidElement, memo, ReactElement, ReactNode, useCallback, useRef, useState } from "react";
-import { ObjectInspector } from 'react-inspector';
-import { count } from "../util/count";
-import { DOM } from "../util/DOM";
-import { ErrorBoundary } from "../util/ErrorBoundary";
-import { saveFile } from "../util/saveFile";
-import { Use } from "../util/Use";
-import useHover from "../util/useHover";
-import ScrollShadow from './ScrollShadow';
-// import { isProbablyFunctionThing } from "../builtin-tools-disabled/function";
+import { ObjectInspector } from "react-inspector";
+import { count } from "../util/count.js";
+import { DOM } from "../util/DOM.js";
+import { ErrorBoundary } from "../util/ErrorBoundary.js";
+import { saveFile } from "../util/saveFile.js";
+import { Use } from "../util/Use.js";
+import useHover from "../util/useHover.js";
+import ScrollShadow from "./ScrollShadow.js";
+// import { isProbablyFunctionThing } from "../builtin-tools-disabled/function.js";
 import { EngraftPromise, PromiseState, usePromiseState } from "@engraft/core";
-import { hasProperty } from "@engraft/shared/lib/hasProperty";
-import { isObject } from "@engraft/shared/lib/isObject";
-import { identity } from "lodash";
-import Diagram from "../util/Diagram";
-import { isoformat } from "../util/isoformat";
+import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
+import { isObject } from "@engraft/shared/lib/isObject.js";
+import Diagram from "../util/Diagram.js";
+import { isoformat } from "../util/isoformat.js";
+import { identity } from "../util/noOp.js";
 
 // HACK for Cuttle mockup
 const UNFRAME_REACT_ELEMENTS = false;

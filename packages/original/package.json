@@ -8,9 +8,10 @@
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
     "test": "vitest run",
-    "depcheck": "node ../../scripts/our-depcheck.js",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 ."
   },
+  "type": "module",
   "dependencies": {
     "@babel/core": "^7.20.12",
     "@babel/standalone": "^7.20.12",

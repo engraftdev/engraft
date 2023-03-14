@@ -1,19 +1,19 @@
-import { slotWithCode } from '@engraft/core';
-import IsolateStyles from '@engraft/original/lib/view/IsolateStyles';
-import { ToolWithView } from '@engraft/original/lib/view/ToolWithView';
-import { ValueEditable } from '@engraft/original/lib/view/ValueEditable';
-import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
-import { doc, updateDoc } from 'firebase/firestore';
-import _ from 'lodash';
-import { useUpdateProxy } from '@engraft/update-proxy-react';
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { useParams } from 'react-router-dom';
-import { patchesRef } from "./db";
-import { useFirestoreUpdater } from './useFirestoreUpdater';
+/// <reference path="./react-firebase-hooks.d.ts" />
 
-
+import { slotWithCode } from "@engraft/core";
+import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
+import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
+import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
+import bootstrapCss from "bootstrap/lib/css/bootstrap.min.css?inline";
+import { doc, updateDoc } from "firebase/firestore";
+import _ from "lodash";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { useDocumentData } from "react-firebase-hooks/firestore";
+import { useParams } from "react-router-dom";
+import { patchesRef } from "./db.js";
+import { useFirestoreUpdater } from "./useFirestoreUpdater.js";
 
 const myCss = `
 @media (min-width: 992px) {

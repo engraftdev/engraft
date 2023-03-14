@@ -1,6 +1,6 @@
 import { memo, ReactNode, useCallback, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { useWindowEventListener } from "./useEventListener";
+import { useWindowEventListener } from "./useEventListener.js";
 
 export type UseContextMenu = {
   openMenu: (e: React.MouseEvent) => void,

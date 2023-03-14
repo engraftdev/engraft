@@ -1,18 +1,18 @@
-import { EngraftPromise, toolFromModule } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
-import { describe, expect, it } from 'vitest';
-import * as testValue from '../../../lib/builtin-tools/test-known-output';
-import { empty } from '../../../lib/util/noOp';
+import { EngraftPromise, toolFromModule } from "@engraft/core";
+import { IncrMemory } from "@engraft/incr";
+import { describe, expect, it } from "vitest";
+import * as testKnownOutput from "../../../lib/builtin-tools/test-known-output/index.js";
+import { empty } from "../../../lib/util/noOp.js";
 
 // @vitest-environment happy-dom
 
-const testValueTool = toolFromModule(testValue);
+const testKnownOutputTool = toolFromModule(testKnownOutput);
 
 describe('test-known-output', () => {
   it('output basically works', () => {
     const memory = new IncrMemory();
     [1, 2, 3].forEach((value) => {
-      const {outputP} = testValueTool.run(memory, {
+      const {outputP} = testKnownOutputTool.run(memory, {
         program: {
           toolName: 'test-known-output',
           outputP: EngraftPromise.resolve({value}),
@@ -27,14 +27,14 @@ describe('test-known-output', () => {
     const memory = new IncrMemory();
 
     let runs = 0;
-    let program: testValue.Program = {
+    let program: testKnownOutput.Program = {
       toolName: 'test-known-output',
       outputP: EngraftPromise.resolve({value: 1}),
       onRun: () => { runs++ },
     };
     function runProgram() {
       return EngraftPromise.state(
-        testValueTool.run(memory, {
+        testKnownOutputTool.run(memory, {
           program,
           varBindings: empty,
         }).outputP

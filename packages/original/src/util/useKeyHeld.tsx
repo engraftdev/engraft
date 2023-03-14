@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useWindowEventListener } from "./useEventListener";
+import { useWindowEventListener } from "./useEventListener.js";
 
 // Known limitation: When you leave a window and come back later, we don't know
 // which keys are held so we assume none are.

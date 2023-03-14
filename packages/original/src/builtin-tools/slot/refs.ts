@@ -1,4 +1,4 @@
-import { idRegExp } from "../../util/id";
+import { idRegExp } from "../../util/id.js";
 
 export function refCode(s: string) {
   // currently, the id of a reference is just embedded directly into code

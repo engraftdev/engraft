@@ -1,15 +1,15 @@
 import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
-import { noOp } from "../../util/noOp";
-import { RowToCol } from "../../util/RowToCol";
+import { noOp } from "../../util/noOp.js";
+import { RowToCol } from "../../util/RowToCol.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { Use } from "../../util/Use";
-import { useWindowEventListener } from "../../util/useEventListener";
-import useHover from "../../util/useHover";
-import { useKeyHeld } from "../../util/useKeyHeld";
-import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value";
-import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns";
+import { Use } from "../../util/Use.js";
+import { useWindowEventListener } from "../../util/useEventListener.js";
+import useHover from "../../util/useHover.js";
+import { useKeyHeld } from "../../util/useKeyHeld.js";
+import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value.js";
+import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
 
 interface PatternWithId {
   id: string;

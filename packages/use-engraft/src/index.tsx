@@ -1,13 +1,13 @@
-import { useDedupe } from '@engraft/original/lib/util/useDedupe';
-import { RootStyles } from '@engraft/original/lib/view/IsolateStyles';
-import { ToolOutputView, Value } from '@engraft/original/lib/view/Value';
-import { VarDefinition } from '@engraft/original/lib/view/Vars';
-import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from '@engraft/toolkit';
-import _ from 'lodash';
-import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { DOM } from './DOM';
-import css from './index.css?inline';
+import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
+import { RootStyles } from "@engraft/original/lib/view/IsolateStyles.js";
+import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
+import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
+import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from "@engraft/toolkit";
+import _ from "lodash";
+import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { DOM } from "./DOM.js";
+import css from "./index.css?inline";
 
 export interface UseEngraftProps {
   defaultValue: any;

@@ -1,10 +1,10 @@
-import { registerAllTheTools } from '@engraft/all-the-tools';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { registerAllTheTools } from "@engraft/all-the-tools";
+import React from "react";
+import { createRoot } from "react-dom/client";
 import { HashRouter, Route, Routes } from "react-router-dom";
-import { EditPatch } from './EditPatch';
-import { Root } from './Root';
-import { ViewPatch } from './ViewPatch';
+import { EditPatch } from "./EditPatch.js";
+import { Root } from "./Root.js";
+import { ViewPatch } from "./ViewPatch.js";
 
 console.log(`Commit: ${import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}`);
 

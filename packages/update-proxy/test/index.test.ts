@@ -1,6 +1,6 @@
-import { Updater } from '@engraft/shared/lib/Updater';
-import { describe, expect, it } from 'vitest';
-import { updateProxy } from '../lib';
+import { Updater } from "@engraft/shared/lib/Updater.js";
+import { describe, expect, it } from "vitest";
+import { updateProxy } from "../lib/index.js";
 
 describe('updateProxy', () => {
   it('works directly', () => {

@@ -1,7 +1,11 @@
-import React, { ChangeEvent, HTMLProps, memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, HTMLProps, memo, useCallback, useEffect, useRef, useState } from "react";
 
-import ContentEditable from 'react-contenteditable';
+import * as ContentEditableModule from "react-contenteditable";
 // TODO: look carefully at https://github.com/lovasoa/react-contenteditable/issues/161
+
+// TODO: what hath ESM wrought?
+const ContentEditable = ContentEditableModule.default as unknown as typeof import("react-contenteditable").default;
+
 
 interface ControlledTextInputProps extends HTMLProps<HTMLInputElement> {
   value: string,

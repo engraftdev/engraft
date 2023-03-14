@@ -1,11 +1,15 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
-import Select, { Props as SelectProps } from 'react-select';
+import * as SelectModule from "react-select";
+import { Props as SelectProps } from "react-select";
 import { VegaLite, VisualizationSpec } from "react-vega";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { gearIcon, markIcons, typeIcons } from "./icons";
+import { gearIcon, markIcons, typeIcons } from "./icons.js";
+
+// TODO: what hath ESM wrought?
+const Select = SelectModule.default as unknown as typeof import("react-select").default;
 
 export type Program = {
   toolName: 'simple-chart',

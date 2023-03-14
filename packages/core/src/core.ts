@@ -1,9 +1,9 @@
 import { IncrFunction } from "@engraft/incr";
-import { weakMapCache } from "@engraft/shared/lib/cache";
-import { Updater } from "@engraft/shared/lib/Updater";
+import { weakMapCache } from "@engraft/shared/lib/cache.js";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 import { ReactElement } from "react";
-import { EngraftPromise } from "./EngraftPromise";
-import { randomId } from './randomId';
+import { EngraftPromise } from "./EngraftPromise.js";
+import { randomId } from "./randomId.js";
 
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;

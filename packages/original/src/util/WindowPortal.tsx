@@ -1,6 +1,6 @@
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
-import { useWindowEventListener } from "./useEventListener";
+import { useWindowEventListener } from "./useEventListener.js";
 
 export type UseWindowContainerProps = {
   title?: string,

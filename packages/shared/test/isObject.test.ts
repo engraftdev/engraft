@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { isObject } from '../lib/isObject';
+import { describe, expect, it } from "vitest";
+import { isObject } from "../lib/isObject.js";
 
 describe('isObject', () => {
   it('basically works', () => {

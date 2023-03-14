@@ -1,5 +1,5 @@
-import { compare } from "@engraft/shared/lib/compare";
-import { hookRef } from "./hooks";
+import { compare } from "@engraft/shared/lib/compare.js";
+import { hookRef } from "./hooks.js";
 
 // Not especially pure; probably shouldn't be used outside of debug contexts?
 export function hookPrevious <T>(value: T, init: () => T): T {

@@ -1,5 +1,5 @@
-import { randomId } from '@engraft/core';
-import seedrandom from 'seedrandom';
+import { randomId } from "@engraft/core";
+import seedrandom from "seedrandom";
 
 export function hashId(...args: any[]): string {
   return randomId(seedrandom(JSON.stringify(args)));

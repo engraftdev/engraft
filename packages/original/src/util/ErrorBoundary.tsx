@@ -1,5 +1,5 @@
 import { memo, ReactNode } from "react";
-import { ErrorBoundary as ErrorBoundaryFromLib, FallbackProps } from 'react-error-boundary';
+import { ErrorBoundary as ErrorBoundaryFromLib, FallbackProps } from "react-error-boundary";
 
 interface ErrorBoundaryProps {
   children: ReactNode,

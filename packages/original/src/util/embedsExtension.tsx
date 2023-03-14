@@ -1,6 +1,6 @@
 import { EditorSelection, EditorState, Extension, StateField, TransactionSpec, Text, RangeSet } from "@codemirror/state";
 import { Decoration, DecorationSet, EditorView } from "@codemirror/view";
-import { PortalSet, PortalWidget } from "./PortalWidget";
+import { PortalSet, PortalWidget } from "./PortalWidget.js";
 
 
 // embedsExtension is a CodeMirror extension which lets you embed arbitrary React-rendered content

@@ -1,13 +1,13 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo, useState } from "react";
-import { Details } from "../../util/Details";
-import { getById, updateById } from "../../util/id";
+import { Details } from "../../util/Details.js";
+import { getById, updateById } from "../../util/id.js";
 import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
-import { Value } from "../../view/Value";
+import { Value } from "../../view/Value.js";
 import builtinStyles from './builtin.css?inline';
-import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes";
+import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes.js";
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.

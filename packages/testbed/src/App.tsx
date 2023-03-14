@@ -1,17 +1,17 @@
-import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, getFullToolIndex, lookUpToolByName, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from '@engraft/core';
-import { useIncr } from '@engraft/incr-react';
-import { Updater } from '@engraft/original/lib/util/immutable';
-import { useStateSetOnly } from '@engraft/original/lib/util/immutable-react';
-import range from '@engraft/original/lib/util/range';
-import { useLocalStorage } from '@engraft/original/lib/util/useLocalStorage';
-import IsolateStyles from '@engraft/original/lib/view/IsolateStyles';
-import { ToolOutputView } from '@engraft/original/lib/view/Value';
-import { ValueEditable } from '@engraft/original/lib/view/ValueEditable';
-import { Fragment, memo, useEffect, useMemo, useReducer } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import appCss from './App.css?inline';
-import { examples } from './examples';
+import { registerAllTheTools } from "@engraft/all-the-tools";
+import { EngraftPromise, getFullToolIndex, lookUpToolByName, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from "@engraft/core";
+import { useIncr } from "@engraft/incr-react";
+import { Updater } from "@engraft/original/lib/util/immutable.js";
+import { useStateSetOnly } from "@engraft/original/lib/util/immutable-react.js";
+import range from "@engraft/original/lib/util/range.js";
+import { useLocalStorage } from "@engraft/original/lib/util/useLocalStorage.js";
+import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
+import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
+import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
+import { Fragment, memo, useEffect, useMemo, useReducer } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import appCss from "./App.css?inline";
+import { examples } from "./examples/index.js";
 
 registerAllTheTools();
 

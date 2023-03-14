@@ -1,5 +1,5 @@
-import { ReactElement } from 'react';
-import TestRenderer from 'react-test-renderer';
+import { ReactElement } from "react";
+import TestRenderer from "react-test-renderer";
 
 
 export default class ReactCell {

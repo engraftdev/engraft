@@ -4,12 +4,13 @@
   "license": "MIT",
   "description": "DESCRIPTION TODO",
   "scripts": {
-    "depcheck": "node ../../scripts/our-depcheck.js",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 .",
     "build-app": "vite build --config ../../vite.config.ts",
     "preview": "vite preview --config ../../vite.config.ts",
     "dev": "vite --config ../../vite.config.ts"
   },
+  "type": "module",
   "dependencies": {
     "firebase": "^9.9.1",
     "firebaseui": "^6.0.1",

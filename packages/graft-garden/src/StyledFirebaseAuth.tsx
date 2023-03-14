@@ -1,10 +1,10 @@
 // adapted from https://github.com/firebase/firebaseui-web-react/pull/173
 // hopefully react-firebaseui will catch up to React 18 someday
 
-import { useEffect, useRef, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import * as firebaseui from 'firebaseui';
-import css from 'firebaseui/dist/firebaseui.css';
+import { useEffect, useRef, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import * as firebaseui from "firebaseui";
+import css from "firebaseui/dist/firebaseui.css";
 
 interface Props {
     // The Firebase UI Web UI Config object.

@@ -1,7 +1,7 @@
-import { EngraftPromise, toolFromModule } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
-import { describe, expect, it } from 'vitest';
-import * as checkbox from '../lib';
+import { EngraftPromise, toolFromModule } from "@engraft/core";
+import { IncrMemory } from "@engraft/incr";
+import { describe, expect, it } from "vitest";
+import * as checkbox from "../lib/index.js";
 
 const checkboxTool = toolFromModule(checkbox);
 

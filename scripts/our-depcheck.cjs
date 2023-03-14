@@ -30,6 +30,6 @@ depcheck(process.cwd(), options).then((unused) => {
   if (problem) {
     process.exit(1);
   } else {
-    console.log("No problems found by our-depcheck.js");
+    console.log("No problems found by our-depcheck.cjs");
   }
 });

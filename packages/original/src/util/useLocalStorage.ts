@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Updater } from "./immutable";
-import { useStateUpdateOnly } from "./immutable-react";
+import { Updater } from "./immutable.js";
+import { useStateUpdateOnly } from "./immutable-react.js";
 
 // note: this only checks local storage at initialization, not continuously.
 // (that would be cool tho; see "StorageItem" in a different project.)

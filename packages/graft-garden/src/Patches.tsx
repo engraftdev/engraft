@@ -1,8 +1,8 @@
 import { getAuth } from "firebase/auth";
-import { addDoc, deleteDoc, doc } from 'firebase/firestore';
-import { slotWithCode } from '@engraft/core';
-import { memo, useCallback } from 'react';
-import { Patch, patchesRef } from './db';
+import { addDoc, deleteDoc, doc } from "firebase/firestore";
+import { slotWithCode } from "@engraft/core";
+import { memo, useCallback } from "react";
+import { Patch, patchesRef } from "./db.js";
 
 type PatchesListProps = {
   patches: (Patch & {id: string})[];

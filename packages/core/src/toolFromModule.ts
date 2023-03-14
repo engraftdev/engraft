@@ -1,5 +1,5 @@
-import { Tool, ToolProgram } from ".";
-import { hasProperty } from "@engraft/shared/lib/hasProperty";
+import { Tool, ToolProgram } from "./index.js";
+import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 
 export type ToolModule<P extends ToolProgram = ToolProgram> = Tool<P> | { default: Tool<P> } | { tool: Tool<P> };
 

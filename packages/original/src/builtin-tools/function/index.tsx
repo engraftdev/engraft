@@ -1,19 +1,19 @@
 import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { objEqWithRefEq } from "@engraft/shared/lib/eq";
+import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
-import { ToolWithView } from "../../view/ToolWithView";
-import { noOp } from "../../util/noOp";
-import { difference } from "@engraft/shared/lib/sets";
+import { ToolWithView } from "../../view/ToolWithView.js";
+import { noOp } from "../../util/noOp.js";
+import { difference } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { useContextMenu } from "../../util/useContextMenu";
-import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu";
-import { SettableValue } from "../../view/SettableValue";
-import { ToolOutputView } from "../../view/Value";
-import { VarDefinition } from "../../view/Vars";
-import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure";
+import { useContextMenu } from "../../util/useContextMenu.js";
+import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu.js";
+import { SettableValue } from "../../view/SettableValue.js";
+import { ToolOutputView } from "../../view/Value.js";
+import { VarDefinition } from "../../view/Vars.js";
+import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure.js";
 
 export type Program = {
   toolName: 'function',

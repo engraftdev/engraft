@@ -1,9 +1,10 @@
-import { UpdateProxy } from '@engraft/update-proxy';
-import { Updater } from '@engraft/shared/lib/Updater';
-import { Fragment } from 'react';
-import TestRenderer from 'react-test-renderer';
-import { describe, expect, it } from 'vitest';
-import { UseUpdateProxy, useUpdateProxy } from '../lib';
+import { UpdateProxy } from "@engraft/update-proxy";
+import { Updater } from "@engraft/shared/lib/Updater.js";
+import { Fragment } from "react";
+import TestRenderer from "react-test-renderer";
+import { describe, expect, it } from "vitest";
+import { UseUpdateProxy, useUpdateProxy } from "../lib/index.js";
+import React from "react";
 
 describe('useUpdateProxy', () => {
   it('basically works', () => {

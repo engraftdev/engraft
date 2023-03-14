@@ -1,13 +1,13 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
 import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { isObject } from "@engraft/shared/lib/isObject";
+import { isObject } from "@engraft/shared/lib/isObject.js";
 import _ from "lodash";
 import { CSSProperties, memo, ReactNode } from "react";
-import { useStateSetOnly } from "../../util/immutable-react";
-import { difference, union } from "@engraft/shared/lib/sets";
+import { useStateSetOnly } from "../../util/immutable-react.js";
+import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { ErrorView, ToolOutputView } from "../../view/Value";
-import { VarDefinition } from "../../view/Vars";
+import { ErrorView, ToolOutputView } from "../../view/Value.js";
+import { VarDefinition } from "../../view/Vars.js";
 
 
 export type Program = {

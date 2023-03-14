@@ -1,10 +1,10 @@
 import { PromiseState, slotWithCode, ToolOutput } from "@engraft/core";
 import { memo, useCallback, useMemo, useState } from "react";
-import { Setter } from "../util/immutable";
-import { useStateSetOnly, useStateUpdateOnly } from "../util/immutable-react";
-import { empty } from "../util/noOp";
-import { ToolWithView } from "./ToolWithView";
-import { Value } from "./Value";
+import { Setter } from "../util/immutable.js";
+import { useStateSetOnly, useStateUpdateOnly } from "../util/immutable-react.js";
+import { empty } from "../util/noOp.js";
+import { ToolWithView } from "./ToolWithView.js";
+import { Value } from "./Value.js";
 
 export type SettableValueProps = {
   value: any,

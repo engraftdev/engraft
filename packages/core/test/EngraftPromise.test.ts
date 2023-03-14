@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { SynchronousPromise } from 'synchronous-promise';
-import { EngraftPromise } from '../lib/EngraftPromise';
+import { describe, expect, it } from "vitest";
+import { SynchronousPromise } from "synchronous-promise";
+import { EngraftPromise } from "../lib/EngraftPromise.js";
 
 describe('EngraftPromise', () => {
   it('calls `then` synchronously if possible', () => {

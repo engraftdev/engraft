@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useState } from "react";
-import { useElementEventListener } from "./useEventListener";
+import { useElementEventListener } from "./useEventListener.js";
 
 let EVENT_LISTENER_CREATED = false;
 let mouseClientX: number;

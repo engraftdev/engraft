@@ -1,5 +1,7 @@
-import isEqual from "lodash/isEqual";
+import IsEqual from "lodash-es/isEqual.js";
 import { diff } from "deep-object-diff";
+
+const isEqual = IsEqual.default;
 
 export function compare(a: any, b: any): string {
   if (isEqual(a, b)) {

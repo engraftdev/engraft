@@ -1,5 +1,5 @@
-import rootCss from './root.css?inline';
-import { HTMLProps, memo } from 'react';
+import rootCss from "./root.css?inline";
+import { HTMLProps, memo } from "react";
 
 export const RootStyles = memo(function RootStyles() {
   return <style>

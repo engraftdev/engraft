@@ -1,10 +1,10 @@
-import { EngraftPromise, makeVarBindings, registerTool, toolFromModule, ToolOutput } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
-import update from 'immutability-helper';
-import _ from 'lodash';
-import { describe, expect, it } from 'vitest';
-import { empty } from '../../../lib/util/noOp';
-import * as slot from '../../../lib/builtin-tools/slot/index';
+import { EngraftPromise, makeVarBindings, registerTool, toolFromModule, ToolOutput } from "@engraft/core";
+import { IncrMemory } from "@engraft/incr";
+import { updateWithUP } from "@engraft/update-proxy";
+import _ from "lodash";
+import { describe, expect, it } from "vitest";
+import * as slot from "../../../lib/builtin-tools/slot/index.js";
+import { empty } from "../../../lib/util/noOp.js";
 
 // @vitest-environment happy-dom
 
@@ -275,10 +275,10 @@ describe('slot', () => {
     expect(runs).toEqual(1);
     expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
     expect(runs).toEqual(1);
-    varBindings = update(varBindings, {IDrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 2})}}});
+    varBindings = updateWithUP(varBindings, (up) => up.IDrelevant000000.outputP.$set(EngraftPromise.resolve({value: 2})));
     expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
     expect(runs).toEqual(2);
-    varBindings = update(varBindings, {IDirrelevant000000: {outputP: {$set: EngraftPromise.resolve({value: 100})}}});
+    varBindings = updateWithUP(varBindings, (up) => up.IDirrelevant000000.outputP.$set(EngraftPromise.resolve({value: 100})));
     expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
     expect(runs).toEqual(2);
   });

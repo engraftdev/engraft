@@ -1,13 +1,13 @@
-import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css';
-import { memo } from 'react';
+import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css";
+import { memo } from "react";
 
 import { getAuth, GoogleAuthProvider, User } from "firebase/auth";
-import { query, where } from 'firebase/firestore';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { patchesRef } from './db';
-import StyledFirebaseAuth from './StyledFirebaseAuth';
-import { useUser } from './util';
-import { PatchesList } from './Patches';
+import { query, where } from "firebase/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { patchesRef } from "./db.js";
+import StyledFirebaseAuth from "./StyledFirebaseAuth.js";
+import { useUser } from "./util.js";
+import { PatchesList } from "./Patches.js";
 
 
 

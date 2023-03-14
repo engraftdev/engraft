@@ -3,10 +3,10 @@ import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { useIncr } from "@engraft/incr-react";
 import _ from "lodash";
 import { memo, useMemo } from "react";
-import { useStateSetOnly } from "../../util/immutable-react";
-import { difference, union } from "@engraft/shared/lib/sets";
+import { useStateSetOnly } from "../../util/immutable-react.js";
+import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { ToolOutputView } from "../../view/Value";
+import { ToolOutputView } from "../../view/Value.js";
 
 
 export type Program = {

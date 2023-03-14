@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { refEq } from '@engraft/shared/lib/eq';
-import { IncrMemory } from '../lib/incr';
-import { hookMemo } from '../lib/hookMemo';
-import { hooks } from '../lib/hooks';
+import { describe, expect, it } from "vitest";
+import { refEq } from "@engraft/shared/lib/eq.js";
+import { IncrMemory } from "../lib/incr.js";
+import { hookMemo } from "../lib/hookMemo.js";
+import { hooks } from "../lib/hooks.js";
 
 describe('hookMemo without equality function', () => {
   let minusRuns = 0;

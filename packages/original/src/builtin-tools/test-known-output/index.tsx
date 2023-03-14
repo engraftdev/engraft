@@ -1,6 +1,6 @@
 import { EngraftPromise, Tool, ToolOutput } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { ToolOutputView } from "../../view/Value";
+import { ToolOutputView } from "../../view/Value.js";
 
 export type Program = {
   toolName: 'test-known-output',

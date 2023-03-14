@@ -1,4 +1,4 @@
-import { hasProperty } from "./hasProperty";
+import { hasProperty } from "./hasProperty.js";
 
 type OrError<T> = {value: T} | {error: unknown};
 

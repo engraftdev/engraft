@@ -1,7 +1,7 @@
 // adapted from https://github.com/marcelklehr/toposort/blob/master/test.js
 
-import { describe, test, expect } from 'vitest';
-import { Edge, toposortFromEdges } from '../../lib/util/toposort';
+import { describe, test, expect } from "vitest";
+import { Edge, toposortFromEdges } from "../../lib/util/toposort.js";
 
 function uniqueNodes(arr: Edge[]){
   var res = new Set<string>()

@@ -1,13 +1,13 @@
-import { EngraftPromise, toolFromModule } from '@engraft/core';
-import { hookFork, hookIncr, hookMemo, hookRef, hooks, IncrMemory } from '@engraft/incr';
-import update from 'immutability-helper';
-import _ from 'lodash';
+import { EngraftPromise, toolFromModule } from "@engraft/core";
+import { hookFork, hookIncr, hookMemo, hookRef, hooks, IncrMemory } from "@engraft/incr";
+import update from "immutability-helper";
+import _ from "lodash";
 import React from "react";
-import * as slider from '../../builtin-tools/slider';
-import { createElementFromReact } from "../../util/createElementFrom";
-import Diagram from '../../util/Diagram';
-import { DOM } from "../../util/DOM";
-import { GoogleMap } from '../../view/GoogleMap';
+import * as slider from "../../builtin-tools/slider/index.js";
+import { createElementFromReact } from "../../util/createElementFrom.js";
+import Diagram from "../../util/Diagram.js";
+import { DOM } from "../../util/DOM.js";
+import { GoogleMap } from "../../view/GoogleMap.js";
 
 const sliderTool = toolFromModule(slider);
 

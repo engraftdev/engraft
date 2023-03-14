@@ -1,7 +1,7 @@
 import { memo, useRef, useState } from "react";
 import { Var, VarBinding } from "@engraft/core";
-import { ControlledSpan } from "../util/ControlledTextInput";
-import { Updater } from "../util/immutable";
+import { ControlledSpan } from "../util/ControlledTextInput.js";
+import { Updater } from "../util/immutable.js";
 import { ObjectInspector } from "react-inspector";
 import { usePromiseState } from "@engraft/core";
 import { useUpdateProxy } from "@engraft/update-proxy-react";

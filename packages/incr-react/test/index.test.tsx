@@ -1,8 +1,8 @@
-import { IncrFunction, memoize } from '@engraft/incr';
-import { useIncr } from '../lib';
-import React, { Fragment } from 'react';
-import TestRenderer from 'react-test-renderer';
-import { describe, expect, it } from 'vitest';
+import { IncrFunction, memoize } from "@engraft/incr";
+import { useIncr } from "../lib/index.js";
+import React, { Fragment } from "react";
+import TestRenderer from "react-test-renderer";
+import { describe, expect, it } from "vitest";
 
 describe('useIncr', () => {
   it('basically works', () => {

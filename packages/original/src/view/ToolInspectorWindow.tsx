@@ -1,12 +1,12 @@
 import { memo } from "react";
 import { references, ToolProgram, VarBindings } from "@engraft/core";
-import { runtimeObjectId } from "../util/id";
-import { Updater } from "../util/immutable";
+import { runtimeObjectId } from "../util/id.js";
+import { Updater } from "../util/immutable.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { WindowPortal } from "../util/WindowPortal";
-import IsolateStyles from "./IsolateStyles";
-import { Value } from "./Value";
-import { ValueEditable } from "./ValueEditable";
+import { WindowPortal } from "../util/WindowPortal.js";
+import IsolateStyles from "./IsolateStyles.js";
+import { Value } from "./Value.js";
+import { ValueEditable } from "./ValueEditable.js";
 
 export type ToolInspectorWindowProps = {
   show: boolean,

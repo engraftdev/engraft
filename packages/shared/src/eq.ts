@@ -1,4 +1,4 @@
-import { isObject } from "./isObject";
+import { isObject } from "./isObject.js";
 
 export type Eq<T> = (x1: T, x2: T) => boolean;
 

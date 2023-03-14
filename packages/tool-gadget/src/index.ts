@@ -1,2 +1,2 @@
-export * from "./gadget-definer";
-export * from "./gadget-user";
+export * from "./gadget-definer.js";
+export * from "./gadget-user.js";

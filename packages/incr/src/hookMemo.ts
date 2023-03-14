@@ -1,5 +1,5 @@
-import { arrEqWithRefEq, Eq } from "@engraft/shared/lib/eq";
-import { HookPath, hookRef, runWithPath } from "./hooks";
+import { arrEqWithRefEq, Eq } from "@engraft/shared/lib/eq.js";
+import { HookPath, hookRef, runWithPath } from "./hooks.js";
 
 // Produce a value with a function when a key changes according to a provided equality function.
 // If an equality function is not provided, hookMemo acts like React.useMemo,

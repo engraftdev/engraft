@@ -1,6 +1,6 @@
 
 import { useCallback, useState } from "react";
-import { Setter, Updater } from "./immutable";
+import { Setter, Updater } from "./immutable.js";
 
 // React's useState returns a setter that doesn't work for function types
 //   (it interprets function arguments as updaters, not new function values)

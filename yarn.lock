@@ -2535,7 +2535,14 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
 
-"@types/lodash@^4.14.178":
+"@types/lodash-es@^4.17.6":
+  version "4.17.6"
+  resolved "https://registry.yarnpkg.com/@types/lodash-es/-/lodash-es-4.17.6.tgz#c2ed4c8320ffa6f11b43eb89e9eaeec65966a0a0"
+  integrity sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash@*", "@types/lodash@^4.14.178":
   version "4.14.191"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.191.tgz#09511e7f7cba275acd8b419ddac8da9a6a79e2fa"
   integrity sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==
@@ -2555,7 +2562,12 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
-"@types/node@*", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
+"@types/node@*":
+  version "18.15.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.0.tgz#286a65e3fdffd691e170541e6ecb0410b16a38be"
+  integrity sha512-z6nr0TTEOBGkzLGmbypWOGnpSpSIBorEhC4L+4HeQ2iezKCi4f77kyslRwvHeNitymGQ+oFyIWGP96l/DPSV9w==
+
+"@types/node@>=12.12.47", "@types/node@>=13.7.0":
   version "18.14.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.2.tgz#c076ed1d7b6095078ad3cf21dfeea951842778b1"
   integrity sha512-1uEQxww3DaghA0RxqHx0O0ppVlo43pJhepY51OxuQIKHpjbnYLA7vcdwioNPzIqmC2u3I/dmylcqjlh0e7AyUA==
@@ -2756,13 +2768,13 @@
     picocolors "^1.0.0"
     std-env "^3.3.1"
 
-"@vitest/expect@0.29.1":
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/@vitest/expect/-/expect-0.29.1.tgz#befba6278167fc3d4d47a87557eaf41f3b06a7cf"
-  integrity sha512-VFt1u34D+/L4pqjLA8VGPdHbdF8dgjX9Nq573L9KG6/7MIAL9jmbEIKpXudmxjoTwcyczOXRyDuUWBQHZafjoA==
+"@vitest/expect@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/expect/-/expect-0.29.2.tgz#7503aabd72764612b0bc8258bafa3232ccb81586"
+  integrity sha512-wjrdHB2ANTch3XKRhjWZN0UueFocH0cQbi2tR5Jtq60Nb3YOSmakjdAvUa2JFBu/o8Vjhj5cYbcMXkZxn1NzmA==
   dependencies:
-    "@vitest/spy" "0.29.1"
-    "@vitest/utils" "0.29.1"
+    "@vitest/spy" "0.29.2"
+    "@vitest/utils" "0.29.2"
     chai "^4.3.7"
 
 "@vitest/runner@0.29.1":
@@ -2774,10 +2786,19 @@
     p-limit "^4.0.0"
     pathe "^1.1.0"
 
-"@vitest/spy@0.29.1":
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-0.29.1.tgz#e84f4d96a268e555e8140aeddcda65d6fd4e1d7b"
-  integrity sha512-sRXXK44pPzaizpiZOIQP7YMhxIs80J/b6v1yR3SItpxG952c8tdA7n0O2j4OsVkjiO/ZDrjAYFrXL3gq6hLx6Q==
+"@vitest/runner@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/runner/-/runner-0.29.2.tgz#bbc7b239758de4158392bb343e48ee5a4aa507e1"
+  integrity sha512-A1P65f5+6ru36AyHWORhuQBJrOOcmDuhzl5RsaMNFe2jEkoj0faEszQS4CtPU/LxUYVIazlUtZTY0OEZmyZBnA==
+  dependencies:
+    "@vitest/utils" "0.29.2"
+    p-limit "^4.0.0"
+    pathe "^1.1.0"
+
+"@vitest/spy@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-0.29.2.tgz#4210d844fabd9a68a1d2932d6a26c051bd089021"
+  integrity sha512-Hc44ft5kaAytlGL2PyFwdAsufjbdOvHklwjNy/gy/saRbg9Kfkxfh+PklLm1H2Ib/p586RkQeNFKYuJInUssyw==
   dependencies:
     tinyspy "^1.0.2"
 
@@ -2796,6 +2817,17 @@
   version "0.29.1"
   resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-0.29.1.tgz#b5de0f836becd18539a8bf9a68c1b06eee23307c"
   integrity sha512-6npOEpmyE6zPS2wsWb7yX5oDpp6WY++cC5BX6/qaaMhGC3ZlPd8BbTz3RtGPi1PfPerPvfs4KqS/JDOIaB6J3w==
+  dependencies:
+    cli-truncate "^3.1.0"
+    diff "^5.1.0"
+    loupe "^2.3.6"
+    picocolors "^1.0.0"
+    pretty-format "^27.5.1"
+
+"@vitest/utils@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-0.29.2.tgz#8990794a6855de19b59da80413dc5a1e1991da4d"
+  integrity sha512-F14/Uc+vCdclStS2KEoXJlOLAEyqRhnw0gM27iXw9bMTcyKRPJrQ+rlC6XZ125GIPvvKYMPpVxNhiou6PsEeYQ==
   dependencies:
     cli-truncate "^3.1.0"
     diff "^5.1.0"
@@ -6400,6 +6432,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash-es@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.camelcase@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
@@ -6744,14 +6781,14 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
 mlly@^1.1.0, mlly@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/mlly/-/mlly-1.1.1.tgz#f1838b14795e2cc284aa4ebcc76a258a52e6f537"
-  integrity sha512-Jnlh4W/aI4GySPo6+DyTN17Q75KKbLTyFK8BrGhjNP4rxuUjbRWhE6gHg3bs33URWAF44FRm7gdQA348i3XxRw==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/mlly/-/mlly-1.2.0.tgz#f0f6c2fc8d2d12ea6907cd869066689b5031b613"
+  integrity sha512-+c7A3CV0KGdKcylsI6khWyts/CYrGTrRVo4R/I7u/cUsy0Conxa6LUhiEzVKIw14lc2L5aiO4+SeVe4TeGRKww==
   dependencies:
     acorn "^8.8.2"
     pathe "^1.1.0"
-    pkg-types "^1.0.1"
-    ufo "^1.1.0"
+    pkg-types "^1.0.2"
+    ufo "^1.1.1"
 
 modern-node-polyfills@0.0.9:
   version "0.0.9"
@@ -7537,7 +7574,7 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-pkg-types@^1.0.1:
+pkg-types@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pkg-types/-/pkg-types-1.0.2.tgz#c233efc5210a781e160e0cafd60c0d0510a4b12e"
   integrity sha512-hM58GKXOcj8WTqUXnsQyJYXdeAPbythQgEF3nTcEo+nkD49chjQ9IKm/QJy9xf6JakXptz86h7ecP2024rrLaQ==
@@ -8169,9 +8206,9 @@ rollup@^2.75.7:
     fsevents "~2.3.2"
 
 rollup@^3.10.0:
-  version "3.17.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.17.3.tgz#ee7c4e1a262da55c491a4788b632fa123315f6ef"
-  integrity sha512-p5LaCXiiOL/wrOkj8djsIDFmyU9ysUxcyW+EKRLHb6TKldJzXpImjcRSR+vgo09DBdofGcOoLOsRyxxG2n5/qQ==
+  version "3.19.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.19.1.tgz#2b3a31ac1ff9f3afab2e523fa687fef5b0ee20fc"
+  integrity sha512-lAbrdN7neYCg/8WaoWn/ckzCtz+jr70GFfYdlf50OF7387HTg+wiuiqJRFYawwSPpqfqDNYqK7smY/ks2iAudg==
   optionalDependencies:
     fsevents "~2.3.2"
 
@@ -8742,9 +8779,9 @@ tiny-invariant@^1.1.0:
   integrity sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==
 
 tinybench@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tinybench/-/tinybench-2.3.1.tgz#14f64e6b77d7ef0b1f6ab850c7a808c6760b414d"
-  integrity sha512-hGYWYBMPr7p4g5IarQE7XhlyWveh1EKhy4wUBS1LrHXCKYgvz+4/jCqgmJqZxxldesn05vccrtME2RLLZNW7iA==
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/tinybench/-/tinybench-2.4.0.tgz#83f60d9e5545353610fe7993bd783120bc20c7a7"
+  integrity sha512-iyziEiyFxX4kyxSp+MtY1oCH/lvjH3PxFN8PGCDeqcZWAJ/i+9y+nL85w99PxVzrIvew/GSkSbDYtiGVa85Afg==
 
 tinypool@^0.3.1:
   version "0.3.1"
@@ -8916,7 +8953,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
-ufo@^1.1.0:
+ufo@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ufo/-/ufo-1.1.1.tgz#e70265e7152f3aba425bd013d150b2cdf4056d7c"
   integrity sha512-MvlCc4GHrmZdAllBc0iUDowff36Q9Ndw/UzqmEKyrfSzokTd9ZCy1i+IIk5hrYKkjoYVQyNbrw7/F8XJ2rEwTg==
@@ -9427,10 +9464,10 @@ vega@^5.22.1:
     vega-voronoi "~4.2.0"
     vega-wordcloud "~4.1.3"
 
-vite-node@0.29.1:
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-0.29.1.tgz#cc1e5fea46ff52645e0cf03d4ee03bf706d60308"
-  integrity sha512-Ey9bTlQOQrCxQN0oJ7sTg+GrU4nTMLg44iKTFCKf31ry60csqQz4E+Q04hdWhwE4cTgpxUC+zEB1kHbf5jNkFA==
+vite-node@0.29.2:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-0.29.2.tgz#463626197e248971774075faf3d6896c29cf8062"
+  integrity sha512-5oe1z6wzI3gkvc4yOBbDBbgpiWiApvuN4P55E8OI131JGrSuo4X3SOZrNmZYo4R8Zkze/dhi572blX0zc+6SdA==
   dependencies:
     cac "^6.7.14"
     debug "^4.3.4"
@@ -9474,17 +9511,17 @@ vite-plugin-checker@^0.5.6:
     fsevents "~2.3.2"
 
 vitest@^0.29.1:
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.29.1.tgz#1a5aa3494a8ff96556d7601a39d57f7c890022c4"
-  integrity sha512-iSy6d9VwsIn7pz5I8SjVwdTLDRGKNZCRJVzROwjt0O0cffoymKwazIZ2epyMpRGpeL5tsXAl1cjXiT7agTyVug==
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.29.2.tgz#0376b547169ddefbde3fbc040b48569ec61d6179"
+  integrity sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==
   dependencies:
     "@types/chai" "^4.3.4"
     "@types/chai-subset" "^1.3.3"
     "@types/node" "*"
-    "@vitest/expect" "0.29.1"
-    "@vitest/runner" "0.29.1"
-    "@vitest/spy" "0.29.1"
-    "@vitest/utils" "0.29.1"
+    "@vitest/expect" "0.29.2"
+    "@vitest/runner" "0.29.2"
+    "@vitest/spy" "0.29.2"
+    "@vitest/utils" "0.29.2"
     acorn "^8.8.1"
     acorn-walk "^8.2.0"
     cac "^6.7.14"
@@ -9500,7 +9537,7 @@ vitest@^0.29.1:
     tinypool "^0.3.1"
     tinyspy "^1.0.2"
     vite "^3.0.0 || ^4.0.0"
-    vite-node "0.29.1"
+    vite-node "0.29.2"
     why-is-node-running "^2.2.2"
 
 vscode-jsonrpc@6.0.0:

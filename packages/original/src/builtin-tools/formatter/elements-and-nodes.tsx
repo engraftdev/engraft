@@ -1,7 +1,7 @@
-import { createContext, CSSProperties, memo, ReactNode, useContext } from 'react';
-import { hashId, updateById } from '../../util/id';
-import { Use } from '../../util/Use';
-import useHover from '../../util/useHover';
+import { createContext, CSSProperties, memo, ReactNode, useContext } from "react";
+import { hashId, updateById } from "../../util/id.js";
+import { Use } from "../../util/Use.js";
+import useHover from "../../util/useHover.js";
 
 
 // **************

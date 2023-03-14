@@ -1,5 +1,5 @@
-import { compare } from "@engraft/shared/lib/compare";
-import { usePrevious } from "./usePrevious";
+import { compare } from "@engraft/shared/lib/compare.js";
+import { usePrevious } from "./usePrevious.js";
 
 // Utility for debugging what might be causing a component to re-render.
 // Just call:

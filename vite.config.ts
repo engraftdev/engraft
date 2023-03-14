@@ -26,6 +26,10 @@ export default defineConfig(() => {
     // },
     test: {
       passWithNoTests: true,
+      css: true,
+      deps: {
+        external: ['**/node_modules/**']
+      }
       // coverage: {
       //   reporter: ["lcov", "html"],
       // },

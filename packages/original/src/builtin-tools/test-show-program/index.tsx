@@ -1,7 +1,7 @@
 import { ComputeReferences, hookRunTool, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { ValueEditable } from '../../view/ValueEditable';
+import { ValueEditable } from "../../view/ValueEditable.js";
 
 export type Program = {
   toolName: 'test-show-program',

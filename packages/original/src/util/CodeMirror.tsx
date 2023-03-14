@@ -1,7 +1,7 @@
-import { EditorState, Extension, StateEffect } from '@codemirror/state';
-import { EditorView, ViewUpdate } from '@codemirror/view';
+import { EditorState, Extension, StateEffect } from "@codemirror/state";
+import { EditorView, ViewUpdate } from "@codemirror/view";
 import { CSSProperties, memo, useEffect, useMemo, useRef, useState } from "react"
-import useInterval from './useInterval';
+import useInterval from "./useInterval.js";
 
 export type MyCodeMirrorProps = {
   extensions: Extension[],

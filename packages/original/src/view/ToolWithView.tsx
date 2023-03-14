@@ -1,6 +1,6 @@
 import { memo, useEffect } from "react";
-import { Setter } from "../util/immutable";
-import IsolateStyles from "../view/IsolateStyles";
+import { Setter } from "../util/immutable.js";
+import IsolateStyles from "../view/IsolateStyles.js";
 import { useIncr } from "@engraft/incr-react";
 import { PromiseState, runTool, ShowView, ToolOutput, ToolProps, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 

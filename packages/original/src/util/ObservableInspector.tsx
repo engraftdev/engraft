@@ -1,9 +1,9 @@
 /// <reference path="./ObservableInspector.d.ts" />
 
-import { Inspector } from '@observablehq/inspector';
-import { memo, useEffect, useState } from 'react';
+import { Inspector } from "@observablehq/inspector";
+import { memo, useEffect, useState } from "react";
 
-import css from './ObservableInspector.css?inline';
+import css from "./ObservableInspector.css?inline";
 
 export type ObservableInspectorProps = {
   value: any,
