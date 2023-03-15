@@ -1,16 +1,15 @@
 import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { inputFrameBarBackdrop, InputHeading, useCommonWidth } from "@engraft/toolkit";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { noOp } from "../../util/noOp.js";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { Use } from "../../util/Use.js";
 import { useWindowEventListener } from "../../util/useEventListener.js";
 import useHover from "../../util/useHover.js";
 import { useKeyHeld } from "../../util/useKeyHeld.js";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value.js";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
-import { iconInput } from "./iconInput.js";
-import { useCommonWidth } from "@engraft/toolkit";
 
 interface PatternWithId {
   id: string;
@@ -23,8 +22,6 @@ export type Program = {
   patternsWithIds: PatternWithId[];
   minimized: boolean;
 }
-
-const topBackground = 'rgba(248, 248, 255, 0.5)';
 
 export const tool: Tool<Program> = {
   programFactory: (defaultInputCode) => ({
@@ -59,7 +56,7 @@ export const tool: Tool<Program> = {
 
     const view: ToolView<Program> = hookMemo(() => ({
       render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>,
-      renderFrameBarBackdrop: () => minimized ? null : <div className="backdrop" style={{background: topBackground, height: '100%'}} />,
+      renderFrameBarBackdrop: () => minimized ? null : inputFrameBarBackdrop,
     }), [props, inputResult, minimized]);
 
     return { outputP, view };
@@ -315,21 +312,10 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       >
         ⊖
       </div>
-      <div
-        className="xPad10 xRow xGap10"
-        style={{
-          background: topBackground,
-          borderBottom: '1px solid rgba(228, 228, 255)',
-        }}
-      >
-        <div
-          className="xRow xAlignRight"
-          style={{ minWidth: headingCommonWidth.minWidth }}
-        >
-          <div ref={headingCommonWidth.ref} style={{ width: 20, paddingTop: 3 }}>{iconInput}</div>
-        </div>
-        <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
-      </div>
+      <InputHeading
+        slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />}
+        headingCommonWidth={headingCommonWidth}
+      />
       <div
         className="ExtractorTool-top xCol xGap10 xPadH10"
         style={{

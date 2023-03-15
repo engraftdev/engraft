@@ -102,3 +102,5 @@ export function useCommonWidth() {
     wrap,
   };
 }
+
+export type CommonWidth = ReturnType<typeof useCommonWidth>;
