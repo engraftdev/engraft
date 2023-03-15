@@ -52,9 +52,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
     );
 
     return {
-      value: {
-        view,
-      },
+      value: view,
     };
   }), [inputResult.outputP, program.rootElement]);
 
