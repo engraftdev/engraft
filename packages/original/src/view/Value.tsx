@@ -9,7 +9,7 @@ import { Use } from "../util/Use.js";
 import useHover from "../util/useHover.js";
 import ScrollShadow from "./ScrollShadow.js";
 // import { isProbablyFunctionThing } from "../builtin-tools-disabled/function.js";
-import { EngraftPromise, PromiseState, usePromiseState } from "@engraft/core";
+import { EngraftPromise, usePromiseState } from "@engraft/core";
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import Diagram from "../util/Diagram.js";
@@ -391,10 +391,8 @@ export type ToolOutputViewProps = {
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
   const {outputP, customizations, displayReactElementsDirectly, valueWrapper = identity} = props;
 
-  const outputState = usePromiseState(outputP);
-
   return <ToolOutputBuffer
-    outputState={outputState}
+    outputP={outputP}
     renderValue={(value) => {
       if (displayReactElementsDirectly) {
         let maybeElement = value as object | null | undefined;
@@ -412,12 +410,14 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
 });
 
 export type ToolOutputBufferProps = {
-  outputState: PromiseState<ToolOutput>;
+  outputP: EngraftPromise<ToolOutput>;
   renderValue: (value: any) => ReactNode;
 }
 
 export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputBufferProps) {
-  const {outputState, renderValue} = props;
+  const {outputP, renderValue} = props;
+
+  const outputState = usePromiseState(outputP);
 
   const lastOutputRef = useRef<ToolOutput>();
   if (outputState.status === 'fulfilled') {
