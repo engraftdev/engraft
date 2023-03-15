@@ -2,7 +2,6 @@ import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCo
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { noOp } from "../../util/noOp.js";
-import { RowToCol } from "../../util/RowToCol.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { Use } from "../../util/Use.js";
 import { useWindowEventListener } from "../../util/useEventListener.js";
@@ -25,7 +24,7 @@ export type Program = {
   minimized: boolean;
 }
 
-const topBackground = 'rgba(0,0,0,0.05)';
+const topBackground = 'rgba(248, 248, 255, 0.5)';
 
 export const tool: Tool<Program> = {
   programFactory: (defaultInputCode) => ({
@@ -282,8 +281,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
 
   const headingCommonWidth = useCommonWidth();
 
-  const [patternsIsCol, setPatternsIsCol] = useState(false);
-
   // todo: very hacky
   if (minimized) {
     return <div className="xRow xAlignVCenter" style={{padding: 2}}>
@@ -318,12 +315,18 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       >
         ⊖
       </div>
-      <div className="xPad10 xRow xAlignVCenter xGap10" style={{background: topBackground}}>
+      <div
+        className="xPad10 xRow xGap10"
+        style={{
+          background: topBackground,
+          borderBottom: '1px solid rgba(228, 228, 255)',
+        }}
+      >
         <div
-          className="xRow xAlignVCenter xAlignRight"
-          style={{ ...!patternsIsCol && { minWidth: headingCommonWidth.minWidth } }}
+          className="xRow xAlignRight"
+          style={{ minWidth: headingCommonWidth.minWidth }}
         >
-          <div ref={headingCommonWidth.ref} style={{width: 20}}>{iconInput}</div>
+          <div ref={headingCommonWidth.ref} style={{ width: 20, paddingTop: 3 }}>{iconInput}</div>
         </div>
         <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
       </div>
@@ -339,7 +342,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           boxShadow: '0 2px 2px 1px rgba(0,0,0,0.1)'
         }}
       >
-        <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200} reportIsCol={setPatternsIsCol}>
+        <div className="ExtractorTool-patterns xRow xGap10">
           <div
             style={{ minWidth: headingCommonWidth.minWidth }}
           >
@@ -398,7 +401,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
               </div>
             )}
           </div>
-        </RowToCol>
+        </div>
       </div>
       <div className="xPad10" style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
