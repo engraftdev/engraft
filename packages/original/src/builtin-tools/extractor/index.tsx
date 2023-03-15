@@ -10,7 +10,7 @@ import { useKeyHeld } from "../../util/useKeyHeld.js";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value.js";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
 import { iconInput } from "./iconInput.js";
-import { useCommonWidth } from "./CommonWidth.js";
+import { useCommonWidth } from "@engraft/toolkit";
 
 interface PatternWithId {
   id: string;

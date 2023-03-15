@@ -50,7 +50,8 @@
     "@engraft/incr-react": "^0.0.1",
     "@engraft/core": "^0.0.1",
     "@engraft/update-proxy": "^0.0.1",
-    "@engraft/update-proxy-react": "^0.0.1"
+    "@engraft/update-proxy-react": "^0.0.1",
+    "@engraft/toolkit": "^0.0.1"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.19",
