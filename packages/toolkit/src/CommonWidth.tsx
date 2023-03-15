@@ -42,7 +42,11 @@ export function useCommonWidth() {
           // new element added
           const observer = new ResizeObserver(() => {
             setElemInfos((oldElemInfos) => {
-              const oldElemInfo = oldElemInfos.get(elem)!;
+              const oldElemInfo = oldElemInfos.get(elem);
+              if (!oldElemInfo) {
+                // TODO: leak? hopefully the observer is getting cleaned up soon
+                return oldElemInfos;
+              }
               const newElemInfo = { ...oldElemInfo, width: elem.getBoundingClientRect().width };
               const newElemInfos = new Map(oldElemInfos);
               newElemInfos.set(elem, newElemInfo);
@@ -81,8 +85,20 @@ export function useCommonWidth() {
   const largestMeasuredWidth = Math.max(...[...elemInfos.values()].map((elemInfo) => elemInfo.width));
   let minWidth = elemInfos.size > 0 ? largestMeasuredWidth : 'initial' ;
 
+  const wrap = useCallback((children: React.ReactNode, align: 'left' | 'right' | 'center') => {
+    const justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+    return (
+      <div style={{minWidth, display: 'flex', justifyContent}}>
+        <div ref={ref} style={{display: 'inline-block'}}>
+          {children}
+        </div>
+      </div>
+    );
+  }, [minWidth, ref]);
+
   return {
     ref,
     minWidth,
+    wrap,
   };
 }

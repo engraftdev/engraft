@@ -1,11 +1,13 @@
 import {
   ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
-  ToolProps, ToolRun, ToolView
+  ToolProps, ToolRun, ToolView, ToolViewRenderProps
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { RowToCol } from "../../util/RowToCol.js";
 import { union } from "@engraft/shared/lib/sets.js";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { useCommonWidth } from "@engraft/toolkit";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { memo, useState } from "react";
+import { RowToCol } from "../../util/RowToCol.js";
 
 export type Program = {
   toolName: "request";
@@ -69,32 +71,54 @@ export const run: ToolRun<Program> = memoizeProps(
 
     const view: ToolView<Program> = hookMemo(
       () => ({
-        render: ({updateProgram}) => (
-          <UseUpdateProxy updater={updateProgram} children={(programUP) =>
-            <div className="xCol xGap10 xPad10 xWidthFitContent">
-              <RowToCol minRowWidth={200} className="xGap10" autoFocus={true}>
-                <b>url</b> <ShowView view={urlResult.view} updateProgram={programUP.urlProgram.$apply} />
-              </RowToCol>
-              <RowToCol minRowWidth={200} className="xGap10">
-                <b>params</b> <ShowView view={paramsResult.view} updateProgram={programUP.paramsProgram.$apply} />
-              </RowToCol>
-              <div>
-                <input
-                  type="checkbox"
-                  checked={program.pauseRequest}
-                  onChange={() =>
-                    programUP.pauseRequest.$apply((pauseRequest) => !pauseRequest)
-                  }
-                ></input>
-                Pause request
-              </div>
-            </div>
-          } />
-        ),
+        render: (renderProps) =>
+          <View
+            {...props}
+            {...renderProps}
+            urlView={urlResult.view}
+            paramsView={paramsResult.view}
+          />,
       }),
-      [urlResult.view, paramsResult.view, program.pauseRequest]
+      [props, urlResult.view, paramsResult.view]
     );
 
     return { view, outputP };
   })
 );
+
+const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<Program> & {
+  urlView: ToolView<ToolProgram>,
+  paramsView: ToolView<ToolProgram>,
+}) {
+  const { program, updateProgram, autoFocus, urlView, paramsView } = props;
+  const programUP = useUpdateProxy(updateProgram);
+
+  const leftCommonWidth = useCommonWidth();
+
+  const [isCol, setIsCol] = useState(false);
+  const headingAlignment = isCol ? 'left' : 'right';
+
+  return <div className="xCol xGap10 xPad10 xWidthFitContent">
+    <RowToCol minRowWidth={200} className="xGap10" autoFocus={true} reportIsCol={setIsCol}>
+      {leftCommonWidth.wrap(<b>url</b>, headingAlignment)}
+      <ShowView view={urlView} updateProgram={programUP.urlProgram.$apply} autoFocus={autoFocus} />
+    </RowToCol>
+    <RowToCol minRowWidth={200} className="xGap10">
+      {leftCommonWidth.wrap(<b>params</b>, headingAlignment)}
+      <ShowView view={paramsView} updateProgram={programUP.paramsProgram.$apply} />
+    </RowToCol>
+    <RowToCol minRowWidth={200} className="xGap10">
+      {!isCol && leftCommonWidth.wrap(null, headingAlignment)}
+      <div>
+        <input
+          type="checkbox"
+          checked={program.pauseRequest}
+          onChange={() =>
+            programUP.pauseRequest.$apply((pauseRequest) => !pauseRequest)
+          }
+        ></input>
+        Pause request
+      </div>
+    </RowToCol>
+  </div>;
+});
