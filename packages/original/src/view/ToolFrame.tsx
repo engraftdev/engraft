@@ -1,6 +1,6 @@
 import { ToolProgram, VarBindings } from "@engraft/core";
 import classNames from "classnames";
-import { CSSProperties, memo, ReactNode, useState } from "react";
+import { CSSProperties, memo, ReactElement, ReactNode, useState } from "react";
 import { Updater } from "../util/immutable.js";
 import { Use } from "../util/Use.js";
 import useHover from "../util/useHover.js";
@@ -12,6 +12,7 @@ export type ToolFrameProps = {
   expand?: boolean,
   program: ToolProgram,
   updateProgram?: Updater<ToolProgram>,
+  frameBarBackdrop?: ReactElement | null,
   onClose?: () => void,
   varBindings: VarBindings,
 }
@@ -19,7 +20,7 @@ export type ToolFrameProps = {
 const SOFT_STYLE = false as boolean;
 
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
-  const {children, expand, program, updateProgram, onClose, varBindings} = props;
+  const {children, expand, program, updateProgram, onClose, varBindings, frameBarBackdrop} = props;
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -43,34 +44,55 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         marginLeft: 3
       };
 
-      return <div ref={hoverRef} className="ToolFrame-bar" style={{height: 15, fontSize: 13, color: '#0008', display: 'flex'}}>
+      return <div
+        ref={hoverRef}
+        className="ToolFrame-bar"
+        style={{position: 'relative'}}
+      >
 
-        <div style={{
-          // paddingLeft: 5, paddingRight: 2, background: '#e4e4ff', borderBottomLeftRadius: 5
-          paddingLeft: 2, paddingRight: 5, background: '#e4e4ff', borderBottomRightRadius: 5,
-          ...SOFT_STYLE && {borderTopLeftRadius: 5},
-          userSelect: 'none', lineHeight: '15px',
-        }}>
-          {program.toolName}
+        <div
+          className="ToolFrame-bar-backdrop"
+          style={{
+            position: 'absolute', top: 0, right: 0, bottom: 0, left: 0,
+          }}
+        >
+          {frameBarBackdrop}
         </div>
 
-        {/* TODO: Feedback for clicking 'cp' */}
-        {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
-        { isHovered && <>
-          <div style={buttonStyle}
-            onClick={() => {navigator.clipboard.writeText(JSON.stringify(program))}}
-          >cp</div>
-          <div style={buttonStyle}
-            onClick={() => {setShowInspector(true)}}
-          >i</div>
-          {onClose &&
-            <div style={buttonStyle}
-              onClick={onClose}
-            >×</div>
-          }
-        </>}
+        <div
+          className="ToolFrame-bar-frontdrop"
+          style={{
+            height: 15, fontSize: 13, color: '#0008', display: 'flex', position: 'relative'
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            // paddingLeft: 5, paddingRight: 2, background: '#e4e4ff', borderBottomLeftRadius: 5
+            paddingLeft: 2, paddingRight: 5, background: '#e4e4ff', borderBottomRightRadius: 5,
+            ...SOFT_STYLE && {borderTopLeftRadius: 5},
+            userSelect: 'none', lineHeight: '15px',
+          }}>
+            {program.toolName}
+          </div>
 
-        <div style={{flexGrow: 1, minWidth: 6}}></div>
+          {/* TODO: Feedback for clicking 'cp' */}
+          {/* TODO: Is cp going to break unique-ID constraints? Hmmmmm. */}
+          { isHovered && <>
+            <div style={buttonStyle}
+              onClick={() => {navigator.clipboard.writeText(JSON.stringify(program))}}
+            >cp</div>
+            <div style={buttonStyle}
+              onClick={() => {setShowInspector(true)}}
+            >i</div>
+            {onClose &&
+              <div style={buttonStyle}
+                onClick={onClose}
+              >×</div>
+            }
+          </>}
+
+          <div style={{flexGrow: 1, minWidth: 6}}></div>
+        </div>
       </div>
     }}/>
     <div style={{minHeight: 0}}>

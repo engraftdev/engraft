@@ -410,6 +410,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         boxSizing: 'border-box',
         maxWidth: '100%',
         ...expand ? {width: '100%'} : {},
+        background: '#fff',
       }}
     >
       <CodeMirror
@@ -510,6 +511,8 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView} = props;
   const programUP = useUpdateProxy(updateProgram);
 
+  const updateSubProgram = programUP.subProgram.$;
+
   const onCloseFrame = useCallback(() => {
     updateProgram(() => ({
       toolName: 'slot',
@@ -521,14 +524,15 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   }, [program.defaultCode, updateProgram]);
 
   if (noFrame) {
-    return <ShowView view={subView} updateProgram={programUP.subProgram.$apply} autoFocus={autoFocus} />;
+    return <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} />;
   } else {
     return <ToolFrame
       expand={expand}
-      program={program.subProgram} updateProgram={programUP.subProgram.$apply} varBindings={varBindings}
+      program={program.subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
+      frameBarBackdrop={subView.renderFrameBarBackdrop && subView.renderFrameBarBackdrop({updateProgram: updateSubProgram})}
       onClose={onCloseFrame}
     >
-      <ShowView view={subView} updateProgram={programUP.subProgram.$apply} autoFocus={autoFocus} />
+      <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} />
     </ToolFrame>;
   }
 });

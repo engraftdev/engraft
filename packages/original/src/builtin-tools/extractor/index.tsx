@@ -1,4 +1,4 @@
-import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { noOp } from "../../util/noOp.js";
@@ -10,6 +10,8 @@ import useHover from "../../util/useHover.js";
 import { useKeyHeld } from "../../util/useKeyHeld.js";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value.js";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
+import { iconInput } from "./iconInput.js";
+import { useCommonWidth } from "./CommonWidth.js";
 
 interface PatternWithId {
   id: string;
@@ -22,6 +24,8 @@ export type Program = {
   patternsWithIds: PatternWithId[];
   minimized: boolean;
 }
+
+const topBackground = 'rgba(0,0,0,0.05)';
 
 export const tool: Tool<Program> = {
   programFactory: (defaultInputCode) => ({
@@ -36,7 +40,7 @@ export const tool: Tool<Program> = {
   run: memoizeProps(hooks((props) => {
     const { program, varBindings } = props;
     const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
-    const { patternsWithIds } = program;
+    const { patternsWithIds, minimized } = program;
 
     const mergedPatterns = hookMemo(() => {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
@@ -54,9 +58,10 @@ export const tool: Tool<Program> = {
       return {value};
     })), [inputResult.outputP, mergedPatterns]);
 
-    const view = hookMemo(() => ({
-      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>
-    }), [props, inputResult]);
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>,
+      renderFrameBarBackdrop: () => minimized ? null : <div className="backdrop" style={{background: topBackground, height: '100%'}} />,
+    }), [props, inputResult, minimized]);
 
     return { outputP, view };
   })),
@@ -254,7 +259,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
     }
   }, [activePatternIndex, patternsWithIds.length])
 
-
   const setActivePattern = useCallback((pattern: Pattern) => {
     programUP.patternsWithIds.$apply((oldPatternsWithIds) => {
       let newPatternsWithIds = oldPatternsWithIds.slice();
@@ -276,9 +280,22 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
   const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
+  const headingCommonWidth = useCommonWidth();
+
+  const [patternsIsCol, setPatternsIsCol] = useState(false);
+
   // todo: very hacky
   if (minimized) {
     return <div className="xRow xAlignVCenter" style={{padding: 2}}>
+      <div
+        style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
+        onClick={(ev) => {
+          ev.preventDefault();
+          programUP.minimized.$set(false);
+        }}
+      >
+        ⊕
+      </div>
       <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
       <div className="xCol">
         {patternsWithIds.map(({pattern, id}) =>
@@ -287,47 +304,52 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           </div>
         )}
       </div>
-      <span
-        style={{marginLeft: 8, cursor: 'pointer'}}
-        onClick={(ev) => {
-          ev.preventDefault();
-          programUP.minimized.$set(false);
-        }}
-      >
-        ⊕
-      </span>
     </div>;
   }
 
   return (
-    <div ref={hoverRef} className="xCol" style={{padding: 10, height: '100%', boxSizing: 'border-box'}}>
+    <div ref={hoverRef} className="xCol" style={{height: '100%', boxSizing: 'border-box'}}>
       <div
-        className="ExtractorTool-top xCol xGap10"
+        style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
+        onClick={(ev) => {
+          ev.preventDefault();
+          programUP.minimized.$set(true);
+        }}
+      >
+        ⊖
+      </div>
+      <div className="xPad10 xRow xAlignVCenter xGap10" style={{background: topBackground}}>
+        <div
+          className="xRow xAlignVCenter xAlignRight"
+          style={{ ...!patternsIsCol && { minWidth: headingCommonWidth.minWidth } }}
+        >
+          <div ref={headingCommonWidth.ref} style={{width: 20}}>{iconInput}</div>
+        </div>
+        <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
+      </div>
+      <div
+        className="ExtractorTool-top xCol xGap10 xPadH10"
         style={{
           position: 'sticky',
           zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
           top: 0,
           background: 'white',
           paddingTop: 10,
-          marginTop: -10,
           paddingBottom: 10,
-          marginBottom: 10,
+          boxShadow: '0 2px 2px 1px rgba(0,0,0,0.1)'
         }}
       >
-        <div
-          style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
-          onClick={(ev) => {
-            ev.preventDefault();
-            programUP.minimized.$set(true);
-          }}
-        >
-          ⊖
-        </div>
-        <RowToCol className="ExtractorTool-input xGap10" minRowWidth={200}>
-          <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />
-        </RowToCol>
-        <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
-          <span style={{fontWeight: 'bold'}}>patterns</span>
+        <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200} reportIsCol={setPatternsIsCol}>
+          <div
+            style={{ minWidth: headingCommonWidth.minWidth }}
+          >
+            <div
+              ref={headingCommonWidth.ref}
+              style={{ display: 'inline-block', fontWeight: 'bold' }}
+            >
+              patterns
+            </div>
+          </div>
           <div className="xCol xShrinkable">
             {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
               <div
@@ -378,7 +400,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
           </div>
         </RowToCol>
       </div>
-      <div style={{minHeight: 0, overflow: 'scroll'}}>
+      <div className="xPad10" style={{minHeight: 0, overflow: 'scroll'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
           <ToolOutputView outputP={inputResult.outputP}  customizations={customizations} />
         </ExtractorContext.Provider>

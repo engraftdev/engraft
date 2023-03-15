@@ -1,13 +1,27 @@
-import { HTMLProps, memo } from "react"
-import { Use } from "./Use.js"
+import { HTMLProps, memo, useEffect } from "react"
 import useSize from "./useSize.js"
 
-export const RowToCol = memo(function RowToCol({children, className, minRowWidth, ...props}: HTMLProps<HTMLDivElement> & {minRowWidth: number}) {
-  return <Use hook={useSize} children={([sizeRef, size]) =>
-    <div ref={sizeRef} className={(size && size.width < minRowWidth ? 'xCol' : 'xRow') + ' ' + className} {...props}>
+export const RowToCol = memo(function RowToCol(props: HTMLProps<HTMLDivElement> & {
+  minRowWidth: number,
+  reportIsCol?: (isCol: boolean) => void,
+}) {
+  const {children, className, minRowWidth, reportIsCol, ...restProps} = props
+
+  const [sizeRef, size] = useSize();
+
+  const isCol = size ? size.width < minRowWidth : false;
+
+  useEffect(() => {
+    if (reportIsCol) {
+      reportIsCol(isCol);
+    }
+  }, [reportIsCol, size, isCol]);
+
+  return (
+    <div ref={sizeRef} className={(isCol ? 'xCol' : 'xRow') + ' ' + className} {...restProps}>
       {children}
     </div>
-  }/>
+  );
 })
 
 
