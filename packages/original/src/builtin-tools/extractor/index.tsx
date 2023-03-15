@@ -328,7 +328,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         </RowToCol>
         <RowToCol className="ExtractorTool-patterns xGap10" minRowWidth={200}>
           <span style={{fontWeight: 'bold'}}>patterns</span>
-          <div className="xCol">
+          <div className="xCol xShrinkable">
             {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
               <div
                 key={patternWithId?.id || 'new'}
