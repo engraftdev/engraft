@@ -110,10 +110,7 @@ const View = memo(function FormatterToolView(props: ViewProps) {
             }
           </div>
           <div
-            className="xCol xGap10"
-            style={{
-              flex: 1,
-            }}
+            className="xCol xGap10 xShrinkable"
           >
             {/* <b>edit view</b> */}
             { <FormatterContext.Provider

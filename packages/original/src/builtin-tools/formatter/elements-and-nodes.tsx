@@ -227,7 +227,10 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
   const { element, ghostInfo } = node;
 
   let inner: ReactNode;
-  let innerStyle: CSSProperties = ghostInfo ? { opacity: "40%", filter: "blur(0.5px)" } : {};
+  let innerStyle: CSSProperties = {
+    ...ghostInfo && { opacity: "40%" },
+    wordBreak: "break-word",
+  };
   switch (element.type) {
     case 'element':
       const Tag = element.tag as keyof JSX.IntrinsicElements;
@@ -283,11 +286,12 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
             position: 'absolute',
             top: 0,
             left: 0,
-            width: 50,
+            ...isSelected ? { right: 0 } : { width: 50 },
             bottom: 0,
             borderTop: boxBorder,
             borderLeft: boxBorder,
             borderBottom: boxBorder,
+            ...isSelected ? { borderRight: boxBorder } : {},
             borderRadius: 2,
           }}
         />
