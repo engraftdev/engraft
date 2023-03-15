@@ -7,7 +7,7 @@ import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { Value } from "../../view/Value.js";
 import builtinStyles from './builtin.css?inline';
-import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, renderElementToNode } from "./elements-and-nodes.js";
+import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, FormatterSelection, renderElementToNode } from "./elements-and-nodes.js";
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.
@@ -76,7 +76,7 @@ const View = memo(function FormatterToolView(props: ViewProps) {
   const programUP = useUpdateProxy(updateProgram);
   const { rootElement } = program;
 
-  const [ selectedNodeId, setSelectedNodeId ] = useState<string | null>(null);
+  const [ selection, setSelection ] = useState<FormatterSelection | null>(null);
 
   const rootNodeWithGhostsP = useMemo(() => inputResult.outputP.then((inputOutput) => {
     return renderElementToNode(rootElement, inputOutput.value, '', true);
@@ -99,10 +99,10 @@ const View = memo(function FormatterToolView(props: ViewProps) {
               flexGrow: 0,
             }}
           >
-            { selectedNodeId
+            { selection
               ? <SelectionInspector
-                  key={selectedNodeId}
-                  selectedNodeId={selectedNodeId}
+                  key={selection.nodeId}
+                  selectedNodeId={selection.nodeId}
                   rootElementUP={programUP.rootElement}
                   rootNode={rootNodeWithGhostsState.value}
                 />
@@ -116,8 +116,8 @@ const View = memo(function FormatterToolView(props: ViewProps) {
             { <FormatterContext.Provider
                 value={{
                   editMode: true,
-                  selectedNodeId,
-                  setSelectedNodeId,
+                  selection,
+                  setSelection,
                 }}
               >
                 <style>{builtinStyles}</style>
@@ -150,28 +150,29 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
   const { element, ghostInfo } = node;
 
   return (
-    <div className="xCol xGap10" style={{position: 'relative'}}>
-      <b>type</b>
-      <div>
-        {element.type}
+    <div className="xCol xGap10">
+      <div className="xCol xGap10" style={{position: 'relative'}}>
+        <b>type</b>
+        <div>
+          {element.type}
+        </div>
+        { element.type === 'element' &&
+          <SelectionInspectorForElement {...props} node={node}/>
+        }
+        { element.type === 'text' &&
+          <SelectionInspectorForText {...props} node={node}/>
+        }
+        { ghostInfo &&
+          <div
+            style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', backgroundColor: '#f4f4f4', opacity: '50%', cursor: 'pointer'}}
+            onClick={() => { rootElementUP.$apply(ghostInfo.realize); } }
+          />
+        }
       </div>
-      { element.type === 'element' &&
-        <SelectionInspectorForElement {...props} node={node}/>
-      }
-      { element.type === 'text' &&
-        <SelectionInspectorForText {...props} node={node}/>
-      }
       <b>debug</b>
       <Details summary='node'>
         <Value value={node} />
       </Details>
-
-      { ghostInfo &&
-        <div
-          style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', backgroundColor: '#f4f4f4', opacity: '50%', cursor: 'pointer'}}
-          onClick={() => { rootElementUP.$apply(ghostInfo.realize); } }
-        />
-      }
     </div>
   )
 });

@@ -200,9 +200,14 @@ export type FormatterContextInfo =
     }
   | {
       editMode: true,
-      selectedNodeId: string | null,
-      setSelectedNodeId: (selectedNodeId: string | null) => void,
+      selection: FormatterSelection | null,
+      setSelection: (selection: FormatterSelection | null) => void,
     };
+
+export type FormatterSelection = {
+  nodeId: string,
+  elementId: string,
+};
 
 export const FormatterContext = createContext<FormatterContextInfo>({
   editMode: false,
@@ -265,8 +270,9 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
   }
 
   if (context.editMode) {
-    const isSelected = context.selectedNodeId === node.id;
-    // todo: "semi-selected", meaning same element id but different nodeid
+    const isSelected = context.selection?.nodeId === node.id;
+    const isElementSelected = context.selection?.elementId === element.id;
+
     const boxBorder = `1px ${ghostInfo ? 'dashed' : 'solid'} ${isSelected ? '#88f' : '#ccc'}`;
 
     return (
@@ -286,12 +292,12 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
             position: 'absolute',
             top: 0,
             left: 0,
-            ...isSelected ? { right: 0 } : { width: 50 },
+            ...isElementSelected ? { right: 0 } : { width: 50 },
             bottom: 0,
             borderTop: boxBorder,
             borderLeft: boxBorder,
             borderBottom: boxBorder,
-            ...isSelected ? { borderRight: boxBorder } : {},
+            ...isElementSelected ? { borderRight: boxBorder } : {},
             borderRadius: 2,
           }}
         />
@@ -307,7 +313,7 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
               whiteSpace: 'nowrap',
             }}
             onClick={() => {
-              context.setSelectedNodeId(node.id)
+              context.setSelection({nodeId: node.id, elementId: element.id});
             }}
           >
             {element.type}{element.scope ? ` (.${element.scope})` : ''}
