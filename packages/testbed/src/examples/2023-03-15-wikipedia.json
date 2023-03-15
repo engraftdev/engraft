@@ -1,0 +1,158 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDavatar449194",
+          "label": "api response"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "request",
+            "urlProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "\"https://en.wikipedia.org/w/api.php\"",
+              "defaultCode": "\"https://httpbin.org/get\"",
+              "subPrograms": {}
+            },
+            "paramsProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{\n origin: '*',\n format: 'json',\n action: 'query',\n generator: 'random',\n grnnamespace: 0,\n prop: 'pageimages|extracts',\n exintro: true,\n rvprop: 'content',\n grnlimit: 5\n}",
+              "defaultCode": "{\n  my_param: \"hello world!\"\n}",
+              "subPrograms": {}
+            },
+            "pauseRequest": false
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDplanet172005",
+          "label": "pages"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "extractor",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDfront111483",
+              "defaultCode": "IDfront111483",
+              "subPrograms": {}
+            },
+            "patternsWithIds": [
+              {
+                "id": "IDease163157",
+                "pattern": [
+                  "query",
+                  "pages",
+                  {
+                    "wildcard": true
+                  },
+                  "title"
+                ]
+              },
+              {
+                "id": "IDeditor068592",
+                "pattern": [
+                  "query",
+                  "pages",
+                  {
+                    "wildcard": true
+                  },
+                  "extract"
+                ]
+              }
+            ],
+            "minimized": false
+          },
+          "defaultCode": "IDfront111483"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDlasagna974419",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "formatter",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDfront111483",
+              "defaultCode": "IDfront111483",
+              "subPrograms": {}
+            },
+            "rootElement": {
+              "id": "root",
+              "type": "element",
+              "tag": "div",
+              "style": {},
+              "className": "",
+              "children": [
+                {
+                  "type": "for-each",
+                  "id": "IDmass232646",
+                  "item": {
+                    "type": "element",
+                    "tag": "div",
+                    "id": "IDcatfish292914",
+                    "className": "",
+                    "children": [
+                      {
+                        "scope": "title",
+                        "type": "element",
+                        "tag": "h2",
+                        "id": "IDcanvas450212",
+                        "className": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "id": "IDshark656896",
+                            "rawHtml": false
+                          }
+                        ]
+                      },
+                      {
+                        "scope": "extract",
+                        "type": "element",
+                        "tag": "div",
+                        "id": "IDscissor310775",
+                        "className": "",
+                        "children": [
+                          {
+                            "type": "text",
+                            "id": "IDbubble166410",
+                            "rawHtml": true
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "defaultCode": "IDfront111483"
+        }
+      }
+    ],
+    "prevVar": {
+      "id": "IDfront111483",
+      "label": "prev"
+    }
+  }
+}
