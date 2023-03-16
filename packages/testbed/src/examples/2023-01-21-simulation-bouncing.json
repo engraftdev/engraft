@@ -40,7 +40,7 @@
           "modeName": "tool",
           "subProgram": {
             "toolName": "simulation",
-            "ticksCount": 20,
+            "ticksCount": 200,
             "stateVar": {
               "id": "IDmallow385799",
               "label": "state"
@@ -56,7 +56,7 @@
                   "modeName": "tool",
                   "subProgram": {
                     "toolName": "slider",
-                    "value": 63,
+                    "value": 61,
                     "min": 0,
                     "max": 100,
                     "step": 1
@@ -138,6 +138,37 @@
           },
           "defaultCode": "IDviscose669675"
         }
+      },
+      {
+        "var_": {
+          "id": "IDsweater235937",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDviscose669675",
+              "defaultCode": "IDviscose669675",
+              "subPrograms": {}
+            },
+            "mark": "point",
+            "xChannel": {
+              "field": "x",
+              "type": "quantitative"
+            },
+            "yChannel": {
+              "field": "y",
+              "type": "quantitative"
+            }
+          },
+          "defaultCode": "IDviscose669675"
+        },
+        "outputManualHeight": "infinity"
       }
     ],
     "prevVarId": "IDviscose669675"
