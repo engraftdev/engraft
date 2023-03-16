@@ -1,7 +1,11 @@
-import { createContext, CSSProperties, memo, ReactNode, useContext } from "react";
+import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
+import { useIncr } from "@engraft/incr-react";
+import { createContext, CSSProperties, memo, ReactNode, useContext, useMemo } from "react";
 import { hashId, updateById } from "../../util/id.js";
+import { identity } from "../../util/noOp.js";
 import { Use } from "../../util/Use.js";
 import useHover from "../../util/useHover.js";
+import { ToolOutputBuffer } from "../../view/Value.js";
 
 
 // **************
@@ -28,6 +32,7 @@ export type FormatterElement = {
   | {
       type: 'text',
       rawHtml: boolean,
+      formatProgram?: ToolProgram,
     }
 )
 
@@ -253,16 +258,21 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
       );
       break;
     case 'text':
-      let text: string;
-      if (typeof node.innerData === 'string' || typeof node.innerData === 'number') {
-        text = node.innerData.toString();
+      if (element.formatProgram) {
+        inner = <ViewFormatProgram formatProgram={element.formatProgram} node={node} />;
       } else {
-        text = JSON.stringify(node.innerData);
-      }
-      if (element.rawHtml) {
-        inner = <span style={innerStyle} dangerouslySetInnerHTML={{__html: text}} />;
-      } else {
-        inner = <span style={innerStyle}>{text}</span>;
+        let text: string;
+        if (typeof node.innerData === 'string' || typeof node.innerData === 'number') {
+          text = node.innerData.toString();
+        } else {
+          text = JSON.stringify(node.innerData);
+        }
+        if (element.rawHtml) {
+          inner = <span style={innerStyle} dangerouslySetInnerHTML={{__html: text}} />;
+        } else {
+          inner = <span style={innerStyle}>{text}</span>;
+        }
+        break;
       }
       break;
     default:
@@ -312,8 +322,9 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
               userSelect: 'none',
               whiteSpace: 'nowrap',
             }}
-            onClick={() => {
+            onClick={(ev) => {
               context.setSelection({nodeId: node.id, elementId: element.id});
+              ev.stopPropagation();
             }}
           >
             {element.type}{element.scope ? ` (.${element.scope})` : ''}
@@ -325,4 +336,23 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
   } else {
     return <>{inner}</>;
   }
+});
+
+export function makeVarBindingsForData(data: any): VarBindings {
+  const id = "IDdata000000";
+  const var_: Var = { id, label: 'data' };
+  const varBindings: VarBindings = { [id]: { var_, outputP: EngraftPromise.resolve({value: data}) } };
+  return varBindings;
+}
+
+const ViewFormatProgram = memo(function ViewFormatProgram(props: {
+  formatProgram: ToolProgram,
+  node: FormatterNode,
+}) {
+  const { formatProgram, node } = props;
+
+  const varBindings = useMemo(() => makeVarBindingsForData(node.innerData), [node.innerData]);
+  const { outputP } = useIncr(runTool, { program: formatProgram, varBindings })
+
+  return <ToolOutputBuffer outputP={outputP} renderValue={identity} />;
 });

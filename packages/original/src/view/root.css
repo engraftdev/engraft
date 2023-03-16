@@ -150,6 +150,10 @@ pre {
   gap: 10px;
 }
 
+.xGap20 {
+  gap: 20px;
+}
+
 .xExpand {
   flex-grow: 1;
 }

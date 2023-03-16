@@ -1,13 +1,14 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { memo, useCallback, useMemo, useState } from "react";
-import { Details } from "../../util/Details.js";
-import { getById, updateById } from "../../util/id.js";
+import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
-import { Value } from "../../view/Value.js";
+import { memo, useCallback, useMemo, useState } from "react";
+import { getById, updateById } from "../../util/id.js";
+import { noOp } from "../../util/noOp.js";
+import { ToolWithView } from "../../view/ToolWithView.js";
 import builtinStyles from './builtin.css?inline';
-import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, FormatterSelection, renderElementToNode } from "./elements-and-nodes.js";
+import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, FormatterSelection, makeVarBindingsForData, renderElementToNode } from "./elements-and-nodes.js";
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.
@@ -61,7 +62,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
-      />
+      />,
+    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, inputResult]);
 
   return {outputP, view};
@@ -84,47 +86,46 @@ const View = memo(function FormatterToolView(props: ViewProps) {
   const rootNodeWithGhostsState = usePromiseState(rootNodeWithGhostsP);
 
   return (
-    <div className="xCol xGap10 xPad10">
-      <div className="xRow xGap10">
-        <b>input</b>
-        <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />
-      </div>
+    <div className="xCol">
+      <InputHeading
+        slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
+      />
+      { rootNodeWithGhostsState.status === 'fulfilled' && selection &&
+        <div
+          className="xCol xGap10 xPad10"
+          style={{
+            flexShrink: 0,
+            flexGrow: 0,
+            position: 'sticky',
+            top: 0,
+            boxShadow: '0 2px 2px 1px rgba(0,0,0,0.1)',
+            background: 'white',
+            zIndex: 1,
+          }}
+        >
+          <SelectionInspector
+            key={selection.nodeId}
+            selectedNodeId={selection.nodeId}
+            rootElementUP={programUP.rootElement}
+            rootNode={rootNodeWithGhostsState.value}
+          />
+        </div>
+      }
       { rootNodeWithGhostsState.status === 'fulfilled' &&
-        <div className="xRow xGap10">
-          <div
-            className="xCol xGap10"
-            style={{
-              width: 200,
-              flexShrink: 0,
-              flexGrow: 0,
+        <div
+          className="xPad10"
+          onClick={() => setSelection(null)}
+        >
+          <style>{builtinStyles}</style>
+          <FormatterContext.Provider
+            value={{
+              editMode: true,
+              selection,
+              setSelection,
             }}
           >
-            { selection
-              ? <SelectionInspector
-                  key={selection.nodeId}
-                  selectedNodeId={selection.nodeId}
-                  rootElementUP={programUP.rootElement}
-                  rootNode={rootNodeWithGhostsState.value}
-                />
-              : <span>none</span>
-            }
-          </div>
-          <div
-            className="xCol xGap10 xShrinkable"
-          >
-            {/* <b>edit view</b> */}
-            { <FormatterContext.Provider
-                value={{
-                  editMode: true,
-                  selection,
-                  setSelection,
-                }}
-              >
-                <style>{builtinStyles}</style>
-                <FormatterNodeView node={rootNodeWithGhostsState.value}/>
-              </FormatterContext.Provider>
-            }
-          </div>
+            <FormatterNodeView node={rootNodeWithGhostsState.value}/>
+          </FormatterContext.Provider>
         </div>
       }
     </div>
@@ -149,30 +150,36 @@ const SelectionInspector = memo(function SelectionInspector(props: SelectionInsp
 
   const { element, ghostInfo } = node;
 
+  if (ghostInfo) {
+    return (
+      <button
+        onClick={() => { rootElementUP.$apply(ghostInfo.realize); } }
+      >
+        add to output
+      </button>
+    )
+  }
+
   return (
-    <div className="xCol xGap10">
-      <div className="xCol xGap10" style={{position: 'relative'}}>
+    <div className="xRow xGap20">
+      <div className="xCol xGap10">
         <b>type</b>
         <div>
           {element.type}
         </div>
-        { element.type === 'element' &&
-          <SelectionInspectorForElement {...props} node={node}/>
-        }
-        { element.type === 'text' &&
-          <SelectionInspectorForText {...props} node={node}/>
-        }
-        { ghostInfo &&
-          <div
-            style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', backgroundColor: '#f4f4f4', opacity: '50%', cursor: 'pointer'}}
-            onClick={() => { rootElementUP.$apply(ghostInfo.realize); } }
-          />
-        }
       </div>
-      <b>debug</b>
-      <Details summary='node'>
-        <Value value={node} />
-      </Details>
+      { element.type === 'element' &&
+        <SelectionInspectorForElement {...props} node={node}/>
+      }
+      { element.type === 'text' &&
+        <SelectionInspectorForText {...props} node={node}/>
+      }
+      {/* <div className="xCol xGap10">
+        <b>debug</b>
+        <Details summary='node'>
+          <Value value={node} />
+        </Details>
+      </div> */}
     </div>
   )
 });
@@ -199,17 +206,21 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
   }, [element.id, rootElementUP]);
 
   return <>
-    <b>tag</b>
-    <div>
-      <select value={element.tag} onChange={onChangeTag}>
-        <option value="div">div</option>
-        <option value="h1">h1</option>
-        <option value="h2">h2</option>
-        <option value="h3">h3</option>
-      </select>
+    <div className="xCol xGap10">
+      <b>tag</b>
+      <div>
+        <select value={element.tag} onChange={onChangeTag}>
+          <option value="div">div</option>
+          <option value="h1">h1</option>
+          <option value="h2">h2</option>
+          <option value="h3">h3</option>
+        </select>
+      </div>
     </div>
-    <b>classes</b>
-    <input value={element.className} onChange={onChangeClasses}/>
+    <div className="xCol xGap10">
+      <b>classes</b>
+      <input value={element.className} onChange={onChangeClasses}/>
+    </div>
   </>;
 });
 
@@ -219,18 +230,61 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
 
   const element = node.element as FormatterElement & { type: 'text' };
 
-  const onChangeRawHtml = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const varBindings = useMemo(() => makeVarBindingsForData(node.innerData), [node.innerData]);
+
+  const showAs = element.formatProgram ? 'custom' : element.rawHtml ? 'html' : 'text';
+  const setShowAs = useCallback((showAs: 'text' | 'html' | 'custom') => {
     rootElementUP.$apply((rootElement) =>
       updateById<FormatterElementOf<'text'>>(rootElement, element.id,
-        (old) => ({...old, rawHtml: e.target.checked})
+        (old) => {
+          if (showAs === 'text') {
+            return {...old, rawHtml: false, formatProgram: undefined};
+          } else if (showAs === 'html') {
+            return {...old, rawHtml: true, formatProgram: undefined};
+          } else if (showAs === 'custom') {
+            if (old.formatProgram) {
+              return old;
+            } else {
+              return {...old, rawHtml: false, formatProgram: slotWithCode('IDdata000000')};
+            }
+          } else {
+            throw new Error('unreachable');
+          }
+        }
       )
-    );
+    )
   }, [element.id, rootElementUP]);
 
   return <>
-    <b>raw html?</b>
-    <div>
-      <input type="checkbox" checked={element.rawHtml} onChange={onChangeRawHtml} />
+    <div className="xCol xGap10">
+      <b>show as</b>
+      <select
+        value={showAs}
+        onChange={(ev) => setShowAs(ev.target.value as any)}
+      >
+        <option value="text">text</option>
+        <option value="html">html</option>
+        <option value="custom">custom...</option>
+      </select>
     </div>
+    { element.formatProgram &&
+      <div className="xCol xGap10">
+        <b>program</b>
+        <div>
+          <ToolWithView
+            program={element.formatProgram}
+            varBindings={varBindings}
+            updateProgram={(newProgram) => {
+              rootElementUP.$apply((rootElement) =>
+                updateById<FormatterElementOf<'text'>>(rootElement, element.id,
+                  (old) => ({...old, formatProgram: newProgram(old.formatProgram)})
+                )
+              );
+            }}
+            reportOutputState={noOp}
+          />
+        </div>
+      </div>
+    }
   </>;
 });

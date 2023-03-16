@@ -317,14 +317,12 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         headingCommonWidth={headingCommonWidth}
       />
       <div
-        className="ExtractorTool-top xCol xGap10 xPadH10"
+        className="ExtractorTool-top xCol xGap10 xPad10"
         style={{
           position: 'sticky',
           zIndex: 1,  // otherwise, relatively positioned stuff goes on top?
           top: 0,
           background: 'white',
-          paddingTop: 10,
-          paddingBottom: 10,
           boxShadow: '0 2px 2px 1px rgba(0,0,0,0.1)'
         }}
       >
