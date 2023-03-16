@@ -18,6 +18,8 @@ registerTool(notebookTool);
 registerTool(toolFromModule(TestKnownOutput));
 registerTool(toolFromModule(Slot));
 
+const prevVarId = 'IDprev000000';
+
 describe('notebook', () => {
   it('output basically works; no unnecessary runs of cells', () => {
     const memory = new IncrMemory();
@@ -46,7 +48,7 @@ describe('notebook', () => {
           outputManualHeight: undefined,
         },
       ],
-      prevVar:  {id: 'prev', label: ''}
+      prevVarId
     }
     function runProgram() {
       return EngraftPromise.state(
@@ -81,8 +83,6 @@ describe('notebook', () => {
   });
 
   it('prev works', () => {
-    const prevVar = newVar('prev');
-
     let program: Notebook.Program = {
       toolName: 'notebook',
       cells: [
@@ -93,11 +93,11 @@ describe('notebook', () => {
         },
         {
           var_: {id: 'cell2', label: ''},
-          program: slotWithCode(`${prevVar.id} + 1`),
+          program: slotWithCode(`${prevVarId} + 1`),
           outputManualHeight: undefined,
         },
       ],
-      prevVar
+      prevVarId
     };
 
     expect(
@@ -142,7 +142,7 @@ describe('notebook', () => {
           outputManualHeight: undefined,
         }
       ],
-      prevVar: newVar('prev')
+      prevVarId
     }
     let varBindings: VarBindings;
     function runProgram() {
@@ -194,7 +194,7 @@ describe('notebook', () => {
           outputManualHeight: undefined,
         },
       ],
-      prevVar:  {id: 'prev', label: ''}
+      prevVarId
     }
 
     const component = TestRenderer.create(<React.Fragment/>);
