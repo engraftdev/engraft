@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, randomId, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever, memoizeProps } from "@engraft/incr";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import _ from "lodash";
@@ -25,7 +25,7 @@ import { VarDefinition } from "../../view/Vars.js";
 export type Program = {
   toolName: 'notebook',
   cells: Cell[],
-  prevVar: Var,
+  prevVarId: string,
   outputBelowInput?: boolean,
 }
 
@@ -46,14 +46,14 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
         outputManualHeight: undefined,
       }
     ],
-    prevVar: newVar('prev')
+    prevVarId: randomId(),
   };
 }
 
 export const computeReferences: ComputeReferences<Program> = (program) =>
   difference(
     union(...Object.values(program.cells).map(cell => references(cell.program))),
-    union(Object.keys(program.cells), [program.prevVar.id])
+    union(Object.keys(program.cells), [program.prevVarId])
   );
 
 
@@ -124,9 +124,13 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           const prevCell = cells[i - 1];
 
           return {
-            [program.prevVar.id]: {
-              var_: program.prevVar,
-              outputP: references(cell.program).has(program.prevVar.id)
+            [program.prevVarId]: {
+              var_: {
+                id: program.prevVarId,
+                label: `↑ <i>${prevCell.var_.label || "[no label]"}</i>`,
+                autoCompleteLabel: '↑ prev'
+              },
+              outputP: references(cell.program).has(program.prevVarId)
                 ? cellResults[prevCell.var_.id].outputP
                 : cellOutputPlaceholderVarBindings[prevCell.var_.id].outputP,
             }
@@ -157,7 +161,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     });
 
     return cellResults;
-  }, [sorted, cells, interCellReferencesByCell, cellOutputPlaceholderVarBindings, varBindings, cyclic, program.prevVar]);
+  }, [sorted, cells, interCellReferencesByCell, cellOutputPlaceholderVarBindings, varBindings, cyclic, program.prevVarId]);
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
@@ -209,7 +213,7 @@ const View = memo((props: ViewProps) => {
         }}>
         {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
-            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId}/>
             <CellView cell={cell} cellUP={programUP.cells[i]}
               cellResult={cellResults[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
@@ -218,7 +222,7 @@ const View = memo((props: ViewProps) => {
             />
           </Fragment>
         )}
-        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVar={program.prevVar}/>
+        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId}/>
       </div>
     </div>
   );
@@ -228,21 +232,21 @@ const CellDivider = memo((props: {
   i: number,
   updateCells: Updater<Cell[]>,
   smallestUnusedLabel: string,
-  prevVar: Var,
+  prevVarId: string,
 }) => {
-  const { i, updateCells, smallestUnusedLabel, prevVar } = props;
+  const { i, updateCells, smallestUnusedLabel, prevVarId } = props;
 
   const onClick = useCallback(() => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
-        program: slotWithCode(i === 0 ? '' : prevVar.id),
+        program: slotWithCode(i === 0 ? '' : prevVarId),
         outputManualHeight: undefined,
       });
       return newCells;
     })
-  }, [i, prevVar.id, smallestUnusedLabel, updateCells]);
+  }, [i, prevVarId, smallestUnusedLabel, updateCells]);
 
   const [isFocused, setIsFocused] = useStateSetOnly(() => false);
 

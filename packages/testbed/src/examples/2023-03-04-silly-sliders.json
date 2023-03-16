@@ -62,10 +62,7 @@
                       }
                     }
                   ],
-                  "prevVar": {
-                    "id": "IDlingonberry379417",
-                    "label": "prev"
-                  }
+                  "prevVarId": "IDlingonberry379417"
                 },
                 "defaultCode": ""
               },
@@ -118,9 +115,6 @@
         }
       }
     ],
-    "prevVar": {
-      "id": "IDbackpack320045",
-      "label": "prev"
-    }
+    "prevVarId": "IDbackpack320045"
   }
 }

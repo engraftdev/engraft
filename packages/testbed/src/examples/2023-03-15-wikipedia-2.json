@@ -182,9 +182,6 @@
         }
       }
     ],
-    "prevVar": {
-      "id": "IDfront111483",
-      "label": "prev"
-    }
+    "prevVarId": "IDfront111483"
   }
 }

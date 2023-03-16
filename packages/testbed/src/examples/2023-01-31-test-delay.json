@@ -63,9 +63,6 @@
         }
       }
     ],
-    "prevVar": {
-      "id": "IDelement769034",
-      "label": "prev"
-    }
+    "prevVarId": "IDelement769034"
   }
 }

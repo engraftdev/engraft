@@ -97,9 +97,6 @@
         }
       }
     ],
-    "prevVar": {
-      "id": "IDopportunity128944",
-      "label": "prev"
-    }
+    "prevVarId": "IDopportunity128944"
   }
 }

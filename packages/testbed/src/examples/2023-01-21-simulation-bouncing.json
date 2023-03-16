@@ -124,10 +124,7 @@
                     }
                   }
                 ],
-                "prevVar": {
-                  "id": "IDtrouble473208",
-                  "label": "prev"
-                }
+                "prevVarId": "IDtrouble473208"
               },
               "defaultCode": "IDmallow385799"
             },
@@ -143,9 +140,6 @@
         }
       }
     ],
-    "prevVar": {
-      "id": "IDviscose669675",
-      "label": "prev"
-    }
+    "prevVarId": "IDviscose669675"
   }
 }

@@ -67,9 +67,6 @@
         "outputManualHeight": "infinity"
       }
     ],
-    "prevVar": {
-      "id": "IDdoll563868",
-      "label": "prev"
-    }
+    "prevVarId": "IDdoll563868"
   }
 }

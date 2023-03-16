@@ -75,9 +75,6 @@
         "outputManualHeight": "infinity"
       }
     ],
-    "prevVar": {
-      "id": "IDresonance061062",
-      "label": "prev"
-    }
+    "prevVarId": "IDresonance061062"
   }
 }

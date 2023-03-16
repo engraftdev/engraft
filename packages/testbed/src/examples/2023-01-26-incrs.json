@@ -112,9 +112,6 @@
         "outputManualHeight": "infinity"
       }
     ],
-    "prevVar": {
-      "id": "IDauroraceratops452408",
-      "label": "prev"
-    }
+    "prevVarId": "IDauroraceratops452408"
   }
 }
