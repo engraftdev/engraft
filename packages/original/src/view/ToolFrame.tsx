@@ -95,7 +95,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         </div>
       </div>
     }}/>
-    <div style={{minHeight: 0, overflowX: 'auto'}}>
+    <div style={{minHeight: 0}}>
       {children}
     </div>
     <ToolInspectorWindow
