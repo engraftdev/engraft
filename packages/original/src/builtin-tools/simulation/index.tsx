@@ -104,7 +104,7 @@ const View = memo((props: ViewProps) => {
   return (
     <div className="xRow xGap10" style={{padding: 10}}>
       <ToolOutputView outputP={toDrawResult.outputP} displayReactElementsDirectly={true}/>
-      <div className="step-rows xCol xGap10">
+      <div className="step-rows xCol xGap10 xShrinkable">
         <div className="xRow xGap10">
         <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>tick</div>
           <div>
@@ -117,9 +117,9 @@ const View = memo((props: ViewProps) => {
             <div style={{display: 'inline-block', width: 30, textAlign: "right"}}>{selectedTick}</div>
           </div>
         </div>
-        <div className="xRow xGap10">
+        <div className="xRow xGap10 xExpand">
           <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>{selectedTick === 0 ? 'init' : 'on-tick'}</div>
-          <div className="xCol xGap10">
+          <div className="xCol xGap10 xShrinkable xExpand">
             {selectedTick > 0 && <>
               {/* an elegant, pastel rectangle with rounded corners */}
               <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
