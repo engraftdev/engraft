@@ -4,7 +4,7 @@ import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, synt
 import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import { Extension } from "@codemirror/state"
-import { dropCursor, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
+import { dropCursor, highlightSpecialChars, keymap, rectangularSelection, tooltips, EditorView } from "@codemirror/view"
 
 let _setup: Extension[] | undefined = undefined;
 
@@ -37,6 +37,16 @@ export function setup(): Extension[] {
         ...lintKeymap
       ]),
       tooltips({ position: 'absolute', parent: document.body }),  // fixes layout of autocomplete tooltip in notebook-canvas
+      EditorView.theme({
+        "&.cm-editor": {
+          outline: "none",
+          background: "rgb(245, 245, 245)",
+        },
+        "&.cm-editor.cm-focused": {
+            outline: "none",
+            background: "rgb(241, 246, 251)",
+        },
+      }),
     ];
   }
   return _setup;

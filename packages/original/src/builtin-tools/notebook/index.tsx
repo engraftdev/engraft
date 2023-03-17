@@ -236,7 +236,7 @@ const View = memo((props: ViewProps) => {
         }
         {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
-            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId}/>
+            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId} outputBelowInput={program.outputBelowInput} />
             <CellView cell={cell} cellUP={programUP.cells[i]}
               cellResult={cellResults[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
@@ -245,7 +245,7 @@ const View = memo((props: ViewProps) => {
             />
           </Fragment>
         )}
-        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId}/>
+        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId} outputBelowInput={program.outputBelowInput} />
       </div>
     </div>
   );
@@ -256,10 +256,11 @@ const CellDivider = memo((props: {
   updateCells: Updater<Cell[]>,
   smallestUnusedLabel: string,
   prevVarId: string,
+  outputBelowInput: boolean,
 }) => {
-  const { i, updateCells, smallestUnusedLabel, prevVarId } = props;
+  const { i, updateCells, smallestUnusedLabel, prevVarId, outputBelowInput } = props;
 
-  const onClick = useCallback(() => {
+  const onClick = useCallback((ev: React.MouseEvent | undefined) => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
@@ -268,22 +269,25 @@ const CellDivider = memo((props: {
         outputManualHeight: undefined,
       });
       return newCells;
-    })
+    });
+    console.log('ev', ev);
+    // TODO: not working to stop the click from focusing the divider
+    ev?.preventDefault();
   }, [i, prevVarId, smallestUnusedLabel, updateCells]);
 
   const [isFocused, setIsFocused] = useStateSetOnly(() => false);
 
   return <Use hook={useHover}>
-    {([hoverRef, isHovered]) =>
+    {([hoverRef, isHovered]) => <>
       <div ref={hoverRef} className="xCol xAlignVCenter xClickable"
-        style={{gridColumn: '1/4', height: 10}}
+        style={{gridColumn: outputBelowInput ? '1/4' : '1/3', height: 10}}
         onClick={onClick}
         tabIndex={0}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onKeyDown={(ev) => {
           if (ev.key === 'Enter' || ev.key === ' ') {
-            onClick();
+            onClick(undefined);
             ev.preventDefault();
             ev.stopPropagation();
           }
@@ -299,7 +303,11 @@ const CellDivider = memo((props: {
           </div>
         }
       </div>
-    }
+      { !outputBelowInput &&
+          // spacer (who has time to learn CSS grid?)
+          <div/>
+      }
+    </>}
     </Use>;
 });
 

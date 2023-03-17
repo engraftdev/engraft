@@ -402,15 +402,15 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
 
   return (
     <div
-      className={classNames('CodeModeView', {xWidthFitContent: !expand})}
+      className='CodeModeView'
       style={{
         display: 'inline-block',
         minWidth: 20,
-        border: '1px solid #0083',
+        // border: '1px solid #0083',
         boxSizing: 'border-box',
-        maxWidth: '100%',
+        width: '100%',
         ...expand ? {width: '100%'} : {},
-        background: '#fff',
+        // background: 'hsl(0, 0%, 98%)',
       }}
     >
       <CodeMirror
