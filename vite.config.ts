@@ -1,7 +1,11 @@
 /// <reference types="vitest" />
+import * as PluginReactModule from "@vitejs/plugin-react";
+import { execSync } from "child_process";
 import { defineConfig } from "vite";
 import { checker } from "vite-plugin-checker";
-import { execSync } from "child_process";
+
+// TODO: what hath ESM wrought?
+const react = PluginReactModule.default as unknown as typeof import("@vitejs/plugin-react").default;
 
 export default defineConfig(() => {
   const gitCommitHash = execSync('git rev-parse HEAD').toString().trimEnd();
@@ -11,6 +15,7 @@ export default defineConfig(() => {
     base: './',
     plugins: [
       checker({ typescript: true }),
+      react(),
     ],
     resolve: {
       alias: {
