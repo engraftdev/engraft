@@ -1,14 +1,14 @@
-import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css";
-import { memo } from "react";
+/// <reference path="./react-firebase-hooks.d.ts" />
 
+import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css";
 import { getAuth, GoogleAuthProvider, User } from "firebase/auth";
 import { query, where } from "firebase/firestore";
+import { memo } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { patchesRef } from "./db.js";
+import { PatchesList } from "./Patches.js";
 import StyledFirebaseAuth from "./StyledFirebaseAuth.js";
 import { useUser } from "./util.js";
-import { PatchesList } from "./Patches.js";
-
 
 
 export const Root = memo(function App() {

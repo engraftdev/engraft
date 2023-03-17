@@ -256,7 +256,7 @@ const CellDivider = memo((props: {
   updateCells: Updater<Cell[]>,
   smallestUnusedLabel: string,
   prevVarId: string,
-  outputBelowInput: boolean,
+  outputBelowInput?: boolean,
 }) => {
   const { i, updateCells, smallestUnusedLabel, prevVarId, outputBelowInput } = props;
 

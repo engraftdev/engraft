@@ -1,13 +1,14 @@
+/// <reference path="./react-firebase-hooks.d.ts" />
+
+import { runTool, ToolProgram } from "@engraft/core";
+import { useIncr } from "@engraft/incr-react";
+import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
 import { memo, useEffect, useMemo } from "react";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { patchesRef } from "./db.js";
-
-import { runTool, ToolProgram } from "@engraft/core";
-import { useIncr } from "@engraft/incr-react";
-import { ToolOutputView } from "@engraft/original/lib/view/Value";
 
 
 export const ViewPatch = memo(function ViewPatch() {

@@ -12,7 +12,6 @@ import { cache } from "@engraft/shared/lib/cache.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import classNames from "classnames";
 import _ from "lodash";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";

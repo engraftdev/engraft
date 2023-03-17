@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Synonymizer: demo of useEngraft built with TypeScript",
+  "type": "module",
   "scripts": {
     "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 .",
