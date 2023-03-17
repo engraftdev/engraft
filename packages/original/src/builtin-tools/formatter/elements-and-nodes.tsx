@@ -1,6 +1,7 @@
 import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
 import { useIncr } from "@engraft/incr-react";
 import { createContext, CSSProperties, memo, ReactNode, useContext, useMemo } from "react";
+import { ErrorBoundary } from "../../util/ErrorBoundary.js";
 import { hashId, updateById } from "../../util/id.js";
 import { identity } from "../../util/noOp.js";
 import { Use } from "../../util/Use.js";
@@ -259,7 +260,9 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
       break;
     case 'text':
       if (element.formatProgram) {
-        inner = <ViewFormatProgram formatProgram={element.formatProgram} node={node} />;
+        inner = <ErrorBoundary>
+          <ViewFormatProgram formatProgram={element.formatProgram} node={node} />
+        </ErrorBoundary>;
       } else {
         let text: string;
         if (typeof node.innerData === 'string' || typeof node.innerData === 'number') {
