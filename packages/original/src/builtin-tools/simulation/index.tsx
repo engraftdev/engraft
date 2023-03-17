@@ -7,6 +7,7 @@ import { useStateSetOnly } from "../../util/immutable-react.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ToolOutputView } from "../../view/Value.js";
+import { outputBackgroundColor } from "@engraft/toolkit";
 
 
 export type Program = {
@@ -121,8 +122,7 @@ const View = memo((props: ViewProps) => {
           <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>{selectedTick === 0 ? 'init' : 'on-tick'}</div>
           <div className="xCol xGap10 xShrinkable xExpand">
             {selectedTick > 0 && <>
-              {/* an elegant, pastel rectangle with rounded corners */}
-              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
+              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: outputBackgroundColor}}>
                 <ToolOutputView outputP={beforeSelectedTickOutputP} />
               </div>
               <div>↓</div>
@@ -134,7 +134,7 @@ const View = memo((props: ViewProps) => {
             />
             {!onTickResults[selectedTick].view.showsOwnOutput && <>
               <div>↓</div>
-              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
+              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: outputBackgroundColor}}>
                 <ToolOutputView outputP={afterSelectedTickOutputP} />
               </div>
             </>}

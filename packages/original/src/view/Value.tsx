@@ -155,7 +155,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
     return wrapInline(
       UNFRAME_REACT_ELEMENTS
       ? <ErrorBoundary>{maybeElement}</ErrorBoundary>
-      : <ValueFrame type='react element'>
+      : <ValueFrame type='react element' innerStyle={{background: 'white'}}>
           <ErrorBoundary>{maybeElement}</ErrorBoundary>
         </ValueFrame>
     );

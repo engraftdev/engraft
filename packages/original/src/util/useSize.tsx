@@ -8,7 +8,10 @@ export default function useSize(): [(elem: HTMLElement | null) => void, DOMRectR
     if (elem) {
       const observer = new ResizeObserver((entries) => setDomRect(entries[0].contentRect));
       observer.observe(elem);
-      return () => observer.disconnect();
+      return () => {
+        observer.disconnect();
+        setDomRect(undefined);
+      }
     }
   }, [elem])
 

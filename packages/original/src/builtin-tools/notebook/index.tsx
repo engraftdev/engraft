@@ -20,6 +20,7 @@ import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu.js
 import ScrollShadow from "../../view/ScrollShadow.js";
 import { ToolOutputView } from "../../view/Value.js";
 import { VarDefinition } from "../../view/Vars.js";
+import { outputBackgroundColor } from "@engraft/toolkit";
 
 
 export type Program = {
@@ -204,13 +205,35 @@ const View = memo((props: ViewProps) => {
     </MyContextMenu>
   , [notebookMenuMaker]));
 
+  const [setOutputSizeElem, outputSize] = useSize();
+
   return (
     <div className="NotebookTool xPadH10" onContextMenu={openMenu}>
       { menuNode }
+      {outputSize &&
+        <div
+          className="output-background"
+          style={{
+            position: 'absolute',
+            top: 0, bottom: 0, right: 0, width: outputSize.width + 20,
+            backgroundColor: outputBackgroundColor
+          }}
+        />
+      }
       <div className="xChildrenMinWidth0"
         style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20, rowGap: 10
+          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20
         }}>
+        {!program.outputBelowInput &&
+          <div
+            ref={setOutputSizeElem}
+            className="output-size"
+            style={{
+              gridColumn: '3 / 4',
+              height: 0,
+            }}
+          />
+        }
         {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
             <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId}/>
@@ -359,7 +382,17 @@ const CellView = memo(function CellView(props: CellViewProps) {
     { !cellShowsOwnOutput &&
       <div
         className="NotebookTool-CellView-output-cell"
-        style={{...(outputBelowInput ? {gridColumn: '2 / 4'} : {})}}
+        style={{
+          ...(
+            outputBelowInput
+            ? {
+              gridColumn: '2 / 4',
+              backgroundColor: outputBackgroundColor,
+              padding: 10,
+            }
+            : {}
+          )
+        }}
         onContextMenu={openMenu}
       >
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputHoverRef])}>
@@ -374,6 +407,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
                       <ScrollShadow
                         innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}
                         contentRef={outputContentRef}
+                        shadowColor={outputBackgroundColor}
                       >
                         {view}
                       </ScrollShadow>

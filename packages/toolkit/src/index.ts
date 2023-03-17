@@ -7,3 +7,5 @@ export * as SetOps from "@engraft/shared/lib/sets.js";
 export * from "./simple-tool.js";
 export * from "./CommonWidth.js";
 export * from "./input.js";
+
+export const outputBackgroundColor = "hsl(120, 50%, 97%)";
