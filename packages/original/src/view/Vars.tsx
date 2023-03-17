@@ -18,7 +18,20 @@ export const VarDefinition = memo(function VarDefinition({var_, updateVar, autoF
 
   return <div
     className={`def-${var_.id}`}
-    style={{ display: 'inline-block', backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', border: '1px solid gray', fontSize: '13px', minHeight: '13px'}}
+    style={{
+      display: "inline-flex",
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'hsl(30, 100%, 90%)',
+      border: '1px solid hsl(30, 100%, 70%)',
+      borderRadius: '10px',
+      padding: '0px 5px',
+      fontFamily: 'sans-serif',
+      fontSize: '13px',
+      minHeight: '13px',
+      height: 18,
+    }}
   >
     <ControlledSpan value={var_.label} onValue={(label) => varUP && varUP.label.$set(label)}
           style={{border: 'none', background: 'none'}} autoFocus={autoFocus}/>
@@ -36,11 +49,21 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
 
   const [inspected, setInspected] = useState(false);
 
-  return <div style={{display: "inline-flex", flexDirection: 'column', alignItems: 'center', borderRadius: '10px', background: 'rgba(0,0,0,0.05)', cursor: 'pointer'}}
+  return <div
+    style={{
+      display: "inline-flex",
+      flexDirection: 'column',
+      alignItems: 'center',
+      borderRadius: '10px',
+      backgroundColor: 'hsl(30, 100%, 90%)',
+      cursor: 'pointer'
+    }}
     onClick={() => setInspected(!inspected)}>
     <span
       ref={spanRef}
-      style={{ backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)', borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', fontSize: '13px', cursor: 'pointer'}}
+      style={{
+        // backgroundImage: 'linear-gradient(180deg,#f4f4f4,#e4e4e4)',
+        borderRadius: '10px', padding: '0px 5px', fontFamily: 'sans-serif', fontSize: '13px', cursor: 'pointer'}}
       onDoubleClick={() => {
         if (!varBinding) { return; }
         const def = document.querySelector(`.def-${varBinding.var_.id}`);
@@ -69,7 +92,7 @@ export const VarUseInspector = memo(function VarUseInspector(props: VarUseInspec
   const outputState = usePromiseState(varBinding.outputP);
 
   if (outputState.status === 'fulfilled') {
-    return <ObjectInspector data={outputState.value.value} />;
+    return <ObjectInspector data={outputState.value} />;
   } else {
     return <span style={{fontStyle: 'italic'}}>missing</span>;
   }
