@@ -69,7 +69,7 @@ export const VarUseInspector = memo(function VarUseInspector(props: VarUseInspec
   const outputState = usePromiseState(varBinding.outputP);
 
   if (outputState.status === 'fulfilled') {
-    return <ObjectInspector data={outputState.value} />;
+    return <ObjectInspector data={outputState.value.value} />;
   } else {
     return <span style={{fontStyle: 'italic'}}>missing</span>;
   }
