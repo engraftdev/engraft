@@ -28,7 +28,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
     className={classNames("ToolFrame", {xWidthFitContent: !expand})}
     style={{
       ...!SOFT_STYLE && {border: '1px solid #c4c4ff'},
-      position: "relative", display: 'inline-flex', flexDirection: 'column', boxSizing: 'border-box',
+      position: "relative", display: 'flex', flexDirection: 'column', boxSizing: 'border-box',
       maxWidth: '100%',
       ...SOFT_STYLE && {borderRadius: 5, boxShadow: '0px 0px 5px 0px #c4c4ff'},
     }}
