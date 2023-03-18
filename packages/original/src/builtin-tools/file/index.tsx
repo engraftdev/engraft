@@ -4,6 +4,8 @@ import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
 import {FileRejection } from "react-dropzone";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { assertNever } from "@engraft/shared/lib/assert.js";
+import * as d3dsv from "d3-dsv";
 
 // TODO: what hath ESM wrought?
 const Dropzone = DropzoneModule.default as unknown as typeof import("react-dropzone").default;
@@ -17,7 +19,7 @@ export type P = {
   }
 }
 
-type OutputMode = 'text' | 'data-uri' | 'react-image' | 'json';
+type OutputMode = 'text' | 'data-uri' | 'react-image' | 'json' | 'csv';
 
 export const computeReferences: ComputeReferences<P> = (program) => new Set();
 
@@ -32,17 +34,20 @@ export const run: ToolRun<P> = memoizeProps(hooks((props: ToolProps<P>) => {
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() => EngraftPromise.try(() => {
     if (!program.file) { return EngraftPromise.unresolved(); }
 
-    if (program.file.outputMode === 'text') {
-      return { value: window.atob(program.file.dataURL.split(',')[1]) };
-    } else if (program.file.outputMode === 'data-uri') {
-      return { value: program.file.dataURL };
-    } else if (program.file.outputMode === 'react-image') {
-      // eslint-disable-next-line jsx-a11y/alt-text
-      return { value: <img src={program.file.dataURL} /> };
-    } else if (program.file.outputMode === 'json') {
-      return { value: JSON.parse(window.atob(program.file.dataURL.split(',')[1])) };
-    } else {
-      throw new Error('Unknown file mode');
+    switch (program.file.outputMode) {
+      case 'text':
+        return { value: textFromDataURL(program.file.dataURL) };
+      case 'data-uri':
+        return { value: program.file.dataURL };
+      case 'react-image':
+        // eslint-disable-next-line jsx-a11y/alt-text
+        return { value: <img src={program.file.dataURL} /> };
+      case 'json':
+        return { value: JSON.parse(textFromDataURL(program.file.dataURL)) };
+      case 'csv':
+        return { value: d3dsv.csvParse(textFromDataURL(program.file.dataURL), d3dsv.autoType) };
+      default:
+        assertNever(program.file.outputMode, `Unknown output mode: ${program.file.outputMode}`);
     }
   }), [program.file]);
 
@@ -92,6 +97,7 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P>) => {
           >
             <option value="text">text</option>
             <option value="json">json</option>
+            <option value="csv">csv</option>
             <option value="data-uri">data URL</option>
             <option value="react-image">React image</option>
           </select>
@@ -139,9 +145,15 @@ function mimeTypeFromDataURL(dataURL: string) {
   return dataURL.split(';')[0].split(':')[1];
 }
 
+function textFromDataURL(dataURL: string) {
+  return window.atob(dataURL.split(',')[1]);
+}
+
 function defaultOutputModeForMimeType(mimeType: string): OutputMode {
   if (mimeType === 'application/json') {
     return 'json';
+  } else if (mimeType === 'text/csv') {
+    return 'csv';
   } else if (mimeType.startsWith('text/')) {
     return 'text';
   } else if (mimeType.startsWith('image/')) {
