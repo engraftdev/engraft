@@ -2,6 +2,8 @@
   "extends": "../../tsconfig.json",
   "include": [ "src" ],
   "compilerOptions": {
-    "module": "es2020"
+    "noEmit": false,
+    "outDir": "lib",
+    "types": [ "node", "vite/client" ]
   }
 }

@@ -1,0 +1,36 @@
+{
+  "name": "@engraft/cli",
+  "version": "0.0.1",
+  "description": "Command-line tool to run Engraft tools",
+  "bin": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 .",
+    "build-app": "vite build --config ../../vite.config.ts",
+    "preview": "vite preview --config ../../vite.config.ts",
+    "dev": "vite --config ../../vite.config.ts"
+  },
+  "dependencies": {
+    "@engraft/all-the-tools": "0.0.1",
+    "express": "^4.18.2",
+    "yargs": "^17.7.1",
+    "@engraft/core": "^0.0.1",
+    "@engraft/incr": "^0.0.1",
+    "@engraft/incr-react": "^0.0.1",
+    "@engraft/original": "^0.0.1",
+    "react": "^18.0.0",
+    "react-error-boundary": "^3.1.4",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/tmp": "^0.2.3",
+    "@types/yargs": "^17.0.22",
+    "tmp": "^0.2.1"
+  }
+}

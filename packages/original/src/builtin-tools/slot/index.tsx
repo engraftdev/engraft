@@ -1,6 +1,7 @@
 import { NodePath, PluginItem, TransformOptions } from "@babel/core";
 import { transform } from "@babel/standalone";
 import * as TemplateModule from "@babel/template";
+import TemplateDefault from "@babel/template";
 import babelTypes from "@babel/types";
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
@@ -34,7 +35,7 @@ import { globals } from "./globals.js";
 import { referencesFromCode, refRE } from "./refs.js";
 
 // TODO: what hath ESM wrought?
-const template = TemplateModule.default as unknown as typeof import("@babel/template").default;
+const template = (TemplateDefault.default || TemplateModule.default) as unknown as typeof import("@babel/template").default;
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 
