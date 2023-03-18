@@ -216,7 +216,8 @@ const View = memo((props: ViewProps) => {
           style={{
             position: 'absolute',
             top: 0, bottom: 0, right: 0, width: outputSize.width + 20,
-            backgroundColor: outputBackgroundColor
+            backgroundColor: outputBackgroundColor,
+            zIndex: -1,
           }}
         />
       }
