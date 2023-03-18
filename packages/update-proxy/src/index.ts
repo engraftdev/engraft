@@ -16,6 +16,7 @@ export type UpdateProxy<T> =
       $: (f: (oldT: T) => T) => void,  // shorthand for $apply
       $apply: (f: (oldT: T) => T) => void,
       $set: (newT: T) => void,
+      $default: (newT: T) => void,
       $helper: (spec: Spec<T>) => void,
       $as: <U>(u?: U) => UpdateProxy<U>,
     }
@@ -47,6 +48,7 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
     $: updater,
     $apply: updater,
     $set: (newT) => updater(() => newT),
+    $default: (newT) => updater((oldT) => oldT ?? newT),
     $helper: (spec) => updater((oldT) => immutabilityHelper(oldT, spec)),
     $as: <U extends T>(u?: U) => up as unknown as UpdateProxy<U>,
     ...remover && {$remove: remover},

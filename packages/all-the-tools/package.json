@@ -19,6 +19,7 @@
     "@engraft/tool-toy-adder-simple": "^0.0.1",
     "@engraft/tool-gadget": "^0.0.1",
     "@engraft/tool-hider": "^0.0.1",
-    "@engraft/tool-checkbox": "^0.0.1"
+    "@engraft/tool-checkbox": "^0.0.1",
+    "@engraft/tool-data-table": "^0.0.1"
   }
 }

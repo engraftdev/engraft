@@ -5,6 +5,7 @@ import ToyAdderSimple from "@engraft/tool-toy-adder-simple";
 import Checkbox from "@engraft/tool-checkbox";
 import Hider from "@engraft/tool-hider";
 import { GadgetDefiner, GadgetUser } from "@engraft/tool-gadget";
+import DataTable from "@engraft/tool-data-table";
 
 // This package is named somewhat flippantly. We don't yet have a principled way
 // to manage tool dependencies. So this package just contains all the tools.
@@ -19,6 +20,7 @@ export const allTheTools: Tool[] = [
   forgetP(toolFromModule(Hider)),
   forgetP(toolFromModule(GadgetDefiner)),
   forgetP(toolFromModule(GadgetUser)),
+  forgetP(toolFromModule(DataTable)),
 ]
 
 export function registerAllTheTools() {
