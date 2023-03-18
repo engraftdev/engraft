@@ -276,8 +276,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
   const activePattern: Pattern | undefined = patternsWithIds[activePatternIndex]?.pattern;
   const otherPatterns = patternsWithIds.map(patternWithId => patternWithId.pattern).filter((_, i) => i !== activePatternIndex);
 
-  const headingCommonWidth = useCommonWidth();
-
   // todo: very hacky
   if (minimized) {
     return <div className="xRow xAlignVCenter" style={{padding: 2}}>
@@ -314,7 +312,6 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$apply} autoFocus={autoFocus} />}
-        headingCommonWidth={headingCommonWidth}
       />
       <div
         className="ExtractorTool-top xCol xGap10 xPad10"
@@ -327,15 +324,8 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
         }}
       >
         <div className="ExtractorTool-patterns xRow xGap10">
-          <div
-            style={{ minWidth: headingCommonWidth.minWidth }}
-          >
-            <div
-              ref={headingCommonWidth.ref}
-              style={{ display: 'inline-block', fontWeight: 'bold' }}
-            >
-              patterns
-            </div>
+          <div style={{ fontWeight: 'bold' }}>
+            patterns
           </div>
           <div className="xCol xShrinkable">
             {[...patternsWithIds, undefined].map((patternWithId, patternIdx) =>
