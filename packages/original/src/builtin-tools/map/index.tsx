@@ -8,6 +8,7 @@ import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ErrorView, ToolOutputView } from "../../view/Value.js";
 import { VarDefinition } from "../../view/Vars.js";
+import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 
 
 export type Program = {
@@ -78,7 +79,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         {...props} {...viewProps}
         inputResult={inputResult}
         itemResultsP={itemResultsP}
-      />
+      />,
+    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [inputResult, itemResultsP, props]);
 
   return {outputP, view};
@@ -169,9 +171,11 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   }
 
   return (
-    <div className="xCol xGap10 xPad10">
-      <div className="MapTool-top xRow xGap10">
-        <b>input</b> <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />
+    <div className="xCol">
+      <InputHeading
+        slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
+      />
+      <div className="MapTool-top xRow xGap10 xPad10">
         {itemResultsState.status === 'rejected' &&
           <ErrorView error={itemResultsState.reason}/>
         }
