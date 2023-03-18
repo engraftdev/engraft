@@ -1,10 +1,12 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { memo, useCallback, useMemo } from "react";
-import DropzoneModule, {FileRejection } from "react-dropzone";
+import * as DropzoneModule from "react-dropzone";
+import {FileRejection } from "react-dropzone";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 
-const Dropzone = DropzoneModule.default;
+// TODO: what hath ESM wrought?
+const Dropzone = DropzoneModule.default as unknown as typeof import("react-dropzone").default;
 
 export type P = {
   toolName: 'file';
