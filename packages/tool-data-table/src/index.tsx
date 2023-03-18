@@ -4,7 +4,7 @@ import { count } from "@engraft/original/lib/util/count.js";
 import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { ErrorView } from "@engraft/original/lib/view/Value.js";
 import { Column, DataFrame, inferDataFrameFromRows, ValueType } from "./data-frame.js";
-import style from './style.css';
+import style from './style.css?inline';
 import { applyTransforms, Transforms } from "./transforms.js";
 import _ from 'lodash';
 import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
