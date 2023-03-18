@@ -128,7 +128,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
             [program.prevVarId]: {
               var_: {
                 id: program.prevVarId,
-                label: `↑ <i>${prevCell.var_.label || "[no label]"}</i>`,
+                label: `<span style="font-style: normal">↑</span> ${prevCell.var_.label || "[no label]"}`,
                 autoCompleteLabel: '↑ prev'
               },
               outputP: references(cell.program).has(program.prevVarId)
@@ -223,7 +223,7 @@ const View = memo((props: ViewProps) => {
       }
       <div className="xChildrenMinWidth0"
         style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: 20
+          display: 'grid', gridTemplateColumns: 'repeat(3, auto)'
         }}>
         {!program.outputBelowInput &&
           <div
@@ -281,7 +281,7 @@ const CellDivider = memo((props: {
   return <Use hook={useHover}>
     {([hoverRef, isHovered]) => <>
       <div ref={hoverRef} className="xCol xAlignVCenter xClickable"
-        style={{gridColumn: outputBelowInput ? '1/4' : '1/3', height: 10}}
+        style={{gridColumn: outputBelowInput ? '1/4' : '1/3', height: 20}}
         onClick={onClick}
         tabIndex={0}
         onFocus={() => setIsFocused(true)}
@@ -374,14 +374,17 @@ const CellView = memo(function CellView(props: CellViewProps) {
   return <>
     {menuNode}
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
-      <div className="xRow xStickyTop10" style={{marginTop: 4}}>
+      <div className="xRow xStickyTop10">
         <div className="xExpand"/>
         <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$apply}/>
       </div>
     </div>
     <div
       className="NotebookTool-CellView-tool-cell xCol"
-      style={{...(cellShowsOwnOutput || outputBelowInput ? {gridColumn: '2 / 4'} : {})}}
+      style={
+        cellShowsOwnOutput || outputBelowInput
+        ? { gridColumn: '2 / 4' }
+        : { marginRight: 20 }}
       onContextMenu={openMenu}
     >
       <div className="xStickyTop10" ref={toolRef}>

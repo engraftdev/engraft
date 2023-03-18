@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { CSSProperties, memo, useRef, useState } from "react";
 import { Var, VarBinding } from "@engraft/core";
 import { ControlledSpan } from "../util/ControlledTextInput.js";
 import { Updater } from "../util/immutable.js";
@@ -6,6 +6,16 @@ import { ObjectInspector } from "react-inspector";
 import { usePromiseState } from "@engraft/core";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 
+
+const sharedStyle: CSSProperties = {
+  display: "inline-flex",
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'hsl(30, 100%, 90%)',
+  fontStyle: 'italic',
+  // border: '1px solid hsl(30, 100%, 70%)',
+}
 
 interface VarDefinitionProps {
   var_: Var,
@@ -19,18 +29,15 @@ export const VarDefinition = memo(function VarDefinition({var_, updateVar, autoF
   return <div
     className={`def-${var_.id}`}
     style={{
-      display: "inline-flex",
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'hsl(30, 100%, 90%)',
-      border: '1px solid hsl(30, 100%, 70%)',
-      borderRadius: '10px',
+      ...sharedStyle,
+      borderTopLeftRadius: '10px',
+      borderBottomLeftRadius: '10px',
       padding: '0px 5px',
       fontFamily: 'sans-serif',
       fontSize: '13px',
       minHeight: '13px',
-      height: 18,
+      height: 26,
+      paddingRight: 10,
     }}
   >
     <ControlledSpan value={var_.label} onValue={(label) => varUP && varUP.label.$set(label)}
@@ -51,11 +58,8 @@ export const VarUse = memo(function VarUse({varBinding}: VarUseProps) {
 
   return <div
     style={{
-      display: "inline-flex",
-      flexDirection: 'column',
-      alignItems: 'center',
+      ...sharedStyle,
       borderRadius: '10px',
-      backgroundColor: 'hsl(30, 100%, 90%)',
       cursor: 'pointer'
     }}
     onClick={() => setInspected(!inspected)}>
@@ -92,7 +96,7 @@ export const VarUseInspector = memo(function VarUseInspector(props: VarUseInspec
   const outputState = usePromiseState(varBinding.outputP);
 
   if (outputState.status === 'fulfilled') {
-    return <ObjectInspector data={outputState.value} />;
+    return <ObjectInspector data={outputState.value.value} />;
   } else {
     return <span style={{fontStyle: 'italic'}}>missing</span>;
   }
