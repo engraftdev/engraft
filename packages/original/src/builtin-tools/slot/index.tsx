@@ -12,6 +12,7 @@ import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/in
 import { cache } from "@engraft/shared/lib/cache.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
+import { outputBackgroundColor } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import objectInspect from "object-inspect";
