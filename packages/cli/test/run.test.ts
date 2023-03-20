@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from 'node:url';
 import { slotWithCode } from "@engraft/core";
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent";
+import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
 
 registerAllTheTools();
 

@@ -23,6 +23,7 @@
     "@babel/plugin-syntax-flow": "^7.18.6",
     "@babel/plugin-transform-react-jsx": "^7.21.0",
     "@engraft/eslint-plugin-incr-hooks": "^0.0.1",
+    "@vitejs/plugin-react": "^3.1.0",
     "@vitest/browser": "^0.29.1",
     "@vitest/coverage-c8": "^0.29.1",
     "@vitest/ui": "^0.29.1",

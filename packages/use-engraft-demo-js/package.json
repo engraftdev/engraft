@@ -7,20 +7,19 @@
   "type": "module",
   "scripts": {
     "depcheck": "node ../../scripts/our-depcheck.cjs",
-    "lint": "eslint --max-warnings=0 .",
-    "build-app": "vite build --config ./vite.config.ts",
-    "preview": "vite preview --config ./vite.config.ts",
-    "dev": "vite --config ./vite.config.ts"
+    "build-app": "vite build . --config ../../vite.config.ts",
+    "preview": "vite preview . --config ../../vite.config.ts",
+    "dev": "vite . --config ../../vite.config.ts"
   },
   "dependencies": {
     "@engraft/all-the-tools": "^0.0.1",
     "@engraft/use-engraft": "^0.0.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "vite": "^4.1.4"
   },
   "devDependencies": {
-    "@types/react-dom": "^18.0.0",
-    "@vitejs/plugin-react": "^3.1.0"
+    "@types/react-dom": "^18.0.0"
   }
 }

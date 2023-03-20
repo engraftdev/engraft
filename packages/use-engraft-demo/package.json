@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "react": "^18.0.0",
-    "react-router-dom": "^6.3.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^6.3.0",
     "@engraft/use-engraft": "^0.0.1",
     "@engraft/all-the-tools": "^0.0.1"
   },
