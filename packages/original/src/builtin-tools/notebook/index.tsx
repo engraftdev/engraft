@@ -269,7 +269,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
       <div className="xRow xStickyTop10">
         <div className="xExpand"/>
-        <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$apply}/>
+        <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$apply} attach='right' style={{marginTop: 4}} />
       </div>
     </div>
     <div

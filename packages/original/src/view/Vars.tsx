@@ -21,23 +21,33 @@ interface VarDefinitionProps {
   var_: Var,
   updateVar?: Updater<Var>,
   autoFocus?: boolean,
+  attach?: 'right' | 'down',
+  style?: CSSProperties,
 }
 
-export const VarDefinition = memo(function VarDefinition({var_, updateVar, autoFocus}: VarDefinitionProps) {
+export const VarDefinition = memo(function VarDefinition(props: VarDefinitionProps) {
+  const { var_, updateVar, autoFocus, attach, style } = props;
   const varUP = useUpdateProxy(updateVar);
+
+  const radii: CSSProperties =
+    attach === 'right'
+    ? {borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px'}
+    : attach === 'down'
+    ? {borderTopRightRadius: '10px', borderTopLeftRadius: '10px'}
+    : {borderRadius: '10px'};
 
   return <div
     className={`def-${var_.id}`}
     style={{
       ...sharedStyle,
-      borderTopLeftRadius: '10px',
-      borderBottomLeftRadius: '10px',
+      ...radii,
       padding: '0px 5px',
       fontFamily: 'sans-serif',
       fontSize: '13px',
       minHeight: '13px',
-      height: 26,
+      height: 18,
       paddingRight: 10,
+      ...style,
     }}
   >
     <ControlledSpan value={var_.label} onValue={(label) => varUP && varUP.label.$set(label)}

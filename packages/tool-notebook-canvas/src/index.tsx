@@ -254,10 +254,10 @@ const CellView = memo(function CellView(props: CellViewProps) {
         }}
       >
         <div
-          style={{display: 'inline-block', cursor: 'initial'}}
+          style={{ display: 'inline-block', cursor: 'initial', alignSelf: 'flex-end' }}
           onMouseDown={(ev) => ev.stopPropagation()}
         >
-          <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$} />
+          <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$} attach='down' />
         </div>
         <div style={{flexGrow: 1}}/>
         <div style={{color: "#aaa"}}>
