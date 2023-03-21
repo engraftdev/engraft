@@ -77,8 +77,8 @@ export const cellNetwork = hooks((props: CellNetworkProps) => {
         , objEqWith(objEqWithRefEq));
 
         const placeholderVarBindings: VarBindings = hookDedupe(hookMemo(() =>
-          _.omit(cellOutputPlaceholderVarBindings, [...interCellReferences])
-        , [cellOutputPlaceholderVarBindings, interCellReferences]), objEqWithRefEq);
+          _.omit(cellOutputPlaceholderVarBindings, [...interCellReferences, cell.var_.id])
+        , [cell.var_.id, cellOutputPlaceholderVarBindings, interCellReferences]), objEqWithRefEq);
 
         const prevVarBindings: VarBindings = hookDedupe((() => {
           if (!prevVarId) { return {}; }
