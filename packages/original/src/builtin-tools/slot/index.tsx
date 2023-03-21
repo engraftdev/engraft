@@ -30,7 +30,7 @@ import IsolateStyles from "../../view/IsolateStyles.js";
 import { ToolFrame } from "../../view/ToolFrame.js";
 import { ToolInspectorWindow } from "../../view/ToolInspectorWindow.js";
 import { VarUse } from "../../view/Vars.js";
-import { refCompletions, toolCompletions } from "./autocomplete.js";
+import { refCompletions, toolCompletions, toolCompletionsTheme } from "./autocomplete.js";
 import { globals } from "./globals.js";
 import { referencesFromCode, refRE } from "./refs.js";
 
@@ -374,6 +374,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       ]),
       embedsExtension(refSet, refRE),
       autocompletion({override: completions}),
+      toolCompletionsTheme,
       EditorView.domEventHandlers({
         paste(event) {
           const text = event.clipboardData?.getData('text');

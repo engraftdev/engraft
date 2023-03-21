@@ -18,6 +18,7 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
       from: word.from,
       options: Object.values(varBindings).map((varBinding) => ({
         label: varBinding.var_.autoCompleteLabel || varBinding.var_.label,
+        type: 'variable',
         apply: refCode(varBinding.var_.id),
       })),
     }
@@ -37,6 +38,7 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
           .filter(([_, tool]) => !tool.isInternal)
           .map(([toolName, tool]) => ({
             label: '/' + toolName,
+            type: 'tool',
             apply: (view: EditorView, completion: Completion, from: number, to: number) => {
               if (replaceWithTool && from === 0 && to === view.state.doc.length) {
                 replaceWithTool(tool);
@@ -56,3 +58,9 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
     }
   }
 }
+
+export const toolCompletionsTheme = EditorView.baseTheme({
+  ".cm-completionIcon-tool": {
+    "&:after": { content: "'🛠️\uFE0E'" } // Disable emoji rendering
+  },
+})
