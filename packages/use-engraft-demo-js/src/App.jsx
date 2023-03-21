@@ -18,7 +18,7 @@ export function App() {
   useEffect(() => {
     if (!word) { return; }
 
-    fetch(`http://words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/${word}/json`)
+    fetch(`//words.bighugelabs.com/api/2/57b1739d4fd2156c72223c9ce7be2958/${word}/json`)
       .then((resp) => resp.json())
       .then(setResponse);
   }, [word])
