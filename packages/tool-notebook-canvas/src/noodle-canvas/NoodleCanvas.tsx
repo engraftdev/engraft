@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { startDrag } from "../../util/drag.js";
-import { clientPtRel, Matrix } from "../../util/geom.js";
+import { startDrag } from "@engraft/original/lib/util/drag.js";
+import { clientPtRel, Matrix } from "@engraft/original/lib/util/geom.js";
 import { Pane, PaneGeo } from "./model.js";
 import { PaneView } from "./PaneView.js";
 
