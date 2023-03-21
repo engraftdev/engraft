@@ -1,7 +1,6 @@
-import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookIncr, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { difference, union } from "@engraft/shared/lib/sets.js";
-import { cellNetwork, outputBackgroundColor } from "@engraft/toolkit";
+import { cellNetwork, cellNetworkReferences, outputBackgroundColor } from "@engraft/toolkit";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
@@ -50,11 +49,7 @@ export const programFactory: ProgramFactory<Program> = (defaultInput) => {
 }
 
 export const computeReferences: ComputeReferences<Program> = (program) =>
-  difference(
-    union(...Object.values(program.cells).map(cell => references(cell.program))),
-    union(Object.keys(program.cells), [program.prevVarId])
-  );
-
+  cellNetworkReferences(program.cells, program.prevVarId);
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

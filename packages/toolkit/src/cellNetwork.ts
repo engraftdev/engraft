@@ -1,7 +1,7 @@
 import { EngraftPromise, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, Var, VarBindings } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever } from "@engraft/incr";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { intersection } from "@engraft/shared/lib/sets.js";
+import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
 import _ from "lodash";
 import { toposort } from "./toposort.js";
 
@@ -126,3 +126,9 @@ export const cellNetwork = hooks((props: CellNetworkProps) => {
 
   return cellResults;
 });
+
+export const cellNetworkReferences = (cells: Cell[], prevVarId?: string) =>
+  difference(
+    union(...Object.values(cells).map(cell => references(cell.program))),
+    union(Object.keys(cells), prevVarId ? [prevVarId] : [])
+  );
