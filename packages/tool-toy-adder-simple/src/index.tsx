@@ -5,7 +5,7 @@ export default defineSimpleTool({
   fields: {
     extra: 0,
   },
-  subTools: ['x', 'y'] as const,
+  subTools: ['x', 'y'],
   compute: ({ fields, subToolOutputs }) => {
     if (typeof subToolOutputs.x !== 'number') { throw new Error('x must be a number'); }
     if (typeof subToolOutputs.y !== 'number') { throw new Error('y must be a number'); }
