@@ -1,13 +1,13 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { useIncr } from "@engraft/incr-react";
+import { difference, union } from "@engraft/shared/lib/sets.js";
+import { outputBackgroundStyle } from "@engraft/toolkit";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import { memo, useMemo } from "react";
 import { useStateSetOnly } from "../../util/immutable-react.js";
-import { difference, union } from "@engraft/shared/lib/sets.js";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { ToolOutputView } from "../../view/Value.js";
-import { outputBackgroundColor } from "@engraft/toolkit";
 
 
 export type Program = {
@@ -122,7 +122,7 @@ const View = memo((props: ViewProps) => {
           <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>{selectedTick === 0 ? 'init' : 'on-tick'}</div>
           <div className="xCol xGap10 xShrinkable xExpand">
             {selectedTick > 0 && <>
-              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: outputBackgroundColor}}>
+              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
                 <ToolOutputView outputP={beforeSelectedTickOutputP} />
               </div>
               <div>↓</div>
@@ -134,7 +134,7 @@ const View = memo((props: ViewProps) => {
             />
             {!onTickResults[selectedTick].view.showsOwnOutput && <>
               <div>↓</div>
-              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: outputBackgroundColor}}>
+              <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
                 <ToolOutputView outputP={afterSelectedTickOutputP} />
               </div>
             </>}

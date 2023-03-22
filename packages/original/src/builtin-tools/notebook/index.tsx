@@ -1,6 +1,6 @@
 import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookIncr, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { cellNetwork, cellNetworkReferences, outputBackgroundColor } from "@engraft/toolkit";
+import { cellNetwork, cellNetworkReferences, outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
@@ -109,7 +109,7 @@ const View = memo((props: ViewProps) => {
           style={{
             position: 'absolute',
             top: 0, bottom: 0, right: 0, width: outputSize.width + 20,
-            backgroundColor: outputBackgroundColor,
+            ...outputBackgroundStyle,
             zIndex: -1,
           }}
         />
@@ -288,11 +288,14 @@ const CellView = memo(function CellView(props: CellViewProps) {
       <div
         className="NotebookTool-CellView-output-cell"
         style={{
+          // Even if output is on the right and we already have a
+          // background-color column, include outputBackgroundStyle on output
+          // divs to get the shadow color right.
+          ...outputBackgroundStyle,
           ...(
             outputBelowInput
             ? {
               gridColumn: '2 / 4',
-              backgroundColor: outputBackgroundColor,
               padding: 10,
             }
             : {}
@@ -312,7 +315,6 @@ const CellView = memo(function CellView(props: CellViewProps) {
                       <ScrollShadow
                         innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}
                         contentRef={outputContentRef}
-                        shadowColor={outputBackgroundColor}
                       >
                         {view}
                       </ScrollShadow>

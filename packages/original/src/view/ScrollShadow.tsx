@@ -24,7 +24,7 @@ type ScrollInfo = {
 export default function ScrollShadow(props: Props) {
   const {
     children,
-    shadowColor = 'rgba(255,255,255,1)',
+    shadowColor = 'var(--shadow-color)',
     shadowBlur = 8,
     shadowSpread = 10,
     shadowMargin = 0,
