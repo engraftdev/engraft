@@ -23,6 +23,7 @@
     "@engraft/tool-data-table": "^0.0.1",
     "@engraft/tool-notebook-canvas": "^0.0.1",
     "@engraft/tool-voyager": "^0.0.1",
-    "@engraft/tool-text": "^0.0.1"
+    "@engraft/tool-text": "^0.0.1",
+    "@engraft/tool-example-datasets": "^0.0.1"
   }
 }
