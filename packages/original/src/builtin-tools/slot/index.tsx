@@ -368,6 +368,16 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
     ];
     return [
       ...setup(),
+      EditorView.theme({
+        "&.cm-editor": {
+          outline: "none",
+          background: "rgb(245, 245, 245)",
+        },
+        "&.cm-editor.cm-focused": {
+            outline: "none",
+            background: "rgb(241, 246, 251)",
+        },
+      }),
       javascript({jsx: true}),
       keymap.of([
         {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},

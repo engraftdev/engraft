@@ -37,16 +37,6 @@ export function setup(): Extension[] {
         ...lintKeymap
       ]),
       tooltips({ position: 'absolute', parent: document.body }),  // fixes layout of autocomplete tooltip in notebook-canvas
-      EditorView.theme({
-        "&.cm-editor": {
-          outline: "none",
-          background: "rgb(245, 245, 245)",
-        },
-        "&.cm-editor.cm-focused": {
-            outline: "none",
-            background: "rgb(241, 246, 251)",
-        },
-      }),
     ];
   }
   return _setup;
