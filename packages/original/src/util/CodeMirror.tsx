@@ -16,7 +16,7 @@ export type MyCodeMirrorProps = {
   autoFocus?: boolean,
 }
 
-const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus}: MyCodeMirrorProps) {
+export const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus}: MyCodeMirrorProps) {
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();
@@ -87,4 +87,3 @@ const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onCha
 
   return <div ref={setDiv} className="cm-theme cm-theme-light" style={style}/>
 })
-export default CodeMirror;

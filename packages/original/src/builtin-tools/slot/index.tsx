@@ -12,13 +12,12 @@ import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/in
 import { cache } from "@engraft/shared/lib/cache.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
-import { outputBackgroundColor } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
-import CodeMirror from "../../util/CodeMirror.js";
+import { CodeMirror } from "../../util/CodeMirror.js";
 import { setup } from "../../util/codeMirrorStuff.js";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile.js";
 import { embedsExtension } from "../../util/embedsExtension.js";

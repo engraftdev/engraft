@@ -2,7 +2,7 @@ import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, Promise
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
-import CodeMirror from "../../util/CodeMirror.js"
+import { CodeMirror } from "../../util/CodeMirror.js"
 import { setup } from "../../util/codeMirrorStuff.js"
 import { compileExpressionCached } from "../../util/compile.js"
 import { Task } from "../../util/Task.js"
