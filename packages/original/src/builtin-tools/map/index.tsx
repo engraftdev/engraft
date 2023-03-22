@@ -158,7 +158,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
           <VarDefinition var_={program.itemVar} updateVar={programUP.itemVar.$}/>
           <div style={{lineHeight: 1}}>=</div>
           <div style={{minWidth: 0}}>
-            <ToolOutputView outputP={itemResultsState.value[shownIndex].outputP} />
+            <ToolOutputView outputP={inputResult.outputP.then(output => ({value: (output.value as unknown[])[shownIndex]}))} />
           </div>
         </div>
         <div>
