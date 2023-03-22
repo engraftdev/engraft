@@ -109,7 +109,7 @@ const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<
     </RowToCol>
     <RowToCol minRowWidth={200} className="xGap10">
       {!isCol && leftCommonWidth.wrap(null, headingAlignment)}
-      <div>
+      <label>
         <input
           type="checkbox"
           checked={program.pauseRequest}
@@ -117,8 +117,10 @@ const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<
             programUP.pauseRequest.$apply((pauseRequest) => !pauseRequest)
           }
         ></input>
-        Pause request
-      </div>
+        <span style={{marginLeft: 5}}>
+          Pause request
+        </span>
+      </label>
     </RowToCol>
   </div>;
 });

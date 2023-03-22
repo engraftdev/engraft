@@ -45,7 +45,7 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
       </tr> }
       <tr>
         <td>
-          <button onClick={onClickAddNew} className="btn btn-primary btn-sm">new patch</button>
+          <button onClick={onClickAddNew} className="btn btn-primary btn-sm">new page</button>
         </td>
       </tr>
     </tbody>

@@ -14,6 +14,7 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { patchesRef } from "./db.js";
 import { useFirestoreUpdater } from "./useFirestoreUpdater.js";
+import { useUser } from "./util.js";
 
 const myCss = `
 @media (min-width: 992px) {
@@ -53,6 +54,14 @@ export const EditPatch = memo(function EditPatch() {
   const [patch, loading, error, _snapshot] = useDocumentData(docRefer);
   const updatePatch = useFirestoreUpdater(docRefer, patch);
   const patchUP = useUpdateProxy(updatePatch);
+
+  const user = useUser();
+  useEffect(() => {
+    if (patch && (!user || patch.ownerUid !== user.uid)) {
+      // redirect to main page
+      window.location.href = '#/';
+    }
+  }, [user, patch]);
 
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
@@ -98,33 +107,31 @@ export const EditPatch = memo(function EditPatch() {
               </div>
             </div>
             <div className="tool-wrapper mx-auto mt-5">
-              <div style={{display: 'inline-block', maxWidth: '100%'}}>
-                <ErrorBoundary
-                  fallbackRender={(props) => {
-                    return <div>
-                      <h1>error!</h1>
-                      <pre>{props.error.message}</pre>
-                      <pre>{props.error.stack}</pre>
-                      <div>
-                        <IsolateStyles>
-                          <ValueEditable value={program} updater={patchUP.toolProgram.$}/>
-                        </IsolateStyles>
-                      </div>
+              <ErrorBoundary
+                fallbackRender={(props) => {
+                  return <div>
+                    <h1>error!</h1>
+                    <pre>{props.error.message}</pre>
+                    <pre>{props.error.stack}</pre>
+                    <div>
+                      <IsolateStyles>
+                        <ValueEditable value={program} updater={patchUP.toolProgram.$}/>
+                      </IsolateStyles>
                     </div>
-                  }}
-                  resetKeys={[program]}
-                >
-                  <ToolWithView program={program} updateProgram={patchUP.toolProgram.$} reportOutputState={() => {}} varBindings={varBindings} autoFocus={true}/>
-                </ErrorBoundary>
-              </div>
+                  </div>
+                }}
+                resetKeys={[program]}
+              >
+                <ToolWithView program={program} updateProgram={patchUP.toolProgram.$} reportOutputState={() => {}} varBindings={varBindings} autoFocus={true}/>
+              </ErrorBoundary>
               { programIsEmpty &&
-                <span style={{paddingLeft: 10}}>← start here!</span>
+                <span style={{paddingLeft: 10}}>↑ start here!</span>
               }
             </div>
           </>
       }
       <div className="col-lg-6 mx-auto mt-5">
-        <small className="text-secondary">this is patch {patchId}</small>
+        <small className="text-secondary">this is page {patchId}</small>
       </div>
     </div>
   </>

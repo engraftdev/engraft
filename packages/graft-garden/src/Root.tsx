@@ -1,6 +1,6 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css";
+import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { getAuth, GoogleAuthProvider, User } from "firebase/auth";
 import { query, where } from "firebase/firestore";
 import { memo } from "react";
@@ -79,7 +79,7 @@ const LoggedIn = memo(function LoggedIn(props: LoggedInProps) {
           </button>
           <h3 className="text-secondary">graft garden</h3>
         </div>
-        <h1>your patches</h1>
+        <h1>your pages</h1>
         { loading
           ? <p>loading...</p>
           : error
