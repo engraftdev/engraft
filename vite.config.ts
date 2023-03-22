@@ -21,6 +21,8 @@ export default defineConfig(() => {
       alias: {
         // Not sure how `chalk` is getting into builds, but it breaks things. This works!
         'chalk': '/dev/null',
+        // from @engraft/tool-voyager
+        'font-awesome-sass-loader': '/dev/null',
       }
     },
     define: {
@@ -39,5 +41,10 @@ export default defineConfig(() => {
       //   reporter: ["lcov", "html"],
       // },
     },
+    optimizeDeps: {
+      include: [
+        "@engraft/vendor-voyager",
+      ]
+    }
   };
 });
