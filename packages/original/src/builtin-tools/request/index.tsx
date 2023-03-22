@@ -62,8 +62,12 @@ export const run: ToolRun<Program> = memoizeProps(
               )
             );
             const resp = await fetch(urlObj.toString());
-            const data: unknown = await resp.json();
-            return { value: data };
+            const contentType = resp.headers.get("content-type");
+            // TODO: handle other content types, merge with file-tool's mime-type handling, etc
+            if (contentType?.startsWith("application/json")) {
+              return { value: await resp.json() };
+            }
+            return { value: await resp.text() };
           }
         ),
       [urlResult.outputP, paramsResult.outputP, program.pauseRequest]
