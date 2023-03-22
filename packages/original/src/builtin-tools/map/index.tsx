@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
 import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import _ from "lodash";
@@ -32,7 +32,8 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   union(references(program.inputProgram), difference(references(program.perItemProgram), [program.itemVar.id]));
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program } = props;
+  const varBindings = hookRelevantVarBindings(props);  // TODO: we haven't figured this out yet, have we
 
   const inputResult = hookRunTool({program: program.inputProgram, varBindings});
 
