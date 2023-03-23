@@ -174,14 +174,6 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     </div>
     <br/>
     <br/>
-    <ToolOutputBuffer
-      outputP={stdoutP}
-      renderValue={(value) => {
-        return <pre>{value}</pre>;
-      }}
-    />
-    <br/>
-    <br/>
     <button
       onClick={async () => {
         await saveProgram();
@@ -201,6 +193,14 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         Save and return
       </button>
     }
+    <br/>
+    <br/>
+    <ToolOutputBuffer
+      outputP={stdoutP}
+      renderValue={(value) => {
+        return <pre>{value}</pre>;
+      }}
+    />
   </>;
 });
 

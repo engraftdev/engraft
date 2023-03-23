@@ -1,6 +1,7 @@
-import './env.js';  // MUST BE FIRST
+import './env.js';
+// LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, runTool, slotWithCode, ToolProgram } from '@engraft/core';
+import { EngraftPromise, lookUpToolByName, runTool, slotWithProgram, ToolProgram } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
@@ -87,7 +88,7 @@ async function read(stream: NodeJS.ReadStream) {
     }
   } else {
     if (program === null) {
-      program = slotWithCode('IDinput000000');
+      program = slotWithProgram(lookUpToolByName('notebook').programFactory('IDinput000000'));
     }
 
     const app = express();
