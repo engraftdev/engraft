@@ -54,6 +54,7 @@ jobs:
           publish_dir: ./website
 
       - name: Clear nx cache
+        if: success() || failure()
         id: clearRequest
         uses: fjogeleit/http-request-action@v1
         with:
@@ -63,10 +64,12 @@ jobs:
           customHeaders: '{"Accept": "application/vnd.github.v3+json"}'
 
       - name: Clear nx cache - show response
+        if: success() || failure()
         run: |
           echo ${{ steps.clearRequest.outputs.response }}
 
       - name: Save nx cache
+        if: success() || failure()
         uses: actions/cache/save@v3
         with:
           path: node_modules/.cache/nx
