@@ -4,7 +4,7 @@ import { bracketMatching, defaultHighlightStyle, foldKeymap, indentOnInput, synt
 import { lintKeymap } from "@codemirror/lint"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import { Extension } from "@codemirror/state"
-import { dropCursor, highlightSpecialChars, keymap, rectangularSelection, tooltips, EditorView } from "@codemirror/view"
+import { dropCursor, highlightSpecialChars, keymap, rectangularSelection, tooltips } from "@codemirror/view"
 
 let _setup: Extension[] | undefined = undefined;
 
