@@ -9,15 +9,15 @@ export default defineSimpleTool({
     text: "",
   },
   subTools: [],
-  compute: ({ fields, subToolOutputs }) => {
-    return fields.text;
+  compute: ({ fields: { text } }) => {
+    return text;
   },
-  render: ({ renderSlot, autoFocus, fields, fieldsUP }) => {
+  render: ({ fields: { text }, fieldsUP, autoFocus }) => {
     return (
       <CodeMirror
         extensions={setup()}
         autoFocus={autoFocus}
-        text={fields.text}
+        text={text}
         onChange={fieldsUP.text.$set}
       />
     );
