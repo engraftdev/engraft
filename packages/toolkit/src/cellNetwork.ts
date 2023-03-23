@@ -80,25 +80,40 @@ export const cellNetwork = hooks((props: CellNetworkProps) => {
           _.omit(cellOutputPlaceholderVarBindings, [...interCellReferences, cell.var_.id])
         , [cell.var_.id, cellOutputPlaceholderVarBindings, interCellReferences]), objEqWithRefEq);
 
-        const prevVarBindings: VarBindings = hookDedupe((() => {
-          if (!prevVarId) { return {}; }
+        const prevVarBindings = hookFork((branch) => {
+          if (prevVarId !== undefined && i > 0) {
+            return branch('yes', () => {
+              const prevCell = cells[i - 1];
 
-          if (i === 0) { return {}; }
-          const prevCell = cells[i - 1];
+              const prevVar = hookMemo(() => (
+                {
+                  id: prevVarId,
+                  label: `<span style="font-style: normal">↑</span> ${prevCell.var_.label || "[no label]"}`,
+                  autoCompleteLabel: '↑ prev'
+                }
+              ), [prevCell.var_.label, prevVarId]);
 
-          return {
-            [prevVarId]: {
-              var_: {
-                id: prevVarId,
-                label: `<span style="font-style: normal">↑</span> ${prevCell.var_.label || "[no label]"}`,
-                autoCompleteLabel: '↑ prev'
-              },
-              outputP: references(cell.program).has(prevVarId)
+              const outputP = hookMemo(() => (
+                references(cell.program).has(prevVarId)
                 ? cellResults[prevCell.var_.id].outputP
-                : cellOutputPlaceholderVarBindings[prevCell.var_.id].outputP,
-            }
+                : cellOutputPlaceholderVarBindings[prevCell.var_.id].outputP
+              ), [cell.program, cellOutputPlaceholderVarBindings, cellResults, prevCell.var_.id, prevVarId]);
+
+              return hookMemo(() => (
+                {
+                  [prevVarId]: {
+                    var_: prevVar,
+                    outputP
+                  }
+                }
+              ), [outputP, prevVar, prevVarId]);
+            });
+          } else {
+            return branch('no', () => {
+              return hookMemo(() => ({}), []);
+            });
           }
-        })(), objEqWith(objEqWithRefEq));
+        });
 
         const cellVarBindings = hookMemo(() => ({
           ...varBindings,
