@@ -164,7 +164,6 @@ const CellDivider = memo((props: {
       });
       return newCells;
     });
-    console.log('ev', ev);
     // TODO: not working to stop the click from focusing the divider
     ev?.preventDefault();
   }, [i, prevVarId, smallestUnusedLabel, updateCells]);
