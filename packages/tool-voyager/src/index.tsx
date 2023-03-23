@@ -1,6 +1,6 @@
 import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
 import { useRefForCallback } from "@engraft/original/lib/util/useRefForCallback.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
 import voyagerStyle from "@engraft/vendor-voyager/src/style.css?inline";
 import _ from "lodash";
@@ -29,7 +29,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
 
   const outputP = hookMemo(() => {
-    return EngraftPromise.unresolved<ToolOutput>();
+    return EngraftPromise.resolve({ value: undefined });
   }, []);
 
   const view: ToolView<Program> = hookMemo(() => ({
@@ -38,7 +38,8 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
         {...props} {...viewProps}
         inputResult={inputResult}
       />,
-
+    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
+    showsOwnOutput: true,
   }), [inputResult, props]);
 
   return {outputP, view};
@@ -207,11 +208,10 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   if (!store) { return <div>loading</div>; }
 
   return (
-    <div className="xCol" style={{padding: 10, minWidth: 1000}}>
-      <div className="VoyagerTool-input-row xRow xGap10">
-        <span style={{fontWeight: 'bold'}}>input</span>
-        <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />
-      </div>
+    <div className="xCol" style={{minWidth: 1000}}>
+      <InputHeading
+        slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
+      />
       <div>
         <style>{voyagerStyle}</style>
         <Voyager store={store}/>

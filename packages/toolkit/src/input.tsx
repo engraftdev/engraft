@@ -4,7 +4,7 @@ import { CommonWidth } from './CommonWidth.js';
 // There's an emerging convention of putting an "input" field at the top of a
 // tool. This is a set of components to do that in a somewhat uniform way.
 
-export const inputBackground = 'rgba(248, 248, 255, 0.5)';
+export const inputBackground = 'rgba(251, 251, 255)';
 
 export const inputFrameBarBackdrop = <div className="backdrop" style={{background: inputBackground, height: '100%'}} />;
 
