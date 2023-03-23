@@ -5,7 +5,7 @@
   "description": "Vendored-in Voyager for @engraft/tool-voyager",
   "scripts": {
   },
-  "main": "src/lib-voyager.js",
+  "main": "src/lib-voyager.cjs",
   "dependencies": {
   }
 }
