@@ -7,10 +7,11 @@ import { Column, DataFrame, inferDataFrameFromRows, ValueType } from "./data-fra
 import style from './style.css?inline';
 import { applyTransforms, Transforms } from "./transforms.js";
 import _ from 'lodash';
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
 import { Updater } from '@engraft/shared/lib/Updater.js';
 import { Use } from '@engraft/original/lib/util/Use.js';
 import useHover from '@engraft/original/lib/util/useHover.js';
+import { isoformat } from "@engraft/original/lib/util/isoformat.js";
 
 /*
 out of scope for now:
@@ -25,9 +26,9 @@ type P = {
   transforms: Transforms,
 }
 
-const programFactory: ProgramFactory<P> = () => ({
+const programFactory: ProgramFactory<P> = (defaultCode) => ({
   toolName: 'data-table',
-  inputProgram: slotWithCode(''),
+  inputProgram: slotWithCode(defaultCode),
   transforms: {},
 });
 
@@ -53,7 +54,8 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
       {...props} {...renderProps}
       inputResult={inputResult}
       dataFramesP={dataFramesP}
-    />
+    />,
+    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, inputResult, dataFramesP]);
 
   return {outputP, view};
@@ -71,11 +73,10 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   const dataFramesState = usePromiseState(dataFramesP);
 
   return (
-    <div className="xCol xGap10 xPad10">
-      <div className="xRow xGap10">
-        <b>input</b>
-        <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />
-      </div>
+    <div className="xCol">
+      <InputHeading
+        slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
+      />
       { dataFramesState.status === 'pending' && <div>loading...</div> }
       { dataFramesState.status === 'rejected' && <ErrorView error={dataFramesState.reason} /> }
       { dataFramesState.status === 'fulfilled' &&
@@ -521,6 +522,14 @@ const TableDataCell = memo((props: {
   >
     {/* TODO: handle all the different display cases */}
     {/* TODO: undefined / NaN */}
-    {cellData as any}
+    {
+      cellData === null || cellData === undefined
+      ? ''
+      : type === 'number'
+      ? (cellData as number).toFixed(2)  // TODO: precision
+      : type === 'date'
+      ? isoformat(cellData as Date)
+      : `${cellData}`
+    }
   </td>
 });
