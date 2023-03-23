@@ -1,5 +1,6 @@
 import { EngraftPromise, hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
 import { union } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -8,7 +9,7 @@ import { useUpdateProxy } from "@engraft/update-proxy-react";
 // number of sub-tools and that works in a simple way. See tool-toy-adder-simple
 // for an example use.
 
-export type SimpleToolProgram<Name extends string, Fields, SubToolKey extends string> = {
+export type SimpleToolProgram<Name extends string, Fields extends object, SubToolKey extends string> = {
   toolName: Name,
   fields: Fields,
   subTools: {
@@ -21,7 +22,7 @@ export type RenderProps = Omit<
   'updateProgram'
 >
 
-export type SimpleToolSpec<Name extends string, Fields, SubToolKey extends string> = {
+export type SimpleToolSpec<Name extends string, Fields extends object, SubToolKey extends string> = {
   name: Name,
   fields: Fields,
   subTools: readonly SubToolKey[],
@@ -40,7 +41,7 @@ export type SimpleToolSpec<Name extends string, Fields, SubToolKey extends strin
   }) => React.ReactElement,
 }
 
-export function defineSimpleTool<Name extends string, Fields, SubToolKey extends string>(
+export function defineSimpleTool<Name extends string, Fields extends object, SubToolKey extends string>(
   simpleToolSpec: SimpleToolSpec<Name, Fields, SubToolKey>
 ): Tool<SimpleToolProgram<Name, Fields, SubToolKey>> {
   return {
@@ -63,14 +64,19 @@ export function defineSimpleTool<Name extends string, Fields, SubToolKey extends
     run: memoizeProps(hooks((props) => {
       const { program, varBindings } = props;
 
-      // This loop doesn't need a fork because simpleToolSpec.subTools is constant.
-      const subToolResults: ToolResult[] =
+      const subToolResults: ToolResult[] = hookDedupe(
+        // This loop doesn't need a fork because simpleToolSpec.subTools is constant.
         simpleToolSpec.subTools.map((key) => {
           const subToolProgram = program.subTools[key];
           return hookRunTool({program: subToolProgram, varBindings});
-        });
+        }),
+        arrEqWithRefEq
+      );
 
-      const subToolOutputPs = subToolResults.map((result) => result.outputP);
+      const subToolOutputPs = hookDedupe(
+        subToolResults.map((result) => result.outputP),
+        arrEqWithRefEq
+      );
 
       const outputP = hookMemo(() =>
         EngraftPromise.all(subToolOutputPs)
@@ -83,8 +89,10 @@ export function defineSimpleTool<Name extends string, Fields, SubToolKey extends
                 ) as Record<SubToolKey, any>,
               })
             };
-          })
-      , [program.fields, subToolOutputPs]);
+          }),
+        [program.fields, subToolOutputPs],
+        recordEqWith([objEqWithRefEq, refEq] as const)
+      );
 
       // object keyed by subToolKeys
       const subToolViews = Object.fromEntries(
@@ -108,7 +116,7 @@ export function defineSimpleTool<Name extends string, Fields, SubToolKey extends
   };
 }
 
-export function SimpleToolView<Name extends string, Fields, SubToolKey extends string>(
+export function SimpleToolView<Name extends string, Fields extends object, SubToolKey extends string>(
   props: ToolProps<SimpleToolProgram<Name, Fields, SubToolKey>>
     & ToolViewRenderProps<SimpleToolProgram<Name, Fields, SubToolKey>> & {
       simpleToolSpec: SimpleToolSpec<Name, Fields, SubToolKey>,

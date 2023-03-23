@@ -1,4 +1,5 @@
 export * from "./core.js";
+export * from "./core-util.js";
 export * from "./globals.js";
 export * from "./EngraftPromise.js";
 export * from "./EngraftPromise-react.js";
