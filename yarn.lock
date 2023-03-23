@@ -1913,6 +1913,13 @@
     protobufjs "^7.0.0"
     yargs "^16.2.0"
 
+"@happy-dom/global-registrator@^8.9.0":
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/@happy-dom/global-registrator/-/global-registrator-8.9.0.tgz#6d129f0a6eedc71337e2823307fec433060fd07a"
+  integrity sha512-Kw/YMNv1kmH862kQUzXM6K0Y4AW5b0I/+2EIopVc7edurBwY8LHSKd5gJzEEQvdgapSeDJowhOCgL0tkhJWi4A==
+  dependencies:
+    happy-dom "^8.9.0"
+
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
@@ -3777,10 +3784,6 @@ caniuse-lite@^1.0.30001449:
   version "1.0.30001458"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001458.tgz#871e35866b4654a7d25eccca86864f411825540c"
   integrity sha512-lQ1VlUUq5q9ro9X+5gOEyH7i3vm+AYVT1WDCVB69XOZ17KZRhnZ9J0Sqz7wTHQaLBJccNCHq8/Ww5LlOIZbB0w==
-
-"canvas-prebuilt@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz", "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz#67f9339bfb8e303792e91df8526cd45375fdb930"
 
 chai@^4.3.7:
   version "4.3.7"

@@ -1,3 +1,4 @@
+import './env.js';  // MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
 import { EngraftPromise, runTool, slotWithCode, ToolProgram } from '@engraft/core';
 import { IncrMemory } from '@engraft/incr';
@@ -9,7 +10,6 @@ import yargs from 'yargs/yargs';
 import { valueFromStdin, valueToStdout, varBindingsObject } from '../shared.js';
 
 const { writeFile } = fsPromises;
-
 
 /*
 

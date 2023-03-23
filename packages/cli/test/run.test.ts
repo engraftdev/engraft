@@ -3,11 +3,12 @@ import * as tmp from "tmp";
 import { writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from 'node:url';
-import { slotWithCode } from "@engraft/core";
-import { registerAllTheTools } from "@engraft/all-the-tools";
+import { registerTool, slotWithCode, toolFromModule } from "@engraft/core";
 import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
+import * as slot from "@engraft/original/lib/builtin-tools/slot/index.js";
 
-registerAllTheTools();
+const slotTool = toolFromModule(slot);
+registerTool(slotTool);
 
 function relative(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
