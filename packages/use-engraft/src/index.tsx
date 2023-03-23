@@ -1,23 +1,32 @@
+/// <reference types="@types/wicg-file-system-access" />
+
 import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
 import { RootStyles } from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
+import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
+import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { EngraftPromise, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, VarBinding } from "@engraft/toolkit";
+import { EngraftPromise, randomId, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, useUpdateProxy, VarBinding, VarBindings } from "@engraft/toolkit";
+import * as IDBKV from 'idb-keyval';
 import _ from "lodash";
 import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { DOM } from "./DOM.js";
 import css from "./index.css?inline";
 
-export interface UseEngraftProps {
-  defaultValue: any;
-  hide?: boolean;
-  program?: ToolProgram;
+export type SavedProgram = {
+  savedProgramId: string,
+  program: ToolProgram,
 }
 
-export function useEngraft(variables: object = {}, props: UseEngraftProps) {
-  const {hide, defaultValue} = props;
-  const show = !hide;
+export type UseEngraftProps = {
+  program: SavedProgram | null,
+  inputs?: Record<string, any>,
+  defaultValue: any,
+  edit?: boolean,
+}
+
+export function useEngraft(props: UseEngraftProps) {
+  const {program, inputs, defaultValue, edit} = props;
 
   // * Manage the replacement *
 
@@ -31,63 +40,50 @@ export function useEngraft(variables: object = {}, props: UseEngraftProps) {
   const newRoot = useMemo(() => createRoot(newContainer), [newContainer]);
 
   useEffect(() => {
-    if (show && origContainer) {
+    if (edit && origContainer) {
       origContainer.replaceWith(newContainer);
       return () => newContainer.replaceWith(origContainer);
     }
-  }, [newContainer, origContainer, show])
+  }, [newContainer, origContainer, edit])
 
 
   // * Manage the tool *
 
-  const stableVariables = useDedupe(variables, _.isEqual);
+  const stableInputs = useDedupe(inputs || {}, _.isEqual);
 
   const varBindings = useMemo(() => {
     let varBindings: {[id: string]: VarBinding} = {};
-    Object.entries(stableVariables).forEach(([name, value]) => {
+    Object.entries(stableInputs).forEach(([name, value]) => {
       const id = `ID${name}000000`;
       varBindings[id] = {var_: {id, label: name}, outputP: EngraftPromise.resolve({value: value})};
     });
     return varBindings;
-  }, [stableVariables]);
+  }, [stableInputs]);
 
-  const [program, updateProgram] = useState<ToolProgram>(
-    props.program || programFromLocalStorage(useEngraftDemoKey) || slotWithCode(defaultCodeFromVariables(variables))
+  const [draft, updateDraft] = useState<SavedProgram>(
+    program || { savedProgramId: randomId(), program: slotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(useEngraftDemoKey, JSON.stringify(program));
-    } catch (e) {
-      console.warn("error saving to local storage", e);
-    }
-  }, [program])
-
-
-  const {outputP, view} = useIncr(runTool, { program, varBindings });
+  const {outputP, view} = useIncr(runTool, { program: draft.program, varBindings });
   const outputState = usePromiseState(outputP);
 
-  const [useDefault, setUseDefault] = useState(show);
-  useEffect(() => {
-    if (show) {
-      setUseDefault(true);
-    }
-  }, [show])
+  const [useDefault, setUseDefault] = useState(!!edit);
 
   useEffect(() => {
     newRoot.render(<>
-      {show &&
+      {edit &&
         <Split
           left={
             <DOM element={origContainer}/>
           }
           right={
             <UseEngraftRHS
-              variables={stableVariables}
+              varBindings={varBindings}
               defaultValue={defaultValue}
               outputP={outputP}
               view={view}
-              updateProgram={updateProgram}
+              draft={draft}
+              updateDraft={updateDraft}
               useDefault={useDefault}
               setUseDefault={setUseDefault}
             />
@@ -95,7 +91,7 @@ export function useEngraft(variables: object = {}, props: UseEngraftProps) {
         />
       }
     </>);
-  }, [defaultValue, varBindings, newRoot, origContainer, stableVariables, useDefault, view, outputP, show]);
+  }, [defaultValue, varBindings, newRoot, origContainer, useDefault, view, outputP, edit, draft]);
 
   if (useDefault || outputState.status !== 'fulfilled') {
     return defaultValue;
@@ -104,64 +100,156 @@ export function useEngraft(variables: object = {}, props: UseEngraftProps) {
   return outputState.value.value;
 }
 
-const useEngraftDemoKey = 'use-engraft-demo';
-
-function programFromLocalStorage(key: string) {
-  const programJson = window.localStorage.getItem(key)
-  if (programJson) {
-    return JSON.parse(programJson);
-  } else {
-    return undefined;
-  }
+type UseEngraftRHSProps = {
+  varBindings: VarBindings,
+  defaultValue: any,
+  outputP: EngraftPromise<ToolOutput>,
+  view: ToolView<ToolProgram>,
+  draft: SavedProgram,
+  updateDraft: (f: (old: SavedProgram) => SavedProgram) => void,
+  useDefault: boolean,
+  setUseDefault: (b: boolean) => void,
 }
 
-interface UseEngraftRHSProps {
-  variables: {[name: string]: any};
-  defaultValue: any;
-  outputP: EngraftPromise<ToolOutput>;
-  view: ToolView<ToolProgram>;
-  updateProgram: (f: (old: ToolProgram) => ToolProgram) => void;
-  useDefault: boolean;
-  setUseDefault: (b: boolean) => void;
-}
+// TODO: TODO: TODO: put the program's ID outside of the program itself, so slots don't break it
 
 const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
-  const {variables, defaultValue, view, outputP, updateProgram, useDefault, setUseDefault} = props;
+  const { varBindings, defaultValue, view, outputP, draft, updateDraft, useDefault, setUseDefault } = props;
+  const draftUP = useUpdateProxy(updateDraft);
+
+  const id = draft.savedProgramId!;
+
+  const [ fileHandle, setFileHandle ] = useState<FileSystemFileHandle | null>(null);
+  const [ fileText, setFileText ] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function act() {
+      const fh = await IDBKV.get<FileSystemFileHandle>(id);
+      if (fh) {
+        setFileHandle(fh);
+        const file = await fh.getFile();
+        const text = await file.text();
+        setFileText(text);
+      }
+    }
+    act();
+  }, [id]);
+
+  const save = useCallback(async () => {
+    let fileHandleForSaving: FileSystemFileHandle;
+    if (fileHandle) {
+      const file = await fileHandle.getFile();
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (parsed !== null && !(typeof parsed === 'object' && parsed.savedProgramId === id)) {
+        setFileHandle(null);
+        await IDBKV.del(id);
+        // TODO: UI
+        throw new Error('File does not match program');
+      }
+      fileHandleForSaving = fileHandle;
+    } else {
+      const pickedFileHandles = await showOpenFilePicker({
+        types: [
+          {
+            description: 'JSON Engraft program',
+            accept: {
+              'application/json': ['.json'],
+            },
+          },
+        ],
+      });
+      if (pickedFileHandles.length !== 1) {
+        // TODO: UI
+        throw new Error('Expected exactly one file handle');
+      }
+      const pickedFileHandle = pickedFileHandles[0];
+      const file = await pickedFileHandle.getFile();
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (parsed !== null && !(typeof parsed === 'object' && parsed.savedProgramId === id)) {
+        // TODO: UI
+        console.log(parsed);
+        throw new Error('File does not match program');
+      }
+      setFileHandle(pickedFileHandle);
+      await IDBKV.set(id, pickedFileHandle);
+      fileHandleForSaving = pickedFileHandle;
+    }
+    const newFileText = JSON.stringify(draft, null, 2);
+    const writable = await fileHandleForSaving.createWritable();
+    await writable.write(newFileText);
+    await writable.close();
+    setFileText(newFileText);
+  }, [fileHandle, id, draft]);
+
+  const synced = fileText === JSON.stringify(draft, null, 2);
+
+  // useInterval(() => {
+  //   if (fileHandle && !synced) {
+  //     save();
+  //   }
+  // }, 1000);
+
   return (
-    <div style={{overflow: 'scroll', height: '100%'}}>
-      <div className="UseEngraftEditor">
-        <style type="text/css">{css}</style>
-        <RootStyles/>
-        <div style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
+    <div className="UseEngraftEditor">
+      <style type="text/css">{css}</style>
+      <RootStyles/>
+      <div className="heading xRow">
+        <h1>useEngraft</h1>
+        <div className="xExpand"/>
+        <button
+          disabled={synced}
+          onClick={() => {
+            save();
+            // navigator.clipboard.writeText(JSON.stringify(draft, null, 2));
+          }}
+          style={{
+            borderRadius: 5,
+            ...synced
+              ? {
+                  border: '1px solid hsl(120, 30%, 50%)',
+                  color: 'hsl(120, 30%, 50%)',
+                  opacity: 0.5,
+                }
+              : {
+                  border: '1px solid hsl(0, 100%, 60%)',
+                  color: 'hsl(0, 100%, 60%)',
+                }
+          }}
+        >
+          { synced ? 'Saved' : 'Save' }
+        </button>
+      </div>
+      <div className="content">
+        <div className="card">
           <h2>Input</h2>
-          {Object.entries(variables).map(([name, value]) => {
-            return <div key={name} className="xRow xAlignTop xGap10" style={{minHeight: 0}}>
-              <VarDefinition var_={{id: 'idunno', label: name}}/>
+          {Object.values(varBindings).map(({var_, outputP}) => {
+            return <div key={var_.id} className="xRow xAlignTop xGap10" style={{minHeight: 0}}>
+              <VarDefinition var_={var_}/>
               <div style={{lineHeight: 1}}>=</div>
               <div style={{minWidth: 0, minHeight: 0, height: '100%', flexGrow: 1}}>
-                {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, height: '100%', display: 'flex' }}> */}
-                  <Value value={value}/>
-                {/* </ValueFrame> */}
+                <ToolOutputView outputP={outputP} />
               </div>
             </div>
           })}
         </div>
 
-        <div style={{display: 'flex', flexDirection: 'column', minHeight: 0, flexShrink: 0}}>
-          <h2>Tool</h2>
-          <ShowView view={view} updateProgram={updateProgram}/>
+        <div className="card" style={{flexShrink: 0}}>
+          <h2>Program</h2>
+          <ShowView view={view} updateProgram={draftUP.program.$}/>
         </div>
 
-        <div style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
+        <div className="card" style={{minHeight: 0}}>
           <h2>Output</h2>
           {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', alignSelf: 'stretch' }} innerStyle={{ flexGrow: 1 }}> */}
             <ToolOutputView outputP={outputP} />
           {/* </ValueFrame> */}
           { defaultValue !== undefined &&
-            <div className="xRow xGap10" style={{marginTop: 10}}>
-              <input name="inline" type="checkbox" checked={useDefault} onChange={(ev) => setUseDefault(ev.target.checked)}/>
-              <label htmlFor="inline">Paused (use default value)</label>
-            </div>
+            <label className="xRow xGap10 xAlignVCenter" style={{marginTop: 20}}>
+              <input type="checkbox" checked={useDefault} onChange={(ev) => setUseDefault(ev.target.checked)} className="xMargin0" />
+              Paused (use default value)
+            </label>
           }
         </div>
       </div>
@@ -204,21 +292,25 @@ const Split = memo(function Split({left, right}: SplitProps) {
         width: '100vw',
       }}
     >
-      <div className="Split-left" style={{flexGrow: 1}}>
-        {left}
+      <div className="Split-left" style={{flexGrow: 1, overflow: 'auto'}}>
+        <ShadowDOM>
+          {left}
+        </ShadowDOM>
       </div>
       <div className="Split-resize" style={{background: '#eaeff5', width: 4, cursor: 'ew-resize'}} onMouseDown={onMouseDownResize}>
 
       </div>
       <div className="Split-right" style={{background: '#eaeff5', width: widthR, flexShrink: 0}}>
-        {right}
+        <ShadowDOM>
+          {right}
+        </ShadowDOM>
       </div>
     </div>
   );
 })
 
-function defaultCodeFromVariables(variables: {[name: string]: any}) {
-  const names = Object.keys(variables);
+function defaultCodeFromInputs(inputs: Record<string, any>) {
+  const names = Object.keys(inputs);
   const firstName: string | undefined = names[0];
   if (firstName) {
     return `ID${firstName}000000`;

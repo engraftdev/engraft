@@ -13,9 +13,13 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.1",
     "@engraft/original": "^0.0.1",
+    "@engraft/toolkit": "^0.0.1",
+    "idb-keyval": "^6.2.0",
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/wicg-file-system-access": "^2020.9.5"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

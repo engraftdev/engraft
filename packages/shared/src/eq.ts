@@ -2,12 +2,12 @@ import { isObject } from "./isObject.js";
 
 export type Eq<T> = (x1: T, x2: T) => boolean;
 
-export const refEq: Eq<any> = (a: unknown, b: unknown) => {
+export function refEq<T>(a: T, b: T) {
   return a === b;
 }
 
-export function objEqWith(eq: Eq<any>): Eq<object> {
-  return (o1: unknown, o2: unknown) => {
+export function objEqWith<T>(eq: Eq<T>): Eq<Record<string, T>> {
+  return (o1, o2) => {
     if (o1 === o2) { return true; }
     if (!isObject(o1) || !isObject(o2)) { return false; }
     const keys1 = Object.keys(o1);
@@ -16,16 +16,19 @@ export function objEqWith(eq: Eq<any>): Eq<object> {
       return false;
     }
     for (let key of keys1) {
-      if (!eq((o1 as any)[key], (o2 as any)[key])) {
+      const val1: T | undefined = o1[key];
+      const val2: T | undefined = o2[key];
+      if (!eq(val1, val2)) {
         return false;
       }
     }
     return true;
   }
 }
-export const objEqWithRefEq = objEqWith(refEq);
+export const objEqWithRefEq = objEqWith(refEq) as Eq<object>;
 
-export function arrEqWith<T, U extends (readonly T[]) | T[]>(eq: Eq<T>): Eq<U> {
+// export function arrEqWith<T, U extends (readonly T[]) | T[]>(eq: Eq<T>): Eq<U> {
+export function arrEqWith<T>(eq: Eq<T>): Eq<T[]> {
   return (a1: unknown, a2: unknown) => {
     if (a1 === a2) { return true; }
     if (!Array.isArray(a1) || !Array.isArray(a2)) { return false; }

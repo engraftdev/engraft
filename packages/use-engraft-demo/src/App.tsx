@@ -3,6 +3,7 @@ import { useEngraft } from "@engraft/use-engraft";
 import { useEffect, useState } from "react";
 
 import css from "./App.css?inline";
+import extractSynonymsProgram from './extractSynonymsProgram.json';
 
 registerAllTheTools();
 
@@ -24,9 +25,14 @@ export function App() {
   }, [word])
 
   // set by TBD processing
-  // let synonyms = ["synonyms", "not", "extracted", "yet"];
-  let synonyms: string[] = useEngraft({response}, { defaultValue: [], hide: false});
-  console.log("synonyms", synonyms)
+  // const synonyms = ["synonyms", "not", "extracted", "yet"];
+  const synonyms: string[] = useEngraft({
+    program: extractSynonymsProgram,
+    inputs: { response },
+    defaultValue: [],
+    edit: true
+  });
+  // console.log("synonyms", synonyms)
 
   return (
     <main>

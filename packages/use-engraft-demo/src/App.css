@@ -4,7 +4,7 @@ html, body {
 	height: 100%;
 }
 
-body {
+body, :host {
 	color: #333;
 	margin: 0;
 	padding: 8px;
@@ -82,6 +82,7 @@ h1 {
   text-transform: uppercase;
   font-size: 4em;
   font-weight: 100;
+	margin-top: 0;
 }
 
 .word {

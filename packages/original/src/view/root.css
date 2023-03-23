@@ -181,6 +181,10 @@ pre {
   text-overflow: ellipsis;
 }
 
+.xPad0 {
+  padding: 0;
+}
+
 .xPad10 {
   padding: 10px;
 }
@@ -188,6 +192,10 @@ pre {
 .xPadH10 {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.xMargin0 {
+  margin: 0;
 }
 
 .xStickyTop10 {

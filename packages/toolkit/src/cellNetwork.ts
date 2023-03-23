@@ -36,7 +36,7 @@ export const cellNetwork = hooks((props: CellNetworkProps) => {
   , [cellIds, cells]), objEqWith(setEqWithRefEq));
   const { sorted, cyclic } = hookDedupe(hookMemo(() => {
     return toposort([...cellIds], interCellReferencesByCell);
-  }, [interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq, cyclic: setEqWithRefEq<string>}));
+  }, [interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq<string>, cyclic: setEqWithRefEq<string>}));
 
   // Make a little placeholder for every cell which will be used when a cell doesn't refer to it yet
   // TODO: this is kinda a "possibleVarBindings" thing; idk how it should really work.
