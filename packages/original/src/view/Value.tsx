@@ -240,7 +240,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
   if (!isArray) {
     if (hasProperty(value, Symbol.toStringTag)) {
       className = value[Symbol.toStringTag] as string;
-    } else if (value.constructor.name !== 'object') {
+    } else if (value.constructor.name !== 'Object') {
       className = value.constructor.name;
     }
   }
