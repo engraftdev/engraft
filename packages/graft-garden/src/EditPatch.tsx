@@ -4,16 +4,18 @@ import { slotWithCode } from "@engraft/core";
 import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
 import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
 import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
+import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc, updateDoc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
-import { patchesRef } from "./db.js";
+import { Patch, patchesRef } from "./db.js";
 import { useFirestoreUpdater } from "./useFirestoreUpdater.js";
+import { usePatchState } from "./usePatchState.js";
 import { useUser } from "./util.js";
 
 const myCss = `
@@ -51,7 +53,7 @@ export const EditPatch = memo(function EditPatch() {
   const patchId = params.patchId;
 
   const docRefer = doc(patchesRef, patchId);
-  const [patch, loading, error, _snapshot] = useDocumentData(docRefer);
+  const [patch, _loading, error, _snapshot] = useDocumentData(docRefer);
   const updatePatch = useFirestoreUpdater(docRefer, patch);
   const patchUP = useUpdateProxy(updatePatch);
 
@@ -63,6 +65,38 @@ export const EditPatch = memo(function EditPatch() {
     }
   }, [user, patch]);
 
+  return <>
+    <style>{bootstrapCss} {myCss}</style>
+    <style>
+
+    </style>
+    <div className="container mt-5">
+      <div className="col-lg-6 mx-auto mb-3">
+        <div className="d-flex flex-row-reverse align-items-center justify-content-between">
+          <a href="#/" className="btn btn-outline-secondary btn-sm">back</a>
+          <h3 className="text-secondary">graft garden</h3>
+        </div>
+      </div>
+      { patch
+        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} />
+        : error
+        ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
+        : <div className="col-lg-6 mx-auto">loading...</div>
+      }
+      <div className="col-lg-6 mx-auto mt-5">
+        <small className="text-secondary">this is page {patchId}</small>
+      </div>
+    </div>
+  </>
+});
+
+const EditPatchLoaded = memo(function EditPatchLoaded(props: {
+  patchId: string | undefined,
+  patch: Patch,
+  patchUP: UpdateProxy<Patch>,
+}) {
+  const { patchId, patch, patchUP } = props;
+
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
@@ -73,66 +107,86 @@ export const EditPatch = memo(function EditPatch() {
     });
   }, [patchId]);
 
-  const program = patch?.toolProgram || slotWithCode('');
-
-  const varBindings = useMemo(() => ({}), []);
-
+  const program = patch.toolProgram;
   const programIsEmpty = _.isEqual(program, slotWithCode(''));
 
-  return <>
-    <style>{bootstrapCss} {myCss}</style>
-    <style>
+  const { stateUP, varBindings } = usePatchState(patch);
 
-    </style>
-    <div className="container mt-5">
-      <div className="col-lg-6 mx-auto">
-        <div className="d-flex flex-row-reverse align-items-center justify-content-between">
-          <a href="#/" className="btn btn-outline-secondary btn-sm">back</a>
-          <h3 className="text-secondary">graft garden</h3>
-        </div>
-      </div>
-      { loading || !program
-        ? <div className="col-lg-6 mx-auto">loading...</div>
-        : error
-        ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
-        : <>
-            <div className="col-lg-6 mx-auto">
-              <div className="btn-toolbar">
-                <div className="btn-group">
-                  <input className="form-control form-control-lg" type="text" value={patch!.name} onChange={onChangeName} placeholder="patch name"/>
-                </div>
-                <div className="btn-group">
-                  <a href={`#/view/${patchId}`} className="btn btn-outline-primary btn-lg">view</a>
-                </div>
-              </div>
-            </div>
-            <div className="tool-wrapper mx-auto mt-5">
-              <ErrorBoundary
-                fallbackRender={(props) => {
-                  return <div>
-                    <h1>error!</h1>
-                    <pre>{props.error.message}</pre>
-                    <pre>{props.error.stack}</pre>
-                    <div>
-                      <IsolateStyles>
-                        <ValueEditable value={program} updater={patchUP.toolProgram.$}/>
-                      </IsolateStyles>
-                    </div>
-                  </div>
-                }}
-                resetKeys={[program]}
-              >
-                <ToolWithView program={program} updateProgram={patchUP.toolProgram.$} reportOutputState={() => {}} varBindings={varBindings} autoFocus={true}/>
-              </ErrorBoundary>
-              { programIsEmpty &&
-                <span style={{paddingLeft: 10}}>↑ start here!</span>
-              }
-            </div>
-          </>
-      }
-      <div className="col-lg-6 mx-auto mt-5">
-        <small className="text-secondary">this is page {patchId}</small>
+  const [initialStateJSONDraft, setInitialStateJSONDraft] = useState(patch.initialStateJSON || "");
+
+
+  return <>
+    <div className="col-lg-6 mx-auto">
+      <div className="input-group">
+        <input className="form-control form-control-lg" type="text" value={patch!.name} onChange={onChangeName} placeholder="patch name"/>
+        <a href={`#/view/${patchId}`} className="btn btn-primary btn-lg">view</a>
       </div>
     </div>
-  </>
+    <div className="tool-wrapper mx-auto mt-5">
+      <ErrorBoundary
+        fallbackRender={(props) => {
+          return <div>
+            <h1>error!</h1>
+            <pre>{props.error.message}</pre>
+            <pre>{props.error.stack}</pre>
+            <div>
+              <IsolateStyles>
+                <ValueEditable value={program} updater={patchUP.toolProgram.$}/>
+              </IsolateStyles>
+            </div>
+          </div>
+        }}
+        resetKeys={[program]}
+      >
+        <ToolWithView program={program} updateProgram={patchUP.toolProgram.$} reportOutputState={() => {}} varBindings={varBindings} autoFocus={true}/>
+      </ErrorBoundary>
+      { programIsEmpty &&
+        <span style={{paddingLeft: 10}}>↑ start here!</span>
+      }
+    </div>
+    <div className="col-lg-6 mx-auto mt-5">
+      { patch.initialStateJSON !== undefined
+        ? <div className="input-group input-group-sm">
+            <span className="input-group-text">state</span>
+            <input
+              type="text"
+              className="form-control"
+              value={initialStateJSONDraft}
+              onChange={(e) => {
+                setInitialStateJSONDraft(e.target.value);
+                // TODO: change state if it parses
+                try {
+                  const parsed = JSON.parse(e.target.value);
+                  stateUP.$set(parsed);
+                  patchUP.initialStateJSON.$set(e.target.value);
+                } catch {
+                  // do nothing
+                }
+              }}
+              style={{
+                ...initialStateJSONDraft !== patch.initialStateJSON
+                && { borderColor: '#dc3545' }
+              }}
+            />
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => {
+                patchUP.initialStateJSON.$set(undefined);
+              }}
+            >
+              remove
+            </button>
+          </div>
+        : <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => {
+              patchUP.initialStateJSON.$set("{}");
+              setInitialStateJSONDraft("{}");
+            }}
+          >
+            add state
+          </button>
+      }
+    </div>
+  </>;
 });

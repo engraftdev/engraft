@@ -20,10 +20,11 @@ export const db = getFirestore(app);
 export const patchesRef = collection(db, "patches") as CollectionReference<Patch>;
 
 export type Patch = {
-  name: string;
-  ownerUid: string;
-  createdAt: Date;
-  toolProgram: ToolProgram;
+  name: string,
+  ownerUid: string,
+  createdAt: Date,
+  toolProgram: ToolProgram,
+  initialStateJSON?: string,
 }
 
 

@@ -1,21 +1,22 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { runTool, ToolProgram } from "@engraft/core";
+import { runTool } from "@engraft/core";
 import { useIncr } from "@engraft/incr-react";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
-import { memo, useEffect, useMemo } from "react";
+import { memo, useEffect } from "react";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
-import { patchesRef } from "./db.js";
+import { Patch, patchesRef } from "./db.js";
+import { usePatchState } from "./usePatchState.js";
 
 
 export const ViewPatch = memo(function ViewPatch() {
   const params = useParams();
   const patchId = params.patchId;
 
-  const [patch, loading, error, _snapshot] = useDocumentData(doc(patchesRef, patchId));
+  const [patch, _loading, error, _snapshot] = useDocumentData(doc(patchesRef, patchId));
 
   useEffect(() => {
     document.title = `${patch?.name || 'no name'}`;
@@ -24,27 +25,24 @@ export const ViewPatch = memo(function ViewPatch() {
   return <>
     <style>{bootstrapCss}</style>
     <div className="container" style={{ marginTop: '1rem' }}>
-      { loading
-        ? <p>loading...</p>
+      { patch
+        ? <ViewPatchActualView patch={patch}/>
         : error
         ? <p>error: {error.message}</p>
-        : <>
-            <ViewPatchActualView program={patch!.toolProgram}/>
-          </>
+        : <p>loading...</p>
       }
     </div>
   </>
 });
 
-
 type ViewPatchActualViewProps = {
-  program: ToolProgram,
+  patch: Patch,
 };
 
 const ViewPatchActualView = memo(function ViewPatchActualView(props: ViewPatchActualViewProps) {
-  const { program } = props;
-  const varBindings = useMemo(() => ({}), []);
-  const { outputP } = useIncr(runTool, { program, varBindings });
+  const { patch } = props;
+  const { varBindings } = usePatchState(patch);
+  const { outputP } = useIncr(runTool, { program: patch.toolProgram, varBindings });
 
   return <ToolOutputView outputP={outputP} displayReactElementsDirectly={true}/>;
 })
