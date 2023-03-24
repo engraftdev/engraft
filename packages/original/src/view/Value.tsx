@@ -236,9 +236,16 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 
   const isArray = value instanceof Array;
 
-  const classLabel = !isArray && value.constructor.name !== 'Object'
-    ? <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre'}}>{value.constructor.name + ' '}</div>
-    : undefined;
+  let className: string | undefined = undefined;
+  if (!isArray) {
+    if (hasProperty(value, Symbol.toStringTag)) {
+      className = value[Symbol.toStringTag] as string;
+    } else if (value.constructor.name !== 'object') {
+      className = value.constructor.name;
+    }
+  }
+  const classLabel = className &&
+    <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre'}}>{className + ' '}</div>;
 
   if (isExpanded) {
     let entries = isArray ? Array.from(value.entries()) : Object.entries(value);
