@@ -32,7 +32,7 @@ import { ToolInspectorWindow } from "../../view/ToolInspectorWindow.js";
 import { VarUse } from "../../view/Vars.js";
 import { refCompletions, toolCompletions, toolCompletionsTheme } from "./autocomplete.js";
 import { globals } from "./globals.js";
-import { referencesFromCode, refRE } from "./refs.js";
+import { referencesFromCodeDirect, referencesFromCodePromise, refREAll } from "./refs.js";
 
 // TODO: what hath ESM wrought?
 const template = (TemplateDefault.default || TemplateModule.default) as unknown as typeof import("@babel/template").default;
@@ -97,7 +97,11 @@ export const computeReferences = (program: Program) => {
   if (program.modeName === 'code') {
     return difference(
       // references from code & subprograms...
-      union(referencesFromCode(program.code), ...Object.values(program.subPrograms).map(references)),
+      union(
+        referencesFromCodeDirect(program.code),
+        referencesFromCodePromise(program.code),
+        ...Object.values(program.subPrograms).map(references),
+      ),
       // ...minus the subprogram ids themselves
       Object.keys(program.subPrograms)
     );
@@ -219,15 +223,14 @@ const runCodeMode = (props: CodeModeProps) => {
     )
   , [program.subPrograms, varBindings]), objEqWithRefEq);
 
-  const codeReferences = hookMemo(() => referencesFromCode(program.code), [program.code]);
+  const codeReferencesDirect = hookMemo(() => referencesFromCodeDirect(program.code), [program.code]);
+  const codeReferencesPromise = hookMemo(() => referencesFromCodePromise(program.code), [program.code]);
 
   // TODO: Where, exactly, does this 'relevantVarBindings' thing belong?
   const relevantVarBindings = hookRelevantVarBindings(props);
 
   const codeReferenceScopeP = hookMemo(() => EngraftPromise.try(() => {
-    const codeReferencesArr = Array.from(codeReferences);
-
-    const outputValuePs = codeReferencesArr.map((ref) => {
+    function resolveRef(ref: string) {
       if (subResults[ref]) {
         return subResults[ref].outputP;
       } else if (relevantVarBindings[ref]) {
@@ -238,12 +241,21 @@ const runCodeMode = (props: CodeModeProps) => {
       } else {
         throw new Error(`Unknown reference ${ref}`);  // caught by promise
       }
-    })
+    }
 
-    return EngraftPromise.all(outputValuePs).then((outputValues) => {
-      return _.zipObject(codeReferencesArr, outputValues.map((v) => v.value));
+    const codeReferencesArrDirect = Array.from(codeReferencesDirect);
+    const codeReferencesArrPromise = Array.from(codeReferencesPromise);
+
+    const outputValuePsDirect = codeReferencesArrDirect.map(resolveRef);
+    const outputValuePsPromise = codeReferencesArrPromise.map(resolveRef);
+
+    return EngraftPromise.all(outputValuePsDirect).then((outputValuesDirect) => {
+      return {
+        ..._.zipObject(codeReferencesArrDirect, outputValuesDirect.map((v) => v.value)),
+        ..._.zipObject(codeReferencesArrPromise.map(r => `${r}_promise`), outputValuePsPromise.map((p) => p.then(v => v.value))),
+      };
     });
-  }), [relevantVarBindings, codeReferences, subResults]);
+  }), [relevantVarBindings, subResults, codeReferencesDirect, codeReferencesPromise]);
 
   const outputAndLogsP = hookMemo(() => {
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
@@ -382,7 +394,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       keymap.of([
         {key: 'Shift-Mod-i', run: () => { setShowInspector((showInspector) => !showInspector); return true; }},
       ]),
-      embedsExtension(refSet, refRE),
+      embedsExtension(refSet, refREAll),
       autocompletion({override: completions}),
       toolCompletionsTheme,
       EditorView.domEventHandlers({

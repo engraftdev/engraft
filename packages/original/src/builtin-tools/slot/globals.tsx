@@ -1,8 +1,8 @@
-import { EngraftPromise, toolFromModule } from "@engraft/core";
+import { EngraftPromise, toolFromModule, usePromiseState } from "@engraft/core";
 import { hookFork, hookIncr, hookMemo, hookRef, hooks, IncrMemory } from "@engraft/incr";
 import update from "immutability-helper";
 import _ from "lodash";
-import React from "react";
+import React, { memo, ReactNode, useEffect, useState } from "react";
 import * as slider from "../../builtin-tools/slider/index.js";
 import { createElementFromReact } from "../../util/createElementFrom.js";
 import Diagram from "../../util/Diagram.js";
@@ -55,6 +55,27 @@ function csvParse(text: string | string[], options: CSVParseOptions = defaultCSV
   }
 }
 
+const Then = memo(function Then(props: {
+  promise: EngraftPromise<ReactNode>,
+  pending?: (latest: ReactNode | undefined) => ReactNode,
+}) {
+  const { promise, pending } = props;
+
+  const [latest, setLatest] = useState<ReactNode | undefined>(undefined);
+  const promiseState = usePromiseState(promise);
+
+  useEffect(() => {
+    if (promiseState.status === "fulfilled") {
+      setLatest(promiseState.value);
+    }
+  }, [promiseState]);
+
+  if (pending && promiseState.status === "pending") {
+    return <>{pending(latest)}</>;
+  }
+
+  return <>{latest}</>;
+});
 
 export const globals = {
   _,
@@ -78,6 +99,7 @@ export const globals = {
   },
   EngraftPromise,
   csvParse,
+  Then,
 };
 
 // For quick debugging-Engraft-inside-Engraft applications...
