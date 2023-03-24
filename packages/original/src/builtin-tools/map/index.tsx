@@ -32,8 +32,7 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   union(references(program.inputProgram), difference(references(program.perItemProgram), [program.itemVar.id]));
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program } = props;
-  const varBindings = hookRelevantVarBindings(props);  // TODO: we haven't figured this out yet, have we
+  const { program, varBindings } = props;
 
   const inputResult = hookRunTool({program: program.inputProgram, varBindings});
 

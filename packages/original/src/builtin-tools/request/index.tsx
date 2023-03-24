@@ -1,14 +1,14 @@
 import {
-  ComputeReferences, EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
+  ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
   ToolProps, ToolRun, ToolView, ToolViewRenderProps
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
 import { union } from "@engraft/shared/lib/sets.js";
 import { useCommonWidth } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+import * as d3dsv from "d3-dsv";
 import { memo, useState } from "react";
 import { RowToCol } from "../../util/RowToCol.js";
-import * as d3dsv from "d3-dsv";
 
 
 export type Program = {
@@ -37,8 +37,7 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
 
 export const run: ToolRun<Program> = memoizeProps(
   hooks((props: ToolProps<Program>) => {
-    const { program } = props;
-    const varBindings = hookRelevantVarBindings(props);
+    const { program, varBindings } = props;
 
     const urlResult = hookRunTool({program: program.urlProgram, varBindings});
     const paramsResult = hookRunTool({program: program.paramsProgram, varBindings});
