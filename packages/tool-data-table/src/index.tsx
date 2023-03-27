@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { CSSProperties, memo, ReactNode, useState } from "react";
+import { CSSProperties, memo, ReactNode, useMemo, useState } from "react";
 import { count } from "@engraft/original/lib/util/count.js";
 import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { ErrorView } from "@engraft/original/lib/view/Value.js";
@@ -12,6 +12,7 @@ import { Updater } from '@engraft/shared/lib/Updater.js';
 import { Use } from '@engraft/original/lib/util/Use.js';
 import useHover from '@engraft/original/lib/util/useHover.js';
 import { isoformat } from "@engraft/original/lib/util/isoformat.js";
+import { startDrag } from "@engraft/original/lib/util/drag.js";
 
 /*
 out of scope for now:
@@ -24,12 +25,14 @@ type P = {
   toolName: 'data-table',
   inputProgram: ToolProgram,
   transforms: Transforms,
+  cellWidths: Record<string, number>,  // TODO: gotta rename these when cols get renamed
 }
 
 const programFactory: ProgramFactory<P> = (defaultCode) => ({
   toolName: 'data-table',
   inputProgram: slotWithCode(defaultCode),
   transforms: {},
+  cellWidths: {},
 });
 
 const computeReferences: ComputeReferences<P> = (program) => references(program.inputProgram);
@@ -153,6 +156,8 @@ const Table = memo((props: {
                   programUP.transforms.select.$default(dataFrames.input.columns.map((c) => c.name));
                   programUP.transforms.select.$apply((cols) => cols!.filter((c) => c !== column.name))
                 }}
+                width={program.cellWidths[column.name]}
+                widthUP={programUP.cellWidths[column.name].$as<number | undefined>()}
               />
             )}
             <th
@@ -343,21 +348,35 @@ const TableHeaderCell = memo((props: {
   column: Column,
   programUP: UpdateProxy<P>,
   removeColumn: () => void,
+  width: number | undefined,
+  widthUP: UpdateProxy<number | undefined>,
 }) => {
-  const { column, removeColumn } = props;
+  const { column, removeColumn, width, widthUP } = props;
 
   const [ref, isHovered] = useHover();
   const [isFocused, setIsFocused] = useState(false);
+
+  const onMouseDownResizer = useMemo(() => startDrag({
+    init() {
+      return {startWidth: width || 150};
+    },
+    move({startWidth}) {
+      const newHeight = Math.max(startWidth + this.startDeltaX, 150);
+      widthUP.$set(newHeight);
+    },
+    done() {},
+    keepCursor: true,
+  }), [width, widthUP]);
+
 
   return <th
     ref={ref}
     style={{
       ...allHeaderCellStyle,
-      width: '150px',  // TODO: this is where column resizing happens (min width 150)
-      // TODO: that (^) doesn't seem to be respected
-      padding: '5px',
-      height: '70px',  // TODO: shrinks when header collapsed
-      zIndex: '1',
+      width: width || 150,
+      padding: 5,
+      height: 70,  // TODO: shrinks when header collapsed
+      zIndex: 1,
     }}
   >
     <div className="flex justify-between items-center">
@@ -446,7 +465,22 @@ const TableHeaderCell = memo((props: {
         </div>
       </div>
     </div>
-    {/* TODO: resize handle goes here */}
+    <Use hook={useHover} children={([hoverRef, isHovered]) =>
+      <div
+        ref={hoverRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: 3,
+          cursor: 'col-resize',
+          zIndex: 1,
+          ...isHovered && {background: 'rgb(239, 239, 239)'},
+        }}
+        onMouseDown={onMouseDownResizer}
+      />
+    } />
   </th>;
 });
 
