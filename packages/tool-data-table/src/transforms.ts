@@ -1,17 +1,39 @@
 import { assert, assertNever } from "@engraft/shared/lib/assert.js";
-import { DataFrame, Row } from "./data-frame.js";
+import { DataFrame, Row, ValueType } from "./data-frame.js";
 
 export type Transforms = {
-  sort?: Sort[],
+  sort: Sort[],
   slice?: Slice,
-  filter?: Filter[],
+  filter: Filter[],
   select?: string[] | null,  // different from Observable; no `columns` property
-  names?: Name[],
+  names: Name[],
 }
 export type Sort = { column: string, direction: 'asc' | 'desc' }
 export type Slice = { from: number | null, to: number | null }
 export type Filter = { type: FilterType, operands: Operand[] }
-export type FilterType = 'eq' | 'ne' | 'lt' | 'lte' | 'gt' | 'gte' | 'in' | 'nin' | 'n' | 'nn' | 'c' | 'nc';
+export const filterTypes = {
+  eq: { label: '=', arity: 2 },  // TODO: 'is' for strings
+  ne: { label: '!=', arity: 2 },  // TODO: 'is not' for strings
+  lt: { label: '<', arity: 2 },
+  lte: { label: '<=', arity: 2 },
+  gt: { label: '>', arity: 2 },
+  gte: { label: '>=', arity: 2 },
+  in: { label: 'is in', arity: 2 },
+  nin: { label: 'is not in', arity: 2 },
+  n: { label: 'is null', arity: 1 },
+  nn: { label: 'is not null', arity: 1 },
+  c: { label: 'contains', arity: 2 },
+  nc: { label: 'does not contain', arity: 2 },
+}
+export type FilterType = keyof typeof filterTypes;
+export const filterTypesByValueType: Record<ValueType, FilterType[]> = {
+  integer: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
+  number: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
+  string: ['eq', 'ne', 'c', 'nc', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
+  boolean: ['eq', 'ne', 'n', 'nn'],
+  date: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
+  other: [],  // TODO
+}
 export type Operand = { type: 'column', value: string } | { type: 'resolved', value: unknown }
 export type Name = { column: string, name: string }
 
@@ -87,13 +109,19 @@ function applyFilter(dataFrame: DataFrame, filter: Filter): DataFrame {
   const type = filter.type;
   const operands = filter.operands;
   const rowsFiltered = rows.filter(row => {
-    const values = operands.map(operand => {
-      if (operand.type === 'column') {
-        return (row as any)[operand.value];
-      }
-      return operand.value;
-    })
-    return checkFilter(type, values);
+    // TODO: this try/catch & the JSON within is a lazy stopgap
+    try {
+      const values = operands.map(operand => {
+        if (operand.type === 'column') {
+          return (row as any)[operand.value];
+        }
+        // return operand.value;
+        return JSON.parse(operand.value as string);
+      })
+      return checkFilter(type, values);
+    } catch {
+      return true;
+    }
   })
   return {
     ...dataFrame,
