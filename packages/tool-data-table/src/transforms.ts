@@ -24,12 +24,13 @@ export const filterTypes = {
   nn: { label: 'is not null', arity: 1 },
   c: { label: 'contains', arity: 2 },
   nc: { label: 'does not contain', arity: 2 },
+  match: { label: 'matches', arity: 2 },
 }
 export type FilterType = keyof typeof filterTypes;
 export const filterTypesByValueType: Record<ValueType, FilterType[]> = {
   integer: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
   number: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
-  string: ['eq', 'ne', 'c', 'nc', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
+  string: ['eq', 'ne', 'c', 'nc', 'match', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
   boolean: ['eq', 'ne', 'n', 'nn'],
   date: ['eq', 'ne', 'lt', 'gt', 'lte', 'gte', 'in', 'nin', 'n', 'nn'],
   other: [],  // TODO
@@ -173,6 +174,9 @@ function checkFilter(type: FilterType, values: unknown[]) {
     case 'nc':
       assert(typeof values[0] === 'string' && typeof values[1] === 'string');
       return !values[0].includes(values[1])
+    case 'match':
+      assert(typeof values[0] === 'string' && typeof values[1] === 'string');
+      return values[0].match(values[1]) !== null;
     default:
       assertNever(type);
   }

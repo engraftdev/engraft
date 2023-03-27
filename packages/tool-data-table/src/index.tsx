@@ -53,7 +53,11 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
   }), [inputResult, program.transforms]);
 
   const outputP = hookMemo(() => dataFramesP.then((dataFrames) => {
-    return {value: dataFrames.output.rows};
+    const { output } = dataFrames;
+    if (output.columns.length === 1) {
+      return {value: output.rows.map((row) => row[output.columns[0].name])};
+    }
+    return {value: output.rows};
   }), [dataFramesP]);
 
   const view: ToolView<P> = hookMemo(() => ({

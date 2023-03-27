@@ -25,13 +25,13 @@ function html(s: string) {
 function objectConverter(columns: string[]) {
   // eslint-disable-next-line no-new-func
   return new Function("d", "return {" + columns.map(function(name, i) {
-    return JSON.stringify(name) + ": d[" + i + "] || \"\"";
+    return JSON.stringify(name) + ": d[" + i + "] ?? \"\"";
   }).join(",") + "}") as (d: unknown[]) => object;
 }
 
 type CSVParseOptions = {
-  header: boolean,
-  autoType: boolean,
+  header?: boolean,
+  autoType?: boolean,
 }
 
 const defaultCSVParseOptions: CSVParseOptions = {
@@ -39,7 +39,9 @@ const defaultCSVParseOptions: CSVParseOptions = {
   autoType: true,
 }
 
-function csvParse(text: string | string[], options: CSVParseOptions = defaultCSVParseOptions) {
+function csvParse(text: string | string[], options: CSVParseOptions = {}) {
+  options = {...defaultCSVParseOptions, ...options};
+
   if (Array.isArray(text)) {
     text = text.join("\n");
   }
@@ -47,7 +49,7 @@ function csvParse(text: string | string[], options: CSVParseOptions = defaultCSV
   if (options.header) {
     return options.autoType ? d3dsv.csvParse(text, d3dsv.autoType) : d3dsv.csvParse(text);
   } else {
-    const rows = d3dsv.csvParseRows(text, d3dsv.autoType) as unknown[][];
+    const rows = options.autoType ? d3dsv.csvParseRows(text, d3dsv.autoType) as unknown[][] : d3dsv.csvParseRows(text) as string[][];
     const maxLength = _.max(rows.map(row => row.length)) || 0;
     const columns = alphaLabels.slice(0, maxLength);
     const convert = objectConverter(columns);
