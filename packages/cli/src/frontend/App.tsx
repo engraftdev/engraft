@@ -156,7 +156,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
   });
 
   return <>
-    <div style={{width: 'fit-content'}}>
+    <div style={{width: 'fit-content', marginBottom: 140}}>
       <ErrorBoundary
         fallbackRender={(props) => {
           return <div>
@@ -172,27 +172,27 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         </IsolateStyles>
       </ErrorBoundary>
     </div>
-    <br/>
-    <br/>
-    <button
-      onClick={async () => {
-        await saveProgram();
-      }}
-    >
-      Save
-    </button>
-    {saveStdout &&
+    <div className="xRow xGap10">
       <button
         onClick={async () => {
           await saveProgram();
-          await saveStdout();
-          // TODO: close tab
-          window.close();
         }}
       >
-        Save and return
+        Save script
       </button>
-    }
+      {saveStdout &&
+        <button
+          onClick={async () => {
+            await saveProgram();
+            await saveStdout();
+            // TODO: close tab
+            window.close();
+          }}
+        >
+          Save script and return to stdout
+        </button>
+      }
+    </div>
     <br/>
     <br/>
     <ToolOutputBuffer

@@ -38,7 +38,23 @@ export const filterTypesByValueType: Record<ValueType, FilterType[]> = {
 export type Operand = { type: 'column', value: string } | { type: 'resolved', value: unknown }
 export type Name = { column: string, name: string }
 
-export function applyTransforms(dataFrame: DataFrame, transforms: Transforms) {
+export function applyTransforms(dataFrame: DataFrame, transforms: Partial<Transforms>): DataFrame {
+  // TODO: this is all a hack to get an interface I like; refactor is called for
+
+  const transformsComplete: Transforms = {
+    sort: [],
+    filter: [],
+    names: [],
+    ...transforms
+  };
+
+  let result = dataFrame
+  result = applyTransformsExceptSelect(result, transformsComplete);
+  result = applyTransformsJustSelect(result, transformsComplete);
+  return result;
+}
+
+export function applyTransformsExceptSelect(dataFrame: DataFrame, transforms: Transforms) {
   let result = dataFrame
   if (transforms.sort) {
     // apply sorts in reverse order so first sort is most significant
@@ -55,14 +71,19 @@ export function applyTransforms(dataFrame: DataFrame, transforms: Transforms) {
       result = applyFilter(result, filter)
     }
   }
-  if (transforms.select) {
-    result = applySelect(result, transforms.select)
-  }
   if (transforms.names) {
     // TODO: applying names one by one doesn't work with weird overlapping column names (like a swap)
     for (const name of transforms.names) {
       result = applyName(result, name)
     }
+  }
+  return result;
+}
+
+export function applyTransformsJustSelect(dataFrame: DataFrame, transforms: Transforms): DataFrame {
+  let result = dataFrame;
+  if (transforms.select) {
+    result = applySelect(result, transforms.select)
   }
   return result;
 }

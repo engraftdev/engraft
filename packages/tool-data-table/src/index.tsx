@@ -5,7 +5,7 @@ import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { ErrorView } from "@engraft/original/lib/view/Value.js";
 import { Column, DataFrame, inferDataFrameFromRows, ValueType } from "./data-frame.js";
 import style from './style.css?inline';
-import { applyTransforms, Filter, FilterType, filterTypes, filterTypesByValueType, Transforms } from "./transforms.js";
+import { applyTransformsExceptSelect, applyTransformsJustSelect, Filter, FilterType, filterTypes, filterTypesByValueType, Transforms } from "./transforms.js";
 import _ from 'lodash';
 import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
 import { Updater } from '@engraft/shared/lib/Updater.js';
@@ -48,8 +48,9 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
 
   const dataFramesP = hookMemo(() => inputResult.outputP.then((inputOutput) => {
     const input = inferDataFrameFromRows(inputOutput.value);
-    const output = applyTransforms(input, program.transforms);
-    return {input, output};
+    const outputExceptSelect = applyTransformsExceptSelect(input, program.transforms);
+    const output = applyTransformsJustSelect(outputExceptSelect, program.transforms);
+    return {input, outputExceptSelect, output};
   }), [inputResult, program.transforms]);
 
   const outputP = hookMemo(() => dataFramesP.then((dataFrames) => {
@@ -76,7 +77,7 @@ export default defineTool({ programFactory, computeReferences, run });
 
 const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   inputResult: ToolResult,
-  dataFramesP: EngraftPromise<{input: DataFrame, output: DataFrame}>,
+  dataFramesP: EngraftPromise<{input: DataFrame, outputExceptSelect: DataFrame, output: DataFrame}>,
 }) => {
   const { program, updateProgram, autoFocus, inputResult, dataFramesP } = props;
   const programUP = useUpdateProxy(updateProgram);
@@ -102,7 +103,7 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
 });
 
 const Table = memo((props: {
-  dataFrames: {input: DataFrame, output: DataFrame},
+  dataFrames: {input: DataFrame, outputExceptSelect: DataFrame, output: DataFrame},
   program: P,
   updateProgram: Updater<P>,
 }) => {
@@ -155,7 +156,7 @@ const Table = memo((props: {
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{transition: 'transform 150ms ease 0s'}}><path d="M13 6.5L8 12L3 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
             </th>
-            {dataFrames.output.columns.map((column, i) =>
+            {dataFrames.outputExceptSelect.columns.map((column) =>
               <TableHeaderCell
                 key={column.name}
                 column={column}
@@ -166,6 +167,7 @@ const Table = memo((props: {
                 }}
                 width={program.cellWidths[column.name]}
                 widthUP={programUP.cellWidths[column.name].$as<number | undefined>()}
+                selected={dataFrames.output.columns.includes(column)}
               />
             )}
             <th
@@ -189,8 +191,8 @@ const Table = memo((props: {
           }}
         >
           {/* TODO: we could alternately use react-window for fast rendering */}
-          {dataFrames.output.rows.slice(0, maxRows).map((row, i) =>
-            <TableRow key={i} i={i} rowData={row} columns={dataFrames.output.columns} />
+          {dataFrames.outputExceptSelect.rows.slice(0, maxRows).map((row, i) =>
+            <TableRow key={i} i={i} rowData={row} columns={dataFrames.outputExceptSelect.columns} selectedColumns={dataFrames.output.columns} />
           )}
         </tbody>
       </table>
@@ -219,7 +221,7 @@ const Table = memo((props: {
         borderBottomLeftRadius: '0px',
       }}
     >
-      <TransformMenu count={0} label={<>
+      <TransformMenu count={program.transforms.filter.length} label={<>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr1"><path d="M3.06752 3H12.9325C13.3564 3 13.588 3.49443 13.3166 3.82009L9 9V11.7929C9 11.9255 8.94732 12.0527 8.85355 12.1464L7.85355 13.1464C7.53857 13.4614 7 13.2383 7 12.7929V9L2.68341 3.82009C2.41202 3.49443 2.6436 3 3.06752 3Z" fill="currentColor"></path></svg>
         Filter
       </>}>
@@ -227,7 +229,7 @@ const Table = memo((props: {
           Filter
         </div>
         <FiltersEditor
-          filters={program.transforms.filter || []}
+          filters={program.transforms.filter}
           filtersUP={programUP.transforms.filter}
           inputDataFrame={dataFrames.input}
         />
@@ -458,14 +460,20 @@ const allHeaderCellStyle: CSSProperties = {
   borderLeft: 'solid 1px var(--light-silver)',
 };
 
+const unselectedCellStyle: CSSProperties = {
+  background: 'hsl(0,0%,90%)',
+  opacity: 0.5,
+};
+
 const TableHeaderCell = memo((props: {
   column: Column,
   programUP: UpdateProxy<P>,
   removeColumn: () => void,
   width: number | undefined,
   widthUP: UpdateProxy<number | undefined>,
+  selected: boolean,
 }) => {
-  const { column, removeColumn, width, widthUP } = props;
+  const { column, removeColumn, width, widthUP, selected } = props;
 
   const [ref, isHovered] = useHover();
   const [isFocused, setIsFocused] = useState(false);
@@ -475,7 +483,7 @@ const TableHeaderCell = memo((props: {
       return {startWidth: width || 150};
     },
     move({startWidth}) {
-      const newHeight = Math.max(startWidth + this.startDeltaX, 150);
+      const newHeight = Math.max(startWidth + this.startDeltaX, 100);
       widthUP.$set(newHeight);
     },
     done() {},
@@ -491,6 +499,7 @@ const TableHeaderCell = memo((props: {
       padding: 5,
       height: 70,  // TODO: shrinks when header collapsed
       zIndex: 1,
+      ...!selected && unselectedCellStyle,
     }}
   >
     <div className="flex justify-between items-center">
@@ -609,10 +618,11 @@ const allBodyCellStyle: CSSProperties = {
 
 const TableRow = memo((props: {
   i: number,
-  columns: Column[],
   rowData: object,
+  columns: Column[],
+  selectedColumns: Column[],
 }) => {
-  const { i, columns, rowData } = props;
+  const { i, rowData, columns, selectedColumns } = props;
 
   const isFirstRow = i === 0;
 
@@ -630,7 +640,13 @@ const TableRow = memo((props: {
       {i}
     </td>
     {columns.map((column, j) =>
-      <TableDataCell key={column.name} isInFirstRow={isFirstRow} cellData={(rowData as any)[column.name]} type={column.type}/>
+      <TableDataCell
+        key={column.name}
+        isInFirstRow={isFirstRow}
+        cellData={(rowData as any)[column.name]}
+        type={column.type}
+        selected={selectedColumns.includes(column)}
+      />
     )}
     <td
       style={{
@@ -646,8 +662,9 @@ const TableDataCell = memo((props: {
   isInFirstRow: boolean,
   cellData: unknown,
   type: ValueType,
+  selected: boolean,
 }) => {
-  const { isInFirstRow, cellData, type } = props;
+  const { isInFirstRow, cellData, type, selected } = props;
 
   const dataTypeStyle: CSSProperties = {
     ...(type === 'integer' || type === 'number') && {
@@ -665,7 +682,8 @@ const TableDataCell = memo((props: {
       ...dataTypeStyle,
       ...isInFirstRow && {
         borderTop: 'none',
-      }
+      },
+      ...!selected && unselectedCellStyle,
     }}
   >
     {/* TODO: handle all the different display cases */}
