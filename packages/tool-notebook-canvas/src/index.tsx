@@ -68,6 +68,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
+    renderFrameBarBackdrop: () => <div style={{backgroundColor: 'rgb(240, 240, 240)', height: '100%'}} /> ,
     showsOwnOutput: cells.length > 0,
   }), [cells.length, props, cellResults]);
 
@@ -257,7 +258,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
           style={{ display: 'inline-block', cursor: 'initial', alignSelf: 'flex-end' }}
           onMouseDown={(ev) => ev.stopPropagation()}
         >
-          <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$} attach='down' />
+          <VarDefinition var_={cell.var_} updateVar={cellUP.var_.$} attach='down' style={{height: 24, boxShadow: '0 0 #0000,0 0 #0000,0 1px 16px 0 rgba(0, 0, 0, .12)'}} />
         </div>
         <div style={{flexGrow: 1}}/>
         <div style={{color: "#aaa"}}>
@@ -266,7 +267,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
       </div>
     </div>
 
-    <div className="NotebookCanvasTool-CellView-tool xCol" style={{background: 'rgb(251, 251, 251)', minHeight: 0}}>
+    <div className="NotebookCanvasTool-CellView-tool xCol" style={{background: 'rgb(251, 251, 251)', minHeight: 0, overflowY: 'auto'}}>
       <ShowView view={cellResult.view} updateProgram={cellUP.program.$} expand={true}/>
     </div>
     { !cellResult.view.showsOwnOutput &&

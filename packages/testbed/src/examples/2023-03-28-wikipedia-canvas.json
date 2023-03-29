@@ -2,11 +2,11 @@
   "toolName": "slot",
   "modeName": "tool",
   "subProgram": {
-    "toolName": "notebook",
+    "toolName": "notebook-canvas",
     "cells": [
       {
         "var_": {
-          "id": "IDavatar449194",
+          "id": "IDsecure540734",
           "label": "api response"
         },
         "program": {
@@ -29,13 +29,19 @@
               "subPrograms": {}
             },
             "pauseRequest": false
-          },
-          "defaultCode": ""
-        }
+          }
+        },
+        "geo": {
+          "x": 48,
+          "y": 32,
+          "width": 336,
+          "height": 576
+        },
+        "showOutputOnly": false
       },
       {
         "var_": {
-          "id": "IDplanet172005",
+          "id": "IDplastic737642",
           "label": "pages"
         },
         "program": {
@@ -46,7 +52,7 @@
             "inputProgram": {
               "toolName": "slot",
               "modeName": "code",
-              "code": "IDfront111483",
+              "code": "IDsecure540734",
               "defaultCode": "IDfront111483",
               "subPrograms": {}
             },
@@ -86,14 +92,20 @@
               }
             ],
             "minimized": false
-          },
-          "defaultCode": "IDfront111483"
-        }
+          }
+        },
+        "geo": {
+          "x": 416,
+          "y": 32,
+          "width": 352,
+          "height": 496
+        },
+        "showOutputOnly": false
       },
       {
         "var_": {
-          "id": "IDlasagna974419",
-          "label": "A"
+          "id": "IDwood911036",
+          "label": "formatted"
         },
         "program": {
           "toolName": "slot",
@@ -103,7 +115,7 @@
             "inputProgram": {
               "toolName": "slot",
               "modeName": "code",
-              "code": "IDfront111483",
+              "code": "IDplastic737642",
               "defaultCode": "IDfront111483",
               "subPrograms": {}
             },
@@ -177,25 +189,42 @@
                 }
               ]
             }
-          },
-          "defaultCode": "IDfront111483"
-        }
+          }
+        },
+        "geo": {
+          "x": 48,
+          "y": 656,
+          "width": 336,
+          "height": 640
+        },
+        "showOutputOnly": false
       },
       {
         "var_": {
-          "id": "IDallium289983",
-          "label": "B"
+          "id": "IDverdict866223",
+          "label": "with title"
         },
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "<div>\n  <h1 style={{fontFamily: 'Marker Felt'}}>Randompedia</h1>\n  {IDfront111483}\n</div>",
-          "defaultCode": "IDfront111483",
+          "code": "<div>\n  <h1 style={{fontFamily: 'Marker Felt'}}>Randompedia</h1>\n  {IDwood911036}\n</div>",
+          "defaultCode": "",
           "subPrograms": {}
         },
-        "outputManualHeight": "infinity"
+        "geo": {
+          "x": 416,
+          "y": 608,
+          "width": 512,
+          "height": 560
+        },
+        "showOutputOnly": false
       }
     ],
-    "prevVarId": "IDfront111483"
+    "prevVar": {
+      "id": "IDlighter258783",
+      "label": "prev"
+    },
+    "width": 960,
+    "height": 1136
   }
 }
