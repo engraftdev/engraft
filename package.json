@@ -14,6 +14,7 @@
     "all:clean": "lerna exec -- rm -rf dist; lerna exec -- rm -rf lib",
     "all:build-app": "lerna run build-app",
     "testbed:dev": "lerna run dev --scope @engraft/testbed",
+    "graft-garden:dev": "lerna run dev --scope @engraft/graft-garden",
     "cli:build-app": "lerna run build-app --scope @engraft/cli",
     "cli:build-app:watch": "npm run cli:build-app; lerna watch -- npm run cli:build-app --scope @engraft/cli"
   },
