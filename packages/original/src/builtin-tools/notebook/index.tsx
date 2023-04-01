@@ -110,7 +110,7 @@ const View = memo((props: ViewProps) => {
             position: 'absolute',
             top: 0, bottom: 0, right: 0, width: outputSize.width + 20,
             ...outputBackgroundStyle,
-            zIndex: -1,
+            // zIndex: -1,
           }}
         />
       }
