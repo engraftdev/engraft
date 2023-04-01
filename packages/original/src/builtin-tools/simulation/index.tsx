@@ -8,6 +8,7 @@ import _ from "lodash";
 import { memo, useMemo } from "react";
 import { useStateSetOnly } from "../../util/immutable-react.js";
 import { ToolOutputView } from "../../view/Value.js";
+import { isObject } from "@engraft/shared/lib/isObject.js";
 
 
 export type Program = {
@@ -61,7 +62,14 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   });
 
   const outputP = EngraftPromise.all(onTickResults.map(tickResult => tickResult.outputP)).then((tickOutputs) => {
-    return {value: tickOutputs.map(tickOutput => tickOutput.value)};
+    return {value: tickOutputs.map((tickOutput, tick) => {
+      const { value } = tickOutput;
+      if (isObject(value)) {
+        return {...value, tick};
+      } else {
+        return value;
+      }
+    })};
   });
 
   const view: ToolView<Program> = hookMemo(() => ({
@@ -107,7 +115,7 @@ const View = memo((props: ViewProps) => {
       <ToolOutputView outputP={toDrawResult.outputP} displayReactElementsDirectly={true}/>
       <div className="step-rows xCol xGap10 xShrinkable">
         <div className="xRow xGap10">
-        <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>tick</div>
+        <div style={{width: 40, textAlign: 'right', fontWeight: 'bold'}}>tick</div>
           <div>
             <input
               type="range"
@@ -119,7 +127,12 @@ const View = memo((props: ViewProps) => {
           </div>
         </div>
         <div className="xRow xGap10 xExpand">
-          <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>{selectedTick === 0 ? 'init' : 'on-tick'}</div>
+          <div style={{width: 40, textAlign: 'right', fontWeight: 'bold'}}>
+            { selectedTick === 0
+              ? <>init</>
+              : <>on<br/>tick</>
+            }
+          </div>
           <div className="xCol xGap10 xShrinkable xExpand">
             {selectedTick > 0 && <>
               <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
@@ -141,7 +154,9 @@ const View = memo((props: ViewProps) => {
           </div>
         </div>
         <div className="xRow xGap10">
-          <div style={{width: 55, textAlign: 'right', fontWeight: 'bold'}}>to-draw</div>
+          <div style={{width: 40, textAlign: 'right', fontWeight: 'bold'}}>
+            to<br/>draw
+          </div>
           <ShowView view={toDrawResult.view} updateProgram={programUP.toDrawProgram.$apply} />
         </div>
       </div>
