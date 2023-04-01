@@ -26,6 +26,7 @@ export type Program = {
 type Example = {
   id: string,
   values: unknown[],  // parallel with vars
+  // TODO: values may not be serializable; represent with tool programs, not directly
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
