@@ -1,0 +1,197 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDamber024430",
+          "label": "width"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "100",
+          "defaultCode": "",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDfather374141",
+          "label": "height"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "200",
+          "defaultCode": "IDviscose669675",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDhawthorn036564",
+          "label": "simulation trace"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simulation",
+            "ticksCount": 80,
+            "stateVar": {
+              "id": "IDmallow385799",
+              "label": "state"
+            },
+            "initProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{\n  x: IDcollarbone833802,\n  y: 10,\n  vx: 5,\n  vy: 7,\n}",
+              "defaultCode": "{}",
+              "subPrograms": {
+                "IDcollarbone833802": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "slider",
+                    "value": 61,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1
+                  }
+                }
+              }
+            },
+            "onTickProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDspring761732",
+                      "label": "new pos"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "{\n ...IDmallow385799,\n x: IDmallow385799.x + IDmallow385799.vx,\n y: IDmallow385799.y + IDmallow385799.vy,\n}",
+                      "defaultCode": "IDmallow385799",
+                      "subPrograms": {}
+                    },
+                    "outputManualHeight": 104
+                  },
+                  {
+                    "var_": {
+                      "id": "IDsilence384377",
+                      "label": "bounce x?"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDspring761732.x < 0 || IDspring761732.x > IDamber024430",
+                      "defaultCode": "IDtrouble473208",
+                      "subPrograms": {}
+                    }
+                  },
+                  {
+                    "var_": {
+                      "id": "IDdecimal112172",
+                      "label": "bounce y?"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDspring761732.y < 0 || IDspring761732.y > IDfather374141",
+                      "defaultCode": "IDtrouble473208",
+                      "subPrograms": {}
+                    }
+                  },
+                  {
+                    "var_": {
+                      "id": "IDpower721478",
+                      "label": "new vs"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "{\n  ...IDspring761732,\n  vx: IDsilence384377 ? -IDspring761732.vx : IDspring761732.vx,\n  vy: IDdecimal112172 ? -IDspring761732.vy : IDspring761732.vy,\n}",
+                      "defaultCode": "IDtrouble473208",
+                      "subPrograms": {}
+                    }
+                  }
+                ],
+                "prevVarId": "IDtrouble473208"
+              },
+              "defaultCode": "IDmallow385799"
+            },
+            "toDrawProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "<svg width={IDamber024430 + 30} height={IDfather374141 + 30}\n     viewBox={`-15 -15 ${IDamber024430 + 30} ${IDfather374141 + 30}`}>\n <rect x={0} y={0} width={IDamber024430} height={IDfather374141}\n       fill=\"none\" stroke=\"black\"/>\n <circle cx={IDmallow385799.x} cy={IDmallow385799.y} r={10} fill=\"fuchsia\"/>\n <line x1={IDmallow385799.x} y1={IDmallow385799.y}\n       x2={IDmallow385799.x + IDmallow385799.vx * 2} y2={IDmallow385799.y + IDmallow385799.vy * 2}\n       stroke='black' strokeWidth={2} />\n</svg>",
+              "defaultCode": "<pre>{JSON.stringify(IDmallow385799, null, 2)}</pre>",
+              "subPrograms": {}
+            }
+          },
+          "defaultCode": "IDviscose669675"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDsweater235937",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "voyager",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDviscose669675",
+              "defaultCode": "IDviscose669675",
+              "subPrograms": {}
+            },
+            "spec": {
+              "data": {
+                "name": "source"
+              },
+              "mark": "point",
+              "encoding": {
+                "x": {
+                  "field": "tick",
+                  "type": "quantitative",
+                  "scale": {}
+                },
+                "y": {
+                  "field": "x",
+                  "type": "quantitative",
+                  "scale": {}
+                },
+                "color": {
+                  "field": "vx",
+                  "type": "nominal"
+                }
+              },
+              "config": {
+                "line": {
+                  "point": true
+                },
+                "scale": {
+                  "useUnaggregatedDomain": true
+                }
+              }
+            }
+          },
+          "defaultCode": "IDviscose669675"
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVarId": "IDviscose669675"
+  }
+}
