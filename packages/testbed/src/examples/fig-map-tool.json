@@ -1,0 +1,72 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDlock914594",
+          "label": "mapped array"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "map",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "[0,1,2,3,4]",
+              "defaultCode": "",
+              "subPrograms": {}
+            },
+            "itemVar": {
+              "id": "IDgigantspinosaurus373191",
+              "label": "item"
+            },
+            "perItemProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDdouble515740",
+                      "label": "A"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDgigantspinosaurus373191 ** 2",
+                      "defaultCode": "IDgigantspinosaurus373191",
+                      "subPrograms": {}
+                    }
+                  },
+                  {
+                    "var_": {
+                      "id": "IDaddress437237",
+                      "label": "B"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDdouble515740 + 10",
+                      "defaultCode": "IDspy585927",
+                      "subPrograms": {}
+                    }
+                  }
+                ],
+                "prevVarId": "IDspy585927"
+              },
+              "defaultCode": "IDgigantspinosaurus373191"
+            }
+          },
+          "defaultCode": ""
+        }
+      }
+    ],
+    "prevVarId": "IDpolyanthus787297"
+  }
+}

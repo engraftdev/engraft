@@ -1,0 +1,168 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDcity161131",
+          "label": "input"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<svg viewBox=\"-150 -220 1140 1140\" width=\"20\" height=\"20\">\n<g>\n<g>\n<path d=\"M415.874051 735.284188 C693.771634 513.203826 840.16705 389.722331 831.373888 172.53446 C820.042385 -107.349512 415.874051 -18.726386 415.874051 238.484188 \" fill=\"none\" stroke=\"#000000\"\n  stroke-width=\"48\" />\n<path d=\"M415.874051 735.284188 C137.976468 513.203826 -8.418949 389.722331 0.374213 172.53446 C11.705717 -107.349512 415.874051 -18.726386 415.874051 238.484188 \" fill=\"none\" stroke=\"#000000\"\n  stroke-width=\"48\" />\n</g>\n</g>\n<defs>\n</defs>\n</svg>",
+          "defaultCode": "",
+          "subPrograms": {}
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDvolcano729706",
+          "label": "rotate"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "(elem, angle) =>\n  <div\n    style={{\n      transform: `rotate(${angle}deg)`,\n      transformOrigin: 'center center'\n    }}\n  >\n    {elem}\n  </div>",
+          "subPrograms": {},
+          "defaultCode": "IDwish591135"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDanswer795891",
+          "label": "rotate test"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDvolcano729706(IDcity161131, 90)",
+          "defaultCode": "IDwish591135",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDstilton248189",
+          "label": "end angle"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "360",
+          "defaultCode": "",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDcream593677",
+          "label": "repetitions"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "6",
+          "defaultCode": "IDwish591135",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDcatmint759272",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "notebook",
+            "cells": [
+              {
+                "var_": {
+                  "id": "IDmonitor474151",
+                  "label": "angle"
+                },
+                "program": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDstilton248189 / IDcream593677",
+                  "defaultCode": "IDwish591135",
+                  "subPrograms": {}
+                }
+              },
+              {
+                "var_": {
+                  "id": "IDdetective806458",
+                  "label": "output"
+                },
+                "program": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "map",
+                    "inputProgram": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "_.range(0,360, IDmonitor474151)",
+                      "defaultCode": "IDopera030770",
+                      "subPrograms": {}
+                    },
+                    "itemVar": {
+                      "id": "IDtwister262497",
+                      "label": "item"
+                    },
+                    "perItemProgram": {
+                      "toolName": "slot",
+                      "modeName": "tool",
+                      "subProgram": {
+                        "toolName": "notebook",
+                        "cells": [
+                          {
+                            "var_": {
+                              "id": "IDjudo712204",
+                              "label": "A"
+                            },
+                            "program": {
+                              "toolName": "slot",
+                              "modeName": "code",
+                              "code": "IDcity161131",
+                              "defaultCode": "IDtwister262497",
+                              "subPrograms": {}
+                            }
+                          },
+                          {
+                            "var_": {
+                              "id": "IDgarlic938828",
+                              "label": "B"
+                            },
+                            "program": {
+                              "toolName": "slot",
+                              "modeName": "code",
+                              "code": "IDvolcano729706(IDquart155082, IDtwister262497)",
+                              "defaultCode": "IDquart155082",
+                              "subPrograms": {}
+                            }
+                          }
+                        ],
+                        "prevVarId": "IDquart155082"
+                      },
+                      "defaultCode": "IDtwister262497"
+                    }
+                  },
+                  "defaultCode": "IDopera030770"
+                }
+              }
+            ],
+            "prevVarId": "IDopera030770"
+          },
+          "defaultCode": "IDwish591135"
+        }
+      }
+    ],
+    "prevVarId": "IDwish591135"
+  }
+}
