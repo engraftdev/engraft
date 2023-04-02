@@ -8,25 +8,67 @@
 
   <title>Engraft</title>
 
+  <link rel="stylesheet" href="tufte.css"/>
+
   <style>
     .logo {
-      max-width: 8em;
+      width: 100px;
+      vertical-align: bottom;
+    }
+
+    ul {
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+
+    section {
+      padding-left: 100px;
+    }
+
+    section > dl,
+    section > ol,
+    section > ul {
+      -webkit-padding-start: 45px;
+      width: calc(55% - 45px);
+    }
+
+    @media (max-width: 760px) {
+      section > dl,
+      section > ol,
+      section > ul {
+          width: 90%;
+      }
     }
   </style>
 </head>
 
 <body>
-  <img src="logo.png" class="logo"/>
-  <h1>Engraft</h1>
-  <ul>
-    <li><a href="./testbed">Testbed</a></li>
-    <li><a href="./graft-garden">Graft Garden</a></li>
-    <li>
-      Demos of useEngraft
+  <article>
+    <h1>
+      <img src="logo.png" class="logo"/>
+      Engraft
+    </h1>
+    <section>
       <ul>
-        <li><a href="./use-engraft-demo">Synonymizer (in TypeScript)</a></li>
-        <li><a href="./use-engraft-demo-js">Synonymizer (in JavaScript)</a></li>
-    </li>
-  </ul>
+        <li>
+          <a href="./testbed">Testbed</a>
+        </li>
+        <li>
+          <a href="./graft-garden">Graft Garden</a>
+        </li>
+        <li>
+          Demos of useEngraft:
+        </li>
+        <ul>
+          <li><a href="./use-engraft-demo">Synonymizer (in TypeScript)</a></li>
+          <li><a href="./use-engraft-demo-js">Synonymizer (in JavaScript)</a></li>
+        </ul>
+      </ul>
+      <p>
+        <small>
+          This work is currently in submission. Please do not share publicly. Thanks!
+        </small>
+      </p>
+    </section>
+  </article>
 </body>
-</html>
