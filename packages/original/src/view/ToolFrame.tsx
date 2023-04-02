@@ -62,7 +62,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
         <div
           className="ToolFrame-bar-frontdrop"
           style={{
-            height: 15, fontSize: 13, color: '#0008', display: 'flex', position: 'relative'
+            height: 15, fontSize: 13, color: '#0008', display: 'flex', position: 'relative', zIndex: 1
           }}
         >
           <div style={{
