@@ -1,5 +1,5 @@
 import { EditorState, Extension, StateEffect } from "@codemirror/state";
-import { EditorView, ViewUpdate } from "@codemirror/view";
+import { EditorView, ViewUpdate, tooltips } from "@codemirror/view";
 import { CSSProperties, memo, useEffect, useMemo, useRef, useState } from "react"
 import useInterval from "./useInterval.js";
 
@@ -14,14 +14,20 @@ export type MyCodeMirrorProps = {
   onBlur?: () => void,
 
   autoFocus?: boolean,
+
+  putTooltipsInRoot?: boolean,
 }
 
-export const CodeMirror = memo(function CodeMirror({extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus}: MyCodeMirrorProps) {
+export const CodeMirror = memo(function CodeMirror(props: MyCodeMirrorProps) {
+  const { extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus, putTooltipsInRoot = true } = props;
+
   const [div, setDiv] = useState<HTMLDivElement | null>();
   const stateRef = useRef<EditorState>();
   const viewRef = useRef<EditorView>();
 
   const allExtensions = useMemo(() => {
+    if (!div) { return undefined; }
+
     let allExtensions = extensions.slice();
     allExtensions.push(EditorView.updateListener.of((vu: ViewUpdate) => {
       if (vu.docChanged) {
@@ -37,17 +43,24 @@ export const CodeMirror = memo(function CodeMirror({extensions, style = {}, text
         }
       }
     }));
+
+    if (putTooltipsInRoot) {
+      // motivation: fixes layout of autocomplete tooltip in notebook-canvas
+      const rootNode = div.getRootNode() as Document | ShadowRoot;
+      const tooltipParent = rootNode instanceof Document ? document.body : rootNode as unknown as HTMLElement;
+      allExtensions.push(tooltips({ position: 'absolute', parent: tooltipParent }))
+    }
     return allExtensions
-  }, [extensions, onBlur, onChange, onFocus]);
+  }, [div, extensions, onBlur, onChange, onFocus, putTooltipsInRoot]);
 
   useEffect(() => {
-    if (viewRef.current) {
+    if (viewRef.current && allExtensions) {
       viewRef.current.dispatch({ effects: StateEffect.reconfigure.of(allExtensions) });
     }
   }, [allExtensions]);
 
   useEffect(() => {
-    if (div && !stateRef.current) {
+    if (div && allExtensions && !stateRef.current) {
       stateRef.current = EditorState.create({
         doc: text,
         extensions: allExtensions,
