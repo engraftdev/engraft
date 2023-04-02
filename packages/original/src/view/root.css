@@ -222,3 +222,7 @@ pre {
 .xUnset {
   all: unset;
 }
+
+.xRelative {
+  position: relative;
+}
