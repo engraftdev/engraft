@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node lib/run.js "$@"
