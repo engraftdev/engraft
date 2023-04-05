@@ -1,6 +1,6 @@
 import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, useRefunction, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, useRefunction, usePromiseState, useUpdateProxy, outputBackgroundStyle, useCommonWidth } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -83,10 +83,15 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
     program.def, varBindings, gadgetProgram, gadgetProgramUP
   );
 
+  const leftCommonWidth = useCommonWidth();
+
   return (
     <div className="xCol xGap10 xPad10">
       <div className="xRow xGap10 xAlignTop">
-        <VarDefinition var_={program.def.programVar} />
+        {leftCommonWidth.wrap(
+          <VarDefinition var_={program.def.programVar} />,
+          'right'
+        )}
         <div>
           <Value value={gadgetProgram} />
         </div>
@@ -96,29 +101,35 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
           </button>
         }
       </div>
-      <div className="xRow xGap10">
-        <b>initial program</b>
+    <div className="xRow xGap10">
+        {leftCommonWidth.wrap(
+          <div style={{textAlign: 'right', fontWeight: 'bold'}}>initial<br/>program</div>,
+          'right'
+        )}
         <ShowView view={initialProgramResults.view} updateProgram={programUP.def.initialProgramProgram.$} autoFocus={autoFocus} />
       </div>
       <div className="xRow xGap10">
-        <b>output</b>
+        {leftCommonWidth.wrap(<b>output</b>, 'right')}
         <div>
           <ShowView view={outputResults.view} updateProgram={programUP.def.outputProgram.$} />
           {!outputResults.view.showsOwnOutput && <>
             <div>↓</div>
-            <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
+            <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
               <ToolOutputView outputP={outputResults.outputP} />
             </div>
           </>}
         </div>
       </div>
       <div className="xRow xGap10">
-        <b>view</b>
+      {leftCommonWidth.wrap(
+        <div style={{textAlign: 'right', fontWeight: 'bold'}}>view</div>,
+        'right'
+      )}
         <div>
           <ShowView view={viewResults.view} updateProgram={programUP.def.viewProgram.$} />
           {!viewResults.view.showsOwnOutput && <>
             <div>↓</div>
-            <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, backgroundColor: '#f0f0f0'}}>
+            <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
               <ToolOutputView outputP={viewResults.outputP} displayReactElementsDirectly={true} />
             </div>
           </>}

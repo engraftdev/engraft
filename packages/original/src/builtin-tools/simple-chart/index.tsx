@@ -7,6 +7,7 @@ import { VegaLite, VisualizationSpec } from "react-vega";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { gearIcon, markIcons, typeIcons } from "./icons.js";
+import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 
 // TODO: what hath ESM wrought?
 const Select = SelectModule.default as unknown as typeof import("react-select").default;
@@ -70,6 +71,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       {...props} {...renderProps}
       dataResult={dataResult}
     />,
+    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, dataResult]);
 
   return { outputP, view };
@@ -184,37 +186,40 @@ const View = memo(function View(props: ViewProps) {
     // }
   }), []);
 
-  return <div className="xPad10 xGap10" style={{display: 'grid', gridTemplateColumns: 'repeat(2, auto)'}}>
-    <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', alignSelf: 'center'}}>data</div>
-    <div style={{width: 250}}>
-      <ShowView view={dataResult.view} updateProgram={programUP.dataProgram.$} expand={true}/>
-    </div>
-    <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>mark</div>
-    <div className="xRow xGap10" style={{width: 250}}>
-      <Select
-        options={markOptions}
-        value={markOption}
-        onChange={(markOption) => programUP.mark.$set(markOption?.value)}
-        formatOptionLabel={formatOptionLabel}
-        {...selectProps}
+  return (
+    <div>
+      <InputHeading
+        slot={<ShowView view={dataResult.view} updateProgram={programUP.dataProgram.$}/>}
       />
-      <SettingsToggle active={false} setActive={() => {}} />
+      <div className="xPad10 xGap10" style={{display: 'grid', gridTemplateColumns: 'repeat(2, auto)'}}>
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>mark</div>
+        <div className="xRow xGap10" style={{width: 250}}>
+          <Select
+            options={markOptions}
+            value={markOption}
+            onChange={(markOption) => programUP.mark.$set(markOption?.value)}
+            formatOptionLabel={formatOptionLabel}
+            {...selectProps}
+          />
+          <SettingsToggle active={false} setActive={() => {}} />
+        </div>
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>x-axis</div>
+        <FieldEditor
+          channelTemplates={channelTemplates}
+          channel={xChannel}
+          channelUP={programUP.xChannel}
+          selectProps={selectProps}
+        />
+        <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>y-axis</div>
+        <FieldEditor
+          channelTemplates={channelTemplates}
+          channel={yChannel}
+          channelUP={programUP.yChannel}
+          selectProps={selectProps}
+        />
+      </div>
     </div>
-    <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>x-axis</div>
-    <FieldEditor
-      channelTemplates={channelTemplates}
-      channel={xChannel}
-      channelUP={programUP.xChannel}
-      selectProps={selectProps}
-    />
-    <div style={{color: 'rgb(113, 122, 148)', justifySelf: 'end', paddingTop: 5}}>y-axis</div>
-    <FieldEditor
-      channelTemplates={channelTemplates}
-      channel={yChannel}
-      channelUP={programUP.yChannel}
-      selectProps={selectProps}
-    />
-  </div>;
+  );
 });
 
 type FieldEditorProps = {
