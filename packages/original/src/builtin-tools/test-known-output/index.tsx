@@ -1,5 +1,5 @@
 import { EngraftPromise, Tool, ToolOutput } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ToolOutputView } from "../../view/Value.js";
 
 export type Program = {

@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/eslint-plugin-incr-hooks",
+  "name": "@engraft/eslint-plugin-refunc-hooks",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "ESLint rules for Incr Hooks (adapted from eslint-plugin-react-hooks)",
+  "description": "ESLint rules for Refunc Hooks (adapted from eslint-plugin-react-hooks)",
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",

@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
-import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";

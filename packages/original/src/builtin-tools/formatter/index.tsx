@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';

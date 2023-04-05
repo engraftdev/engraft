@@ -13,7 +13,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/incr": "^0.0.1",
+    "@engraft/refunc": "^0.0.1",
     "@engraft/shared": "^0.0.1",
     "@types/lodash-es": "^4.17.6",
     "friendly-words": "^1.2.0",

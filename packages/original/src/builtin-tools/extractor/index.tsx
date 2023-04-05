@@ -1,5 +1,5 @@
 import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";

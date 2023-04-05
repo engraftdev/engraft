@@ -1,5 +1,5 @@
 import { EngraftPromise, toolFromModule } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as checkbox from "../lib/index.js";
 
@@ -7,7 +7,7 @@ const checkboxTool = toolFromModule(checkbox);
 
 describe('checkbox', () => {
   it('output works', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     [true, false].forEach((checked) => {
       const {outputP} = checkboxTool.run(memory, {
         program: {

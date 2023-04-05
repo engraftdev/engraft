@@ -8,7 +8,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { EditorState, RangeSet } from "@codemirror/state";
 import { Decoration, EditorView, keymap, WidgetType } from "@codemirror/view";
 import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, setSlotWithCode, setSlotWithProgram, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
-import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";

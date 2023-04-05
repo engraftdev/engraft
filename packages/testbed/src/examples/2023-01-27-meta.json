@@ -26,7 +26,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// Run the slider tool, to get an output and a view.\n\nconst mem = new IncrMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program: IDwhitefish971440\n})\n\nreturn result",
+          "code": "// Run the slider tool, to get an output and a view.\n\nconst mem = new RefuncMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program: IDwhitefish971440\n})\n\nreturn result",
           "defaultCode": "",
           "subPrograms": {}
         },
@@ -54,7 +54,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    Meta.sliderTool.programFactory()\n  );\n  const mem = new IncrMemory();\n  const result = Meta.sliderTool.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
+          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    Meta.sliderTool.programFactory()\n  );\n  const mem = new RefuncMemory();\n  const result = Meta.sliderTool.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },
@@ -68,7 +68,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// And just in case you're curious: Here's the Incr\n// memory backing the tool, after one run.\n\nconst program = Meta.sliderTool.programFactory()\n\nconst mem = new IncrMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program\n})\n\nreturn mem",
+          "code": "// And just in case you're curious: Here's the Refunc\n// memory backing the tool, after one run.\n\nconst program = Meta.sliderTool.programFactory()\n\nconst mem = new RefuncMemory();\nconst result = Meta.sliderTool.run(mem, {\n  program\n})\n\nreturn mem",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },

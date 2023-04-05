@@ -342,7 +342,7 @@ module.exports = {
         reportProblem({
           node: writeExpr,
           message:
-            `Assignments to the '${key}' variable from inside Incr Hook ` +
+            `Assignments to the '${key}' variable from inside Refunc Hook ` +
             `${context.getSource(reactiveHook)} will be lost after each ` +
             `render. To preserve the value over time, store it in a useRef ` +
             `Hook and keep the mutable value in the '.current' property. ` +
@@ -378,7 +378,7 @@ module.exports = {
         reportProblem({
           node: declaredDependenciesNode,
           message:
-            `Incr Hook ${context.getSource(reactiveHook)} was passed a ` +
+            `Refunc Hook ${context.getSource(reactiveHook)} was passed a ` +
             'dependency list that is not an array literal. This means we ' +
             "can't statically verify whether you've passed the correct " +
             'dependencies.',
@@ -394,7 +394,7 @@ module.exports = {
             reportProblem({
               node: declaredDependencyNode,
               message:
-                `Incr Hook ${context.getSource(reactiveHook)} has a spread ` +
+                `Refunc Hook ${context.getSource(reactiveHook)} has a spread ` +
                 "element in its dependency array. This means we can't " +
                 "statically verify whether you've passed the " +
                 'correct dependencies.',
@@ -432,7 +432,7 @@ module.exports = {
                 reportProblem({
                   node: declaredDependencyNode,
                   message:
-                    `Incr Hook ${context.getSource(reactiveHook)} has a ` +
+                    `Refunc Hook ${context.getSource(reactiveHook)} has a ` +
                     `complex expression in the dependency array. ` +
                     'Extract it to a separate variable so it can be statically checked.',
                 });
@@ -707,7 +707,7 @@ module.exports = {
       reportProblem({
         node: declaredDependenciesNode,
         message:
-          `Incr Hook ${context.getSource(reactiveHook)} has ` +
+          `Refunc Hook ${context.getSource(reactiveHook)} has ` +
           // To avoid a long message, show the next actionable item.
           (getWarningMessage(missingDependencies, 'a', 'missing', 'include') ||
             getWarningMessage(
@@ -743,13 +743,13 @@ module.exports = {
     function visitCallExpression(node) {
       const callbackIndex = getReactiveHookCallbackIndex(node.callee, options, node);
       if (callbackIndex === -1) {
-        // Not a Incr Hook call that needs deps.
+        // Not a Refunc Hook call that needs deps.
         return;
       }
 
       const callback = node.arguments[callbackIndex];
       const reactiveHook = node.callee;
-      const reactiveHookName = getNodeWithoutIncrNamespace(reactiveHook).name;
+      const reactiveHookName = getNodeWithoutRefuncNamespace(reactiveHook).name;
       const declaredDependenciesNode = node.arguments[callbackIndex + 1];
 
       // Check whether a callback is supplied. If there is no callback supplied
@@ -759,7 +759,7 @@ module.exports = {
         reportProblem({
           node: reactiveHook,
           message:
-            `Incr Hook ${reactiveHookName} requires an effect callback. ` +
+            `Refunc Hook ${reactiveHookName} requires an effect callback. ` +
             `Did you forget to pass a callback to the hook?`,
         });
         return;
@@ -777,7 +777,7 @@ module.exports = {
           reportProblem({
             node: reactiveHook,
             message:
-              `Incr Hook ${reactiveHookName} does nothing when called with ` +
+              `Refunc Hook ${reactiveHookName} does nothing when called with ` +
               `only one argument. Did you forget to pass an array of ` +
               `dependencies?`,
           });
@@ -868,7 +868,7 @@ module.exports = {
           reportProblem({
             node: reactiveHook,
             message:
-              `Incr Hook ${reactiveHookName} received a function whose dependencies ` +
+              `Refunc Hook ${reactiveHookName} received a function whose dependencies ` +
               `are unknown. Pass an inline function instead.`,
           });
           return; // Handled
@@ -878,7 +878,7 @@ module.exports = {
       reportProblem({
         node: reactiveHook,
         message:
-          `Incr Hook ${reactiveHookName} has a missing dependency: '${callback.name}'. ` +
+          `Refunc Hook ${reactiveHookName} has a missing dependency: '${callback.name}'. ` +
           `Either include it or remove the dependency array.`,
         suggest: [
           {
@@ -1290,11 +1290,11 @@ function analyzePropertyChain(node, optionalChains) {
   }
 }
 
-function getNodeWithoutIncrNamespace(node, options) {
+function getNodeWithoutRefuncNamespace(node, options) {
   if (
     node.type === 'MemberExpression' &&
     node.object.type === 'Identifier' &&
-    node.object.name === 'Incr' &&
+    node.object.name === 'Refunc' &&
     node.property.type === 'Identifier' &&
     !node.computed
   ) {
@@ -1309,7 +1309,7 @@ function getNodeWithoutIncrNamespace(node, options) {
 // 1 for useImperativeHandle(ref, fn).
 // For additionally configured Hooks, assume that they're like useEffect (0).
 function getReactiveHookCallbackIndex(calleeNode, options, callNode) {
-  const node = getNodeWithoutIncrNamespace(calleeNode);
+  const node = getNodeWithoutRefuncNamespace(calleeNode);
   if (node.type !== 'Identifier') {
     return -1;
   }

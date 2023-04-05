@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { describe, expect, it } from "vitest";
-import { hookFork, hookIncr, hookRef, hooks } from "../lib/hooks.js";
-import { IncrMemory } from "../lib/incr.js";
+import { hookFork, hookRefunction, hookRef, hooks } from "../lib/hooks.js";
+import { RefuncMemory } from "../lib/refunc.js";
 
 let squareRuns = 0;
 const square = hooks((x: number) => {
@@ -19,7 +19,7 @@ const square = hooks((x: number) => {
 describe('hookRef', () => {
   it('single hookRef works (square)', () => {
     squareRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(square(memory, 10)).toEqual(100);
     expect(squareRuns).toEqual(1);
     expect(square(memory, 10)).toEqual(100);
@@ -37,7 +37,7 @@ describe('hookFork', () => {
     hookFork(branch => {
       for (const key in obj) {
         branch(key, () => {
-          result[key] = hookIncr(square, obj[key]);
+          result[key] = hookRefunction(square, obj[key]);
         });
       }
     });
@@ -46,7 +46,7 @@ describe('hookFork', () => {
 
   it('basically works', () => {
     squareRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
     expect(squareRuns).toEqual(2);
     expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
@@ -57,7 +57,7 @@ describe('hookFork', () => {
 
   it('cleans up appropriately (check 1)', () => {
     squareRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(squareEach(memory, {x: 1, y: 2})).toEqual({x: 1, y: 4});
     expect(squareRuns).toEqual(2);
     expect(squareEach(memory, {x: 1})).toEqual({x: 1});
@@ -68,7 +68,7 @@ describe('hookFork', () => {
 
   it('cleans up appropriately (check 2)', () => {
     squareRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(squareEach(memory, {x: 1})).toEqual({x: 1});
     expect(squareRuns).toEqual(1);
     const memoryAfterJustX = _.cloneDeep(memory);

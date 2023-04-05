@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { refEq } from "@engraft/shared/lib/eq.js";
-import { IncrMemory } from "../lib/incr.js";
+import { RefuncMemory } from "../lib/refunc.js";
 import { hookMemo } from "../lib/hookMemo.js";
 import { hooks } from "../lib/hooks.js";
 
@@ -15,7 +15,7 @@ describe('hookMemo without equality function', () => {
 
   it('does not re-run when arguments stay the same', () => {
     minusRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 5)).toBe(5);
@@ -24,7 +24,7 @@ describe('hookMemo without equality function', () => {
 
   it('does re-run when arguments change', () => {
     minusRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(minus(memory, 10, 5)).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, 10, 6)).toBe(4);
@@ -43,7 +43,7 @@ describe('hookMemo with equality function', () => {
 
   it('does not re-run when arguments stay the same', () => {
     minusRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     const props = {x: 10, y: 5}
     expect(minus(memory, props)).toBe(5);
     expect(minusRuns).toBe(1);
@@ -53,7 +53,7 @@ describe('hookMemo with equality function', () => {
 
   it('does re-run when arguments change', () => {
     minusRuns = 0;
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     expect(minus(memory, {x: 10, y: 5})).toBe(5);
     expect(minusRuns).toBe(1);
     expect(minus(memory, {x: 10, y: 5})).toBe(5);

@@ -2,7 +2,7 @@ import {
   ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
   ToolProps, ToolRun, ToolView, ToolViewRenderProps
 } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { union } from "@engraft/shared/lib/sets.js";
 import { useCommonWidth } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";

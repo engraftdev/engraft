@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolRun, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ControlledTextInput } from "../../util/ControlledTextInput.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 

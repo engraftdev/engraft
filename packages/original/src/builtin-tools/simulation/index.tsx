@@ -1,6 +1,6 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
-import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/incr";
-import { useIncr } from "@engraft/incr-react";
+import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { useRefunction } from "@engraft/refunc-react";
 import { difference, union } from "@engraft/shared/lib/sets.js";
 import { outputBackgroundStyle } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -105,7 +105,7 @@ const View = memo((props: ViewProps) => {
     ...varBindings,
     [program.stateVar.id]: { var_: program.stateVar, outputP: tickOutputP },
   }), [varBindings, program.stateVar, tickOutputP]);
-  const toDrawResult = useIncr(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings });
+  const toDrawResult = useRefunction(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings });
   const unresolvedP = useMemo(() => EngraftPromise.unresolved<ToolOutput>(), []);
   const beforeSelectedTickOutputP = selectedTick === 0 ? unresolvedP : onTickResults[selectedTick-1].outputP;
   const afterSelectedTickOutputP = onTickResults[selectedTick].outputP;

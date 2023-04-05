@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
 import {FileRejection } from "react-dropzone";

@@ -1,6 +1,6 @@
 import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, useIncr, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, useRefunction, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -56,7 +56,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   const { program, updateProgram, varBindings, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const initialProgramResults = useIncr(runTool, {program: program.def.initialProgramProgram, varBindings});
+  const initialProgramResults = useRefunction(runTool, {program: program.def.initialProgramProgram, varBindings});
   const initialProgramOutputState = usePromiseState(initialProgramResults.outputP);
 
   const [gadgetProgram, setGadgetProgram] = useState<unknown | null>(() => {
@@ -73,12 +73,12 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   }, [gadgetProgram, initialProgramOutputState.status, initialProgramOutputState]);
   const gadgetProgramUP = useUpdateProxy(setGadgetProgram) as UpdateProxy<unknown>;
 
-  const outputResults = useIncr(
+  const outputResults = useRefunction(
     runOutputProgram,
     program.def, varBindings, gadgetProgram
   );
 
-  const viewResults = useIncr(
+  const viewResults = useRefunction(
     runViewProgram,
     program.def, varBindings, gadgetProgram, gadgetProgramUP
   );

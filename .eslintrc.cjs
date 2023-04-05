@@ -5,7 +5,7 @@ module.exports = {
     "react-app"
   ],
   plugins: [
-    "@engraft/incr-hooks"
+    "@engraft/refunc-hooks"
   ],
   settings: {
     'import/resolver': {
@@ -26,7 +26,7 @@ module.exports = {
         varsIgnorePattern: "^_"
       }
     ],
-    "@engraft/incr-hooks/exhaustive-deps": "warn",
+    "@engraft/refunc-hooks/exhaustive-deps": "warn",
     "import/no-restricted-paths": [
       "error",
       {

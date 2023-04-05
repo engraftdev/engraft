@@ -1,10 +1,10 @@
-import { IncrFunction, IncrMemory } from "./incr.js";
+import { Refunction, RefuncMemory } from "./refunc.js";
 
 // a way to make mentos using React-hook-like sugar
 
-export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): IncrFunction<Args, Return> {
-  return (memory: IncrMemory, ...args) => {
-    const memoryForHooks = memory as IncrMemory & { path?: HookPath };
+export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): Refunction<Args, Return> {
+  return (memory: RefuncMemory, ...args) => {
+    const memoryForHooks = memory as RefuncMemory & { path?: HookPath };
     if (!memoryForHooks.path) {
       memoryForHooks.path = new HookPath();
     }
@@ -84,7 +84,7 @@ export function runWithPath<Return>(f: () => Return, path: HookPath): Return {
 
   let result = f();
 
-  // TODO: figure out how error-handling should work for hooky functions (incr functions in general?)
+  // TODO: figure out how error-handling should work for hooky functions (refunctions in general?)
 
   GLOBAL_PATH_POSITION = oldPosition;
 
@@ -152,14 +152,14 @@ export function hookLater(): <Return>(f: () => Return) => Return {
   // We never call group.done – by construction, this fork will only ever have a single branch.
 }
 
-// Run an arbitrary incr in a hooky function, keeping its memory between runs.
-export function hookIncr<Args extends unknown[], Return>(incr: IncrFunction<Args, Return>, ...args: Args): Return {
-  const memory = hookRef(() => new IncrMemory(), 'hookIncr');
-  return incr(memory.current, ...args);
+// Run an arbitrary refunction in a hooky function, keeping its memory between runs.
+export function hookRefunction<Args extends unknown[], Return>(f: Refunction<Args, Return>, ...args: Args): Return {
+  const memory = hookRef(() => new RefuncMemory(), 'hookRefunction');
+  return f(memory.current, ...args);
 }
 
-// Establish a persistent memory for a shared IncrFunction that can be used multiple times.
-export function hookSharedIncr<Args extends unknown[], Return>(incr: IncrFunction<Args, Return>): (...args: Args) => Return {
-  const memory = hookRef(() => new IncrMemory(), 'hookSharedIncr');
-  return (...args: Args) => incr(memory.current, ...args);
+// Establish a persistent memory for a shared refunction that can be used multiple times.
+export function hookSharedRefunction<Args extends unknown[], Return>(f: Refunction<Args, Return>): (...args: Args) => Return {
+  const memory = hookRef(() => new RefuncMemory(), 'hookSharedRefunction');
+  return (...args: Args) => f(memory.current, ...args);
 }

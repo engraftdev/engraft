@@ -1,5 +1,5 @@
 import { EngraftPromise, Tool, ToolProps, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { memo, useState } from "react";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 

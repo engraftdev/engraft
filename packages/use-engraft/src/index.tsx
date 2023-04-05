@@ -5,7 +5,7 @@ import { RootStyles } from "@engraft/original/lib/view/IsolateStyles.js";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { EngraftPromise, randomId, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useIncr, usePromiseState, useUpdateProxy, VarBinding, VarBindings } from "@engraft/toolkit";
+import { EngraftPromise, randomId, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useRefunction, usePromiseState, useUpdateProxy, VarBinding, VarBindings } from "@engraft/toolkit";
 import * as IDBKV from 'idb-keyval';
 import _ from "lodash";
 import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
@@ -64,7 +64,7 @@ export function useEngraft(props: UseEngraftProps) {
     program || { savedProgramId: randomId(), program: slotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
-  const {outputP, view} = useIncr(runTool, { program: draft.program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program: draft.program, varBindings });
   const outputState = usePromiseState(outputP);
 
   const [useDefault, setUseDefault] = useState(!!edit);

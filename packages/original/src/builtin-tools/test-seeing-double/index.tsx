@@ -1,5 +1,5 @@
 import { hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 

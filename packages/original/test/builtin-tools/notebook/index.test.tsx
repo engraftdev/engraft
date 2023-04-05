@@ -1,5 +1,5 @@
 import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";
@@ -22,7 +22,7 @@ const prevVarId = 'IDprev000000';
 
 describe('notebook', () => {
   it('output basically works; no unnecessary runs of cells', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
 
     let cell1Runs = 0;
     let cell2Runs = 0;
@@ -102,7 +102,7 @@ describe('notebook', () => {
 
     expect(
       EngraftPromise.state(
-        notebookTool.run(new IncrMemory(), {
+        notebookTool.run(new RefuncMemory(), {
           program,
           varBindings: empty,
         }).outputP
@@ -124,7 +124,7 @@ describe('notebook', () => {
   });
 
   it('changing earlier cell through external binding propagates to later cell', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     const externalVar = newVar('external');
     const cell1 = newVar('cell1');
     const cell2 = newVar('cell2');

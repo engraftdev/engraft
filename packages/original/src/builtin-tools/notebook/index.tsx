@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
-import { hookIncr, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookRefunction, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { cellNetwork, cellNetworkReferences, outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -55,7 +55,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { cells, prevVarId } = program;
 
-  const cellResults = hookIncr(cellNetwork, { cells, varBindings, prevVarId });
+  const cellResults = hookRefunction(cellNetwork, { cells, varBindings, prevVarId });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);

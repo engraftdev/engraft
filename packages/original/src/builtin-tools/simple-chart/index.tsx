@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import * as SelectModule from "react-select";
 import { Props as SelectProps } from "react-select";

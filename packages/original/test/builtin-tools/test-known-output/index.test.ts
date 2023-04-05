@@ -1,5 +1,5 @@
 import { EngraftPromise, toolFromModule } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as testKnownOutput from "../../../lib/builtin-tools/test-known-output/index.js";
 import { empty } from "../../../lib/util/noOp.js";
@@ -10,7 +10,7 @@ const testKnownOutputTool = toolFromModule(testKnownOutput);
 
 describe('test-known-output', () => {
   it('output basically works', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
     [1, 2, 3].forEach((value) => {
       const {outputP} = testKnownOutputTool.run(memory, {
         program: {
@@ -24,7 +24,7 @@ describe('test-known-output', () => {
   });
 
   it('onRun basically works', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
 
     let runs = 0;
     let program: testKnownOutput.Program = {

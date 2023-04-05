@@ -1,5 +1,5 @@
 import { EngraftPromise, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, Var, VarBindings } from "@engraft/core";
-import { hookDedupe, hookFork, hookMemo, hooks, hookSharedIncr, memoizeForever } from "@engraft/incr";
+import { hookDedupe, hookFork, hookMemo, hooks, hookSharedRefunction, memoizeForever } from "@engraft/refunc";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
 import _ from "lodash";
@@ -41,7 +41,7 @@ export const cellNetwork = hooks((props: CellNetworkProps) => {
   // Make a little placeholder for every cell which will be used when a cell doesn't refer to it yet
   // TODO: this is kinda a "possibleVarBindings" thing; idk how it should really work.
 
-  const makePlaceholder = hookSharedIncr(memoizeForever((var_: Var) => {
+  const makePlaceholder = hookSharedRefunction(memoizeForever((var_: Var) => {
     return {var_, outputP: EngraftPromise.reject<ToolOutput>(new Error("just a placeholder"))};
   }));
 

@@ -1,4 +1,4 @@
-import { hookDedupe, hookFork, hookIncr, hookMemo, hooks } from "@engraft/incr";
+import { hookDedupe, hookFork, hookRefunction, hookMemo, hooks } from "@engraft/refunc/lib/index.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { lookUpToolByProgram, references, ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core.js";
 
@@ -10,7 +10,7 @@ export function hookRunTool<P extends ToolProgram>(props: ToolProps<P>): ToolRes
   // TODO: hookKeyed?
   return hookFork((branch) =>
     branch(toolName, () => {
-      return hookIncr(tool.run, props);
+      return hookRefunction(tool.run, props);
     })
   );
 }

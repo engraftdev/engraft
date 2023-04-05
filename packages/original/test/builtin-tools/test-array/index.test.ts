@@ -1,5 +1,5 @@
 import { EngraftPromise, registerTool, toolFromModule } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { updateWithUP } from "@engraft/update-proxy";
 import { describe, expect, it } from "vitest";
 import * as TestArray from "../../../lib/builtin-tools/test-array/index.js";
@@ -13,7 +13,7 @@ registerTool(toolFromModule(TestKnownOutput));
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
 
     let subTool1Runs = 0;
     let subTool2Runs = 0;

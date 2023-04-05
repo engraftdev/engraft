@@ -1,9 +1,8 @@
 {
-  "private": true,
-  "name": "@engraft/incr-react",
+  "name": "@engraft/refunc",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "React features for Incr",
+  "description": "Library for incremental computation",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
@@ -14,9 +13,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/incr": "^0.0.1"
-  },
-  "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "@engraft/shared": "^0.0.1"
   }
 }

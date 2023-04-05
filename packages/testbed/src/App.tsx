@@ -1,6 +1,6 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
 import { EngraftPromise, getFullToolIndex, lookUpToolByName, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from "@engraft/core";
-import { useIncr } from "@engraft/incr-react";
+import { useRefunction } from "@engraft/refunc-react";
 import { Updater } from "@engraft/original/lib/util/immutable.js";
 import { useStateSetOnly } from "@engraft/original/lib/util/immutable-react.js";
 import range from "@engraft/original/lib/util/range.js";
@@ -132,7 +132,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
-  const {outputP, view} = useIncr(runTool, { program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program, varBindings });
 
   const [showTool, setShowTool] = useStateSetOnly(() => true);
   const [showOutput, setShowOutput] = useStateSetOnly(() => false);

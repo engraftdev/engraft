@@ -1,5 +1,5 @@
 import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
-import { useIncr } from "@engraft/incr-react";
+import { useRefunction } from "@engraft/refunc-react";
 import { createContext, CSSProperties, memo, ReactNode, useContext, useMemo } from "react";
 import { ErrorBoundary } from "../../util/ErrorBoundary.js";
 import { hashId, updateById } from "../../util/id.js";
@@ -355,7 +355,7 @@ const ViewFormatProgram = memo(function ViewFormatProgram(props: {
   const { formatProgram, node } = props;
 
   const varBindings = useMemo(() => makeVarBindingsForData(node.innerData), [node.innerData]);
-  const { outputP } = useIncr(runTool, { program: formatProgram, varBindings })
+  const { outputP } = useRefunction(runTool, { program: formatProgram, varBindings })
 
   return <ToolOutputBuffer outputP={outputP} renderValue={identity} />;
 });

@@ -17,8 +17,8 @@
   "dependencies": {
     "@engraft/all-the-tools": "0.0.1",
     "@engraft/core": "^0.0.1",
-    "@engraft/incr": "^0.0.1",
-    "@engraft/incr-react": "^0.0.1",
+    "@engraft/refunc": "^0.0.1",
+    "@engraft/refunc-react": "^0.0.1",
     "@engraft/original": "^0.0.1",
     "@happy-dom/global-registrator": "^8.9.0",
     "express": "^4.18.2",

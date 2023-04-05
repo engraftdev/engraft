@@ -1,5 +1,5 @@
 import { EngraftPromise, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as functionM from "../../../lib/builtin-tools/function/index.js";
 import { empty } from "../../../lib/util/noOp.js";
@@ -14,7 +14,7 @@ registerTool(toolFromModule(slot));
 
 describe('function', () => {
   it('output works', () => {
-    const memory = new IncrMemory();
+    const memory = new RefuncMemory();
 
     const input1 = newVar('input 1');
     const input2 = newVar('input 2');

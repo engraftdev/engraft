@@ -1,5 +1,5 @@
 import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../../lib/builtin-tools/simulation/index.js";
 import * as slot from "../../../lib/builtin-tools/slot/index.js";
@@ -23,7 +23,7 @@ describe('simulation', () => {
 
     expect(
       EngraftPromise.state(
-        simulationTool.run(new IncrMemory(), {
+        simulationTool.run(new RefuncMemory(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
         }).outputP

@@ -1,5 +1,5 @@
 import { EngraftPromise, hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
 import { union } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy } from "@engraft/update-proxy";

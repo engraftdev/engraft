@@ -1,5 +1,5 @@
 import { ComputeReferences, hookRunTool, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { ValueEditable } from "../../view/ValueEditable.js";
 

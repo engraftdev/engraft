@@ -1,6 +1,6 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
 import { EngraftPromise, runTool, ShowView, ToolProgram, usePromiseState } from "@engraft/core";
-import { useIncr } from "@engraft/incr-react";
+import { useRefunction } from "@engraft/refunc-react";
 import { Updater } from "@engraft/original/lib/util/immutable.js";
 import { useLocalStorage } from "@engraft/original/lib/util/useLocalStorage.js";
 import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
@@ -120,7 +120,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: input})},
   ]), [input]);
 
-  const {outputP, view} = useIncr(runTool, { program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program, varBindings });
 
   const stdoutP = useMemo(() => {
     return outputP.then(({value}) => ({value: valueToStdout(value)}));

@@ -1,7 +1,7 @@
 // adapted from https://github.com/marcelklehr/toposort/blob/master/test.js
 
 import { EngraftPromise, ProgramOf } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 import { Fragment } from "react";
 import { describe, expect, it } from "vitest";
 import { defineSimpleTool } from "../lib/simple-tool.js";
@@ -32,7 +32,7 @@ describe('simple-tool', () => {
     const varBindings1 = {};
     const varBindings2 = {};
 
-    const mem = new IncrMemory();
+    const mem = new RefuncMemory();
     const results1 = knownValueTool.run(mem, { program, varBindings: varBindings1 });
     expect(EngraftPromise.state(results1.outputP)).toEqual({ status: 'fulfilled', value: { value: 10 } });
     const results2 = knownValueTool.run(mem, { program, varBindings: varBindings2 });

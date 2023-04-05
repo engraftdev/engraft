@@ -1,7 +1,7 @@
 import { memo, useEffect } from "react";
 import { Setter } from "../util/immutable.js";
 import IsolateStyles from "../view/IsolateStyles.js";
-import { useIncr } from "@engraft/incr-react";
+import { useRefunction } from "@engraft/refunc-react";
 import { PromiseState, runTool, ShowView, ToolOutput, ToolProps, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 
 type ToolWithViewProps =
@@ -12,7 +12,7 @@ type ToolWithViewProps =
 export const ToolWithView = memo(function ToolWithView(props: ToolWithViewProps) {
   const { program, varBindings, reportOutputState, ...rest } = props;
 
-  const {outputP, view} = useIncr(runTool, { program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program, varBindings });
 
   const outputState = usePromiseState(outputP);
   useEffect(() => {

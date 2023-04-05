@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
-import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";

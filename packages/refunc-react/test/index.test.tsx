@@ -1,20 +1,20 @@
-import { IncrFunction, memoize } from "@engraft/incr";
-import { useIncr } from "../lib/index.js";
+import { Refunction, memoize } from "@engraft/refunc";
+import { useRefunction } from "../lib/index.js";
 import React, { Fragment } from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 
-describe('useIncr', () => {
+describe('useRefunction', () => {
   it('basically works', () => {
     let squareRuns = 0;
-    const squareIncr = memoize(IncrFunction.fromFunction((x: number) => {
+    const squareRefunc = memoize(Refunction.fromFunction((x: number) => {
       squareRuns++;
       return x * x;
     }));
 
     let output: number | null = null;
     const MyComponent = (props: {x: number}) => {
-      output = useIncr(squareIncr, props.x);
+      output = useRefunction(squareRefunc, props.x);
       return null;
     };
 

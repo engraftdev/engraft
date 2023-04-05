@@ -1,5 +1,5 @@
 import { EngraftPromise, toolFromModule, usePromiseState } from "@engraft/core";
-import { hookFork, hookIncr, hookMemo, hookRef, hooks, IncrMemory } from "@engraft/incr";
+import { hookFork, hookRefunction, hookMemo, hookRef, hooks, RefuncMemory } from "@engraft/refunc";
 import update from "immutability-helper";
 import _ from "lodash";
 import React, { memo, ReactNode, useEffect, useState } from "react";
@@ -88,14 +88,14 @@ export const globals = {
   GoogleMap,
   html,
   Diagram,
-  Incr: {
+  Refunc: {
     hooks,
     hookRef,
     hookFork,
     hookMemo,
-    hookIncr,
+    hookRefunction,
   },
-  IncrMemory,
+  RefuncMemory,
   Meta: {
     sliderTool,
   },

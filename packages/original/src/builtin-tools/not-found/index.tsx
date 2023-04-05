@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr";
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 
 export type Program = {
   toolName: 'not-found',

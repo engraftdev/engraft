@@ -1,7 +1,7 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
 import { runTool } from "@engraft/core";
-import { useIncr } from "@engraft/incr-react";
+import { useRefunction } from "@engraft/refunc-react";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
@@ -42,7 +42,7 @@ type ViewPatchActualViewProps = {
 const ViewPatchActualView = memo(function ViewPatchActualView(props: ViewPatchActualViewProps) {
   const { patch } = props;
   const { varBindings } = usePatchState(patch);
-  const { outputP } = useIncr(runTool, { program: patch.toolProgram, varBindings });
+  const { outputP } = useRefunction(runTool, { program: patch.toolProgram, varBindings });
 
   return <ToolOutputView outputP={outputP} displayReactElementsDirectly={true}/>;
 })

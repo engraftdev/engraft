@@ -1,5 +1,5 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, PromiseState, randomId, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
-import { hookMemo, hooks, memoizeProps } from "@engraft/incr"
+import { hookMemo, hooks, memoizeProps } from "@engraft/refunc"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
 import { CodeMirror } from "../../util/CodeMirror.js"

@@ -2,7 +2,7 @@ import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
 import { EngraftPromise, lookUpToolByName, runTool, slotWithProgram, ToolProgram } from '@engraft/core';
-import { IncrMemory } from '@engraft/incr';
+import { RefuncMemory } from '@engraft/refunc';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
 import { exit } from 'node:process';
@@ -75,7 +75,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     global.window = {} as any;
 
-    const mem = new IncrMemory();
+    const mem = new RefuncMemory();
     const { outputP } = runTool(mem, { program, varBindings })
 
     try {

@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookIncr, hookLater, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, useIncr, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookRefunction, hookLater, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, useRefunction, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -53,7 +53,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         const closure = closureOutput.value as GadgetClosure;
         const { def, closureVarBindings } = closure;
 
-        const outputResults = hookIncr(
+        const outputResults = hookRefunction(
           runOutputProgram,
           def, closureVarBindings, gadgetProgram
         );
@@ -74,7 +74,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   const { program, updateProgram, varBindings, gadgetProgramP, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const closureResults = useIncr(runTool, {program: program.closureProgram, varBindings});
+  const closureResults = useRefunction(runTool, {program: program.closureProgram, varBindings});
   const closureOutputState = usePromiseState(closureResults.outputP);
 
   const gadgetProgramState = usePromiseState(gadgetProgramP);
@@ -111,7 +111,7 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
     }
   }, [gadgetProgram, gadgetProgramUP, program.gadgetProgram]);
 
-  const viewResults = useIncr(runViewProgram,
+  const viewResults = useRefunction(runViewProgram,
     closure.def, closure.closureVarBindings, gadgetProgram, gadgetProgramUP
   );
 

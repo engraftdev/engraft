@@ -4,7 +4,7 @@ import { useContextMenu } from "@engraft/original/lib/util/useContextMenu.js";
 import { MyContextMenu, MyContextMenuHeading } from "@engraft/original/lib/view/MyContextMenu.js";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookIncr, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, updateWithUP, useUpdateProxy, Var } from "@engraft/toolkit";
+import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookRefunction, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, updateWithUP, useUpdateProxy, Var } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { PaneGeo, roundTo } from "./noodle-canvas/model.js";
@@ -55,7 +55,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { cells } = program;
 
-  const cellResults = hookIncr(cellNetwork, { cells, varBindings });
+  const cellResults = hookRefunction(cellNetwork, { cells, varBindings });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);

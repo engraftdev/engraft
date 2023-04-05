@@ -1,4 +1,4 @@
-import { IncrFunction } from "@engraft/incr";
+import { Refunction } from "@engraft/refunc/lib/index.js";
 import { weakMapCache } from "@engraft/shared/lib/cache.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { ReactElement } from "react";
@@ -19,7 +19,7 @@ export type ToolProgram = {
 }
 
 export type ToolRun<P extends ToolProgram> =
-  IncrFunction<[props: ToolProps<P>], ToolResult<P>>;
+  Refunction<[props: ToolProps<P>], ToolResult<P>>;
 
 export type ToolProps<P extends ToolProgram> = {
   program: P,

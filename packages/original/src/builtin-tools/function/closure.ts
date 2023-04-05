@@ -1,5 +1,5 @@
 import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
-import { IncrMemory } from "@engraft/incr";
+import { RefuncMemory } from "@engraft/refunc";
 
 export type Closure = {
   vars: Var[],
@@ -28,7 +28,7 @@ export function closureToSyncFunction(closure: Closure) {
     const varBindings = valuesToVarBindings(args, vars);
 
     const result = runTool(
-      new IncrMemory(),  // no incrementality
+      new RefuncMemory(),  // no incrementality
       {
         program: bodyProgram,
         varBindings: {

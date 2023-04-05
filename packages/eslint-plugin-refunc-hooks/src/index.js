@@ -3,9 +3,9 @@ const ExhaustiveDeps = require('./ExhaustiveDeps');
 module.exports = {
   configs: {
     recommended: {
-      plugins: ['@engraft/incr-hooks'],
+      plugins: ['@engraft/refunc-hooks'],
       rules: {
-        '@engraft/incr-hooks/exhaustive-deps': 'warn',
+        '@engraft/refunc-hooks/exhaustive-deps': 'warn',
       },
     },
   },
