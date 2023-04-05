@@ -5,6 +5,9 @@ import { ReactElement } from "react";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";
 
+// NOTE: The Engraft codebase uses "tool" to refer to what our paper calls
+// "components". This is outdated terminology that will be changed soon.
+
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
   programFactory: ProgramFactory<P>;
