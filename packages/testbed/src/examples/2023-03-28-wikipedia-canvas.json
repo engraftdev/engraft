@@ -33,7 +33,7 @@
         },
         "geo": {
           "x": 48,
-          "y": 32,
+          "y": 16,
           "width": 336,
           "height": 576
         },
@@ -95,8 +95,8 @@
           }
         },
         "geo": {
-          "x": 416,
-          "y": 32,
+          "x": 432,
+          "y": 16,
           "width": 352,
           "height": 496
         },
@@ -193,7 +193,7 @@
         },
         "geo": {
           "x": 48,
-          "y": 656,
+          "y": 624,
           "width": 336,
           "height": 640
         },
@@ -207,14 +207,14 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "<div>\n  <h1 style={{fontFamily: 'Marker Felt'}}>Randompedia</h1>\n  {IDwood911036}\n</div>",
+          "code": "<div>\n<h1 style={{fontFamily: 'Palatino'}}>\n  Randompedia\n</h1>\n{IDwood911036}\n</div>",
           "defaultCode": "",
           "subPrograms": {}
         },
         "geo": {
           "x": 416,
-          "y": 608,
-          "width": 512,
+          "y": 560,
+          "width": 384,
           "height": 560
         },
         "showOutputOnly": false
@@ -224,7 +224,7 @@
       "id": "IDlighter258783",
       "label": "prev"
     },
-    "width": 960,
-    "height": 1136
+    "width": 816,
+    "height": 944
   }
 }

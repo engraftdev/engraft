@@ -18,8 +18,8 @@
               "toolName": "slot",
               "modeName": "code",
               "code": "\"https://en.wikipedia.org/w/api.php\"",
-              "defaultCode": "\"https://httpbin.org/get\"",
-              "subPrograms": {}
+              "subPrograms": {},
+              "defaultCode": "\"https://httpbin.org/get\""
             },
             "paramsProgram": {
               "toolName": "slot",
@@ -31,7 +31,8 @@
             "pauseRequest": false
           },
           "defaultCode": ""
-        }
+        },
+        "outputManualHeight": 779
       },
       {
         "var_": {
@@ -93,7 +94,7 @@
       {
         "var_": {
           "id": "IDlasagna974419",
-          "label": "A"
+          "label": "formatted"
         },
         "program": {
           "toolName": "slot",
@@ -184,12 +185,12 @@
       {
         "var_": {
           "id": "IDallium289983",
-          "label": "B"
+          "label": "with heading"
         },
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "<div>\n  <h1 style={{fontFamily: 'Marker Felt'}}>Randompedia</h1>\n  {IDfront111483}\n</div>",
+          "code": "<div>\n<h1 style={{fontFamily: 'Palatino'}}>\n  Randompedia\n</h1>\n{IDfront111483}\n</div>",
           "defaultCode": "IDfront111483",
           "subPrograms": {}
         },
