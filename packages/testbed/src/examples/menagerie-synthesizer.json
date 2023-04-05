@@ -1,0 +1,27 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "synthesizer",
+    "inputProgram": {
+      "toolName": "slot",
+      "modeName": "code",
+      "code": "\"Input Without Provided Output\"",
+      "defaultCode": "",
+      "subPrograms": {}
+    },
+    "code": "input.split(' ').map((x) => x[0]).join('')",
+    "inOutPairs": [
+      {
+        "id": "IDtungsten196389",
+        "inCode": "\"George Washington Carver\"",
+        "outCode": "\"GWC\""
+      },
+      {
+        "id": "IDarrow061111",
+        "inCode": "\"David Attenborough\"",
+        "outCode": "\"DA\""
+      }
+    ]
+  }
+}

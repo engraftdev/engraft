@@ -1,0 +1,80 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDocicat278045",
+          "label": "time gadget"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-definer",
+            "def": {
+              "initialProgramProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "{ time: '02:30' }",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "outputProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "IDtick764409.time",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "viewProgram": {
+                "toolName": "slot",
+                "modeName": "code",
+                "code": "<input\n  type=\"time\" style={{width: 110}}\n  value={IDtick764409.time}\n  onChange={(e) =>\n    IDwinter054132.time.$set(e.target.value)\n  }\n/>",
+                "defaultCode": "",
+                "subPrograms": {}
+              },
+              "programVar": {
+                "id": "IDtick764409",
+                "label": "program"
+              },
+              "programUPVar": {
+                "id": "IDwinter054132",
+                "label": "program updater"
+              }
+            }
+          },
+          "defaultCode": ""
+        },
+        "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDowl491944",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "gadget-user",
+            "closureProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDocicat278045",
+              "defaultCode": "",
+              "subPrograms": {}
+            },
+            "gadgetProgram": {
+              "time": "04:05"
+            }
+          },
+          "defaultCode": "IDprincipal736511"
+        }
+      }
+    ],
+    "prevVarId": "IDprincipal736511"
+  }
+}

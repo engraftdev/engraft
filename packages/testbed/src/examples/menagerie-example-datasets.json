@@ -1,0 +1,56 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDrabbit188545",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "example-datasets",
+            "fields": {
+              "datasetName": "olympians"
+            },
+            "subTools": {}
+          },
+          "defaultCode": ""
+        },
+        "outputManualHeight": 77
+      },
+      {
+        "var_": {
+          "id": "IDwaitress989419",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "data-table",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDdolphin292158",
+              "defaultCode": "IDdolphin292158",
+              "subPrograms": {}
+            },
+            "transforms": {
+              "sort": [],
+              "filter": [],
+              "names": []
+            },
+            "cellWidths": {}
+          },
+          "defaultCode": "IDdolphin292158"
+        }
+      }
+    ],
+    "prevVarId": "IDdolphin292158"
+  }
+}

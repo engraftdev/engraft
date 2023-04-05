@@ -1,0 +1,45 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDamethyst894619",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "example-datasets",
+                "fields": {
+                  "datasetName": "cars"
+                },
+                "subTools": {}
+              },
+              "defaultCode": ""
+            },
+            "mark": "point",
+            "xChannel": {
+              "field": "economy (mpg)",
+              "type": "quantitative"
+            },
+            "yChannel": {
+              "field": "displacement (cc)",
+              "type": "quantitative"
+            }
+          }
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVarId": "IDface414118"
+  }
+}

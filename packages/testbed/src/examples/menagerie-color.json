@@ -1,0 +1,38 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDsole978612",
+          "label": "star"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<h1 style={{color: IDatom831336}}>\n  ★★★\n</h1>",
+          "defaultCode": "IDclover116038",
+          "subPrograms": {
+            "IDatom831336": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "color",
+                "fields": {
+                  "r": 230,
+                  "g": 191,
+                  "b": 64
+                },
+                "subTools": {}
+              }
+            }
+          }
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVarId": "IDclover116038"
+  }
+}

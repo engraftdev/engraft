@@ -1,0 +1,38 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDsailor264826",
+          "label": "confetti"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "npm",
+            "packageName": "canvas-confetti"
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDgeese353480",
+          "label": "button"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "<button\n  onClick={() => IDsailor264826.default()}\n>\n  Celebrate!\n</button>",
+          "defaultCode": "IDmagnesium183044",
+          "subPrograms": {}
+        }
+      }
+    ],
+    "prevVarId": "IDmagnesium183044"
+  }
+}

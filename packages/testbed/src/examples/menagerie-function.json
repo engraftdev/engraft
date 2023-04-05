@@ -1,0 +1,112 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDalibi344480",
+          "label": "initials func"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "function",
+            "vars": [
+              {
+                "id": "IDcartoon848035",
+                "label": "name"
+              }
+            ],
+            "bodyProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "notebook",
+                "cells": [
+                  {
+                    "var_": {
+                      "id": "IDpeace636258",
+                      "label": "A"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDcartoon848035.split(' ')",
+                      "defaultCode": "IDcartoon848035",
+                      "subPrograms": {}
+                    },
+                    "outputManualHeight": "infinity"
+                  },
+                  {
+                    "var_": {
+                      "id": "IDhardhat214762",
+                      "label": "B"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDdeath273464.map(w => w[0])",
+                      "defaultCode": "IDdeath273464",
+                      "subPrograms": {}
+                    },
+                    "outputManualHeight": "infinity"
+                  },
+                  {
+                    "var_": {
+                      "id": "IDsnapper203855",
+                      "label": "C"
+                    },
+                    "program": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDdeath273464.join('')",
+                      "defaultCode": "IDdeath273464",
+                      "subPrograms": {}
+                    }
+                  }
+                ],
+                "prevVarId": "IDdeath273464"
+              },
+              "defaultCode": "IDcartoon848035"
+            },
+            "examples": [
+              {
+                "id": "IDradish841865",
+                "values": [
+                  "David Attenborough"
+                ]
+              },
+              {
+                "id": "IDmanta532542",
+                "values": [
+                  "George Washington Carver"
+                ]
+              }
+            ],
+            "activeExampleId": "IDradish841865"
+          },
+          "defaultCode": ""
+        },
+        "outputManualHeight": 83
+      },
+      {
+        "var_": {
+          "id": "IDlemonade854979",
+          "label": "initials use"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDalibi344480('Michael Jackson')",
+          "subPrograms": {},
+          "defaultCode": "IDmonarch481242"
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVarId": "IDmonarch481242"
+  }
+}

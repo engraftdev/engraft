@@ -1,0 +1,32 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDeyeliner690347",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "if (IDadvantage858860) {\n  return \"yes please\"\n} else {\n  return \"no thank you\"\n}",
+          "defaultCode": "",
+          "subPrograms": {
+            "IDadvantage858860": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "checkbox",
+                "checked": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "prevVarId": "IDliver637520"
+  }
+}
