@@ -41,4 +41,5 @@ describe('simple-tool', () => {
 
   it.todo('tests of subtools');
   it.todo('tests of etc');
+  it.todo('tests of render function using hooks');
 });

@@ -4,6 +4,7 @@ import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/sh
 import { union } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { useCallback } from "react";
 
 // "defineSimpleTool" provides a simple way to define a tool that has a fixed
 // number of sub-tools and that works in a simple way. See tool-toy-adder-simple
@@ -126,17 +127,18 @@ export function SimpleToolView<Name extends string, Fields extends object, SubTo
   const {program, updateProgram, simpleToolSpec, subToolViews, ...renderProps} = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  return simpleToolSpec.render({
-    ...props,
-    fields: program.fields,
-    fieldsUP: programUP.fields,
-    renderSlot: (slotName, slotRenderProps) => {
-      return <ShowView
-        view={subToolViews[slotName]}
-        updateProgram={programUP.subTools[slotName].$}
-        {...slotRenderProps}
-      />
-    },
-    ...renderProps,
-  });
+  const renderSlot = useCallback((slotName: SubToolKey, slotRenderProps?: RenderProps) => {
+    return <ShowView
+      view={subToolViews[slotName]}
+      updateProgram={programUP.subTools[slotName].$}
+      {...slotRenderProps}
+    />
+  }, [programUP, subToolViews]);
+
+  return <simpleToolSpec.render
+    fields={program.fields}
+    fieldsUP={programUP.fields}
+    renderSlot={renderSlot}
+    {...renderProps}
+  />;
 }
