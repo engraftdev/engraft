@@ -137,7 +137,13 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
         }}
         resetKeys={[program]}
       >
-        <ToolWithView program={program} updateProgram={patchUP.toolProgram.$} reportOutputState={() => {}} varBindings={varBindings} autoFocus={true}/>
+        <ToolWithView
+          program={program} updateProgram={patchUP.toolProgram.$}
+          reportOutputState={() => {}}
+          varBindings={varBindings}
+          autoFocus={true}
+          expand={true}
+        />
       </ErrorBoundary>
       { programIsEmpty &&
         <span style={{paddingLeft: 10}}>↑ start here!</span>
