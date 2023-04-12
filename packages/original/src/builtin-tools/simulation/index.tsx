@@ -118,14 +118,16 @@ const runSimulationOnDraft = memoizeProps(hooks((props: {
   varBindings: VarBindings,
   draft: Draft | undefined,
 }) => {
+  const { program, varBindings, draft } = props;
+
   return hookFork((branch) => {
-    if (props.draft) {
+    if (draft) {
       return branch('draft', () => {
         return hookRefunction(runSimulation, {
-          program: props.program,
-          varBindings: props.varBindings,
-          initOutputP: props.draft!.initOutputP,
-          ticksCount: props.program.ticksCount - props.draft!.initTick,
+          program,
+          varBindings,
+          initOutputP: draft!.initOutputP,
+          ticksCount: program.ticksCount - draft!.initTick,
         });
       })
     } else {
@@ -286,7 +288,7 @@ export const OnTickEditor = memo((props: {
   const { onTickResult, onTickProgramUP, incomingOutputP, draft, draftUP, tick } = props;
 
   const updateProgram: Updater<ToolProgram> = useCallback((f) => {
-    if (draft === undefined) {
+    if (tick !== 0 && tick !== draft?.initTick) {
       draftUP.$set({
         initTick: tick,
         initOutputP: incomingOutputP,
