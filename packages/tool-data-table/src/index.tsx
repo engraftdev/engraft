@@ -132,7 +132,7 @@ const Table = memo((props: {
       }}
     >
       <table
-        className="w-100 dark-gray ma0 nowrap overflow-visible"
+        className="dark-gray ma0 nowrap overflow-visible"
         style={{
           tableLayout: 'fixed',
           font: '13px/1.2 var(--sans-serif)',
@@ -177,7 +177,7 @@ const Table = memo((props: {
                 borderBottom: 'solid 1px var(--light-silver)',
                 borderLeft: 'solid 1px var(--light-silver)',
 
-                width: '99%',
+                // width: '99%',
               }}
             >
 
@@ -652,7 +652,7 @@ const TableRow = memo((props: {
       style={{
         ...allBodyCellStyle,
         ...isFirstRow && {borderTop: 'none'},
-        width: '99%',
+        // width: '99%',
       }}
     />
   </tr>
