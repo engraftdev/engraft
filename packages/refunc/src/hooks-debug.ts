@@ -17,8 +17,12 @@ export function hookLogChanges(values: any, label?: string) {
   if (!prevValues) { return; }
   for (const key in values) {
     if (values[key] !== prevValues[key]) {
-      console.log(`${label ? `(${label}) ` : ''}${key}: ${prevValues[key]} → ${values[key]}`);
-      console.log(compare(prevValues[key], values[key]));
+      console.groupCollapsed(`${label ? `(${label}) ` : ''}${key}: ${prevValues[key]} → ${values[key]}`);
+      try {
+        console.log(compare(prevValues[key], values[key]));
+      } finally {
+        console.groupEnd();
+      }
     }
   }
 }
