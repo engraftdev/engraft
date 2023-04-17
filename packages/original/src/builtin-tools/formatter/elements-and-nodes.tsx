@@ -33,6 +33,7 @@ export type FormatterElement = {
   | {
       type: 'text',
       rawHtml: boolean,
+      // TODO: formatProgram is hacked in right now (e.g., no varBindings from above)
       formatProgram?: ToolProgram,
     }
 )
@@ -341,6 +342,7 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
   }
 });
 
+// This function prepares var bindings for a custom format program.
 export function makeVarBindingsForData(data: any): VarBindings {
   const id = "IDdata000000";
   const var_: Var = { id, label: 'data' };
@@ -348,6 +350,7 @@ export function makeVarBindingsForData(data: any): VarBindings {
   return varBindings;
 }
 
+// This component renders the output of custom (per-node) format programs.
 const ViewFormatProgram = memo(function ViewFormatProgram(props: {
   formatProgram: ToolProgram,
   node: FormatterNode,
