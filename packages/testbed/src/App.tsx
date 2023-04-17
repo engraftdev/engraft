@@ -138,7 +138,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
   const [showOutput, setShowOutput] = useStateSetOnly(() => false);
 
   return <>
-    <div style={{...!showTool && {display: 'none'}, width: 'fit-content'}}>
+    <div style={{...!showTool && {display: 'none'}}}>
       <ErrorBoundary
         fallbackRender={(props) => {
           return <div>
