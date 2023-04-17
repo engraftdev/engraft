@@ -1,6 +1,7 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
 import { slotWithCode } from "@engraft/core";
+import { noOp } from "@engraft/original/lib/util/noOp.js";
 import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
 import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
 import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
@@ -10,10 +11,9 @@ import { doc, updateDoc } from "firebase/firestore";
 import _ from "lodash";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
-import { useFirestoreUpdater } from "./useFirestoreUpdater.js";
+import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
 import { useUser } from "./util.js";
 
@@ -52,8 +52,8 @@ export const EditPatch = memo(function EditPatch() {
   const patchId = params.patchId;
 
   const docRefer = doc(patchesRef, patchId);
-  const [patch, _loading, error, _snapshot] = useDocumentData(docRefer);
-  const updatePatch = useFirestoreUpdater(docRefer, patch);
+  const [patch, updatePatch] = useDocumentDataAndUpdater(docRefer);
+  const error = undefined as Error | undefined;  // TODO: handle errors
   const patchUP = useUpdateProxy(updatePatch);
 
   const user = useUser();
@@ -113,7 +113,6 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
 
   const [initialStateJSONDraft, setInitialStateJSONDraft] = useState(patch.initialStateJSON || "");
 
-
   return <>
     <div className="col-lg-6 mx-auto">
       <div className="input-group">
@@ -139,7 +138,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
       >
         <ToolWithView
           program={program} updateProgram={patchUP.toolProgram.$}
-          reportOutputState={() => {}}
+          reportOutputState={noOp}
           varBindings={varBindings}
           autoFocus={true}
           expand={true}

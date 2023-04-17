@@ -419,8 +419,10 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   }, [refSet, logDecorations, programUP, program.defaultCode, scopeVarBindingsRef, updateProgram])
 
   const onChange = useCallback((value: string) => {
-    programUP.code.$set(value);
-  }, [programUP.code]);
+    if (value !== program.code) {
+      programUP.code.$set(value);
+    }
+  }, [program.code, programUP.code]);
 
   return (
     <div
