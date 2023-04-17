@@ -1,5 +1,5 @@
 import { arrEqWithRefEq, Eq } from "@engraft/shared/lib/eq.js";
-import { HookPath, hookRef, runWithPath } from "./hooks.js";
+import { hookForkLater, HookPath, hookRef, runWithPath } from "./hooks.js";
 
 // Produce a value with a function when a key changes according to a provided equality function.
 // If an equality function is not provided, hookMemo acts like React.useMemo,
@@ -28,4 +28,26 @@ export function hookMemo<Key, Return>(f: () => Return, key: Key, eq?: Eq<Key>) {
 
 export function hookDedupe<T>(value: T, eq: Eq<T>): T {
   return hookMemo(() => value, value, eq);
+}
+
+export type Cache<T> = {
+  get: (key: string) => T,
+  done: () => void,
+}
+
+// TODO: speculative new pattern
+export function hookCache<T>(f: (key: string) => T): Cache<T> {
+  const cache: Record<string, T> = {};
+  const fork = hookForkLater();
+  return {
+    get: (key: string) => {
+      if (!cache[key]) {
+        cache[key] = fork.branch(key, () => f(key));
+      }
+      return cache[key];
+    },
+    done: () => {
+      fork.done();
+    },
+  };
 }

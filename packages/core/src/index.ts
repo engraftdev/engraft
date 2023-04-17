@@ -4,7 +4,7 @@ export * from "./globals.js";
 export * from "./EngraftPromise.js";
 export * from "./EngraftPromise-react.js";
 export * from "./randomId.js";
-export * from "./hooks.js";
+export * from "./runTool.js";
 export * from "./ShowView.js";
 export * from "./toolFromModule.js";
 export * from "./test-utils.js";

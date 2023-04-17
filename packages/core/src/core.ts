@@ -1,7 +1,7 @@
 import { Refunction } from "@engraft/refunc/lib/index.js";
-import { weakMapCache } from "@engraft/shared/lib/cache.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { ReactElement } from "react";
+import { weakMapCache } from "@engraft/shared/lib/cache.js";
+import { ReactElement, createContext } from "react";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";
 
@@ -65,6 +65,14 @@ export type ToolViewRenderProps<P> = {
   expand?: boolean,
   noFrame?: boolean,
 }
+
+export type ToolViewContextValue = {
+  scopeVarBindings: VarBindings,
+}
+
+export const ToolViewContext = createContext<ToolViewContextValue>({
+  scopeVarBindings: {},
+});
 
 export type ProgramFactory<P extends ToolProgram> =
   (defaultInputCode?: string) => P;

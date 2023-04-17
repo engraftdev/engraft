@@ -1,16 +1,16 @@
-import { ComputeReferences, EngraftPromise, hookRelevantVarBindings, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import _ from "lodash";
-import { memo, useCallback, useMemo } from "react";
-import { ToolWithView } from "../../view/ToolWithView.js";
-import { noOp } from "../../util/noOp.js";
 import { difference } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+import _ from "lodash";
+import { memo, useCallback, useMemo } from "react";
+import { noOp } from "../../util/noOp.js";
 import { useContextMenu } from "../../util/useContextMenu.js";
 import { MyContextMenu, MyContextMenuHeading } from "../../view/MyContextMenu.js";
 import { SettableValue } from "../../view/SettableValue.js";
+import { ToolWithView } from "../../view/ToolWithView.js";
 import { ToolOutputView } from "../../view/Value.js";
 import { VarDefinition } from "../../view/Vars.js";
 import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure.js";
@@ -45,14 +45,13 @@ export const computeReferences: ComputeReferences<Program> = (program) =>
   difference(references(program.bodyProgram), program.vars.map((v) => v.id));
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program } = props;
+  const { program, varBindings } = props;
   const { vars, bodyProgram } = program;
-  const relevantVarBindings = hookRelevantVarBindings(props);
 
   const closure: Closure = hookDedupe({
     vars,
     bodyProgram,
-    closureVarBindings: relevantVarBindings,
+    closureVarBindings: varBindings,
   }, objEqWithRefEq);
 
   const syncFunction = hookMemo(() => {

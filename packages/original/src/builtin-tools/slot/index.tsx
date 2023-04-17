@@ -1,13 +1,12 @@
 import { NodePath, PluginItem, TransformOptions } from "@babel/core";
 import { transform } from "@babel/standalone";
-import * as TemplateModule from "@babel/template";
-import TemplateDefault from "@babel/template";
+import TemplateDefault, * as TemplateModule from "@babel/template";
 import babelTypes from "@babel/types";
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorState, RangeSet } from "@codemirror/state";
-import { Decoration, EditorView, keymap, WidgetType } from "@codemirror/view";
-import { EngraftPromise, hookRelevantVarBindings, hookRunTool, ProgramFactory, randomId, references, setSlotWithCode, setSlotWithProgram, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, VarBinding } from "@engraft/core";
+import { Decoration, EditorView, WidgetType, keymap } from "@codemirror/view";
+import { EngraftPromise, ProgramFactory, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewContext, ToolViewRenderProps, VarBinding, hookRunTool, randomId, references, setSlotWithCode, setSlotWithProgram, usePromiseState } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
@@ -15,14 +14,14 @@ import { difference, union } from "@engraft/shared/lib/sets.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import objectInspect from "object-inspect";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useContext, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { CodeMirror } from "../../util/CodeMirror.js";
+import { usePortalSet } from "../../util/PortalWidget.js";
 import { setup } from "../../util/codeMirrorStuff.js";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile.js";
 import { embedsExtension } from "../../util/embedsExtension.js";
 import { Updater } from "../../util/immutable.js";
-import { usePortalSet } from "../../util/PortalWidget.js";
 import { makeRand } from "../../util/rand.js";
 import { Replace } from "../../util/types.js";
 import { useRefForCallback } from "../../util/useRefForCallback.js";
@@ -32,7 +31,7 @@ import { ToolInspectorWindow } from "../../view/ToolInspectorWindow.js";
 import { VarUse } from "../../view/Vars.js";
 import { refCompletions, toolCompletions, toolCompletionsTheme } from "./autocomplete.js";
 import { globals } from "./globals.js";
-import { referencesFromCodeDirect, referencesFromCodePromise, refREAll } from "./refs.js";
+import { refREAll, referencesFromCodeDirect, referencesFromCodePromise } from "./refs.js";
 
 // TODO: what hath ESM wrought?
 const template = (TemplateDefault.default || TemplateModule.default) as unknown as typeof import("@babel/template").default;
@@ -188,6 +187,8 @@ type CodeModeProps = Replace<ToolProps<Program>, {
 const runCodeMode = (props: CodeModeProps) => {
   const { program, varBindings } = props;
 
+  // hookLogChanges({program, varBindings}, 'slot:runCodeMode');
+
   const compiledP = hookMemo(() => EngraftPromise.try(() => {
     if (program.code === '') {
       throw new Error("Empty code");
@@ -226,15 +227,12 @@ const runCodeMode = (props: CodeModeProps) => {
   const codeReferencesDirect = hookMemo(() => referencesFromCodeDirect(program.code), [program.code]);
   const codeReferencesPromise = hookMemo(() => referencesFromCodePromise(program.code), [program.code]);
 
-  // TODO: Where, exactly, does this 'relevantVarBindings' thing belong?
-  const relevantVarBindings = hookRelevantVarBindings(props);
-
   const codeReferenceScopeP = hookMemo(() => EngraftPromise.try(() => {
     function resolveRef(ref: string) {
       if (subResults[ref]) {
         return subResults[ref].outputP;
-      } else if (relevantVarBindings[ref]) {
-        const binding = relevantVarBindings[ref];
+      } else if (varBindings[ref]) {
+        const binding = varBindings[ref];
         return binding.outputP.catch(() => {
           throw new Error(`Error from reference ${binding.var_.label}`);
         });
@@ -255,7 +253,7 @@ const runCodeMode = (props: CodeModeProps) => {
         ..._.zipObject(codeReferencesArrPromise.map(r => `${r}_promise`), outputValuePsPromise.map((p) => p.then(v => v.value))),
       };
     });
-  }), [relevantVarBindings, subResults, codeReferencesDirect, codeReferencesPromise]);
+  }), [varBindings, subResults, codeReferencesDirect, codeReferencesPromise]);
 
   const outputAndLogsP = hookMemo(() => {
     return EngraftPromise.all(compiledP, codeReferenceScopeP).then(([compiled, codeReferenceScope]) => {
@@ -332,7 +330,8 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const {program, varBindings, updateProgram, expand, autoFocus, subViews, logsP} = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const varBindingsRef = useRefForCallback(varBindings);
+  const { scopeVarBindings } = useContext(ToolViewContext);
+  const scopeVarBindingsRef = useRefForCallback(scopeVarBindings);
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -375,7 +374,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       });
     };
     const completions = [
-      refCompletions(() => varBindingsRef.current),
+      refCompletions(() => scopeVarBindingsRef.current),
       toolCompletions(insertTool, replaceWithTool),
     ];
     return [
@@ -417,7 +416,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       logTheme,
       logDecorations,
     ];
-  }, [refSet, logDecorations, programUP, program.defaultCode, varBindingsRef, updateProgram])
+  }, [refSet, logDecorations, programUP, program.defaultCode, scopeVarBindingsRef, updateProgram])
 
   const onChange = useCallback((value: string) => {
     programUP.code.$set(value);

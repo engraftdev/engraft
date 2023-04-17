@@ -1,6 +1,6 @@
 import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, useRefunction, usePromiseState, useUpdateProxy, outputBackgroundStyle, useCommonWidth } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, ProgramFactory, SetOps, ShowView, ShowViewWithNewScopeVarBindings, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, references, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -56,8 +56,8 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   const { program, updateProgram, varBindings, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const initialProgramResults = useRefunction(runTool, {program: program.def.initialProgramProgram, varBindings});
-  const initialProgramOutputState = usePromiseState(initialProgramResults.outputP);
+  const initialProgramResult = useRefunction(runTool, {program: program.def.initialProgramProgram, varBindings});
+  const initialProgramOutputState = usePromiseState(initialProgramResult.outputP);
 
   const [gadgetProgram, setGadgetProgram] = useState<unknown | null>(() => {
     if (initialProgramOutputState.status === 'fulfilled') {
@@ -73,12 +73,12 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   }, [gadgetProgram, initialProgramOutputState.status, initialProgramOutputState]);
   const gadgetProgramUP = useUpdateProxy(setGadgetProgram) as UpdateProxy<unknown>;
 
-  const outputResults = useRefunction(
+  const outputResult = useRefunction(
     runOutputProgram,
     program.def, varBindings, gadgetProgram
   );
 
-  const viewResults = useRefunction(
+  const viewResult = useRefunction(
     runViewProgram,
     program.def, varBindings, gadgetProgram, gadgetProgramUP
   );
@@ -106,16 +106,19 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
           <div style={{textAlign: 'right', fontWeight: 'bold'}}>initial<br/>program</div>,
           'right'
         )}
-        <ShowView view={initialProgramResults.view} updateProgram={programUP.def.initialProgramProgram.$} autoFocus={autoFocus} />
+        <ShowView view={initialProgramResult.view} updateProgram={programUP.def.initialProgramProgram.$} autoFocus={autoFocus} />
       </div>
       <div className="xRow xGap10">
         {leftCommonWidth.wrap(<b>output</b>, 'right')}
         <div>
-          <ShowView view={outputResults.view} updateProgram={programUP.def.outputProgram.$} />
-          {!outputResults.view.showsOwnOutput && <>
+          <ShowViewWithNewScopeVarBindings
+            {...outputResult.viewWithNewScopeVarBinding}
+            updateProgram={programUP.def.outputProgram.$}
+          />
+          {!outputResult.viewWithNewScopeVarBinding.view.showsOwnOutput && <>
             <div>↓</div>
             <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
-              <ToolOutputView outputP={outputResults.outputP} />
+              <ToolOutputView outputP={outputResult.outputP} />
             </div>
           </>}
         </div>
@@ -126,11 +129,14 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
         'right'
       )}
         <div>
-          <ShowView view={viewResults.view} updateProgram={programUP.def.viewProgram.$} />
-          {!viewResults.view.showsOwnOutput && <>
+          <ShowViewWithNewScopeVarBindings
+            {...viewResult.viewWithNewScopeVarBinding}
+            updateProgram={programUP.def.viewProgram.$}
+          />
+          {!viewResult.viewWithNewScopeVarBinding.view.showsOwnOutput && <>
             <div>↓</div>
             <div className='xInlineBlock xAlignSelfLeft xPad10' style={{borderRadius: 5, ...outputBackgroundStyle}}>
-              <ToolOutputView outputP={viewResults.outputP} displayReactElementsDirectly={true} />
+              <ToolOutputView outputP={viewResult.outputP} displayReactElementsDirectly={true} />
             </div>
           </>}
         </div>

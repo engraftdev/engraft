@@ -1,5 +1,5 @@
-import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
-import { hookRefunction, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowViewWithNewScopeVarBindings, slotWithCode, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { cellNetwork, cellNetworkReferences, outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -75,7 +75,7 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 }));
 
 type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
-  cellResults: {[id: string]: ToolResult},
+  cellResults: {[id: string]: ToolResultWithNewScopeVarBindings},
 }
 
 const View = memo((props: ViewProps) => {
@@ -208,7 +208,7 @@ type CellViewProps = {
   cell: Cell,
   cellUP: UpdateProxyRemovable<Cell>,
 
-  cellResult: ToolResult,
+  cellResult: ToolResultWithNewScopeVarBindings,
 
   notebookMenuMaker: MenuMaker,
 
@@ -220,7 +220,7 @@ type CellViewProps = {
 const CellView = memo(function CellView(props: CellViewProps) {
   const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput, autoFocus} = props;
 
-  const cellShowsOwnOutput = cellResult.view.showsOwnOutput;
+  const cellShowsOwnOutput = cellResult.viewWithNewScopeVarBinding.view.showsOwnOutput;
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -280,7 +280,11 @@ const CellView = memo(function CellView(props: CellViewProps) {
       onContextMenu={openMenu}
     >
       <div className="xStickyTop10" ref={toolRef}>
-        <ShowView view={cellResult.view} updateProgram={cellUP.program.$apply} autoFocus={autoFocus}/>
+        <ShowViewWithNewScopeVarBindings
+          {...cellResult.viewWithNewScopeVarBinding}
+          updateProgram={cellUP.program.$apply}
+          autoFocus={autoFocus}
+        />
       </div>
     </div>
     { !cellShowsOwnOutput &&

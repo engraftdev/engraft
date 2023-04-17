@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, hookRunToolWithNewScopeVarBindings, newVar, ProgramFactory, references, runTool, ShowView, ShowViewWithNewScopeVarBindings, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
 import { isObject } from "@engraft/shared/lib/isObject.js";
@@ -90,15 +90,22 @@ const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
     // Even if the tick function is async, we can synchronously construct the computation graph.
     // Hence, no need for hookForkLater here.
 
-    const onTickResults: ToolResult[] = [];
+    const onTickResults: ToolResultWithNewScopeVarBindings[] = [];
     let lastOutputP = initOutputP;
     for (let i = 0; i < ticksCount; i++) {
+      // TODO: memoize?
+      const newVarBindings = {
+        [program.stateVar.id]: { var_: program.stateVar, outputP: lastOutputP },
+      };
       const varBindingsWithState = {
         ...varBindings,
-        [program.stateVar.id]: { var_: program.stateVar, outputP: lastOutputP }
+        ...newVarBindings,
       };
       const onTickResult = branch(`${i}`, () => {
-        return hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState });
+        return hookRunToolWithNewScopeVarBindings(
+          { program: program.onTickProgram, varBindings: varBindingsWithState },
+          newVarBindings,
+        );
       });
       onTickResults.push(onTickResult);
       lastOutputP = onTickResult.outputP;
@@ -140,7 +147,7 @@ const runSimulationOnDraft = memoizeProps(hooks((props: {
 
 type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   initResult: ToolResult,
-  onTickResults: ToolResult[],
+  onTickResults: ToolResultWithNewScopeVarBindings[],
 }
 
 const View = memo((props: ViewProps) => {
@@ -278,7 +285,7 @@ export const InitEditor = memo((props: {
 })
 
 export const OnTickEditor = memo((props: {
-  onTickResult: ToolResult,
+  onTickResult: ToolResultWithNewScopeVarBindings,
   onTickProgramUP: UpdateProxy<ToolProgram>,
   incomingOutputP: EngraftPromise<ToolOutput>,
   draft: Draft | undefined,
@@ -308,11 +315,11 @@ export const OnTickEditor = memo((props: {
         </div>
         <ToolOutputView outputP={incomingOutputP} />
       </div>
-      <ShowView
-        view={onTickResult.view}
+      <ShowViewWithNewScopeVarBindings
+        {...onTickResult.viewWithNewScopeVarBinding}
         updateProgram={updateProgram}
       />
-      {!onTickResult.view.showsOwnOutput &&
+      {!onTickResult.viewWithNewScopeVarBinding.view.showsOwnOutput &&
         <div className='xPad10 xRelative' style={{...outputBackgroundStyle}}>
           <div style={{ position: 'absolute', top: 0, right: 0, padding: 5, opacity: 0.5 }}>
             outgoing state

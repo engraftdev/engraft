@@ -4,11 +4,11 @@ import { useContextMenu } from "@engraft/original/lib/util/useContextMenu.js";
 import { MyContextMenu, MyContextMenuHeading } from "@engraft/original/lib/view/MyContextMenu.js";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookRefunction, hookMemo, hooks, memoizeProps, newVar, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, updateWithUP, useUpdateProxy, Var } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxy, Var, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
-import { PaneGeo, roundTo } from "./noodle-canvas/model.js";
 import { NoodleCanvas } from "./noodle-canvas/NoodleCanvas.js";
+import { PaneGeo, roundTo } from "./noodle-canvas/model.js";
 
 
 export type Program = {
@@ -78,7 +78,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 export default defineTool({ programFactory, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
-  cellResults: {[id: string]: ToolResult},
+  cellResults: {[id: string]: ToolResultWithNewScopeVarBindings},
 }) => {
   const { program, updateProgram, cellResults } = props;
   const programUP = useUpdateProxy(updateProgram);
@@ -172,7 +172,7 @@ type CellViewProps = {
   cell: Cell;
   cellsUP: UpdateProxy<Cell[]>,
 
-  cellResult: ToolResult,
+  cellResult: ToolResultWithNewScopeVarBindings,
 
   onMouseDownDragPane: (startEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }
@@ -268,9 +268,9 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </div>
 
     <div className="NotebookCanvasTool-CellView-tool xCol" style={{background: 'rgb(251, 251, 251)', minHeight: 0, overflowY: 'auto'}}>
-      <ShowView view={cellResult.view} updateProgram={cellUP.program.$} expand={true}/>
+      <ShowView {...cellResult.viewWithNewScopeVarBinding} updateProgram={cellUP.program.$} expand={true}/>
     </div>
-    { !cellResult.view.showsOwnOutput &&
+    { !cellResult.viewWithNewScopeVarBinding.view.showsOwnOutput &&
       <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 6, flexShrink: 1000000}}>
         <ToolOutputView outputP={cellResult.outputP}/>
       </div>

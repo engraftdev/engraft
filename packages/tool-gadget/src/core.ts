@@ -1,4 +1,4 @@
-import { EngraftPromise, hookRunTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/core";
+import { EngraftPromise, hookRunToolWithNewScopeVarBindings, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/core";
 import { hookMemo, hooks, UpdateProxy } from "@engraft/toolkit";
 
 export type GadgetDef = {
@@ -21,18 +21,23 @@ export const runOutputProgram = hooks((
   closureVarBindings: VarBindings,
   gadgetProgram: unknown,
 ) => {
-  const programVarBinding = hookMemo(() => ({
-    var_: def.programVar,
-    outputP: gadgetProgram ?
-      EngraftPromise.resolve({value: gadgetProgram}) :
-      EngraftPromise.unresolved<ToolOutput>()
+  const programVarBindings = hookMemo(() => ({
+    [def.programVar.id]: {
+      var_: def.programVar,
+      outputP: gadgetProgram ?
+        EngraftPromise.resolve({value: gadgetProgram}) :
+        EngraftPromise.unresolved<ToolOutput>()
+    }
   }), [gadgetProgram, def.programVar]);
 
-  const outputVarBindings: VarBindings = hookMemo(() => ({
+  const varBindings: VarBindings = hookMemo(() => ({
     ...closureVarBindings,
-    [def.programVar.id]: programVarBinding,
-  }), [closureVarBindings, def.programVar, programVarBinding]);
-  const outputResults = hookRunTool({program: def.outputProgram, varBindings: outputVarBindings});
+    ...programVarBindings,
+  }), [closureVarBindings, programVarBindings]);
+  const outputResults = hookRunToolWithNewScopeVarBindings(
+    {program: def.outputProgram, varBindings},
+    programVarBindings
+  );
 
   return outputResults;
 });
@@ -43,25 +48,32 @@ export const runViewProgram = hooks((
   gadgetProgram: unknown,
   gadgetProgramUP: UpdateProxy<unknown>,
 ) => {
-  const programVarBinding = hookMemo(() => ({
-    var_: def.programVar,
-    outputP: gadgetProgram ?
-      EngraftPromise.resolve({value: gadgetProgram}) :
-      EngraftPromise.unresolved<ToolOutput>()
+  const programVarBindings = hookMemo(() => ({
+    [def.programVar.id]: {
+      var_: def.programVar,
+      outputP: gadgetProgram ?
+        EngraftPromise.resolve({value: gadgetProgram}) :
+        EngraftPromise.unresolved<ToolOutput>()
+    }
   }), [gadgetProgram, def.programVar]);
-  const programUPVarBinding = hookMemo(() => ({
-    var_: def.programUPVar,
-    outputP: gadgetProgram ?
-      EngraftPromise.resolve({value: gadgetProgramUP}) :
-      EngraftPromise.unresolved<ToolOutput>()
+  const programUPVarBindings = hookMemo(() => ({
+    [def.programUPVar.id]: {
+      var_: def.programUPVar,
+      outputP: gadgetProgram ?
+        EngraftPromise.resolve({value: gadgetProgramUP}) :
+        EngraftPromise.unresolved<ToolOutput>()
+    }
   }), [gadgetProgram, gadgetProgramUP, def.programUPVar]);
 
-  const viewVarBindings: VarBindings = hookMemo(() => ({
+  const varBindings: VarBindings = hookMemo(() => ({
     ...closureVarBindings,
-    [def.programVar.id]: programVarBinding,
-    [def.programUPVar.id]: programUPVarBinding,
-  }), [closureVarBindings, def.programVar, def.programUPVar, programUPVarBinding, programVarBinding]);
-  const viewResults = hookRunTool({program: def.viewProgram, varBindings: viewVarBindings});
+    ...programVarBindings,
+    ...programUPVarBindings,
+  }), [closureVarBindings, programVarBindings, programUPVarBindings]);
+  const viewResults = hookRunToolWithNewScopeVarBindings(
+    {program: def.viewProgram, varBindings},
+    hookMemo(() => ({...programVarBindings, ...programUPVarBindings}), [programVarBindings, programUPVarBindings])
+  );
 
   return viewResults;
 });

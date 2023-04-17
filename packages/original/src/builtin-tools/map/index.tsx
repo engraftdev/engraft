@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, hookRunToolWithNewScopeVarBindings, newVar, ProgramFactory, references, ShowView, ShowViewWithNewScopeVarBindings, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithNewScopeVarBindings, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
 import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
@@ -47,18 +47,24 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
   }), [inputResult]);
 
   // TODO: This block is pretty bad. Worth thinking about a bit.
-  const itemResultsP: EngraftPromise<ToolResult<ToolProgram>[]> =
+  const itemResultsP: EngraftPromise<ToolResultWithNewScopeVarBindings<ToolProgram>[]> =
     hookMemo(() => {
       const later = hookLater();
       return inputArrayP.then((inputArray) => later(() =>
           hookFork((branch) =>
             inputArray.map((inputElem, i) =>
               branch(`${i}`, () => {
+                const newVarBindings: VarBindings = hookMemo(() => ({
+                  [program.itemVar.id]: {var_: program.itemVar, outputP: EngraftPromise.resolve({value: inputElem})},
+                }), [program.itemVar, inputElem]);
                 const itemVarBindings: VarBindings = hookMemo(() => ({
                   ...varBindings,
-                  [program.itemVar.id]: {var_: program.itemVar, outputP: EngraftPromise.resolve({value: inputElem})},
-                }), [varBindings, program.itemVar, inputElem]);
-                const itemResult = hookRunTool({program: program.perItemProgram, varBindings: itemVarBindings})
+                  ...newVarBindings,
+                }), [varBindings, newVarBindings]);
+                const itemResult = hookRunToolWithNewScopeVarBindings(
+                  {program: program.perItemProgram, varBindings: itemVarBindings},
+                  newVarBindings,
+                )
                 return itemResult
               })
             )
@@ -91,7 +97,7 @@ const MAX_ITEMS_DISPLAYED = 10;
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,
-  itemResultsP: EngraftPromise<ToolResult<ToolProgram>[]>,
+  itemResultsP: EngraftPromise<ToolResultWithNewScopeVarBindings<ToolProgram>[]>,
 }) => {
   const { program, updateProgram, autoFocus, inputResult, itemResultsP } = props;
   const programUP = useUpdateProxy(updateProgram);
@@ -162,7 +168,10 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
           </div>
         </div>
         <div>
-          <ShowView view={itemResultsState.value[shownIndex].view} updateProgram={programUP.perItemProgram.$}/>
+          <ShowViewWithNewScopeVarBindings
+            {...itemResultsState.value[shownIndex].viewWithNewScopeVarBinding}
+            updateProgram={programUP.perItemProgram.$}
+          />
         </div>
       </div>;
     } else {

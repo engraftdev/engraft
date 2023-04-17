@@ -9,6 +9,7 @@ import { ToolProgram } from "./core.js";
 const _globals = {
   slotWithCode: null as null | typeof slotWithCode,
   slotWithProgram: null as null | typeof slotWithProgram,
+  debugMode: false
 }
 
 export function slotWithCode(program: string = ''): ToolProgram {
@@ -29,4 +30,11 @@ export function slotWithProgram<P extends ToolProgram>(program: P): ToolProgram 
 }
 export function setSlotWithProgram(slotWithProgramNew: typeof slotWithProgram) {
   _globals.slotWithProgram = slotWithProgramNew;
+}
+
+export function debugMode(): boolean {
+  return _globals.debugMode;
+}
+export function setDebugMode(debugModeNew: boolean) {
+  _globals.debugMode = debugModeNew;
 }

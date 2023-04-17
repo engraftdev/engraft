@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, registerTool, toolFromModule, ToolOutput } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, registerTool, runTool, toolFromModule, ToolOutput } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { updateWithUP } from "@engraft/update-proxy";
 import _ from "lodash";
@@ -15,7 +15,7 @@ describe('slot', () => {
   it('basic code works', () => {
     expect(
       EngraftPromise.state(
-        slotTool.run(new RefuncMemory(), {
+        runTool(new RefuncMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -34,7 +34,7 @@ describe('slot', () => {
   it('multi-statement code works', () => {
     expect(
       EngraftPromise.state(
-        slotTool.run(new RefuncMemory(), {
+        runTool(new RefuncMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -51,7 +51,7 @@ describe('slot', () => {
   });
 
   it('returned promises are resolved into output', async () => {
-    const {outputP} = slotTool.run(new RefuncMemory(), {
+    const {outputP} = runTool(new RefuncMemory(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
@@ -136,7 +136,7 @@ describe('slot', () => {
   it('resolves references correctly', () => {
     expect(
       EngraftPromise.state(
-        slotTool.run(new RefuncMemory(), {
+        runTool(new RefuncMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -156,7 +156,7 @@ describe('slot', () => {
     const foxOutputP = new EngraftPromise<ToolOutput>((resolve) => {
       setTimeout(() => resolve({value: 100}), 10);
     });
-    const { outputP } = slotTool.run(new RefuncMemory(), {
+    const { outputP } = runTool(new RefuncMemory(), {
       program: {
         toolName: 'slot',
         modeName: 'code',
@@ -196,7 +196,7 @@ describe('slot', () => {
     let program: slot.Program;
     function runProgram() {
       return EngraftPromise.state(
-        slotTool.run(memory, {
+        runTool(memory, {
           program,
           varBindings: empty,
         }).outputP
@@ -225,7 +225,7 @@ describe('slot', () => {
   it('works with subtools', () => {
     expect(
       EngraftPromise.state(
-        slotTool.run(new RefuncMemory(), {
+        runTool(new RefuncMemory(), {
           program: {
             toolName: 'slot',
             modeName: 'code',
@@ -263,23 +263,32 @@ describe('slot', () => {
     }
     const memory = new RefuncMemory();
     function runProgram() {
-      return EngraftPromise.state(
-        slotTool.run(memory, {
-          program,
-          varBindings,
-        }).outputP
-      );
+      return runTool(memory, {
+        program,
+        varBindings,
+      }).outputP
     }
 
-    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+    // first run
+    const outputP1 = runProgram();
+    expect(EngraftPromise.state(outputP1)).toEqual({status: 'fulfilled', value: {value: 1}});
     expect(runs).toEqual(1);
-    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 1}});
+
+    // run again with no changes
+    const outputP2 = runProgram();
+    expect(outputP2).toBe(outputP1);
     expect(runs).toEqual(1);
+
+    // run again with relevant change
     varBindings = updateWithUP(varBindings, (up) => up.IDrelevant000000.outputP.$set(EngraftPromise.resolve({value: 2})));
-    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    const outputP3 = runProgram();
+    expect(EngraftPromise.state(outputP3)).toEqual({status: 'fulfilled', value: {value: 2}});
     expect(runs).toEqual(2);
+
+    // run again with irrelevant change
     varBindings = updateWithUP(varBindings, (up) => up.IDirrelevant000000.outputP.$set(EngraftPromise.resolve({value: 100})));
-    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 2}});
+    const outputP4 = runProgram();
+    expect(outputP4).toBe(outputP3);
     expect(runs).toEqual(2);
   });
 });

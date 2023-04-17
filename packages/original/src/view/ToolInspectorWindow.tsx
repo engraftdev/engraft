@@ -1,8 +1,8 @@
-import { memo } from "react";
-import { references, ToolProgram, VarBindings } from "@engraft/core";
-import { runtimeObjectId } from "../util/id.js";
-import { Updater } from "../util/immutable.js";
+import { references, ToolProgram, ToolViewContext, VarBindings } from "@engraft/core";
+import { runtimeObjectId } from "@engraft/shared/lib/runtimeObjectId.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { memo, useContext } from "react";
+import { Updater } from "../util/immutable.js";
 import { WindowPortal } from "../util/WindowPortal.js";
 import IsolateStyles from "./IsolateStyles.js";
 import { Value } from "./Value.js";
@@ -20,6 +20,8 @@ export type ToolInspectorWindowProps = {
 export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspectorWindowProps) {
   const {program, updateProgram, varBindings, show, onClose} = props;
   const programUP = useUpdateProxy(updateProgram);
+
+  const { scopeVarBindings } = useContext(ToolViewContext);
 
   if (!show) return null;
 
@@ -54,6 +56,8 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
       </ul>
       <h3>Variable bindings</h3>
       <Value value={varBindings}/>
+      <h3>Scope variable bindings</h3>
+      <Value value={scopeVarBindings}/>
     </IsolateStyles>
   </WindowPortal>;
 });

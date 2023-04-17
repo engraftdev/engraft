@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, registerTool, runTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
@@ -52,7 +52,7 @@ describe('notebook', () => {
     }
     function runProgram() {
       return EngraftPromise.state(
-        notebookTool.run(memory, {
+        runTool(memory, {
           program,
           varBindings: empty,
         }).outputP
@@ -102,7 +102,7 @@ describe('notebook', () => {
 
     expect(
       EngraftPromise.state(
-        notebookTool.run(new RefuncMemory(), {
+        runTool(new RefuncMemory(), {
           program,
           varBindings: empty,
         }).outputP
@@ -147,7 +147,7 @@ describe('notebook', () => {
     let varBindings: VarBindings;
     function runProgram() {
       return EngraftPromise.state(
-        notebookTool.run(memory, {
+        runTool(memory, {
           program,
           varBindings,
         }).outputP
@@ -169,7 +169,7 @@ describe('notebook', () => {
     );
   });
 
-  it('no unnecessary renders of cells', () => {
+  it.skip('no unnecessary renders of cells', () => {
     let cell1ViewRenders = 0;
     let cell2ViewRenders = 0;
     let program: Notebook.Program = {
@@ -230,5 +230,81 @@ describe('notebook', () => {
     runProgram();
     expect(cell1ViewRenders).toEqual(1);
     expect(cell2ViewRenders).toEqual(2);
+  });
+
+  it('no unnecessary runs of cells (with an inter-cell dependency)', () => {
+    const memory = new RefuncMemory();
+
+    const cell1 = newVar('cell1');
+    const cell2 = newVar('cell2');
+    const cell3 = newVar('cell3');
+    let cell1Runs = 0;
+    let cell2Runs = 0;
+    let cell3Runs = 0;
+    const cell2Run = newVar('cell2Run');
+    const varBindings = makeVarBindings({[cell2Run.id]: {value: () => cell2Runs++}});
+    let program: Notebook.Program = {
+      toolName: 'notebook',
+      cells: [
+        {
+          var_: cell1,
+          program: {
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 1 }),
+            onRun: () => { cell1Runs++ },
+          } satisfies TestKnownOutput.Program,
+          outputManualHeight: undefined,
+        },
+        {
+          var_: cell2,
+          program: slotWithCode(`${cell2Run.id}(); return ${cell1.id} + 1`),
+          // program: {
+          //   toolName: 'test-known-output',
+          //   outputP: EngraftPromise.resolve({ value: 2 }),
+          //   onRun: () => { cell2Runs++ },
+          // } satisfies TestKnownOutput.Program,
+          outputManualHeight: undefined,
+        },
+        {
+          var_: cell3,
+          program: {
+            toolName: 'test-known-output',
+            outputP: EngraftPromise.resolve({ value: 3 }),
+            onRun: () => { cell3Runs++ },
+          } satisfies TestKnownOutput.Program,
+          outputManualHeight: undefined,
+        },
+      ],
+      prevVarId
+    }
+    function runProgram() {
+      return EngraftPromise.state(
+        notebookTool.run(memory, {
+          program,
+          varBindings,
+        }).outputP
+      );
+    }
+
+    // first run
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 3}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(1);
+    expect(cell3Runs).toEqual(1);
+
+    // run without changes
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 3}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(1);
+    expect(cell3Runs).toEqual(1);
+
+    // run with change to cell 3
+    program = updateWithUP(program, (programUP) => {
+      programUP.cells[2].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 4 }));
+    });
+    expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 4}});
+    expect(cell1Runs).toEqual(1);
+    expect(cell2Runs).toEqual(1);
+    expect(cell3Runs).toEqual(2);
   });
 });

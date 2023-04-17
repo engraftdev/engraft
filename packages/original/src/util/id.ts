@@ -8,21 +8,6 @@ export function hashId(...args: any[]): string {
 // TODO: extended this from a-z so I could shove js variable names in; not great
 export const idRegExp = "ID[a-zA-Z_]*[0-9]{6}";
 
-// This is independent: a li'l system to generate runtime ids for arbitrary objects (for debugging)
-
-export function runtimeObjectId(obj: any): string {
-  const fromMap = runtimeObjectIdMap.get(obj);
-  if (fromMap !== undefined) {
-    return fromMap;
-  }
-
-  const id = randomId();
-  runtimeObjectIdMap.set(obj, id);
-  return id;
-}
-
-const runtimeObjectIdMap = new WeakMap<any, string>();
-
 // This is also independent: functional getters and updaters by id for nested objects
 // TODO: hacky
 
