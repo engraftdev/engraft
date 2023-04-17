@@ -503,7 +503,11 @@ export const ErrorView = memo(function ErrorView(props: {
     }}
     onClick={toggleIsExpanded}
   >
-    ⚠️ <span style={{fontFamily: 'monospace'}}>{isExpanded ? message : messageFirstLine}</span>
+    ⚠️{' '}
+    <span
+      style={{fontFamily: 'monospace'}}
+      dangerouslySetInnerHTML={{__html: isExpanded ? message : messageFirstLine}}
+    />
     { isExpanded && stack && <details>
       <summary onClick={(e) => e.stopPropagation()}>
         Stack
