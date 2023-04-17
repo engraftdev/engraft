@@ -17,6 +17,7 @@
     "@engraft/original": "^0.0.1",
     "@engraft/toolkit": "^0.0.1",
     "@engraft/all-the-tools": "^0.0.1",
+    "@engraft/shared": "^0.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

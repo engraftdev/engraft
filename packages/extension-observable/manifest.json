@@ -1,0 +1,20 @@
+{
+  "name": "Observable Writer",
+  "description": "Write to Observable cells from their output",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["activeTab", "tabs", "scripting"],
+  "host_permissions": [
+    "https://observablehq.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://observablehq.com/*"],
+      "js": ["content_script.js"]
+    }
+  ],
+  "web_accessible_resources": [{
+    "resources": ["injected_script.js"],
+    "matches": ["<all_urls>"]
+  }]
+}
