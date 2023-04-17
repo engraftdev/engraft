@@ -1,10 +1,11 @@
-import IsEqual from "lodash-es/isEqual.js";
+import * as IsEqual from "lodash-es/isEqual.js";
 import { diff } from "deep-object-diff";
 
-const isEqual = IsEqual.default;
+// TODO: what hath ESM wrought?
+const isEqual = IsEqual.default as unknown as typeof import("lodash-es/isEqual.js").default;
 
 export function compare(a: any, b: any): string {
-  if (isEqual(a, b)) {
+  if (!isEqual(a, b)) {
     return "[not deep-equal]: " + JSON.stringify(diff(a, b), null, 2);
   } else {
     return "[deep-equal]: " + JSON.stringify(compareDeepEqualObjectsForReferenceEquality(a, b), null, 2);
