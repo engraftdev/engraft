@@ -5,11 +5,7 @@ export type ShowViewProps<P extends ToolProgram> = ToolViewRenderProps<P> & {
   view: ToolView<P>,
 }
 
-export const ShowViewNoMemo = function ShowView<P extends ToolProgram>({view, ...rest}: ShowViewProps<P>) {
-  if (!view) {
-    return null;
-  }
-
+const ShowViewNoMemo = function ShowView<P extends ToolProgram>({view, ...rest}: ShowViewProps<P>) {
   return view.render(rest);
 };
 
