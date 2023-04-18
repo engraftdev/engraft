@@ -1,14 +1,14 @@
 /// <reference types="@types/wicg-file-system-access" />
 
+import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
 import { RootStyles } from "@engraft/original/lib/view/IsolateStyles.js";
 import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
-import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
 import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { EngraftPromise, randomId, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolView, useRefunction, usePromiseState, useUpdateProxy, VarBinding, VarBindings } from "@engraft/toolkit";
+import { EngraftPromise, ShowViewWithNewScopeVarBindings, ToolOutput, ToolProgram, VarBinding, VarBindings, ViewWithNewScopeVarBindings, randomId, runToolWithNewScopeVarBindings, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import * as IDBKV from 'idb-keyval';
 import _ from "lodash";
-import React, { memo, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { DOM } from "./DOM.js";
 import css from "./index.css?inline";
@@ -64,7 +64,11 @@ export function useEngraft(props: UseEngraftProps) {
     program || { savedProgramId: randomId(), program: slotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
-  const {outputP, view} = useRefunction(runTool, { program: draft.program, varBindings });
+  const {outputP, viewWithNewScopeVarBinding} = useRefunction(
+    runToolWithNewScopeVarBindings,
+    { program: draft.program, varBindings },
+    varBindings
+  );
   const outputState = usePromiseState(outputP);
 
   const [useDefault, setUseDefault] = useState(!!edit);
@@ -81,7 +85,7 @@ export function useEngraft(props: UseEngraftProps) {
               varBindings={varBindings}
               defaultValue={defaultValue}
               outputP={outputP}
-              view={view}
+              viewWithNewScopeVarBindings={viewWithNewScopeVarBinding}
               draft={draft}
               updateDraft={updateDraft}
               useDefault={useDefault}
@@ -91,7 +95,7 @@ export function useEngraft(props: UseEngraftProps) {
         />
       }
     </>);
-  }, [defaultValue, varBindings, newRoot, origContainer, useDefault, view, outputP, edit, draft]);
+  }, [defaultValue, varBindings, newRoot, origContainer, useDefault, outputP, edit, draft, viewWithNewScopeVarBinding]);
 
   if (useDefault || outputState.status !== 'fulfilled') {
     return defaultValue;
@@ -104,7 +108,7 @@ type UseEngraftRHSProps = {
   varBindings: VarBindings,
   defaultValue: any,
   outputP: EngraftPromise<ToolOutput>,
-  view: ToolView<ToolProgram>,
+  viewWithNewScopeVarBindings: ViewWithNewScopeVarBindings<ToolProgram>,
   draft: SavedProgram,
   updateDraft: (f: (old: SavedProgram) => SavedProgram) => void,
   useDefault: boolean,
@@ -114,7 +118,7 @@ type UseEngraftRHSProps = {
 // TODO: TODO: TODO: put the program's ID outside of the program itself, so slots don't break it
 
 const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
-  const { varBindings, defaultValue, view, outputP, draft, updateDraft, useDefault, setUseDefault } = props;
+  const { varBindings, defaultValue, viewWithNewScopeVarBindings, outputP, draft, updateDraft, useDefault, setUseDefault } = props;
   const draftUP = useUpdateProxy(updateDraft);
 
   const id = draft.savedProgramId!;
@@ -237,7 +241,7 @@ const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
 
         <div className="card" style={{flexShrink: 0}}>
           <h2>Program</h2>
-          <ShowView view={view} updateProgram={draftUP.program.$}/>
+          <ShowViewWithNewScopeVarBindings {...viewWithNewScopeVarBindings} updateProgram={draftUP.program.$}/>
         </div>
 
         <div className="card" style={{minHeight: 0}}>
