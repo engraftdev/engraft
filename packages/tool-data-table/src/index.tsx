@@ -1,18 +1,18 @@
-import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { CSSProperties, Fragment, memo, ReactNode, useCallback, useMemo, useState } from "react";
-import { count } from "@engraft/original/lib/util/count.js";
 import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
-import { ErrorView } from "@engraft/original/lib/view/Value.js";
-import { Column, DataFrame, inferDataFrameFromRows, ValueType } from "./data-frame.js";
-import style from './style.css?inline';
-import { applyTransformsExceptSelect, applyTransformsJustSelect, Filter, FilterType, filterTypes, filterTypesByValueType, Transforms } from "./transforms.js";
-import _ from 'lodash';
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
-import { Updater } from '@engraft/shared/lib/Updater.js';
 import { Use } from '@engraft/original/lib/util/Use.js';
-import useHover from '@engraft/original/lib/util/useHover.js';
-import { isoformat } from "@engraft/original/lib/util/isoformat.js";
+import { count } from "@engraft/original/lib/util/count.js";
 import { startDrag } from "@engraft/original/lib/util/drag.js";
+import { isoformat } from "@engraft/original/lib/util/isoformat.js";
+import useHover from '@engraft/original/lib/util/useHover.js';
+import { ErrorView } from "@engraft/original/lib/view/Value.js";
+import { Updater } from '@engraft/shared/lib/Updater.js';
+import { ComputeReferences, EngraftPromise, InputHeading, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, references, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
+import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { Column, DataFrame, ValueType, inferDataFrameFromRows } from "./data-frame.js";
+import style from './style.css?inline';
+import { Filter, FilterType, Transforms, applyTransformsExceptSelect, applyTransformsJustSelect, filterTypes, filterTypesByValueType } from "./transforms.js";
 
 /*
 out of scope for now:
@@ -67,7 +67,6 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
       inputResult={inputResult}
       dataFramesP={dataFramesP}
     />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, inputResult, dataFramesP]);
 
   return {outputP, view};
@@ -79,13 +78,14 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   inputResult: ToolResult,
   dataFramesP: EngraftPromise<{input: DataFrame, outputExceptSelect: DataFrame, output: DataFrame}>,
 }) => {
-  const { program, updateProgram, autoFocus, inputResult, dataFramesP } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, dataFramesP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const dataFramesState = usePromiseState(dataFramesP);
 
   return (
     <div className="xCol">
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />

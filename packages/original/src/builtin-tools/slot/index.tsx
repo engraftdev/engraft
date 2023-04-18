@@ -547,16 +547,18 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
     }));
   }, [program.defaultCode, updateProgram]);
 
+  const [frameBarBackdropElem, setFrameBarBackdropElem] = useState<HTMLDivElement | undefined>(undefined) ;
+
   if (noFrame) {
     return <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} />;
   } else {
     return <ToolFrame
       expand={expand}
       program={program.subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
-      frameBarBackdrop={subView.renderFrameBarBackdrop && subView.renderFrameBarBackdrop({updateProgram: updateSubProgram})}
+      setFrameBarBackdropElem={setFrameBarBackdropElem}
       onClose={onCloseFrame}
     >
-      <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} />
+      <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} frameBarBackdropElem={frameBarBackdropElem}/>
     </ToolFrame>;
   }
 });

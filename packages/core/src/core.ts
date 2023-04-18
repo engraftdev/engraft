@@ -55,7 +55,6 @@ export type ToolResult<P extends ToolProgram = ToolProgram> = {
 
 export type ToolView<P extends ToolProgram> = {
   render: (props: ToolViewRenderProps<P>) => ReactElement<any, any> | null,
-  renderFrameBarBackdrop?: (props: ToolViewRenderProps<P>) => ReactElement<any, any> | null,
   showsOwnOutput?: boolean,
 }
 
@@ -64,6 +63,7 @@ export type ToolViewRenderProps<P> = {
   autoFocus?: boolean,
   expand?: boolean,
   noFrame?: boolean,
+  frameBarBackdropElem?: HTMLDivElement,
 }
 
 export type ToolViewContextValue = {

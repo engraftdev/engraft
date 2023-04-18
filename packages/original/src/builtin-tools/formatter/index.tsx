@@ -9,6 +9,7 @@ import { noOp } from "../../util/noOp.js";
 import { ToolWithView } from "../../view/ToolWithView.js";
 import builtinStyles from './builtin.css?inline';
 import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, FormatterSelection, makeVarBindingsForData, renderElementToNode } from "./elements-and-nodes.js";
+import { createPortal } from "react-dom";
 
 // TODO: The old version of formatter supported (the beginnings of) controls.
 // That's stripped out in this version, but we should get back into that someday.
@@ -63,7 +64,6 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         {...props} {...viewProps}
         inputResult={inputResult}
       />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, inputResult]);
 
   return {outputP, view};
@@ -74,7 +74,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 }
 
 const View = memo(function FormatterToolView(props: ViewProps) {
-  const { program, updateProgram, autoFocus, inputResult } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult } = props;
   const programUP = useUpdateProxy(updateProgram);
   const { rootElement } = program;
 
@@ -87,6 +87,7 @@ const View = memo(function FormatterToolView(props: ViewProps) {
 
   return (
     <div className="xCol">
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />
