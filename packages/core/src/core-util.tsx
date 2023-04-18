@@ -1,6 +1,6 @@
 import { ReactNode, memo, useContext, useMemo } from 'react';
 import { Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewContext, ToolViewRenderProps, VarBindings } from './core.js';
-import { hookMemo } from '@engraft/refunc';
+import { hookMemo, hooks } from '@engraft/refunc';
 import { hookRunTool } from './runTool.js';
 
 export type ProgramOf<T> = T extends Tool<infer P> ? P : never;
@@ -54,6 +54,8 @@ export function hookRunToolWithNewScopeVarBindings<P extends ToolProgram>(
   const result = hookRunTool(props);
   return hookAttachNewScopeVarBindings(result, newScopeVarBindings);
 }
+
+export const runToolWithNewScopeVarBindings = hooks(hookRunToolWithNewScopeVarBindings);
 
 export type ShowViewWithNewScopeVarBindingsProps<P extends ToolProgram> = ToolViewRenderProps<P> & ViewWithNewScopeVarBindings<P>;
 
