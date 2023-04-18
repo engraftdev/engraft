@@ -392,7 +392,7 @@ export type ToolOutputViewProps = {
   outputP: EngraftPromise<ToolOutput>;
   customizations?: ValueCustomizations;
   displayReactElementsDirectly?: boolean;
-  valueWrapper?: (value: ReactNode) => ReactNode;
+  valueWrapper?: (valueNode: ReactNode, value: unknown) => ReactNode;
 }
 
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
@@ -408,10 +408,10 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
           maybeElement = (maybeElement as any).view;
         };
         if (isObject(maybeElement) && isValidElement(maybeElement)) {
-          return valueWrapper(<ErrorBoundary>{maybeElement}</ErrorBoundary>);
+          return valueWrapper(<ErrorBoundary>{maybeElement}</ErrorBoundary>, value);
         }
       }
-      return valueWrapper(<Value value={value} customizations={customizations}/>);
+      return valueWrapper(<Value value={value} customizations={customizations}/>, value);
     }}
   />;
 });

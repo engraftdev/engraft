@@ -327,7 +327,7 @@ type CodeModeViewProps = CodeModeProps & ToolViewRenderProps<Program> & {
 };
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, subViews, logsP} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, onBlur, subViews, logsP} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const { scopeVarBindings } = useContext(ToolViewContext);
@@ -442,6 +442,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         autoFocus={autoFocus}
         text={program.code}
         onChange={onChange}
+        onBlur={onBlur}
       />
       {refs.map(([elem, {id}]) => {
         return ReactDOM.createPortal(

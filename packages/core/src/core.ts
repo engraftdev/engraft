@@ -64,6 +64,7 @@ export type ToolViewRenderProps<P> = {
   expand?: boolean,
   noFrame?: boolean,
   frameBarBackdropElem?: HTMLDivElement,
+  onBlur?: () => void,
 }
 
 export type ToolViewContextValue = {
