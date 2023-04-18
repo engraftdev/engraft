@@ -1,16 +1,16 @@
+import { registerAllTheTools } from '@engraft/all-the-tools';
+import { ErrorBoundary } from '@engraft/original/lib/util/ErrorBoundary.js';
 import { ObservableInspector } from '@engraft/original/lib/util/ObservableInspector.js';
 import IsolateStyles from '@engraft/original/lib/view/IsolateStyles.js';
+import { ToolWithView } from '@engraft/original/lib/view/ToolWithView.js';
 import { ToolOutputBuffer } from '@engraft/original/lib/view/Value.js';
-import { ErrorBoundary } from '@engraft/original/lib/util/ErrorBoundary.js';
 import { isObject } from '@engraft/shared/lib/isObject.js';
-import { EngraftPromise, PromiseState, runTool, ShowView, slotWithCode, ToolOutput, ToolProgram, usePromiseState, useRefunction, VarBinding } from '@engraft/toolkit';
-import { isValidElement, memo, useEffect, useMemo, useState } from 'react';
-import React from 'react';
-import { registerAllTheTools } from '@engraft/all-the-tools';
+import { EngraftPromise, PromiseState, slotWithCode, ToolOutput, ToolProgram, VarBinding } from '@engraft/toolkit';
+import React, { isValidElement, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 // React exports for Observable to use
-export { React };
 export * as ReactDOM from 'react-dom';
+export { React };
 
 registerAllTheTools();
 
@@ -47,16 +47,14 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     }
   }, [program, localStorageKey])
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings });
+  const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
 
-  useEffect(() => {
+  const myReportOutputP = useCallback((outputP: EngraftPromise<ToolOutput>) => {
+    // Report it to the parent
     reportOutputP && reportOutputP(outputP);
-  }, [outputP, reportOutputP]);
-
-  const outputState = usePromiseState(outputP);
-  useEffect(() => {
-    reportOutputState && reportOutputState(outputState);
-  }, [outputState, reportOutputState]);
+    // Save it to state, so we can display it
+    setOutputP(outputP);
+  }, [reportOutputP]);
 
   return (
     <div>
@@ -74,7 +72,13 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
       { !hide &&
         <div style={{marginTop: 10}}>
           <IsolateStyles>
-            <ShowView view={view} updateProgram={updateProgram} autoFocus={true} />
+            <ToolWithView
+              program={program}
+              varBindings={varBindings}
+              updateProgram={updateProgram}
+              reportOutputP={myReportOutputP}
+              reportOutputState={reportOutputState}
+            />
           </IsolateStyles>
         </div>
       }
