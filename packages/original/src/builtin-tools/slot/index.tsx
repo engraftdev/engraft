@@ -461,6 +461,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
                 if (parsed.toolName) {
                   if (fromB === 0 && toB === tr.newDoc.length) {
                     // Replace the slot with the pasted program
+                    // TODO: perhaps we should paste inline and then simplify on blur?
                     programUP.$as<Program>().$apply((program) => slotWithProgram(parsed, program.defaultCode));
                   } else {
                     const newId = randomId();
