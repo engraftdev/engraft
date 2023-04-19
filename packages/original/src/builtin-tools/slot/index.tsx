@@ -4,7 +4,7 @@ import TemplateDefault, * as TemplateModule from "@babel/template";
 import babelTypes from "@babel/types";
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
-import { EditorState, RangeSet } from "@codemirror/state";
+import { ChangeSpec, EditorState, RangeSet, Transaction } from "@codemirror/state";
 import { Decoration, EditorView, WidgetType, keymap } from "@codemirror/view";
 import { EngraftPromise, ProgramFactory, ShowView, Tool, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewContext, ToolViewRenderProps, VarBinding, hookRunTool, randomId, references, setSlotWithCode, setSlotWithProgram, usePromiseState } from "@engraft/core";
 import { hookDedupe, hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
@@ -18,7 +18,7 @@ import { memo, useCallback, useContext, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { CodeMirror } from "../../util/CodeMirror.js";
 import { usePortalSet } from "../../util/PortalWidget.js";
-import { setup } from "../../util/codeMirrorStuff.js";
+import { defaultCopyCutHandler, setup } from "../../util/codeMirrorStuff.js";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile.js";
 import { embedsExtension } from "../../util/embedsExtension.js";
 import { Updater } from "../../util/immutable.js";
@@ -77,7 +77,7 @@ function slotWithCode(program: string = ''): Program {
 }
 setSlotWithCode(slotWithCode);
 
-function slotWithProgram(program: ToolProgram): Program {
+function slotWithProgram(program: ToolProgram, defaultCode?: string): Program {
   // TODO: this condition is a hack, isn't it?
   if (program.toolName === 'slot') {
     return program as Program;
@@ -87,7 +87,7 @@ function slotWithProgram(program: ToolProgram): Program {
     toolName: 'slot',
     modeName: 'tool',
     subProgram: program,
-    defaultCode: undefined,
+    defaultCode,
   };
 }
 setSlotWithProgram(slotWithProgram);
@@ -377,6 +377,11 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       refCompletions(() => scopeVarBindingsRef.current),
       toolCompletions(insertTool, replaceWithTool),
     ];
+
+    // TODO: We're storing some state here for inter-extension communication.
+    // I'm sure there's a more correct CodeMirror-ish way.
+    let pastedSlotProgram: Program & { modeName: 'code' } | undefined = undefined;
+
     return [
       ...setup(),
       EditorView.theme({
@@ -397,26 +402,87 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       autocompletion({override: completions}),
       toolCompletionsTheme,
       EditorView.domEventHandlers({
+        copy(event, view) {
+          defaultCopyCutHandler(view, event);
+          // Attach the program to the clipboard as json-engraft data
+          event.clipboardData!.setData('application/json-engraft', JSON.stringify(program));
+          return true;
+        },
         paste(event) {
-          const text = event.clipboardData?.getData('text');
-          if (text) {
+          // Pasting code with json-engraft clipboard data
+          // (here, we just save it so it's accessible in the transaction filter)
+          const pastedJsonEngraftData = event.clipboardData?.getData('application/json-engraft');
+          if (pastedJsonEngraftData) {
             try {
-              const parsed = JSON.parse(text);
-              if (parsed.toolName) {
-                // TODO: for now, we just replace – someday we should check about insertions
-                updateProgram(() => slotWithProgram(parsed));
-                event.preventDefault();
-              }
+              pastedSlotProgram = JSON.parse(pastedJsonEngraftData);
             } catch {
-              // totally expected
+              console.warn("couldn't parse json engraft data", pastedJsonEngraftData);
+              pastedSlotProgram = undefined;
+            }
+          } else {
+            pastedSlotProgram = undefined;
+          }
+        }
+      }),
+      EditorState.transactionFilter.of(tr => {
+        if (tr.annotation(Transaction.userEvent) === 'input.paste') {
+          if (pastedSlotProgram) {
+            // Pasting code with a json-engraft side-channel
+
+            let newChanges: ChangeSpec[] = [];
+            tr.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+              // Scan through inserted text for IDs of subtools. If a subtool
+              // is found, replace it with a new ID and insert the subtool
+              // from pastedSlotProgram into this program.
+              const insertedStr = inserted.toString()
+              let insertedStrAfterReplacements = insertedStr;
+              Object.entries(pastedSlotProgram!.subPrograms).forEach(([id, subProgram]) => {
+                // It should really occur at most once, but just in case, we replaceAll.
+                insertedStrAfterReplacements = insertedStrAfterReplacements.replaceAll(id, () => {
+                  const newId = randomId();
+                  programUP.subPrograms[newId].$set(subProgram);
+                  return newId;
+                });
+              });
+              if (insertedStrAfterReplacements !== insertedStr) {
+                newChanges.push({ from: fromB, to: toB, insert: insertedStrAfterReplacements });
+              }
+            });
+            if (newChanges.length > 0) {
+              return [tr, { changes: newChanges, sequential: true }];
+            }
+          } else {
+            // Check if we're pasting program JSON directly
+
+            let newChanges: ChangeSpec[] = [];
+            tr.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+              try {
+                const parsed = JSON.parse(inserted.toString());
+                if (parsed.toolName) {
+                  if (fromB === 0 && toB === tr.newDoc.length) {
+                    // Replace the slot with the pasted program
+                    programUP.$as<Program>().$apply((program) => slotWithProgram(parsed, program.defaultCode));
+                  } else {
+                    const newId = randomId();
+                    programUP.subPrograms[newId].$set(slotWithProgram(parsed));
+                    newChanges.push({ from: fromB, to: toB, insert: newId });
+                  }
+                }
+              } catch {
+                // it's not JSON, totally expected
+              }
+            });
+            if (newChanges.length > 0) {
+              return [tr, { changes: newChanges, sequential: true }];
             }
           }
         }
+        return tr;
       }),
       logTheme,
       logDecorations,
     ];
-  }, [refSet, logDecorations, programUP, program.defaultCode, scopeVarBindingsRef, updateProgram])
+  }, [refSet, logDecorations, programUP, program, scopeVarBindingsRef])
 
   const onChange = useCallback((value: string) => {
     if (value !== program.code) {
