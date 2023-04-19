@@ -49,7 +49,6 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { 
         autoFocus={autoFocus}
         onBlur={() => {
           setShowTool(false);
-          console.log("blur!");
         }}
       />
     }
