@@ -32,32 +32,32 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 export default defineTool({ programFactory, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { subResult: ToolResult }) => {
-  const { updateProgram, subResult, autoFocus, frameBarBackdropElem } = props;
+  const { updateProgram, subResult, frameBarBackdropElem } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [showTool, setShowTool] = useState(false);
 
   return <div onClick={() => setShowTool(true)}>
-    { !showTool && frameBarBackdropElem && createPortal(
+    { frameBarBackdropElem && createPortal(
       <div className="backdrop" style={{...outputBackgroundStyle, height: '100%'}} />,
       frameBarBackdropElem
     ) }
-    { showTool &&
-      <ShowView
-        view={subResult.view}
-        updateProgram={programUP.subProgram.$apply}
-        autoFocus={autoFocus}
-        onBlur={() => {
-          setShowTool(false);
-        }}
-      />
-    }
     <div style={{...outputBackgroundStyle}}>
       <ToolOutputView
         outputP={subResult.outputP}
         valueWrapper={myValueWrapper}
       />
     </div>
+    { showTool &&
+      <ShowView
+        view={subResult.view}
+        updateProgram={programUP.subProgram.$apply}
+        autoFocus={true}
+        onBlur={() => {
+          setShowTool(false);
+        }}
+      />
+    }
   </div>
 })
 
