@@ -6,44 +6,21 @@ function replaceText (editorView, text) {
   editorView.dispatch({changes: { from: 0, to: editorView.state.doc.length, insert: text}});
 }
 
-// let cells, cellIds;
-
-function getCells() {
-  const cellElems = document.querySelectorAll("[data-node-id]");
-  return [...cellElems].map(cellElem => {
-    const cellId = cellElem.getAttribute("data-node-id");
-    const view = cellElem.querySelector(".cm-content")?.cmView;
-    // const text = view?.editorView.state.doc.toString();
-    return { cellElem, cellId, view };
-  });
+function getCell(i) {
+  return document.querySelectorAll("[data-node-id]")[i];
 }
 
-// function onNotebookChange() {
-//   const cellElems = document.querySelectorAll("[data-node-id]");
-//   cells = [...cellElems].map(cellElem => {
-//     const cellId = cellElem.getAttribute("data-node-id");
-//     const view = cellElem.querySelector(".cm-content").cmView;
-//     const text = view.editorView.state.doc.toString();
-//     return { cellElem, cellId, view, text };
-//     // cell.addEventListener("click", () => {
-//     //   console.log("Observable Writer: cell clicked");
-//     //   const nodeId = cell.getAttribute("data-node-id");
-//     //   window.postMessage({ type: "OBSERVABLE_WRITER_CELL_CLICKED", nodeId }, "*");
-//     // });
-//   });
-//   window.cells = cells;
+function getCellId(cell) {
+  return cellElem.getAttribute("data-node-id");
+}
 
-//   cellIds = cells.map(c => c.cellId);
-//   console.log("notebookChange", cellIds);
-// };
+function getView(cell) {
+  return cell.querySelector(".cm-content")?.cmView;
+}
 
-// new MutationObserver(function () {
-//   onNotebookChange();
-// }).observe(document.querySelector(".notebook"), {
-//   childList: true,
-// });
-
-// onNotebookChange();
+function getText(view) {
+  return view?.editorView.state.doc.toString();
+}
 
 window.addEventListener("message", (event) => {
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
@@ -51,9 +28,8 @@ window.addEventListener("message", (event) => {
     if (event.data.type === "click") {
       console.log("click!");
       const { order } = event.data;
-      const { cellId, view } = getCells()[order];
+      const view = getView(getCell(order));
       replaceText(view.editorView, "WOW");
     }
-    // console.log("parent got event", event.data);
   }
 });
