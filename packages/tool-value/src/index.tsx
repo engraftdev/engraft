@@ -63,12 +63,14 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { 
 
 // TODO: we're hacking in support for cute little tables; generalization TBD
 function myValueWrapper(valueNode: ReactNode, value: unknown) {
+  const colSpacing = 10;
+
   if (value instanceof Array) {
     if (value.length > 0 && value[0] instanceof Array) {
-      return <table>
+      return <table style={{margin: `0 -${colSpacing / 2}px`}}>
         <tbody>
           {value.map((row, i) => <tr key={i}>
-            {(row as unknown[]).map((cell, j) => <td key={j}><Value value={cell}/></td>)}
+            {(row as unknown[]).map((cell, j) => <td key={j} style={{padding: `0 ${colSpacing / 2}px`}}><Value value={cell}/></td>)}
           </tr>)}
         </tbody>
       </table>
