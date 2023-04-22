@@ -1,6 +1,6 @@
 import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
 import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy } from "@engraft/toolkit";
-import { memo, ReactNode, useState } from "react";
+import { memo, ReactNode, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 export type Program = {
@@ -23,7 +23,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} subResult={subResult} />,
-
+    showsOwnOutput: true,
   }), [props, subResult]);
 
   return {outputP: subResult.outputP, view};
@@ -37,7 +37,23 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { 
 
   const [showTool, setShowTool] = useState(false);
 
-  return <div onClick={() => setShowTool(true)}>
+  const [showToolOnLastMouseDown, setShowToolOnLastMouseDown] = useState(false);
+
+  // This logic avoids a problem where...
+  // 1. mouse-down blurs the tool, causing setShowTool(false)...
+  // 2. mouse-up triggers a click with showTool == false, causing setShowTool(true).
+
+  const onMouseDown = useCallback(() => {
+    setShowToolOnLastMouseDown(showTool);
+  }, [showTool]);
+
+  const onClick = useCallback(() => {
+    if (!showToolOnLastMouseDown) {
+      setShowTool(true);
+    }
+  }, [showToolOnLastMouseDown]);
+
+  return <div onMouseDown={onMouseDown} onClick={onClick}>
     { frameBarBackdropElem && createPortal(
       <div className="backdrop" style={{...outputBackgroundStyle, height: '100%'}} />,
       frameBarBackdropElem
@@ -67,7 +83,7 @@ function myValueWrapper(valueNode: ReactNode, value: unknown) {
 
   if (value instanceof Array) {
     if (value.length > 0 && value[0] instanceof Array) {
-      return <table style={{margin: `0 -${colSpacing / 2}px`}}>
+      return <table style={{margin: `${colSpacing / 2}px 0`}}>
         <tbody>
           {value.map((row, i) => <tr key={i}>
             {(row as unknown[]).map((cell, j) => <td key={j} style={{padding: `0 ${colSpacing / 2}px`}}><Value value={cell}/></td>)}
