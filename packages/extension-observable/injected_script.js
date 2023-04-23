@@ -22,6 +22,14 @@ function getText(view) {
   return view?.editorView.state.doc.toString();
 }
 
+function replaceProgramString(editorView, programString) {
+  // programString = latest program string transmitted from a updateProgram event from host
+  const re = /(?<=engraft\('\w+', {.*?}, this, ).*?(?=\))/
+  const oldString = "" // get from editor view
+  const newString = oldString.replace(re, programString)
+  editorView.dispatch({changes: { from: 0, to: editorView.state.doc.length, insert: newString}});
+}
+
 window.addEventListener("message", (event) => {
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
     console.log("parent got event", event.data);
@@ -32,9 +40,11 @@ window.addEventListener("message", (event) => {
       replaceText(view.editorView, "WOW");
     }
     if (event.data.type === 'engraft-update') {
-      console.log('updating engraft in cell ', event?.data?.order)
-      console.log('program')
-      console.log(event?.data?.program)
+      const { order, program} = event.data;
+      const view = getView(getCell(order));
+      console.log('updating engraft in cell ', order)
+
+      replaceProgramString(view.editorView, program)
     }
   }
 });
