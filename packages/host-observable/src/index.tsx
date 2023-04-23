@@ -111,11 +111,11 @@ type ObservableExtEmbedProps = {
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
   inputs: {[name: string]: any} | undefined,
   hide?: boolean,
-  initialProgram?: ToolProgram
+  programString?: ToolProgram
 }
 
 export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: ObservableExtEmbedProps) {
-  const {inputs = {}, reportOutputState, reportOutputP, hide = false, initialProgram = null } = props;
+  const {inputs = {}, reportOutputState, reportOutputP, hide = false, programString = null } = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
@@ -128,17 +128,31 @@ export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: Observ
   }, [inputs]);
 
   const [program, updateProgram] = useState<ToolProgram>(
-      initialProgram || slotWithCode(defaultCodeFromInputs(inputs))
+      programString || slotWithCode(defaultCodeFromInputs(inputs))
   );
 
+
+  // Engraft GUI change -> local program changes -> [Extension] -> programString changes
   useEffect(() => {
     try {
       // definitely needs debouncing
       window.parent.postMessage({source: 'observable-writer', type: 'engraft-update', order: 1, program: program}, "*")
     } catch (e) {
-      console.warn("error writing to cell", e);
+      console.warn("error writing program string to cell", e);
     }
   }, [program])
+
+  // manual program string change -> local program changes -> Engraft GUI changes
+  useEffect(() => {
+    try {
+      // definitely needs debouncing
+      programString && updateProgram(programString)
+    } catch (e) {
+      console.warn("error writing program string to cell", e);
+    }
+  }, [programString])
+
+
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
 
@@ -151,9 +165,6 @@ export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: Observ
 
   return (
       <div>
-        <div style={{backgroundColor: 'red'}}>
-          {JSON.stringify(initialProgram)}
-        </div>
         <ToolOutputBuffer
             outputP={outputP}
             renderValue={(value) => {
