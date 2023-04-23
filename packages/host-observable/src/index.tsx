@@ -105,3 +105,82 @@ function programFromLocalStorage(key: string) {
     return undefined;
   }
 }
+
+type ObservableExtEmbedProps = {
+  reportOutputState?: (outputState: PromiseState<ToolOutput>) => void,
+  reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
+  inputs: {[name: string]: any} | undefined,
+  hide?: boolean,
+  initialProgram?: ToolProgram
+}
+
+export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: ObservableExtEmbedProps) {
+  const {inputs = {}, reportOutputState, reportOutputP, hide = false, initialProgram = null } = props;
+
+  // turn inputs provided from Observable into varBindings
+  const varBindings = useMemo(() => {
+    let varBindings: {[id: string]: VarBinding} = {};
+    Object.entries(inputs || {}).forEach(([name, value]) => {
+      const id = `ID${name}000000`;
+      varBindings[id] = {var_: {id, label: name}, outputP: EngraftPromise.resolve({value: value})};
+    });
+    return varBindings;
+  }, [inputs]);
+
+  const [program, updateProgram] = useState<ToolProgram>(
+      initialProgram || slotWithCode(defaultCodeFromInputs(inputs))
+  );
+
+  useEffect(() => {
+    try {
+      // definitely needs debouncing
+      window.parent.postMessage({source: 'observable-writer', type: 'engraft-update', order: 1, program: program}, "*")
+    } catch (e) {
+      console.warn("error writing to cell", e);
+    }
+  }, [program])
+
+  const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
+
+  const myReportOutputP = useCallback((outputP: EngraftPromise<ToolOutput>) => {
+    // Report it to the parent
+    reportOutputP && reportOutputP(outputP);
+    // Save it to state, so we can display it
+    setOutputP(outputP);
+  }, [reportOutputP]);
+
+  return (
+      <div>
+        <div style={{backgroundColor: 'red'}}>
+          {JSON.stringify(initialProgram)}
+        </div>
+        <ToolOutputBuffer
+            outputP={outputP}
+            renderValue={(value) => {
+              // TODO: copied from elsewhere
+              let maybeElement = value as object | null | undefined;
+              if (isObject(maybeElement) && isValidElement(maybeElement)) {
+                return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
+              }
+              return <ObservableInspector value={value}/>;
+            }}
+        />
+        { !hide &&
+            <div style={{marginTop: 10}}>
+              <IsolateStyles>
+                <ToolWithView
+                    program={program}
+                    varBindings={varBindings}
+                    updateProgram={updateProgram}
+                    reportOutputP={myReportOutputP}
+                    reportOutputState={reportOutputState}
+                />
+              </IsolateStyles>
+            </div>
+        }
+      </div>
+  );
+});
+
+
+
