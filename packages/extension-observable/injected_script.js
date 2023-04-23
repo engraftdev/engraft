@@ -31,5 +31,10 @@ window.addEventListener("message", (event) => {
       const view = getView(getCell(order));
       replaceText(view.editorView, "WOW");
     }
+    if (event.data.type === 'engraft-update') {
+      console.log('updating engraft in cell ', event?.data?.order)
+      console.log('program')
+      console.log(event?.data?.program)
+    }
   }
 });
