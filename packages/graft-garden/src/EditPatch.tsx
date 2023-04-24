@@ -7,9 +7,9 @@ import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
 import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
 import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
@@ -100,12 +100,6 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
 
-  const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    updateDoc(doc(patchesRef, patchId), {
-      name: e.target.value,
-    });
-  }, [patchId]);
-
   const program = patch.toolProgram;
   const programIsEmpty = _.isEqual(program, slotWithCode(''));
 
@@ -116,7 +110,9 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   return <>
     <div className="col-lg-6 mx-auto">
       <div className="input-group">
-        <input className="form-control form-control-lg" type="text" value={patch!.name} onChange={onChangeName} placeholder="patch name"/>
+        <input className="form-control form-control-lg" type="text"
+          value={patch!.name} onChange={(e) => patchUP.name.$set(e.target.value)}
+          placeholder="patch name"/>
         <a href={`#/view/${patchId}`} className="btn btn-primary btn-lg">view</a>
       </div>
     </div>
