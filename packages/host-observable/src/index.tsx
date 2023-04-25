@@ -111,11 +111,11 @@ type ObservableExtEmbedProps = {
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
   inputs: {[name: string]: any} | undefined,
   hide?: boolean,
-  programString?: ToolProgram
+  programString: ToolProgram
 }
 
 export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: ObservableExtEmbedProps) {
-  const {inputs = {}, reportOutputState, reportOutputP, hide = false, programString = null } = props;
+  const {inputs = {}, reportOutputState, reportOutputP, hide = false, programString } = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
@@ -136,7 +136,7 @@ export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: Observ
   useEffect(() => {
     try {
       // definitely needs debouncing
-      window.parent.postMessage({source: 'observable-writer', type: 'engraft-update', order: 1, program: program}, "*")
+      window.parent.postMessage({source: 'observable-writer', type: 'engraft-update', order: 11, program: program}, "*")
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
@@ -151,7 +151,6 @@ export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: Observ
       console.warn("error writing program string to cell", e);
     }
   }, [programString])
-
 
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
