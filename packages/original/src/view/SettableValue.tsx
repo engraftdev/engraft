@@ -1,7 +1,7 @@
 import { PromiseState, slotWithCode, ToolOutput } from "@engraft/core";
+import { Setter } from "@engraft/shared/lib/Updater.js";
+import { useStateUP } from "@engraft/update-proxy-react";
 import { memo, useCallback, useMemo, useState } from "react";
-import { Setter } from "../util/immutable.js";
-import { useStateSetOnly, useStateUpdateOnly } from "../util/immutable-react.js";
 import { empty } from "../util/noOp.js";
 import { ToolWithView } from "./ToolWithView.js";
 import { Value } from "./Value.js";
@@ -22,8 +22,8 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
 
-  const [entryProgram, updateEntryProgram] = useStateUpdateOnly(() => slotWithCode(''))
-  const [entryOutputState, setEntryOutputState] = useStateSetOnly<PromiseState<ToolOutput> | null>(() => null)
+  const [entryProgram, entryProgramUP] = useStateUP(() => slotWithCode(''))
+  const [entryOutputState, entryOutputStateUP] = useStateUP<PromiseState<ToolOutput> | null>(() => null)
 
   const onClickSet = useCallback(() => {
     if (entryOutputState?.status === 'fulfilled') {
@@ -51,7 +51,7 @@ export const SettableValue = memo(function SettableValue(props: SettableValuePro
       {expanded &&
         <>
           <div>←</div>
-          <ToolWithView program={entryProgram} updateProgram={updateEntryProgram} reportOutputState={setEntryOutputState} varBindings={empty}/>
+          <ToolWithView program={entryProgram} updateProgram={entryProgramUP.$} reportOutputState={entryOutputStateUP.$set} varBindings={empty}/>
           <button disabled={entryOutputState === null} onClick={onClickSet}>set</button>
         </>
       }

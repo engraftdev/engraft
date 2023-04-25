@@ -6,8 +6,7 @@ import { difference, union } from "@engraft/shared/lib/sets.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxy, useStateUP, useUpdateProxy } from "@engraft/update-proxy-react";
-import { memo, useCallback, useEffect, useMemo } from "react";
-import { useStateSetOnly } from "../../util/immutable-react.js";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { ToolOutputView } from "../../view/Value.js";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
@@ -156,7 +155,7 @@ const View = memo((props: ViewProps) => {
 
   const [draft, draftUP] = useStateUP<Draft | undefined>(() => undefined);
 
-  let [selection, setSelection] = useStateSetOnly<SimSliderValue>(() => ({type: 'init', tick: 0}));
+  let [selection, setSelection] = useState<SimSliderValue>(() => ({type: 'init', tick: 0}));
   // deal with out-of-bounds selection
   if (selection.type === 'init' && selection.tick > program.ticksCount) {
     selection = {type: 'init', tick: 0};

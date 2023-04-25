@@ -1,8 +1,8 @@
 import { memo, useEffect } from "react";
-import { Setter } from "../util/immutable.js";
 import IsolateStyles from "../view/IsolateStyles.js";
 import { useRefunction } from "@engraft/refunc-react";
 import { EngraftPromise, PromiseState, runTool, ShowView, ToolOutput, ToolProps, ToolViewContext, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { Setter } from "@engraft/shared/lib/Updater.js";
 
 /*
   ToolWithView is a quick and simple way to embed a tool somewhere outside

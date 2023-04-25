@@ -1,6 +1,5 @@
+import { UpdateProxy, useStateUP } from "@engraft/update-proxy-react";
 import { useEffect } from "react";
-import { Updater } from "./immutable.js";
-import { useStateUpdateOnly } from "./immutable-react.js";
 
 // note: this only checks local storage at initialization, not continuously.
 // (that would be cool tho; see "StorageItem" in a different project.)
@@ -12,8 +11,8 @@ export function useLocalStorage<T>(
   init: () => T,
   parse: (s: string) => T = JSON.parse,
   stringify: (t: T) => string = JSON.stringify
-): [T, Updater<T>] {
-  const [t, updateT] = useStateUpdateOnly<T>(() => {
+): [T, UpdateProxy<T>] {
+  const [t, tUP] = useStateUP<T>(() => {
     try {
       const str = window.localStorage.getItem(key)
       if (str) {
@@ -31,5 +30,5 @@ export function useLocalStorage<T>(
     }
   }, [key, stringify, t]);
 
-  return [t, updateT];
+  return [t, tUP];
 }

@@ -1,13 +1,12 @@
 import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, ShowViewWithNewScopeVarBindings, slotWithCode, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cellNetwork, cellNetworkReferences, outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxyRemovable } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
-import { Fragment, memo, useCallback, useMemo, useRef } from "react";
+import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
 import { startDrag } from "../../util/drag.js";
-import { useStateSetOnly } from "../../util/immutable-react.js";
-import { Updater } from "../../util/immutable.js";
 import { mergeRefs } from "../../util/mergeRefs.js";
 import { alphaLabels, unusedLabel } from "../../util/unusedLabel.js";
 import { Use } from "../../util/Use.js";
@@ -168,7 +167,7 @@ const CellDivider = memo((props: {
     ev?.preventDefault();
   }, [i, prevVarId, smallestUnusedLabel, updateCells]);
 
-  const [isFocused, setIsFocused] = useStateSetOnly(() => false);
+  const [isFocused, setIsFocused] = useState(false);
 
   return <Use hook={useHover}>
     {([hoverRef, isHovered]) => <>

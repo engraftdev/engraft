@@ -13,12 +13,12 @@ import { useUpdateProxy } from "@engraft/update-proxy-react";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { compileBodyCached, compileExpressionCached } from "../../util/compile.js";
-import { Updater } from "../../util/immutable.js";
 import { makeRand } from "../../util/rand.js";
 import { Replace } from "../../util/types.js";
 import { ToolFrame } from "../../view/ToolFrame.js";
 import { ToolInspectorWindow } from "../../view/ToolInspectorWindow.js";
 import { globals } from "./globals.js";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 
 // TODO: what hath ESM wrought?
 const template = (TemplateDefault.default || TemplateModule.default) as unknown as typeof import("@babel/template").default;

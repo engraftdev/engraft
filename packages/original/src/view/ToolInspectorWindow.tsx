@@ -2,11 +2,11 @@ import { references, ToolProgram, ToolViewContext, VarBindings } from "@engraft/
 import { runtimeObjectId } from "@engraft/shared/lib/runtimeObjectId.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { memo, useContext } from "react";
-import { Updater } from "../util/immutable.js";
 import { WindowPortal } from "../util/WindowPortal.js";
 import IsolateStyles from "./IsolateStyles.js";
 import { Value } from "./Value.js";
 import { ValueEditable } from "./ValueEditable.js";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 
 export type ToolInspectorWindowProps = {
   show: boolean,

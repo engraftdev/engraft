@@ -2,9 +2,9 @@ import { ToolProgram, VarBindings } from "@engraft/core";
 import classNames from "classnames";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { Use } from "../util/Use.js";
-import { Updater } from "../util/immutable.js";
 import useHover from "../util/useHover.js";
 import { ToolInspectorWindow } from "./ToolInspectorWindow.js";
+import { Updater } from "@engraft/shared/lib/Updater.js";
 
 
 export type ToolFrameProps = {

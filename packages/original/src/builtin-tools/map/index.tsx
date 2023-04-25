@@ -5,9 +5,8 @@ import { difference, union } from "@engraft/shared/lib/sets.js";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
-import { CSSProperties, memo, ReactNode } from "react";
+import { CSSProperties, memo, ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
-import { useStateSetOnly } from "../../util/immutable-react.js";
 import { ErrorView, ToolOutputView } from "../../view/Value.js";
 import { VarDefinition } from "../../view/Vars.js";
 
@@ -102,8 +101,8 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, itemResultsP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const [selectedIndex, setSelectedIndex] = useStateSetOnly(() => 0);
-  const [hoveredIndex, setHoveredIndex] = useStateSetOnly(() => 0 as number | null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(0 as number | null);
 
   const itemResultsState = usePromiseState(itemResultsP);
 
