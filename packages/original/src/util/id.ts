@@ -5,9 +5,6 @@ export function hashId(...args: any[]): string {
   return randomId(seedrandom(JSON.stringify(args)));
 }
 
-// TODO: extended this from a-z so I could shove js variable names in; not great
-export const idRegExp = "ID[a-zA-Z_]*[0-9]{6}";
-
 // This is also independent: functional getters and updaters by id for nested objects
 // TODO: hacky
 

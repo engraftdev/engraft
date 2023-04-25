@@ -151,6 +151,14 @@ const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
     );
   }
 
+  if (hasProperty(value, 'constructor') && (value.constructor as Function).name === 'PyProxy') {
+    return wrapInline(
+      <ValueFrame type='python object'>
+        <pre style={{...valueFont, margin: 0}}>{value.toString()}</pre>
+      </ValueFrame>
+    );
+  }
+
   if (value instanceof EngraftPromise) {
     return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} expandedLevelsLeft={expandedLevelsLeft} />;
   }

@@ -3,6 +3,8 @@ const depcheck = require('depcheck');
 const options = {
   // tests will use devDependencies from the root package.json; ignore them
   ignorePatterns: ["/test/**", "/dist/**", "/lib/**", "vite.config.ts"],
+  // dynamic imports from the web should be ignored
+  ignoreMatches: ["https:*"]
 };
 
 depcheck(process.cwd(), options).then((unused) => {

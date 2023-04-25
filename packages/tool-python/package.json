@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/tool-notebook-canvas",
+  "name": "@engraft/tool-python",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "A spatial notebook canvas for Engraft",
+  "description": "Engraft tool for Python code (via Pyodide)",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
@@ -13,13 +13,11 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.1",
-    "@engraft/original": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
-    "lodash": "^4.17.21"
+    "@codemirror/lang-python": "^6.1.2",
+    "@engraft/codemirror-helpers": "^0.0.1",
+    "@engraft/toolkit": "^0.0.1"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
-    "react-dom": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
   }
 }
