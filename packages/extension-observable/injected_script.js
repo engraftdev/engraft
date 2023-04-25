@@ -36,7 +36,14 @@ window.addEventListener("message", (event) => {
       const view = getView(getCell(order));
       console.log('updating engraft in cell ', order)
 
-      const re = /(?<=engraft\('\w+', {.*?}, this, ).*?[\s]*(?=\))/
+      // matches the engraft function call:
+      //  engraft(key: string, inputs: {}, this, hide: bool, programString: ToolProgram)
+      //
+      // lookbehind matches: engraft(key: string, inputs: {}, this, hide: bool,
+      // prog matches: programString json
+      // lookahead matches: ending parenthesis
+
+      const re = /(?<=engraft\(\s*'\w+'\s*,\s*{.*?}\s*,\s*this\s*,\s*((true|false|)\s*,\s*)*){.*}?\s*(?=\)$)/
       const oldString = view.editorView.state.doc.toString()
       const newString = oldString.replace(re, JSON.stringify(program))
 
