@@ -43,9 +43,12 @@ window.addEventListener("message", (event) => {
       // prog matches: programString json
       // lookahead matches: ending parenthesis
 
-      const re = /(?<=engraft\(\s*'\w+'\s*,\s*{.*?}\s*,\s*this\s*,\s*((true|false|)\s*,\s*)*){.*}|null?\s*(?=\)$)/
+      const re = /(?<=engraft\(\s*'\w+'\s*,\s*{.*?}\s*,\s*this\s*,\s*((true|false|)\s*,\s*)*)({.*}?|null)\s*(?=\))/
       const oldString = view.editorView.state.doc.toString()
+      console.log(oldString)
+      console.log(oldString.search(re))
       const newString = oldString.replace(re, JSON.stringify(program))
+      console.log(newString)
 
       replaceText(view.editorView, newString)
     }
