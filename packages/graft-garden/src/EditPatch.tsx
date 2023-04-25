@@ -47,7 +47,9 @@ export function useLogChanges(values: any) {
 }
 
 
-export const EditPatch = memo(function EditPatch() {
+export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
+  const { safeMode = false } = props;
+
   const params = useParams();
   const patchId = params.patchId;
 
@@ -77,7 +79,7 @@ export const EditPatch = memo(function EditPatch() {
         </div>
       </div>
       { patch
-        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} />
+        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} safeMode={safeMode} />
         : error
         ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
         : <div className="col-lg-6 mx-auto">loading...</div>
@@ -93,8 +95,9 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   patchId: string | undefined,
   patch: Patch,
   patchUP: UpdateProxy<Patch>,
+  safeMode: boolean,
 }) {
-  const { patchId, patch, patchUP } = props;
+  const { patchId, patch, patchUP, safeMode } = props;
 
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
@@ -132,13 +135,21 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
         }}
         resetKeys={[program]}
       >
-        <ToolWithView
-          program={program} updateProgram={patchUP.toolProgram.$}
-          reportOutputState={noOp}
-          varBindings={varBindings}
-          autoFocus={true}
-          expand={true}
-        />
+        { safeMode
+          ? <div>
+              <p>Safe mode is on. Edit the program below, then <a href={`#/edit/${patchId}`}>click here</a> to turn off safe mode.</p>
+              <IsolateStyles>
+                <ValueEditable value={program} updater={patchUP.toolProgram.$} maxDepth={Infinity}/>
+              </IsolateStyles>
+            </div>
+          : <ToolWithView
+              program={program} updateProgram={patchUP.toolProgram.$}
+              reportOutputState={noOp}
+              varBindings={varBindings}
+              autoFocus={true}
+              expand={true}
+            />
+        }
       </ErrorBoundary>
       { programIsEmpty &&
         <span style={{paddingLeft: 10}}>↑ start here!</span>
