@@ -110,12 +110,12 @@ type ObservableExtEmbedProps = {
   reportOutputState?: (outputState: PromiseState<ToolOutput>) => void,
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
   inputs: {[name: string]: any} | undefined,
+  programString: ToolProgram,
   hide?: boolean,
-  programString: ToolProgram
 }
 
 export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: ObservableExtEmbedProps) {
-  const {inputs = {}, reportOutputState, reportOutputP, hide = false, programString } = props;
+  const {inputs = {}, reportOutputState, reportOutputP, programString, hide = false} = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
