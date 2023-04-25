@@ -1,10 +1,11 @@
 import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
-import { useRefForCallback } from "@engraft/original/lib/util/useRefForCallback.js";
+import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
 import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
 import voyagerStyle from "@engraft/vendor-voyager/src/style.css?inline";
 import _ from "lodash";
 import { memo, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Spec = ReturnType<typeof selectMainSpec>;
 type Schema = ReturnType<typeof buildSchema>;
@@ -38,7 +39,6 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
         {...props} {...viewProps}
         inputResult={inputResult}
       />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
     showsOwnOutput: true,
   }), [inputResult, props]);
 
@@ -50,7 +50,7 @@ export default defineTool({ programFactory, computeReferences, run })
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,
 }) => {
-  const { program, updateProgram, autoFocus, inputResult } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const inputOutputState = usePromiseState(inputResult.outputP);
@@ -209,6 +209,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
 
   return (
     <div className="xCol" style={{minWidth: 1000}}>
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />

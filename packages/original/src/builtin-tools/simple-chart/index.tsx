@@ -1,13 +1,14 @@
 import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
+import { UpdateProxy } from "@engraft/update-proxy";
+import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import * as SelectModule from "react-select";
 import { Props as SelectProps } from "react-select";
 import { VegaLite, VisualizationSpec } from "react-vega";
-import { UpdateProxy } from "@engraft/update-proxy";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
 import { gearIcon, markIcons, typeIcons } from "./icons.js";
-import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 
 // TODO: what hath ESM wrought?
 const Select = SelectModule.default as unknown as typeof import("react-select").default;
@@ -71,7 +72,6 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       {...props} {...renderProps}
       dataResult={dataResult}
     />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, dataResult]);
 
   return { outputP, view };
@@ -125,7 +125,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 }
 
 const View = memo(function View(props: ViewProps) {
-  const { program, updateProgram, dataResult } = props;
+  const { program, updateProgram, dataResult, frameBarBackdropElem } = props;
   const { mark = 'bar', xChannel, yChannel } = program;
   const programUP = useUpdateProxy(updateProgram);
   const dataOutputState = usePromiseState(dataResult.outputP);
@@ -188,6 +188,7 @@ const View = memo(function View(props: ViewProps) {
 
   return (
     <div>
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={dataResult.view} updateProgram={programUP.dataProgram.$}/>}
       />

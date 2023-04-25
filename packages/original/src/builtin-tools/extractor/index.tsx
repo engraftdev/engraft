@@ -10,6 +10,7 @@ import useHover from "../../util/useHover.js";
 import { useKeyHeld } from "../../util/useKeyHeld.js";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "../../view/Value.js";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
+import { createPortal } from "react-dom";
 
 interface PatternWithId {
   id: string;
@@ -36,7 +37,7 @@ export const tool: Tool<Program> = {
   run: memoizeProps(hooks((props) => {
     const { program, varBindings } = props;
     const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
-    const { patternsWithIds, minimized } = program;
+    const { patternsWithIds } = program;
 
     const mergedPatterns = hookMemo(() => {
       return patternsWithIds.length > 0 && mergePatterns(patternsWithIds.map(patternWithId => patternWithId.pattern))
@@ -56,8 +57,7 @@ export const tool: Tool<Program> = {
 
     const view: ToolView<Program> = hookMemo(() => ({
       render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>,
-      renderFrameBarBackdrop: () => minimized ? null : inputFrameBarBackdrop,
-    }), [props, inputResult, minimized]);
+    }), [props, inputResult]);
 
     return { outputP, view };
   })),
@@ -243,7 +243,7 @@ type ExtractorToolViewProps = ToolProps<Program> & ToolViewRenderProps<Program> 
 }
 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
-  const { program, updateProgram, autoFocus, inputResult } = props;
+  const { program, updateProgram, autoFocus, inputResult, frameBarBackdropElem } = props;
   const { patternsWithIds, minimized } = program;
   const programUP = useUpdateProxy(updateProgram);
 
@@ -301,6 +301,7 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
 
   return (
     <div ref={hoverRef} className="xCol" style={{height: '100%', boxSizing: 'border-box'}}>
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <div
         style={{position: 'absolute', cursor: 'pointer', flexGrow: 1, right: 0, top: 0}}
         onClick={(ev) => {

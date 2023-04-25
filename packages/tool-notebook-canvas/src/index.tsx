@@ -7,6 +7,7 @@ import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
 import { ComputeReferences, EngraftPromise, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxy, Var, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { NoodleCanvas } from "./noodle-canvas/NoodleCanvas.js";
 import { PaneGeo, roundTo } from "./noodle-canvas/model.js";
 
@@ -68,7 +69,6 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
-    renderFrameBarBackdrop: () => <div style={{backgroundColor: 'rgb(240, 240, 240)', height: '100%'}} /> ,
     showsOwnOutput: cells.length > 0,
   }), [cells.length, props, cellResults]);
 
@@ -80,7 +80,7 @@ export default defineTool({ programFactory, computeReferences, run })
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   cellResults: {[id: string]: ToolResultWithNewScopeVarBindings},
 }) => {
-  const { program, updateProgram, cellResults } = props;
+  const { program, updateProgram, cellResults, frameBarBackdropElem } = props;
   const programUP = useUpdateProxy(updateProgram);
   const { cells } = program;
 
@@ -134,6 +134,10 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
       className="NotebookCanvasTool"
       style={{position: 'relative', width: program.width + 1, height: program.height + 1, overflow: 'hidden'}}
     >
+      { frameBarBackdropElem && createPortal(
+        <div style={{backgroundColor: 'rgb(240, 240, 240)', height: '100%'}} />,
+        frameBarBackdropElem
+      )}
       <NoodleCanvas
         panes={cells.map((cell, i) => ({
           id: cell.var_.id,

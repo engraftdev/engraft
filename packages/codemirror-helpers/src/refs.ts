@@ -1,4 +1,5 @@
-import { idRegExp } from "../../util/id.js";
+// TODO: extended this from a-z so I could shove js variable names in; not great
+export const idRegExp = "ID[a-zA-Z_]*[0-9]{6}";
 
 export function refCode(s: string) {
   // currently, the id of a reference is just embedded directly into code

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { memo, useMemo } from "react";
 import { startDrag } from "../../util/drag.js";
-import { useRefForCallback } from "../../util/useRefForCallback.js";
+import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
 
 export type SimSliderValue =
   | { type: 'init', tick: number }

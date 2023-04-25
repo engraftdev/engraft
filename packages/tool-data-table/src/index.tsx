@@ -1,18 +1,18 @@
-import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { CSSProperties, Fragment, memo, ReactNode, useCallback, useMemo, useState } from "react";
-import { count } from "@engraft/original/lib/util/count.js";
 import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
-import { ErrorView } from "@engraft/original/lib/view/Value.js";
-import { Column, DataFrame, inferDataFrameFromRows, ValueType } from "./data-frame.js";
-import style from './style.css?inline';
-import { applyTransformsExceptSelect, applyTransformsJustSelect, Filter, FilterType, filterTypes, filterTypesByValueType, Transforms } from "./transforms.js";
-import _ from 'lodash';
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
-import { Updater } from '@engraft/shared/lib/Updater.js';
 import { Use } from '@engraft/original/lib/util/Use.js';
-import useHover from '@engraft/original/lib/util/useHover.js';
-import { isoformat } from "@engraft/original/lib/util/isoformat.js";
+import { count } from "@engraft/original/lib/util/count.js";
 import { startDrag } from "@engraft/original/lib/util/drag.js";
+import { isoformat } from "@engraft/original/lib/util/isoformat.js";
+import useHover from '@engraft/original/lib/util/useHover.js';
+import { ErrorView } from "@engraft/original/lib/view/Value.js";
+import { Updater } from '@engraft/shared/lib/Updater.js';
+import { ComputeReferences, EngraftPromise, InputHeading, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, references, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
+import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { Column, DataFrame, ValueType, inferDataFrameFromRows } from "./data-frame.js";
+import style from './style.css?inline';
+import { Filter, FilterType, Transforms, applyTransformsExceptSelect, applyTransformsJustSelect, filterTypes, filterTypesByValueType } from "./transforms.js";
 
 /*
 out of scope for now:
@@ -67,7 +67,6 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
       inputResult={inputResult}
       dataFramesP={dataFramesP}
     />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [props, inputResult, dataFramesP]);
 
   return {outputP, view};
@@ -79,13 +78,14 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   inputResult: ToolResult,
   dataFramesP: EngraftPromise<{input: DataFrame, outputExceptSelect: DataFrame, output: DataFrame}>,
 }) => {
-  const { program, updateProgram, autoFocus, inputResult, dataFramesP } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, dataFramesP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const dataFramesState = usePromiseState(dataFramesP);
 
   return (
     <div className="xCol">
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />
@@ -154,7 +154,7 @@ const Table = memo((props: {
                 padding: '7px',
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{transition: 'transform 150ms ease 0s'}}><path d="M13 6.5L8 12L3 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{transition: 'transform 150ms ease 0s'}}><path d="M13 6.5L8 12L3 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path></svg>
             </th>
             {dataFrames.outputExceptSelect.columns.map((column) =>
               <TableHeaderCell
@@ -235,7 +235,7 @@ const Table = memo((props: {
         />
       </TransformMenu>
       <TransformMenu count={program.transforms.select?.length || 0} label={<>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr1"><path fillRule="evenodd" clip-rule="evenodd" d="M1 5C1 2.79086 2.79086 1 5 1H11C13.2091 1 15 2.79086 15 5V11C15 13.2091 13.2091 15 11 15H5C2.79086 15 1 13.2091 1 11V5ZM5 3C3.89543 3 3 3.89543 3 5V11C3 12.1046 3.89543 13 5 13H11C12.1046 13 13 12.1046 13 11V5C13 3.89543 12.1046 3 11 3H5Z" fill="currentColor"></path><path fillRule="evenodd" clip-rule="evenodd" d="M11.7071 6.70711L7.00001 11.4142L4.29291 8.70711L5.70712 7.29289L7.00001 8.58579L10.2929 5.29289L11.7071 6.70711Z" fill="currentColor"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr1"><path fillRule="evenodd" clipRule="evenodd" d="M1 5C1 2.79086 2.79086 1 5 1H11C13.2091 1 15 2.79086 15 5V11C15 13.2091 13.2091 15 11 15H5C2.79086 15 1 13.2091 1 11V5ZM5 3C3.89543 3 3 3.89543 3 5V11C3 12.1046 3.89543 13 5 13H11C12.1046 13 13 12.1046 13 11V5C13 3.89543 12.1046 3 11 3H5Z" fill="currentColor"></path><path fillRule="evenodd" clipRule="evenodd" d="M11.7071 6.70711L7.00001 11.4142L4.29291 8.70711L5.70712 7.29289L7.00001 8.58579L10.2929 5.29289L11.7071 6.70711Z" fill="currentColor"></path></svg>
         Columns
       </>}>
         <div className="flex justify-between pb12">
@@ -309,7 +309,7 @@ const Table = memo((props: {
       </TransformMenu> */}
       {/* TODO: slice */}
       {/* <TransformMenu count={0} label={<>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr1"><path fillRule="evenodd" clip-rule="evenodd" d="M13 4.75C13.6904 4.75 14.25 5.30964 14.25 6C14.25 6.69036 13.6904 7.25 13 7.25C12.3096 7.25 11.75 6.69036 11.75 6C11.75 5.30964 12.3096 4.75 13 4.75ZM15.75 6C15.75 4.48122 14.5188 3.25 13 3.25C11.4812 3.25 10.25 4.48122 10.25 6C10.25 7.51878 11.4812 8.75 13 8.75C14.5188 8.75 15.75 7.51878 15.75 6Z" fill="currentColor"></path><path fillRule="evenodd" clip-rule="evenodd" d="M1.5 8L11.5 8V6L1.5 6C0.947715 6 0.5 6.44772 0.5 7C0.5 7.55228 0.947715 8 1.5 8Z" fill="currentColor"></path><path fillRule="evenodd" clip-rule="evenodd" d="M3.17594 2.56653L8.67594 10.5665L10.324 9.43347L4.82403 1.43347C4.51114 0.978369 3.88856 0.863076 3.43345 1.17596C2.97835 1.48885 2.86306 2.11143 3.17594 2.56653Z" fill="currentColor"></path><path fillRule="evenodd" clip-rule="evenodd" d="M10 10.75C10.6904 10.75 11.25 11.3096 11.25 12C11.25 12.6904 10.6904 13.25 10 13.25C9.30964 13.25 8.75 12.6904 8.75 12C8.75 11.3096 9.30964 10.75 10 10.75ZM12.75 12C12.75 10.4812 11.5188 9.25 10 9.25C8.48122 9.25 7.25 10.4812 7.25 12C7.25 13.5188 8.48122 14.75 10 14.75C11.5188 14.75 12.75 13.5188 12.75 12Z" fill="currentColor"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr1"><path fillRule="evenodd" clipRule="evenodd" d="M13 4.75C13.6904 4.75 14.25 5.30964 14.25 6C14.25 6.69036 13.6904 7.25 13 7.25C12.3096 7.25 11.75 6.69036 11.75 6C11.75 5.30964 12.3096 4.75 13 4.75ZM15.75 6C15.75 4.48122 14.5188 3.25 13 3.25C11.4812 3.25 10.25 4.48122 10.25 6C10.25 7.51878 11.4812 8.75 13 8.75C14.5188 8.75 15.75 7.51878 15.75 6Z" fill="currentColor"></path><path fillRule="evenodd" clipRule="evenodd" d="M1.5 8L11.5 8V6L1.5 6C0.947715 6 0.5 6.44772 0.5 7C0.5 7.55228 0.947715 8 1.5 8Z" fill="currentColor"></path><path fillRule="evenodd" clipRule="evenodd" d="M3.17594 2.56653L8.67594 10.5665L10.324 9.43347L4.82403 1.43347C4.51114 0.978369 3.88856 0.863076 3.43345 1.17596C2.97835 1.48885 2.86306 2.11143 3.17594 2.56653Z" fill="currentColor"></path><path fillRule="evenodd" clipRule="evenodd" d="M10 10.75C10.6904 10.75 11.25 11.3096 11.25 12C11.25 12.6904 10.6904 13.25 10 13.25C9.30964 13.25 8.75 12.6904 8.75 12C8.75 11.3096 9.30964 10.75 10 10.75ZM12.75 12C12.75 10.4812 11.5188 9.25 10 9.25C8.48122 9.25 7.25 10.4812 7.25 12C7.25 13.5188 8.48122 14.75 10 14.75C11.5188 14.75 12.75 13.5188 12.75 12Z" fill="currentColor"></path></svg>
         Slice
       </>}>
       </TransformMenu> */}
@@ -410,7 +410,7 @@ const FilterEditor = memo((props: {
       <button className="bg-transparent bn light-gray pointer" title="Remove filter"
         onClick={filterUP.$remove}
       >
-        <svg width="16" height="16" viewBox="0 0 10 16" stroke="currentColor" stroke-width="2"><path d="M1 4L9 12M9 4L1 12"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 10 16" stroke="currentColor" strokeWidth="2"><path d="M1 4L9 12M9 4L1 12"></path></svg>
       </button>
     }
   </div>;
@@ -535,7 +535,7 @@ const TableHeaderCell = memo((props: {
             className="blue bn bg-transparent pa0 ml1 pointer"
             onClick={removeColumn}
           >
-            <svg width="16" height="16" viewBox="0 0 10 16" stroke="currentColor" stroke-width="2"><path d="M1 4L9 12M9 4L1 12"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 10 16" stroke="currentColor" strokeWidth="2"><path d="M1 4L9 12M9 4L1 12"></path></svg>
           </button>
         </div>
       }
@@ -543,7 +543,7 @@ const TableHeaderCell = memo((props: {
         <button
           className="bn bg-transparent gray pointer"
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 9.5L3 6L6 2.5" stroke="currentColor" stroke-width="2"></path><path d="M4 6C5.91616 6 7.69217 6 9.49994 6C11.4329 6 13 7.567 13 9.5V9.5C13 11.433 11.433 13 9.5 13H9" stroke="currentColor" stroke-width="2"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 9.5L3 6L6 2.5" stroke="currentColor" strokeWidth="2"></path><path d="M4 6C5.91616 6 7.69217 6 9.49994 6C11.4329 6 13 7.567 13 9.5V9.5C13 11.433 11.433 13 9.5 13H9" stroke="currentColor" strokeWidth="2"></path></svg>
         </button>
       }
     </div>

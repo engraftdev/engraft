@@ -10,6 +10,8 @@ import NotebookCanvas from "@engraft/tool-notebook-canvas";
 import Voyager from "@engraft/tool-voyager";
 import Text from "@engraft/tool-text";
 import ExampleDatasets from "@engraft/tool-example-datasets";
+import Value from "@engraft/tool-value";
+import Python from "@engraft/tool-python";
 
 // This package is named somewhat flippantly. We don't yet have a principled way
 // to manage tool dependencies. So this package just contains all the tools.
@@ -29,6 +31,8 @@ export const allTheTools: Tool[] = [
   forgetP(toolFromModule(Voyager)),
   forgetP(toolFromModule(Text)),
   forgetP(toolFromModule(ExampleDatasets)),
+  forgetP(toolFromModule(Value)),
+  forgetP(toolFromModule(Python)),
 ]
 
 export function registerAllTheTools() {

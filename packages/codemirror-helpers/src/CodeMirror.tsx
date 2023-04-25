@@ -3,7 +3,7 @@ import { EditorView, ViewUpdate, tooltips } from "@codemirror/view";
 import { CSSProperties, memo, useEffect, useMemo, useRef, useState } from "react"
 import useInterval from "./useInterval.js";
 
-export type MyCodeMirrorProps = {
+export type CodeMirrorProps = {
   extensions: Extension[],
   style?: CSSProperties,
 
@@ -18,7 +18,7 @@ export type MyCodeMirrorProps = {
   putTooltipsInRoot?: boolean,
 }
 
-export const CodeMirror = memo(function CodeMirror(props: MyCodeMirrorProps) {
+export const CodeMirror = memo(function CodeMirror(props: CodeMirrorProps) {
   const { extensions, style = {}, text, onChange, onFocus, onBlur, autoFocus, putTooltipsInRoot = true } = props;
 
   const [div, setDiv] = useState<HTMLDivElement | null>();

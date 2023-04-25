@@ -16,9 +16,11 @@
     "@engraft/toolkit": "^0.0.1",
     "@engraft/vendor-voyager": "^0.0.1",
     "@engraft/original": "^0.0.1",
+    "@engraft/shared": "^0.0.1",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
+    "react-dom": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
   }
 }

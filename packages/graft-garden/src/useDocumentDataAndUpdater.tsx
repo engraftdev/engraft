@@ -55,6 +55,7 @@ export function useDocumentDataAndUpdater<T>(docRef: DocumentReference<T>): [T |
         return oldValue;
       }
 
+      // TODO: this `setDoc` might be costly; consider sending a diff
       setDoc(docRef, newValue);
       return newValue;
     });

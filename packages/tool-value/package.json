@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/tool-notebook-canvas",
+  "name": "@engraft/tool-value",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "A spatial notebook canvas for Engraft",
+  "description": "Engraft tool which covers a slot with its value",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
@@ -14,9 +14,7 @@
   "type": "module",
   "dependencies": {
     "@engraft/toolkit": "^0.0.1",
-    "@engraft/original": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
-    "lodash": "^4.17.21"
+    "@engraft/original": "^0.0.1"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

@@ -1,8 +1,8 @@
 import { ToolProgram, VarBindings } from "@engraft/core";
 import classNames from "classnames";
-import { CSSProperties, memo, ReactElement, ReactNode, useState } from "react";
-import { Updater } from "../util/immutable.js";
+import { CSSProperties, ReactNode, memo, useState } from "react";
 import { Use } from "../util/Use.js";
+import { Updater } from "../util/immutable.js";
 import useHover from "../util/useHover.js";
 import { ToolInspectorWindow } from "./ToolInspectorWindow.js";
 
@@ -12,7 +12,7 @@ export type ToolFrameProps = {
   expand?: boolean,
   program: ToolProgram,
   updateProgram?: Updater<ToolProgram>,
-  frameBarBackdrop?: ReactElement | null,
+  setFrameBarBackdropElem?: (frameBarBackdropElem: HTMLDivElement) => void,
   onClose?: () => void,
   varBindings: VarBindings,
 }
@@ -20,7 +20,7 @@ export type ToolFrameProps = {
 const SOFT_STYLE = false as boolean;
 
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
-  const {children, expand, program, updateProgram, onClose, varBindings, frameBarBackdrop} = props;
+  const {children, expand, program, updateProgram, onClose, varBindings, setFrameBarBackdropElem} = props;
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -52,12 +52,11 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
 
         <div
           className="ToolFrame-bar-backdrop"
+          ref={setFrameBarBackdropElem}
           style={{
             position: 'absolute', top: 0, right: 0, bottom: 0, left: 0,
           }}
-        >
-          {frameBarBackdrop}
-        </div>
+        />
 
         <div
           className="ToolFrame-bar-frontdrop"

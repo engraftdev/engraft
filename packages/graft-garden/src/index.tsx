@@ -18,6 +18,7 @@ root.render(
       <Routes>
         <Route path="/" element={<Root/>}/>
         <Route path="/edit/:patchId" element={<EditPatch/>}/>
+        <Route path="/edit/:patchId/safe" element={<EditPatch safeMode/>}/>
         <Route path="/view/:patchId" element={<ViewPatch/>}/>
       </Routes>
     </HashRouter>

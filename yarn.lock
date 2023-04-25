@@ -1080,6 +1080,16 @@
     "@codemirror/view" "^6.6.0"
     "@lezer/common" "^1.0.0"
 
+"@codemirror/autocomplete@^6.3.2":
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@codemirror/autocomplete/-/autocomplete-6.5.1.tgz#539cfff291dbffd3841cba078b222cea28ff7eda"
+  integrity sha512-/Sv9yJmqyILbZ26U4LBHnAtbikuVxWUp+rQ8BXuRGtxZfbfKOY/WPbsUtvSP2h0ZUZMlkxV/hqbKRFzowlA6xw==
+  dependencies:
+    "@codemirror/language" "^6.0.0"
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.6.0"
+    "@lezer/common" "^1.0.0"
+
 "@codemirror/commands@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@codemirror/commands/-/commands-6.2.1.tgz#ab5e979ad1458bbe395bf69ac601f461ac73cf08"
@@ -1102,6 +1112,15 @@
     "@codemirror/view" "^6.0.0"
     "@lezer/common" "^1.0.0"
     "@lezer/javascript" "^1.0.0"
+
+"@codemirror/lang-python@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@codemirror/lang-python/-/lang-python-6.1.2.tgz#cabb57529679981f170491833dbf798576e7ab18"
+  integrity sha512-nbQfifLBZstpt6Oo4XxA2LOzlSp4b/7Bc5cmodG1R+Cs5PLLCTUvsMNWDnziiCfTOG/SW1rVzXq/GbIr6WXlcw==
+  dependencies:
+    "@codemirror/autocomplete" "^6.3.2"
+    "@codemirror/language" "^6.0.0"
+    "@lezer/python" "^1.0.0"
 
 "@codemirror/language@^6.0.0", "@codemirror/language@^6.6.0":
   version "6.6.0"
@@ -2053,6 +2072,14 @@
   integrity sha512-JPQe3mwJlzEVqy67iQiiGozhcngbO8QBgpqZM6oL1Wj/dXckrEexpBLeFkq0edtW5IqnPRFxA24BHJni8Js69w==
   dependencies:
     "@lezer/common" "^1.0.0"
+
+"@lezer/python@^1.0.0":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@lezer/python/-/python-1.1.4.tgz#6ef58ff965286150fea9f2db776944a1d69cd9b9"
+  integrity sha512-x82XgYxqqX0Yiw7uIemQJ3z2QyQme5BYpectkPfNg99OQrakqfwqVolqEVIrsj4QO9rVDLFZZ49J0Vbne7UbAA==
+  dependencies:
+    "@lezer/highlight" "^1.0.0"
+    "@lezer/lr" "^1.0.0"
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"

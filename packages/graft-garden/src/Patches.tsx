@@ -13,7 +13,7 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
 
   const onClickAddNew = useCallback(() => {
     addDoc(patchesRef, {
-      name: `new patch on ${new Date().toLocaleString()}`,
+      name: `new page on ${new Date().toLocaleString()}`,
       ownerUid: getAuth().currentUser!.uid,
       createdAt: new Date(),
       toolProgram: slotWithCode(''),

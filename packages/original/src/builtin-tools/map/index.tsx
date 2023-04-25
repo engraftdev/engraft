@@ -6,6 +6,7 @@ import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import { CSSProperties, memo, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useStateSetOnly } from "../../util/immutable-react.js";
 import { ErrorView, ToolOutputView } from "../../view/Value.js";
 import { VarDefinition } from "../../view/Vars.js";
@@ -86,7 +87,6 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
         inputResult={inputResult}
         itemResultsP={itemResultsP}
       />,
-    renderFrameBarBackdrop: () => inputFrameBarBackdrop,
   }), [inputResult, itemResultsP, props]);
 
   return {outputP, view};
@@ -99,7 +99,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,
   itemResultsP: EngraftPromise<ToolResultWithNewScopeVarBindings<ToolProgram>[]>,
 }) => {
-  const { program, updateProgram, autoFocus, inputResult, itemResultsP } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, itemResultsP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [selectedIndex, setSelectedIndex] = useStateSetOnly(() => 0);
@@ -181,6 +181,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
 
   return (
     <div className="xCol">
+      {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />
