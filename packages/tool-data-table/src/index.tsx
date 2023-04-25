@@ -1,11 +1,11 @@
-import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
-import { Use } from '@engraft/original/lib/util/Use.js';
-import { count } from "@engraft/original/lib/util/count.js";
-import { startDrag } from "@engraft/original/lib/util/drag.js";
-import { isoformat } from "@engraft/original/lib/util/isoformat.js";
-import useHover from '@engraft/original/lib/util/useHover.js';
-import { ErrorView } from "@engraft/original/lib/view/Value.js";
+import { ErrorView } from "@engraft/core-widgets";
+import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
 import { Updater } from '@engraft/shared/lib/Updater.js';
+import { Use } from '@engraft/shared/lib/Use.js';
+import { count } from "@engraft/shared/lib/count.js";
+import { startDrag } from "@engraft/shared/lib/drag.js";
+import { isoformat } from "@engraft/shared/lib/isoformat.js";
+import { useHover } from '@engraft/shared/lib/useHover.js';
 import { ComputeReferences, EngraftPromise, InputHeading, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, references, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";

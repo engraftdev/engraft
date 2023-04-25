@@ -1,8 +1,8 @@
-import { CSSProperties, memo, useMemo, useState } from "react";
-import { combineDrags, someDrag, startDrag } from "@engraft/original/lib/util/drag.js";
-import { UpdateProxy } from "@engraft/toolkit";
-import useHover from "@engraft/original/lib/util/useHover.js";
+import { combineDrags, someDrag, startDrag } from "@engraft/shared/lib/drag.js";
+import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
+import { UpdateProxy } from "@engraft/toolkit";
+import { CSSProperties, memo, useMemo, useState } from "react";
 import { PaneGeo, roundTo } from "./model.js";
 
 export type PaneResizersProps = {

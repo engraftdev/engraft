@@ -1,8 +1,7 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
 import { EngraftPromise, runTool, ShowView, ToolProgram, usePromiseState } from "@engraft/core";
-import { useLocalStorage } from "@engraft/original/lib/util/useLocalStorage.js";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolOutputBuffer } from "@engraft/original/lib/view/Value.js";
+import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
+import { IsolateStyles, ToolOutputBuffer } from "@engraft/core-widgets";
 import { useRefunction } from "@engraft/refunc-react";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
@@ -22,7 +21,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
   const [stdin, updateStdin] = useState<string | null>(null);
   const [program, updateProgram] = useState<ToolProgram | null>(null);
-  const [darkMode, darkModeUP] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
+  const [darkMode, setDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
 
 
   useEffect(() => {
@@ -94,7 +93,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     </div>
     <br/>
     <div>
-      <input type='checkbox' checked={darkMode} onChange={(ev) => darkModeUP.$set(ev.target.checked)}/>
+      <input type='checkbox' checked={darkMode} onChange={(ev) => setDarkMode(ev.target.checked)}/>
       <label>Dark mode</label>
     </div>
     <br/>

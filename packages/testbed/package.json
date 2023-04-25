@@ -13,11 +13,9 @@
   },
   "type": "module",
   "dependencies": {
-    "@engraft/original": "^0.0.1",
-    "@engraft/core": "^0.0.1",
+    "@engraft/hostkit": "^0.0.1",
     "@engraft/all-the-tools": "^0.0.1",
-    "@engraft/refunc-react": "^0.0.1",
-    "@engraft/update-proxy": "^0.0.1",
+    "@engraft/shared": "^0.0.1",
     "react": "^18.0.0",
     "react-error-boundary": "^3.1.4",
     "react-router-dom": "^6.3.0",

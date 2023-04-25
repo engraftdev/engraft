@@ -1,4 +1,4 @@
-import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
+import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
 import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";

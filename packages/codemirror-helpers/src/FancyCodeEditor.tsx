@@ -1,8 +1,7 @@
 import { Completion, CompletionContext, CompletionSource, autocompletion, pickedCompletion } from "@codemirror/autocomplete";
 import { ChangeSpec, EditorState, Extension, Transaction } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { VarUse } from "@engraft/original/lib/view/Vars.js";
+import { IsolateStyles, VarUse } from "@engraft/core-widgets";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
 import { EngraftPromise, SetOps, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, getFullToolIndex, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, references, slotWithProgram } from "@engraft/toolkit";

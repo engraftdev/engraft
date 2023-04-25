@@ -14,8 +14,8 @@
   "type": "module",
   "dependencies": {
     "@engraft/toolkit": "^0.0.1",
-    "@engraft/original": "^0.0.1",
-    "@engraft/core": "^0.0.1"
+    "@engraft/core": "^0.0.1",
+    "@engraft/core-widgets": "^0.0.1"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

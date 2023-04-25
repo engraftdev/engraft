@@ -1,4 +1,4 @@
-import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
+import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { DocumentReference, refEqual as firebaseRefEqual, onSnapshot, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 

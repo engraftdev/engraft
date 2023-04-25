@@ -1,9 +1,8 @@
 import { CSSProperties } from "react";
 
 export * from "@engraft/core";
-export * from "@engraft/refunc";
+export * from "@engraft/core-widgets";
 export * from "@engraft/refunc-react";
-export * from "@engraft/update-proxy";
 export * from "@engraft/update-proxy-react";
 export * as SetOps from "@engraft/shared/lib/sets.js";
 export * from "./simple-tool.js";

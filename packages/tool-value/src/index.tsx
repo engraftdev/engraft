@@ -1,5 +1,4 @@
-import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
-import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy, Value } from "@engraft/toolkit";
 import { memo, ReactNode, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 

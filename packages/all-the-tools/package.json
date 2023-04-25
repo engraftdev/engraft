@@ -14,18 +14,20 @@
   "type": "module",
   "dependencies": {
     "@engraft/core": "^0.0.1",
-    "@engraft/original": "^0.0.1",
-    "@engraft/tool-toy-adder": "^0.0.1",
-    "@engraft/tool-toy-adder-simple": "^0.0.1",
-    "@engraft/tool-gadget": "^0.0.1",
-    "@engraft/tool-hider": "^0.0.1",
+    "@engraft/original-tools": "^0.0.1",
     "@engraft/tool-checkbox": "^0.0.1",
     "@engraft/tool-data-table": "^0.0.1",
-    "@engraft/tool-notebook-canvas": "^0.0.1",
-    "@engraft/tool-voyager": "^0.0.1",
-    "@engraft/tool-text": "^0.0.1",
     "@engraft/tool-example-datasets": "^0.0.1",
+    "@engraft/tool-gadget": "^0.0.1",
+    "@engraft/tool-hider": "^0.0.1",
+    "@engraft/tool-notebook": "^0.0.1",
+    "@engraft/tool-notebook-canvas": "^0.0.1",
+    "@engraft/tool-python": "^0.0.1",
+    "@engraft/tool-slot": "^0.0.1",
+    "@engraft/tool-text": "^0.0.1",
+    "@engraft/tool-toy-adder-simple": "^0.0.1",
+    "@engraft/tool-toy-adder": "^0.0.1",
     "@engraft/tool-value": "^0.0.1",
-    "@engraft/tool-python": "^0.0.1"
+    "@engraft/tool-voyager": "^0.0.1"
   }
 }

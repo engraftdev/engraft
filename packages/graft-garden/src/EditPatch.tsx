@@ -1,11 +1,7 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { slotWithCode } from "@engraft/core";
-import { noOp } from "@engraft/original/lib/util/noOp.js";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
-import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
-import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
+import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, useUpdateProxy } from "@engraft/hostkit";
+import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
 import _ from "lodash";

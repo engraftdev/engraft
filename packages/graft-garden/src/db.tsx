@@ -1,6 +1,6 @@
+import { ToolProgram } from "@engraft/hostkit";
 import { initializeApp } from "firebase/app";
 import { collection, CollectionReference, deleteDoc, doc, getDocs, getFirestore, initializeFirestore, setDoc } from "firebase/firestore";
-import { ToolProgram } from "@engraft/core";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBtFUvC-EUgrQeZSiXwzJG3I3TIdqHctCE",

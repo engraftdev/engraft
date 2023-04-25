@@ -22,8 +22,8 @@
     "@codemirror/view": "^6.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "@engraft/core-widgets": "^0.0.1",
     "@engraft/toolkit": "^0.0.1",
-    "@engraft/original": "^0.0.1",
     "@engraft/shared": "^0.0.1",
     "lodash": "^4.17.21"
   },
