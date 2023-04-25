@@ -139,7 +139,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
           ? <div>
               <p>Safe mode is on. Edit the program below, then <a href={`#/edit/${patchId}`}>click here</a> to turn off safe mode.</p>
               <IsolateStyles>
-                <ValueEditable value={program} updater={patchUP.toolProgram.$} maxDepth={Infinity}/>
+                <ValueEditable value={program} updater={patchUP.toolProgram.$} expandedDepth={Infinity}/>
               </IsolateStyles>
             </div>
           : <ToolWithView

@@ -87,14 +87,16 @@ export type ValueCustomizations = {
 export type ValueProps = {
   value: unknown,
   customizations?: ValueCustomizations,
+  expandedDepth?: number,
 }
 
 const defaultCustomizations: ValueCustomizations = {
   SubValueHandle: SubValueHandleDefault,
 };
 
-export const Value = memo(function Value({value, customizations = defaultCustomizations}: ValueProps) {
-  return <ValueInternal value={value} path={[]} customizations={customizations} isTopLevel={true} />
+export const Value = memo(function Value(props: ValueProps) {
+  const {value, customizations = defaultCustomizations, expandedDepth = 2} = props;
+  return <ValueInternal value={value} path={[]} customizations={customizations} isTopLevel={true} expandedLevelsLeft={expandedDepth} />
 })
 
 export type ValueInternalProps = {
@@ -104,9 +106,12 @@ export type ValueInternalProps = {
   suffix?: ReactNode,
   customizations: ValueCustomizations,
   isTopLevel?: boolean,
+  expandedLevelsLeft: number,
 }
 
-const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, customizations, isTopLevel}: ValueInternalProps) {
+const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
+  const {value, path, prefix, suffix, customizations, isTopLevel, expandedLevelsLeft} = props;
+
   function wrapInline(children: ReactNode) {
     return <div className='ValueInternal-wrapInline-row xRow' style={{width: '100%'}}>
       {prefix}
@@ -147,7 +152,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   }
 
   if (value instanceof EngraftPromise) {
-    return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} />;
+    return <ValuePromise value={value as EngraftPromise<any>} prefix={prefix} expandedLevelsLeft={expandedLevelsLeft} />;
   }
 
   const maybeElement = value as {} | null | undefined;
@@ -188,7 +193,7 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   // OBJECTS & ARRAYS
 
   if (value instanceof Object && !(value instanceof Function)) {
-    return <ValueComposite value={value} prefix={prefix} path={path} customizations={customizations}/>
+    return <ValueComposite value={value} prefix={prefix} path={path} customizations={customizations} expandedLevelsLeft={expandedLevelsLeft}/>
   }
 
   // PRIMITIVE VALUES
@@ -231,32 +236,44 @@ const ValueInternal = memo(function ValueInternal({value, path, prefix, suffix, 
   )
 })
 
-const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix, customizations}: ValueInternalProps & {value: Object}) {
-  const [isExpanded, setIsExpanded] = useState(true);
+const ValueComposite = memo(function ValueComposite(props: ValueInternalProps & {value: Object}) {
+  const {value, path, prefix, suffix, customizations, expandedLevelsLeft} = props;
+  const [isExpanded, setIsExpanded] = useState(expandedLevelsLeft > 0);
 
-  const isArray = value instanceof Array;
+  const isArrayLike = hasProperty(value, Symbol.iterator) && hasProperty(value, 'length');
 
   let className: string | undefined = undefined;
-  if (!isArray) {
-    if (hasProperty(value, Symbol.toStringTag)) {
-      className = value[Symbol.toStringTag] as string;
-    } else if (value.constructor.name !== 'Object') {
-      className = value.constructor.name;
-    }
+
+  if (hasProperty(value, Symbol.toStringTag)) {
+    className = value[Symbol.toStringTag] as string;
+  } else if (value.constructor.name !== 'Object' && value.constructor.name !== 'Array') {
+    className = value.constructor.name;
   }
+
   const classLabel = className &&
     <div style={{...valueFont, fontStyle: 'italic', whiteSpace: 'pre'}}>{className + ' '}</div>;
 
-  if (isExpanded) {
-    let entries = isArray ? Array.from(value.entries()) : Object.entries(value);
-    // TODO: customization of maxItems
-    const maxItems = 100;
-    let moreItems = 0;
-    if (entries.length > maxItems) {
-      moreItems = entries.length - maxItems;
-      entries = entries.slice(0, maxItems);
+  const maxEntriesToShow = isExpanded ? 100 : 20;
+  let numEntriesTotal: number;
+  let entriesToShow: [string, any][] = [];
+  if (isArrayLike) {
+    numEntriesTotal = value.length as number;
+    const numEntriesToShow = Math.min(numEntriesTotal, maxEntriesToShow);
+    for (let i = 0; i < numEntriesToShow; i++) {
+      entriesToShow.push([i.toString(), (value as any)[i]]);
     }
+  } else if (value instanceof Map) {
+    // TODO: showing keys?
+    numEntriesTotal = value.size;
+    entriesToShow = Array.from(value.entries()).slice(0, maxEntriesToShow);
+  } else {
+    const entries = Object.entries(value);
+    numEntriesTotal = entries.length;
+    entriesToShow = entries.slice(0, maxEntriesToShow);
+  }
+  const moreEntries = numEntriesTotal - entriesToShow.length;
 
+  if (isExpanded) {
     return <>
       <div className='ValueComposite-open-row xRow' style={{width: '100%'}}>
         {prefix}
@@ -264,7 +281,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
           <div className='ValueComposite-open-row xRow' ref={hoverRef} style={{flexGrow: 1}}>
             <customizations.SubValueHandle value={value} path={path}>
               {classLabel}
-              <div style={valueFont}>{isArray ? '[' : '{'}</div>
+              <div style={valueFont}>{isArrayLike ? '[' : '{'}</div>
             </customizations.SubValueHandle>
             { isHovered &&
               <div
@@ -281,7 +298,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
         }/>
       </div>
       <Indent style={{padding: 1}}>
-        {entries.map(([key, value]) =>
+        {entriesToShow.map(([key, value]) =>
           <div key={key} className='ValueComposite-item' style={{
             marginTop: 1,
             marginBottom: 1,
@@ -290,7 +307,7 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
             <ValueInternal
               value={value}
               prefix={
-                !isArray &&
+                !isArrayLike &&
                 <div
                   className='prefix-with-key'
                   style={{display: 'inline-block', ...valueFont, marginRight: 5, whiteSpace: 'nowrap'}}
@@ -303,28 +320,29 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
               }
               path={path && [...path, key]}
               customizations={customizations}
+              expandedLevelsLeft={expandedLevelsLeft - 1}
             />
           </div>
         )}
-        {moreItems > 0 &&
+        {moreEntries > 0 &&
           <div style={{...valueFont, fontStyle: 'italic', opacity: 0.5}}>
-            and {moreItems} more
+            and {moreEntries} more
           </div>
         }
       </Indent>
       <div className='ValueComposite-close-row xRow' style={{width: '100%'}}>
-        <div className='ValueComposite-close' style={valueFont}>{isArray ? ']' : '}'}</div>
+        <div className='ValueComposite-close' style={valueFont}>{isArrayLike ? ']' : '}'}</div>
         {suffix}
       </div>
     </>;
   } else {
     let abbreviated: ReactElement;
 
-    if (isArray) {
+    if (isArrayLike) {
       abbreviated = <>
         [
         <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
-          {count(value.length, 'element', 'elements')}
+          {count(value.length as number, 'element', 'elements')}
         </div>
         ]
       </>
@@ -333,7 +351,8 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
         {classLabel}
         {'{'}
         <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
-          {Object.keys(value).join(', ')}
+          {entriesToShow.map(([key]) => key).join(', ')}
+          {moreEntries > 0 && `, and ${moreEntries} more`}
         </div>
         {'}'}
       </>
@@ -366,8 +385,9 @@ const ValueComposite = memo(function ValueComposite({value, path, prefix, suffix
 const ValuePromise = memo(function ValuePromise(props: {
   value: EngraftPromise<any>,
   prefix?: ReactNode,
+  expandedLevelsLeft: number,
 }) {
-  const {value, prefix} = props;
+  const {value, prefix, expandedLevelsLeft} = props;
 
   const state = usePromiseState(value);
   const color = state.status === 'fulfilled' ? 'green' : state.status === 'rejected' ? 'red' : 'black';
@@ -380,7 +400,7 @@ const ValuePromise = memo(function ValuePromise(props: {
     return newPrefix;
   } else {
     const value = state.status === 'fulfilled' ? state.value : state.reason;
-    return <ValueInternal value={value} path={[]} prefix={newPrefix} customizations={defaultCustomizations} />;
+    return <ValueInternal value={value} path={[]} prefix={newPrefix} customizations={defaultCustomizations} expandedLevelsLeft={expandedLevelsLeft - 1} />;
   }
 });
 
