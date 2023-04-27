@@ -1,0 +1,54 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDlettuce129029",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "python",
+            "code": "import numpy as np\nnp.arange(12).reshape(3,4)",
+            "subPrograms": {}
+          },
+          "defaultCode": ""
+        }
+      },
+      {
+        "var_": {
+          "id": "IDfirefly964345",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "python",
+            "code": "IDavocado332558 + IDpharaoh168742",
+            "subPrograms": {
+              "IDpharaoh168742": {
+                "toolName": "slot",
+                "modeName": "tool",
+                "subProgram": {
+                  "toolName": "slider",
+                  "value": 2,
+                  "min": -10,
+                  "max": 10,
+                  "step": 1
+                }
+              }
+            }
+          },
+          "defaultCode": "IDavocado332558"
+        }
+      }
+    ],
+    "prevVarId": "IDavocado332558"
+  }
+}
