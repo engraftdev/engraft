@@ -1,17 +1,16 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, useUpdateProxy } from "@engraft/hostkit";
+import { IsolateStyles, ToolWithView, Value, slotWithCode, useStateUP } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
-import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
-import { useUser } from "./util.js";
 
 const myCss = `
 @media (min-width: 992px) {
@@ -24,24 +23,13 @@ const myCss = `
 }
 `
 
-export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
-  const { safeMode = false } = props;
-
+export const TinkerPatch = memo(function TinkerPatch() {
   const params = useParams();
   const patchId = params.patchId;
 
   const docRefer = doc(patchesRef, patchId);
-  const [patch, updatePatch] = useDocumentDataAndUpdater(docRefer);
+  const [patch] = useDocumentData(docRefer);
   const error = undefined as Error | undefined;  // TODO: handle errors
-  const patchUP = useUpdateProxy(updatePatch);
-
-  const user = useUser();
-  useEffect(() => {
-    if (patch && (!user || patch.ownerUid !== user.uid)) {
-      // redirect to main page
-      window.location.href = '#/';
-    }
-  }, [user, patch]);
 
   return <>
     <style>{bootstrapCss} {myCss}</style>
@@ -56,7 +44,7 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
         </div>
       </div>
       { patch
-        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} safeMode={safeMode} />
+        ? <TinkerPatchLoaded patchId={patchId} patch={patch} />
         : error
         ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
         : <div className="col-lg-6 mx-auto">loading...</div>
@@ -68,32 +56,29 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
   </>
 });
 
-const EditPatchLoaded = memo(function EditPatchLoaded(props: {
+const TinkerPatchLoaded = memo(function TinkerPatchLoaded(props: {
   patchId: string | undefined,
   patch: Patch,
-  patchUP: UpdateProxy<Patch>,
-  safeMode: boolean,
 }) {
-  const { patchId, patch, patchUP, safeMode } = props;
+  const { patch } = props;
 
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
 
-  const program = patch.toolProgram;
+  const [ program, programUP ] = useStateUP(() => patch.toolProgram);
+
   const programIsEmpty = _.isEqual(program, slotWithCode(''));
 
-  const { stateUP, varBindings } = usePatchState(patch);
-
-  const [initialStateJSONDraft, setInitialStateJSONDraft] = useState(patch.initialStateJSON || "");
+  const { varBindings } = usePatchState(patch);
 
   return <>
     <div className="col-lg-6 mx-auto">
       <div className="input-group">
         <input className="form-control form-control-lg" type="text"
-          value={patch!.name} onChange={(e) => patchUP.name.$set(e.target.value)}
-          placeholder="patch name"/>
-        <a href={`#/view/${patchId}`} className="btn btn-primary btn-lg">view</a>
+          value={patch!.name}
+          placeholder="patch name"
+          disabled/>
       </div>
     </div>
     <div className="tool-wrapper mx-auto mt-5">
@@ -105,28 +90,23 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
             <pre>{props.error.stack}</pre>
             <div>
               <IsolateStyles>
-                <ValueEditable value={program} updater={patchUP.toolProgram.$}/>
+                <Value value={program}/>
               </IsolateStyles>
             </div>
           </div>
         }}
         resetKeys={[program]}
       >
-        { safeMode
-          ? <div>
-              <p>Safe mode is on. Edit the program below, then <a href={`#/edit/${patchId}`}>click here</a> to turn off safe mode.</p>
-              <IsolateStyles>
-                <ValueEditable value={program} updater={patchUP.toolProgram.$} expandedDepth={Infinity}/>
-              </IsolateStyles>
-            </div>
-          : <ToolWithView
-              program={program} updateProgram={patchUP.toolProgram.$}
-              reportOutputState={noOp}
-              varBindings={varBindings}
-              autoFocus={true}
-              expand={true}
-            />
-        }
+        <div className="alert alert-warning" role="alert">
+          This is tinker mode – edits to the program will not be saved.
+        </div>
+        <ToolWithView
+          program={program} updateProgram={programUP.$}
+          reportOutputState={noOp}
+          varBindings={varBindings}
+          autoFocus={true}
+          expand={true}
+        />
       </ErrorBoundary>
       { programIsEmpty &&
         <span style={{paddingLeft: 10}}>↑ start here!</span>
@@ -139,38 +119,19 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
             <input
               type="text"
               className="form-control"
-              value={initialStateJSONDraft}
-              onChange={(e) => {
-                setInitialStateJSONDraft(e.target.value);
-                // TODO: change state if it parses
-                try {
-                  const parsed = JSON.parse(e.target.value);
-                  stateUP.$set(parsed);
-                  patchUP.initialStateJSON.$set(e.target.value);
-                } catch {
-                  // do nothing
-                }
-              }}
-              style={{
-                ...initialStateJSONDraft !== patch.initialStateJSON
-                && { borderColor: '#dc3545' }
-              }}
+              value={patch.initialStateJSON}
+              disabled
             />
             <button
               className="btn btn-outline-danger"
-              onClick={() => {
-                patchUP.initialStateJSON.$set(undefined);
-              }}
+              disabled
             >
               remove
             </button>
           </div>
         : <button
             className="btn btn-outline-secondary btn-sm"
-            onClick={() => {
-              patchUP.initialStateJSON.$set("{}");
-              setInitialStateJSONDraft("{}");
-            }}
+            disabled
           >
             add state
           </button>
