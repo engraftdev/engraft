@@ -1,20 +1,20 @@
-import "./env.js";
+import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
-import { registerAllTheTools } from "@engraft/all-the-tools";
+import { registerAllTheTools } from '@engraft/all-the-tools';
 import {
   EngraftPromise,
   lookUpToolByName,
   runTool,
   slotWithProgram,
   ToolProgram,
-} from "@engraft/core";
-import { RefuncMemory } from "@engraft/refunc";
-import express from "express";
-import { promises as fsPromises, readFileSync } from "node:fs";
-import { exit } from "node:process";
-import { fileURLToPath } from "node:url";
-import yargs from "yargs/yargs";
-import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
+} from '@engraft/core';
+import { RefuncMemory } from '@engraft/refunc';
+import express from 'express';
+import { promises as fsPromises, readFileSync } from 'node:fs';
+import { exit } from 'node:process';
+import { fileURLToPath } from 'node:url';
+import yargs from 'yargs/yargs';
+import { valueFromStdin, valueToStdout, varBindingsObject } from '../shared.js';
 
 const { writeFile } = fsPromises;
 
@@ -38,14 +38,14 @@ not bad
 registerAllTheTools();
 
 const argv = yargs(process.argv.slice(2))
-  .command("* <program>", "run a program", (yargs) =>
+  .command('* <program>', 'run a program', (yargs) =>
     yargs
-      .positional("program", {
-        type: "string",
+      .positional('program', {
+        type: 'string',
       })
       .options({
-        edit: { type: "boolean", default: false },
-        json_only: { type: "boolean", default: false },
+        edit: { type: 'boolean', default: false },
+        json_only: { type: 'boolean', default: false },
       })
   )
   .parseSync();
@@ -58,7 +58,7 @@ const opts = argv as unknown as {
 
 let program: ToolProgram | null = null;
 try {
-  const programStr = readFileSync(opts.program, { encoding: "utf-8" });
+  const programStr = readFileSync(opts.program, { encoding: 'utf-8' });
   program = JSON.parse(programStr);
 } catch (e) {
   // it's fine
@@ -67,7 +67,7 @@ try {
 async function read(stream: NodeJS.ReadStream) {
   const chunks = [];
   for await (const chunk of stream) chunks.push(chunk);
-  return Buffer.concat(chunks).toString("utf8");
+  return Buffer.concat(chunks).toString('utf8');
 }
 
 (async () => {
@@ -82,7 +82,7 @@ async function read(stream: NodeJS.ReadStream) {
     const varBindings = varBindingsObject([
       // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
       {
-        var_: { id: "IDinput000000", label: "input" },
+        var_: { id: 'IDinput000000', label: 'input' },
         outputP: EngraftPromise.resolve({ value: valueFromStdin(stdin) }),
       },
     ]);
@@ -103,7 +103,7 @@ async function read(stream: NodeJS.ReadStream) {
   } else {
     if (program === null) {
       program = slotWithProgram(
-        lookUpToolByName("notebook").programFactory("IDinput000000")
+        lookUpToolByName('notebook').programFactory('IDinput000000')
       );
     }
 
@@ -112,41 +112,41 @@ async function read(stream: NodeJS.ReadStream) {
     console.error(`Editor running at http://localhost:${PORT}/`);
 
     // TODO: don't love this hard-coded path
-    const staticDir = fileURLToPath(new URL("../../dist", import.meta.url));
+    const staticDir = fileURLToPath(new URL('../../dist', import.meta.url));
     // console.log('staticDir', staticDir);
     app.use(express.static(staticDir));
     // app.use(express.static(path.join(__dirname, '../../cli-frontend/dist')));
 
     app.use(express.json());
 
-    app.get("/api/stdin", async (_req, res) => {
+    app.get('/api/stdin', async (_req, res) => {
       // console.log("setting header");
       // idk why it's not working, but w/e
-      res.setHeader("content-type", "text/plain");
+      res.setHeader('content-type', 'text/plain');
       res.send(stdin);
     });
 
-    app.get("/api/program", async (_req, res) => {
+    app.get('/api/program', async (_req, res) => {
       res.send(program);
     });
 
-    app.post("/api/program", async (req, res) => {
+    app.post('/api/program', async (req, res) => {
       // console.log('req.body', req.body)
       program = req.body;
       await writeFile(opts.program, JSON.stringify(program, null, 2), {
-        encoding: "utf-8",
+        encoding: 'utf-8',
       });
-      res.send("ok");
+      res.send('ok');
     });
 
     // send the value of opts.json_only to the frontend
-    app.get("/api/json_only", async (_req, res) => {
+    app.get('/api/json_only', async (_req, res) => {
       res.send(opts.json_only);
     });
 
-    app.post("/api/stdout", async (req, res) => {
+    app.post('/api/stdout', async (req, res) => {
       console.log(req.body.value);
-      res.send("ok");
+      res.send('ok');
       exit(0);
     });
 

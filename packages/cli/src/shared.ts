@@ -1,4 +1,4 @@
-import { VarBinding } from "@engraft/core";
+import { VarBinding } from '@engraft/core';
 
 export function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(
@@ -13,13 +13,13 @@ export function valueFromStdin(input: string) {
   } catch (e) {}
 
   // otherwise, trim off whitespace and return it as lines
-  return input.trim().split("\n");
+  return input.trim().split('\n');
 }
 
 export function valueToStdout(value: any, json_only = false) {
   if (!json_only) {
     // return it raw if it's a string
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
       return value;
     }
 
@@ -27,12 +27,12 @@ export function valueToStdout(value: any, json_only = false) {
     if (Array.isArray(value)) {
       // string lines are raw, other lines are JSON
       const lines = value.map((line) => {
-        if (typeof line === "string") {
+        if (typeof line === 'string') {
           return line;
         }
         return JSON.stringify(line);
       });
-      return lines.join("\n");
+      return lines.join('\n');
     }
   }
   // otherwise, return it as JSON

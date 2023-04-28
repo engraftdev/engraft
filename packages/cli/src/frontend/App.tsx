@@ -1,15 +1,15 @@
-import { registerAllTheTools } from "@engraft/all-the-tools";
+import { registerAllTheTools } from '@engraft/all-the-tools';
 import {
   EngraftPromise,
   runTool,
   ShowView,
   ToolProgram,
   usePromiseState,
-} from "@engraft/core";
-import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
-import { IsolateStyles, ToolOutputBuffer } from "@engraft/core-widgets";
-import { useRefunction } from "@engraft/refunc-react";
-import { Updater } from "@engraft/shared/lib/Updater.js";
+} from '@engraft/core';
+import { useLocalStorage } from '@engraft/shared/lib/useLocalStorage.js';
+import { IsolateStyles, ToolOutputBuffer } from '@engraft/core-widgets';
+import { useRefunction } from '@engraft/refunc-react';
+import { Updater } from '@engraft/shared/lib/Updater.js';
 import {
   Fragment,
   memo,
@@ -17,16 +17,16 @@ import {
   useMemo,
   useReducer,
   useState,
-} from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
-import appCss from "./App.css?inline";
+} from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { valueFromStdin, valueToStdout, varBindingsObject } from '../shared.js';
+import appCss from './App.css?inline';
 
 registerAllTheTools();
 
 const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
   useEffect(() => {
-    document.title = "Engraft";
+    document.title = 'Engraft';
   }, []);
 
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
@@ -34,7 +34,7 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
   const [stdin, updateStdin] = useState<string | null>(null);
   const [program, updateProgram] = useState<ToolProgram | null>(null);
   const [darkMode, setDarkMode] = useLocalStorage(
-    "engraft-2022-testbed-darkMode",
+    'engraft-2022-testbed-darkMode',
     () => false
   );
   const [json_only, setJsonOnly] = useState<boolean>(false);
@@ -42,7 +42,7 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
   useEffect(() => {
     if (stdin === null) {
       (async () => {
-        const resp = await fetch("/api/stdin");
+        const resp = await fetch('/api/stdin');
         const stdin = await resp.text();
         updateStdin(stdin);
       })();
@@ -52,7 +52,7 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
   useEffect(() => {
     if (program === null) {
       (async () => {
-        const resp = await fetch("/api/program");
+        const resp = await fetch('/api/program');
         const program = await resp.json();
         updateProgram(program);
       })();
@@ -60,18 +60,18 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
   }, [program]);
 
   useEffect(() => {
-    window.document.firstElementChild!.classList.toggle("darkMode", darkMode);
+    window.document.firstElementChild!.classList.toggle('darkMode', darkMode);
   }, [darkMode]);
 
   useEffect(() => {
     (async () => {
-      const resp = await fetch("/api/json_only");
+      const resp = await fetch('/api/json_only');
       const json_only = await resp.text();
-      setJsonOnly(json_only === "true");
+      setJsonOnly(json_only === 'true');
     })();
   }, [json_only]);
 
-  const [copyPasteMessage, setCopyPasteMessage] = useState("");
+  const [copyPasteMessage, setCopyPasteMessage] = useState('');
 
   return (
     <Fragment key={version}>
@@ -89,42 +89,42 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
       <br />
       <br />
       <br />
-      <div className="bottom-stuff">
+      <div className='bottom-stuff'>
         <button
-          className="button-add"
+          className='button-add'
           onClick={async () => {
             try {
               await navigator.clipboard.writeText(
                 JSON.stringify(program, null, 2)
               );
-              setCopyPasteMessage("Copied successfully");
+              setCopyPasteMessage('Copied successfully');
             } catch (e) {
               setCopyPasteMessage(
-                "Copy unsuccessful" +
-                  (e instanceof Error ? ": " + e.message : "")
+                'Copy unsuccessful' +
+                  (e instanceof Error ? ': ' + e.message : '')
               );
             }
           }}
         >
           Copy to clipboard
-        </button>{" "}
+        </button>{' '}
         <button
-          className="button-add"
+          className='button-add'
           onClick={async () => {
             try {
               const text = await navigator.clipboard.readText();
               updateProgram(() => JSON.parse(text));
-              setCopyPasteMessage("Pasted successfully");
+              setCopyPasteMessage('Pasted successfully');
             } catch (e) {
               setCopyPasteMessage(
-                "Paste unsuccessful" +
-                  (e instanceof Error ? ": " + e.message : "")
+                'Paste unsuccessful' +
+                  (e instanceof Error ? ': ' + e.message : '')
               );
             }
           }}
         >
           Paste from clipboard
-        </button>{" "}
+        </button>{' '}
         {copyPasteMessage}
       </div>
       <br />
@@ -134,15 +134,15 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
       <br />
       <div>
         <input
-          type="checkbox"
+          type='checkbox'
           checked={darkMode}
           onChange={(ev) => setDarkMode(ev.target.checked)}
         />
         <label>Dark mode</label>
       </div>
       <br />
-      <div style={{ color: "gray" }}>
-        Commit: {import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || "unknown"}
+      <div style={{ color: 'gray' }}>
+        Commit: {import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}
       </div>
     </Fragment>
   );
@@ -167,7 +167,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
       varBindingsObject([
         // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
         {
-          var_: { id: "IDinput000000", label: "input" },
+          var_: { id: 'IDinput000000', label: 'input' },
           outputP: EngraftPromise.resolve({ value: input }),
         },
       ]),
@@ -185,10 +185,10 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
   const stdoutState = usePromiseState(stdoutP);
 
   const saveProgram = async () => {
-    const resp = await fetch("/api/program", {
-      method: "POST",
+    const resp = await fetch('/api/program', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(program),
     });
@@ -200,13 +200,13 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
   };
 
   const saveStdout =
-    stdoutState.status === "fulfilled" &&
+    stdoutState.status === 'fulfilled' &&
     (async () => {
-      console.log("saving stdout", stdoutState.value.value);
-      const resp = await fetch("/api/stdout", {
-        method: "POST",
+      console.log('saving stdout', stdoutState.value.value);
+      const resp = await fetch('/api/stdout', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(stdoutState.value),
       });
@@ -219,7 +219,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
 
   return (
     <>
-      <div style={{ width: "fit-content", marginBottom: 140 }}>
+      <div style={{ width: 'fit-content', marginBottom: 140 }}>
         <ErrorBoundary
           fallbackRender={(props) => {
             return (
@@ -241,7 +241,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
           </IsolateStyles>
         </ErrorBoundary>
       </div>
-      <div className="xRow xGap10">
+      <div className='xRow xGap10'>
         <button
           onClick={async () => {
             await saveProgram();
