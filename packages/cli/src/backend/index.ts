@@ -15,11 +15,10 @@ import { exit } from "node:process";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs/yargs";
 import {
-  set_python_embedding,
   valueFromStdin,
   valueToStdout,
   varBindingsObject,
-  unescape_data,
+  set_json_only,
 } from "../shared.js";
 
 const { writeFile } = fsPromises;
@@ -51,14 +50,16 @@ const argv = yargs(process.argv.slice(2))
       })
       .options({
         edit: { type: "boolean", default: false },
-      })
-      .options({
-        python: { type: "boolean", default: false },
+        json_only: { type: "boolean", default: false },
       })
   )
   .parseSync();
 
-const opts = argv as unknown as { program: string; edit: boolean };
+const opts = argv as unknown as {
+  program: string;
+  edit: boolean;
+  json_only: boolean;
+};
 
 let program: ToolProgram | null = null;
 try {
@@ -71,20 +72,15 @@ try {
 async function read(stream: NodeJS.ReadStream) {
   const chunks = [];
   for await (const chunk of stream) chunks.push(chunk);
-
-  let data = Buffer.concat(chunks).toString("utf8");
-
-  if (argv["python"]) {
-    set_python_embedding();
-    data = unescape_data(data);
-  }
-
-  return data;
+  return Buffer.concat(chunks).toString("utf8");
 }
 
 (async () => {
-  const stdin = await read(process.stdin);
-
+  let stdin = await read(process.stdin);
+  if (opts.json_only) {
+    set_json_only();
+    stdin = JSON.parse(stdin);
+  }
   if (!opts.edit) {
     if (program === null) {
       console.error(`No program found at ${opts.program}`);
