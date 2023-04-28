@@ -1,6 +1,6 @@
 import { VarBinding } from "@engraft/core";
 
-let json_only = false;
+let get_json = false;
 
 export function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(
@@ -18,12 +18,14 @@ export function valueFromStdin(input: string) {
   return input.trim().split("\n");
 }
 
-export function set_json_only() {
-  json_only = true;
+export function set_json() {
+  console.error("SET_JSON");
+  get_json = true;
 }
 
 export function valueToStdout(value: any) {
-  if (!json_only) {
+  console.error("JSON_ONLY", get_json);
+  if (!get_json) {
     // return it raw if it's a string
     if (typeof value === "string") {
       return value;

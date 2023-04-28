@@ -18,7 +18,7 @@ import {
   valueFromStdin,
   valueToStdout,
   varBindingsObject,
-  set_json_only,
+  set_json,
 } from "../shared.js";
 
 const { writeFile } = fsPromises;
@@ -78,8 +78,7 @@ async function read(stream: NodeJS.ReadStream) {
 (async () => {
   let stdin = await read(process.stdin);
   if (opts.json_only) {
-    set_json_only();
-    stdin = JSON.parse(stdin);
+    set_json();
   }
   if (!opts.edit) {
     if (program === null) {
