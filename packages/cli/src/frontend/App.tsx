@@ -37,6 +37,7 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
     "engraft-2022-testbed-darkMode",
     () => false
   );
+  const [json_only, setJsonOnly] = useState<boolean>(false);
 
   useEffect(() => {
     if (stdin === null) {
@@ -62,6 +63,14 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
     window.document.firstElementChild!.classList.toggle("darkMode", darkMode);
   }, [darkMode]);
 
+  useEffect(() => {
+    (async () => {
+      const resp = await fetch("/api/json_only");
+      const json_only = await resp.text();
+      setJsonOnly(json_only === "true");
+    })();
+  }, [json_only]);
+
   const [copyPasteMessage, setCopyPasteMessage] = useState("");
 
   return (
@@ -72,6 +81,7 @@ const App = memo(function App({ safeMode = false }: { safeMode?: boolean }) {
           program={program}
           stdin={stdin}
           updateProgram={updateProgram as Updater<ToolProgram>}
+          json_only={json_only}
         />
       ) : (
         <div>Loading...</div>
@@ -142,12 +152,13 @@ type AppWithRunningProgramProps = {
   program: ToolProgram;
   updateProgram: Updater<ToolProgram>;
   stdin: string;
+  json_only: boolean;
 };
 
 const AppWithRunningProgram = memo(function AppWithRunningProgram(
   props: AppWithRunningProgramProps
 ) {
-  const { program, updateProgram, stdin } = props;
+  const { program, updateProgram, stdin, json_only } = props;
 
   const input = useMemo(() => valueFromStdin(stdin), [stdin]);
 
@@ -166,7 +177,9 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(
   const { outputP, view } = useRefunction(runTool, { program, varBindings });
 
   const stdoutP = useMemo(() => {
-    return outputP.then(({ value }) => ({ value: valueToStdout(value) }));
+    return outputP.then(({ value }) => ({
+      value: valueToStdout(value, json_only),
+    }));
   }, [outputP]);
 
   const stdoutState = usePromiseState(stdoutP);

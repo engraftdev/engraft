@@ -1,5 +1,5 @@
 import requests
-import main
+import engraft_python
 
 # make a request to the wikipedia API to get 5 random articles
 response = requests.get(
@@ -15,5 +15,5 @@ response = requests.get(
     }
 )
 
-res = main.useEngraft(response, "wikipedia", False)
+res = engraft_python.useEngraft(response, "wikipedia.json", False)
 print(res)

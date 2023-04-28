@@ -14,12 +14,7 @@ import { promises as fsPromises, readFileSync } from "node:fs";
 import { exit } from "node:process";
 import { fileURLToPath } from "node:url";
 import yargs from "yargs/yargs";
-import {
-  valueFromStdin,
-  valueToStdout,
-  varBindingsObject,
-  set_json,
-} from "../shared.js";
+import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
 
 const { writeFile } = fsPromises;
 
@@ -77,9 +72,7 @@ async function read(stream: NodeJS.ReadStream) {
 
 (async () => {
   let stdin = await read(process.stdin);
-  if (opts.json_only) {
-    set_json();
-  }
+
   if (!opts.edit) {
     if (program === null) {
       console.error(`No program found at ${opts.program}`);
@@ -101,7 +94,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
-      console.log(valueToStdout(output.value));
+      console.log(valueToStdout(output.value, opts.json_only));
       exit(0);
     } catch (e) {
       console.error(e);
@@ -144,6 +137,11 @@ async function read(stream: NodeJS.ReadStream) {
         encoding: "utf-8",
       });
       res.send("ok");
+    });
+
+    // send the value of opts.json_only to the frontend
+    app.get("/api/json_only", async (_req, res) => {
+      res.send(opts.json_only);
     });
 
     app.post("/api/stdout", async (req, res) => {
