@@ -1,4 +1,4 @@
-import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
+import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { DocumentReference, refEqual as firebaseRefEqual, onSnapshot, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 
@@ -55,6 +55,7 @@ export function useDocumentDataAndUpdater<T>(docRef: DocumentReference<T>): [T |
         return oldValue;
       }
 
+      // TODO: this `setDoc` might be costly; consider sending a diff
       setDoc(docRef, newValue);
       return newValue;
     });

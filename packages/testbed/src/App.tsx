@@ -1,17 +1,10 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, getFullToolIndex, lookUpToolByName, runTool, ShowView, slotWithProgram, ToolProgram, VarBinding } from "@engraft/core";
-import { useRefunction } from "@engraft/refunc-react";
-import { Updater } from "@engraft/original/lib/util/immutable.js";
-import { useStateSetOnly } from "@engraft/original/lib/util/immutable-react.js";
-import range from "@engraft/original/lib/util/range.js";
-import { useLocalStorage } from "@engraft/original/lib/util/useLocalStorage.js";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
-import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
-import { Fragment, memo, useEffect, useMemo, useReducer } from "react";
+import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
+import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import appCss from "./App.css?inline";
 import { examples } from "./examples/index.js";
+import { EngraftPromise, IsolateStyles, ShowView, ToolOutputView, ToolProgram, ValueEditable, VarBinding, getFullToolIndex, lookUpToolByName, runTool, slotWithProgram, useRefunction } from "@engraft/hostkit";
 
 registerAllTheTools();
 
@@ -28,14 +21,14 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
   const [version, incrementVersion] = useReducer((version) => version + 1, 0);
 
-  const [program, updateProgram] = useLocalStorage('engraft-2022-testbed', () => defaultProgram);
-  const [darkMode, updateDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
+  const [program, setProgram] = useLocalStorage('engraft-2022-testbed', () => defaultProgram);
+  const [darkMode, setDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
 
   useEffect(() => {
     window.document.firstElementChild!.classList.toggle('darkMode', darkMode);
   }, [darkMode]);
 
-  const [copyPasteMessage, setCopyPasteMessage] = useStateSetOnly(() => '');
+  const [copyPasteMessage, setCopyPasteMessage] = useState('');
 
   return <Fragment key={version}>
     <style>
@@ -44,12 +37,12 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     { safeMode
       ? <div>
           <IsolateStyles>
-            <ValueEditable value={program} updater={updateProgram}/>
+            <ValueEditable value={program} updater={setProgram}/>
           </IsolateStyles>
         </div>
       : <AppWithRunningProgram
           program={program}
-          updateProgram={updateProgram as Updater<ToolProgram>}
+          setProgram={setProgram}
         />
     }
     <br/>
@@ -68,7 +61,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       <button className="button-add" onClick={async () => {
         try {
           const text = await navigator.clipboard.readText();
-          updateProgram(() => JSON.parse(text));
+          setProgram(JSON.parse(text));
           setCopyPasteMessage('Pasted successfully');
         } catch (e) {
           setCopyPasteMessage('Paste unsuccessful' + (e instanceof Error ? ': ' + e.message : ''));
@@ -80,11 +73,11 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     <br/>
     <div>
       {/* HACK: {...defaultProgram} is to distinguish it from defaultProgram, so it gets saved */}
-      <button onClick={() => updateProgram(() => defaultProgram)}>Clear</button>
+      <button onClick={() => setProgram(defaultProgram)}>Clear</button>
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateProgram(() => examples.find((ex) => ex.name === ev.target.value)!.program);
+          setProgram(examples.find((ex) => ex.name === ev.target.value)!.program);
         }}>
         <option value='none' disabled={true}>Load example...</option>
         {examples.map(({name, program}) =>
@@ -94,7 +87,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          updateProgram(() => slotWithProgram(lookUpToolByName(ev.target.value).programFactory()));
+          setProgram(slotWithProgram(lookUpToolByName(ev.target.value).programFactory()));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
         {Object.keys(getFullToolIndex()).map((name) =>
@@ -108,7 +101,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     </div>
     <br/>
     <div>
-      <input type='checkbox' checked={darkMode} onChange={(ev) => updateDarkMode(() => ev.target.checked)}/>
+      <input type='checkbox' checked={darkMode} onChange={(ev) => setDarkMode(ev.target.checked)}/>
       <label>Dark mode</label>
     </div>
     <br/>
@@ -120,22 +113,21 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
 
 type AppWithRunningProgramProps = {
   program: ToolProgram,
-  updateProgram: Updater<ToolProgram>,
+  setProgram: React.Dispatch<React.SetStateAction<ToolProgram>>,
 }
 
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
-  const {program, updateProgram} = props;
+  const {program, setProgram} = props;
 
   const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
     {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
-    {var_: {id: 'IDrange000000', label: 'range'}, outputP: EngraftPromise.resolve({value: range})},
   ]), []);
 
   const {outputP, view} = useRefunction(runTool, { program, varBindings });
 
-  const [showTool, setShowTool] = useStateSetOnly(() => true);
-  const [showOutput, setShowOutput] = useStateSetOnly(() => false);
+  const [showTool, setShowTool] = useState(true);
+  const [showOutput, setShowOutput] = useState(false);
 
   return <>
     <div style={{...!showTool && {display: 'none'}}}>
@@ -150,7 +142,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         resetKeys={[program]}
       >
         <IsolateStyles>
-          <ShowView view={view} updateProgram={updateProgram} autoFocus={true} />
+          <ShowView view={view} updateProgram={setProgram} autoFocus={true} />
         </IsolateStyles>
       </ErrorBoundary>
     </div>

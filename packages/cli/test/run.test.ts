@@ -5,9 +5,9 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from 'node:url';
 import { registerTool, slotWithCode, toolFromModule } from "@engraft/core";
 import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
-import * as slot from "@engraft/original/lib/builtin-tools/slot/index.js";
+import Slot from "@engraft/tool-slot";
 
-const slotTool = toolFromModule(slot);
+const slotTool = toolFromModule(Slot);
 registerTool(slotTool);
 
 function relative(path: string) {

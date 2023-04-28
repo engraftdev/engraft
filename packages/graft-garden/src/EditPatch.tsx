@@ -1,15 +1,11 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { slotWithCode } from "@engraft/core";
-import { noOp } from "@engraft/original/lib/util/noOp.js";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
-import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
-import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
+import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, useUpdateProxy } from "@engraft/hostkit";
+import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
@@ -28,26 +24,9 @@ const myCss = `
 }
 `
 
+export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
+  const { safeMode = false } = props;
 
-export function usePrevious <T>(value: T, initialValue: T): T {
-  const ref = useRef(initialValue);
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
-
-export function useLogChanges(values: any) {
-  const prevValues = usePrevious(values, null);
-  for (const key in values) {
-    if (prevValues && values[key] !== prevValues[key]) {
-      console.log(`${key}: ${prevValues[key]} → ${values[key]}`);
-    }
-  }
-}
-
-
-export const EditPatch = memo(function EditPatch() {
   const params = useParams();
   const patchId = params.patchId;
 
@@ -77,7 +56,7 @@ export const EditPatch = memo(function EditPatch() {
         </div>
       </div>
       { patch
-        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} />
+        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} safeMode={safeMode} />
         : error
         ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
         : <div className="col-lg-6 mx-auto">loading...</div>
@@ -93,18 +72,13 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   patchId: string | undefined,
   patch: Patch,
   patchUP: UpdateProxy<Patch>,
+  safeMode: boolean,
 }) {
-  const { patchId, patch, patchUP } = props;
+  const { patchId, patch, patchUP, safeMode } = props;
 
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
-
-  const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    updateDoc(doc(patchesRef, patchId), {
-      name: e.target.value,
-    });
-  }, [patchId]);
 
   const program = patch.toolProgram;
   const programIsEmpty = _.isEqual(program, slotWithCode(''));
@@ -116,7 +90,9 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   return <>
     <div className="col-lg-6 mx-auto">
       <div className="input-group">
-        <input className="form-control form-control-lg" type="text" value={patch!.name} onChange={onChangeName} placeholder="patch name"/>
+        <input className="form-control form-control-lg" type="text"
+          value={patch!.name} onChange={(e) => patchUP.name.$set(e.target.value)}
+          placeholder="patch name"/>
         <a href={`#/view/${patchId}`} className="btn btn-primary btn-lg">view</a>
       </div>
     </div>
@@ -136,13 +112,21 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
         }}
         resetKeys={[program]}
       >
-        <ToolWithView
-          program={program} updateProgram={patchUP.toolProgram.$}
-          reportOutputState={noOp}
-          varBindings={varBindings}
-          autoFocus={true}
-          expand={true}
-        />
+        { safeMode
+          ? <div>
+              <p>Safe mode is on. Edit the program below, then <a href={`#/edit/${patchId}`}>click here</a> to turn off safe mode.</p>
+              <IsolateStyles>
+                <ValueEditable value={program} updater={patchUP.toolProgram.$} expandedDepth={Infinity}/>
+              </IsolateStyles>
+            </div>
+          : <ToolWithView
+              program={program} updateProgram={patchUP.toolProgram.$}
+              reportOutputState={noOp}
+              varBindings={varBindings}
+              autoFocus={true}
+              expand={true}
+            />
+        }
       </ErrorBoundary>
       { programIsEmpty &&
         <span style={{paddingLeft: 10}}>↑ start here!</span>

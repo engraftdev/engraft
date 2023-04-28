@@ -1,0 +1,25 @@
+{
+  "name": "@engraft/core-widgets",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Some common React components. TODO: is this a real thing?",
+  "scripts": {
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dependencies": {
+    "@engraft/core": "^0.0.1",
+    "@engraft/shared": "^0.0.1",
+    "@engraft/update-proxy-react": "^0.0.1",
+    "react-inspector": "^6.0.1",
+    "react-merge-refs": "^2.0.1"
+  },
+  "peerDependencies": {
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+  }
+}

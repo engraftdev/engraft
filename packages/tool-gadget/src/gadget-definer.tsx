@@ -1,5 +1,5 @@
-import { ToolOutputView, Value } from "@engraft/original/lib/view/Value.js";
-import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
+import { ToolOutputView, Value } from "@engraft/core-widgets";
+import { VarDefinition } from "@engraft/core-widgets";
 import { ComputeReferences, EngraftPromise, ProgramFactory, SetOps, ShowView, ShowViewWithNewScopeVarBindings, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, references, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";

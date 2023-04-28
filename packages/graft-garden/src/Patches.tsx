@@ -1,8 +1,8 @@
 import { getAuth } from "firebase/auth";
 import { addDoc, deleteDoc, doc } from "firebase/firestore";
-import { slotWithCode } from "@engraft/core";
 import { memo, useCallback } from "react";
 import { Patch, patchesRef } from "./db.js";
+import { slotWithCode } from "@engraft/hostkit";
 
 type PatchesListProps = {
   patches: (Patch & {id: string})[];
@@ -13,7 +13,7 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
 
   const onClickAddNew = useCallback(() => {
     addDoc(patchesRef, {
-      name: `new patch on ${new Date().toLocaleString()}`,
+      name: `new page on ${new Date().toLocaleString()}`,
       ownerUid: getAuth().currentUser!.uid,
       createdAt: new Date(),
       toolProgram: slotWithCode(''),
