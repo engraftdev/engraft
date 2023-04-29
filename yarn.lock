@@ -2593,6 +2593,11 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
+"@popperjs/core@^2.11.7":
+  version "2.11.7"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.7.tgz#ccab5c8f7dc557a52ca3288c10075c9ccd37fff7"
+  integrity sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -3908,10 +3913,6 @@ caniuse-lite@^1.0.30001449:
   version "1.0.30001458"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001458.tgz#871e35866b4654a7d25eccca86864f411825540c"
   integrity sha512-lQ1VlUUq5q9ro9X+5gOEyH7i3vm+AYVT1WDCVB69XOZ17KZRhnZ9J0Sqz7wTHQaLBJccNCHq8/Ww5LlOIZbB0w==
-
-"canvas-prebuilt@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz", "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz#67f9339bfb8e303792e91df8526cd45375fdb930"
 
 chai@^4.3.7:
   version "4.3.7"
