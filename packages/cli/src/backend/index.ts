@@ -1,13 +1,7 @@
 import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import {
-  EngraftPromise,
-  lookUpToolByName,
-  runTool,
-  slotWithProgram,
-  ToolProgram,
-} from '@engraft/core';
+import { EngraftPromise, lookUpToolByName, runTool, slotWithProgram, ToolProgram } from '@engraft/core';
 import { RefuncMemory } from '@engraft/refunc';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
@@ -35,34 +29,30 @@ not bad
 
 */
 
+
 registerAllTheTools();
 
 const argv = yargs(process.argv.slice(2))
   .command('* <program>', 'run a program', (yargs) =>
-    yargs
-      .positional('program', {
-        type: 'string',
-      })
-      .options({
-        edit: { type: 'boolean', default: false },
-        json_only: { type: 'boolean', default: false },
-      })
+    yargs.positional('program', {
+      type: 'string',
+    }).options({
+      edit: { type: 'boolean', default: false },
+      json_only: { type: 'boolean', default: false },
+    })
   )
   .parseSync();
 
-const opts = argv as unknown as {
-  program: string;
-  edit: boolean;
-  json_only: boolean;
-};
+const opts = argv as unknown as { program: string, edit: boolean, json_only: boolean };
 
 let program: ToolProgram | null = null;
 try {
-  const programStr = readFileSync(opts.program, { encoding: 'utf-8' });
+  const programStr = readFileSync(opts.program, { encoding: 'utf-8' })
   program = JSON.parse(programStr);
 } catch (e) {
   // it's fine
 }
+
 
 async function read(stream: NodeJS.ReadStream) {
   const chunks = [];
@@ -71,7 +61,7 @@ async function read(stream: NodeJS.ReadStream) {
 }
 
 (async () => {
-  let stdin = await read(process.stdin);
+  const stdin = await read(process.stdin);
 
   if (!opts.edit) {
     if (program === null) {
@@ -81,20 +71,17 @@ async function read(stream: NodeJS.ReadStream) {
 
     const varBindings = varBindingsObject([
       // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-      {
-        var_: { id: 'IDinput000000', label: 'input' },
-        outputP: EngraftPromise.resolve({ value: valueFromStdin(stdin) }),
-      },
+      {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: valueFromStdin(stdin)})},
     ]);
 
     global.window = {} as any;
 
     const mem = new RefuncMemory();
-    const { outputP } = runTool(mem, { program, varBindings });
+    const { outputP } = runTool(mem, { program, varBindings })
 
     try {
       const output = await outputP;
-      console.log(valueToStdout(output.value, opts.json_only));
+      console.log(valueToStdout(output.value, opts.json_only))
       exit(0);
     } catch (e) {
       console.error(e);
@@ -102,9 +89,7 @@ async function read(stream: NodeJS.ReadStream) {
     }
   } else {
     if (program === null) {
-      program = slotWithProgram(
-        lookUpToolByName('notebook').programFactory('IDinput000000')
-      );
+      program = slotWithProgram(lookUpToolByName('notebook').programFactory('IDinput000000'));
     }
 
     const app = express();
@@ -129,23 +114,20 @@ async function read(stream: NodeJS.ReadStream) {
     app.get('/api/program', async (_req, res) => {
       res.send(program);
     });
-
-    app.post('/api/program', async (req, res) => {
-      // console.log('req.body', req.body)
-      program = req.body;
-      await writeFile(opts.program, JSON.stringify(program, null, 2), {
-        encoding: 'utf-8',
-      });
-      res.send('ok');
-    });
-
-    // send the value of opts.json_only to the frontend
+    
     app.get('/api/json_only', async (_req, res) => {
       res.send(opts.json_only);
     });
 
+    app.post('/api/program', async (req, res) => {
+      // console.log('req.body', req.body)
+      program = req.body;
+      await writeFile(opts.program, JSON.stringify(program, null, 2), { encoding: 'utf-8' });
+      res.send('ok');
+    });
+
     app.post('/api/stdout', async (req, res) => {
-      console.log(req.body.value);
+      console.log(req.body.value)
       res.send('ok');
       exit(0);
     });
