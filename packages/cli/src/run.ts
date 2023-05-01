@@ -9,7 +9,7 @@ function relative(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
 }
 
-spawnSync(
+const spawned = spawnSync(
   'node',
   [
     '--no-warnings',
@@ -21,3 +21,5 @@ spawnSync(
     stdio: 'inherit',
   }
 );
+
+process.exitCode = spawned.status ?? 1;
