@@ -1,9 +1,9 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, runTool, ShowView, ToolProgram, usePromiseState } from "@engraft/core";
-import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
-import { IsolateStyles, ToolOutputBuffer } from "@engraft/core-widgets";
-import { useRefunction } from "@engraft/refunc-react";
+import { EngraftPromise, ToolOutput, ToolProgram, usePromiseState } from "@engraft/core";
+import { ToolOutputBuffer } from "@engraft/core-widgets";
+import { ToolWithView } from "@engraft/hostkit";
 import { Updater } from "@engraft/shared/lib/Updater.js";
+import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
@@ -119,7 +119,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: input})},
   ]), [input]);
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings });
+  const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.unresolved());
 
   const stdoutP = useMemo(() => {
     return outputP.then(({value}) => ({value: valueToStdout(value)}));
@@ -166,9 +166,13 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         }}
         resetKeys={[program]}
       >
-        <IsolateStyles>
-          <ShowView view={view} updateProgram={updateProgram} autoFocus={true} />
-        </IsolateStyles>
+        <ToolWithView
+          program={program} updateProgram={updateProgram}
+          reportOutputP={setOutputP}
+          varBindings={varBindings}
+          autoFocus={true}
+          expand={true}
+        />
       </ErrorBoundary>
     </div>
     <div className="xRow xGap10">
