@@ -2,7 +2,9 @@
   "name": "@engraft/cli",
   "version": "0.0.1",
   "description": "Command-line tool to run Engraft tools",
-  "bin": "./src/index.ts",
+  "bin": {
+    "engraft": "./lib/run.js"
+  },
   "type": "module",
   "scripts": {
     "test:watch": "vitest",
