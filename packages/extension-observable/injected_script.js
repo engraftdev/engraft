@@ -22,6 +22,10 @@ function getText(view) {
   return view?.editorView.state.doc.toString();
 }
 
+function splice(source, index, text) {
+  return source.slice(0, index) + text + source.slice(index);
+}
+
 window.addEventListener("message", (event) => {
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
     console.log("parent got event", event.data);
@@ -39,18 +43,28 @@ window.addEventListener("message", (event) => {
       const view = getView(getCell(order));
       console.log('updating engraft in cell ', order)
 
-      // matches the engraft function call:
-      //  engraft(key: string, inputs: {}, this, hide: bool, programString: ToolProgram)
-      //
-      // lookbehind matches: engraft(key: string, inputs: {}, this, hide: bool,
-      // prog matches: programString json
-      // lookahead matches: ending parenthesis
 
-      const re = /(?<=engraft\(\s*'\w+'\s*,\s*{.*?}\s*,\s*this\s*,\s*){.*}|null?\s*(?=\s*,\s*(true|false|)*\)$)/
+      // Detects the keyword engraft(this), selecting everything between this and )
+      const funcCall_re = /(?<=engraft\(this).*(?=\)$)/
       const oldString = view.editorView.state.doc.toString()
-      const newString = oldString.replace(re, JSON.stringify(program))
 
-      replaceText(view.editorView, newString)
+      const content = oldString.match(funcCall_re)
+      const index = content.index
+      const params = content[0]
+
+      const progAndInputs = "{inputs: {}, program:{}}"
+      console.log(params)
+
+
+      if (params.length === 0) {
+        // engraft(this)
+        replaceText(view.editorView, splice(oldString, index, ", " + progAndInputs))
+      } else {
+        // engraft(this, {inputs: {}, program:{}})
+        const input_re = /(?<=input\s*:\s*_){.*}(?=})/
+        console.log(params)
+        console.log(params.match(input_re))
+      }
     }
   }
 });
