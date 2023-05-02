@@ -9,7 +9,6 @@ import { ErrorBoundary } from "react-error-boundary";
 import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
 import appCss from "./App.css?inline";
 
-
 registerAllTheTools();
 
 const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
@@ -133,7 +132,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
 
   const stdoutP = useMemo(() => {
     return outputP.then(({value}) => ({value: valueToStdout(value, jsonOnly)}));
-  }, [outputP]);
+  }, [outputP, jsonOnly]);
 
   const stdoutState = usePromiseState(stdoutP);
 

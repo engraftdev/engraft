@@ -14,8 +14,8 @@ export function valueFromStdin(input: string) {
   return input.trim().split("\n");
 }
 
-export function valueToStdout(value: any, json_only=false) {
-  if (!json_only) {
+export function valueToStdout(value: any, jsonOnly=false) {
+  if (!jsonOnly) {
     // return it raw if it's a string
     if (typeof value === 'string') {
       return value;
