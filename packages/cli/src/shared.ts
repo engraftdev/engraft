@@ -1,4 +1,4 @@
-import { VarBinding } from "@engraft/core";
+import { VarBinding } from "@engraft/hostkit";
 
 export function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));

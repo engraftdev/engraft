@@ -1,7 +1,5 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, ToolOutput, ToolProgram, usePromiseState } from "@engraft/core";
-import { ToolOutputBuffer } from "@engraft/core-widgets";
-import { ToolWithView } from "@engraft/hostkit";
+import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState } from "@engraft/hostkit";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
