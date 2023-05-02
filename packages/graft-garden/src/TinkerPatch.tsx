@@ -8,7 +8,7 @@ import _ from "lodash";
 import { memo, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
 import { usePatchState } from "./usePatchState.js";
 
@@ -39,7 +39,7 @@ export const TinkerPatch = memo(function TinkerPatch() {
     <div className="container mt-5">
       <div className="col-lg-6 mx-auto mb-3">
         <div className="d-flex flex-row-reverse align-items-center justify-content-between">
-          <a href="#/" className="btn btn-outline-secondary btn-sm">back</a>
+          <Link to="/" className="btn btn-outline-secondary btn-sm">back</Link>
           <h3 className="text-secondary">graft garden</h3>
         </div>
       </div>

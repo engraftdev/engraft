@@ -2,7 +2,9 @@
   "name": "@engraft/cli",
   "version": "0.0.1",
   "description": "Command-line tool to run Engraft tools",
-  "bin": "./src/index.ts",
+  "bin": {
+    "engraft": "./lib/run.js"
+  },
   "type": "module",
   "scripts": {
     "test:watch": "vitest",
@@ -18,6 +20,7 @@
     "@engraft/all-the-tools": "0.0.1",
     "@engraft/core": "^0.0.1",
     "@engraft/core-widgets": "^0.0.1",
+    "@engraft/hostkit": "^0.0.1",
     "@engraft/refunc": "^0.0.1",
     "@engraft/refunc-react": "^0.0.1",
     "@engraft/shared": "^0.0.1",

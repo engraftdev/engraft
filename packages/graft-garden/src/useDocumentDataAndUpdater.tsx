@@ -14,17 +14,14 @@ export function useDocumentDataAndUpdater<T>(docRef: DocumentReference<T>): [T |
 
   docRef = useDedupe(docRef, firebaseRefEqual);
 
-  console.log("useDocumentDataAndUpdater tick");
-
   // Handle remote updates
   useEffect(() => {
     const unsubscribe = onSnapshot(
       docRef,
       (doc) => {
-        const { fromCache, hasPendingWrites } = doc.metadata;
+        const { hasPendingWrites } = doc.metadata;
 
         if (!hasPendingWrites) {
-          console.log("Local document state updated with remote data", {fromCache, hasPendingWrites});
           // TODO: Rather than completely replacing the data, try to re-use
           // existing subobjects to minimize recomputation work in Engraft.
           setData(doc.data());
@@ -42,8 +39,6 @@ export function useDocumentDataAndUpdater<T>(docRef: DocumentReference<T>): [T |
 
   // Make a function that can update the document
   const updater = useCallback((f: (oldValue: T) => T) => {
-    console.log("updater called");
-    console.trace();
     setData((oldValue) => {
       if (!oldValue) {
         console.warn('updater called on uninitialized value; nothing will happen');

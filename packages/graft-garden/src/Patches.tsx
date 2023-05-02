@@ -1,8 +1,9 @@
 import { getAuth } from "firebase/auth";
-import { addDoc, deleteDoc, doc } from "firebase/firestore";
-import { memo, useCallback } from "react";
+import { Timestamp, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { memo, useCallback, useMemo } from "react";
 import { Patch, patchesRef } from "./db.js";
 import { slotWithCode } from "@engraft/hostkit";
+import { Link, useNavigate } from "react-router-dom";
 
 type PatchesListProps = {
   patches: (Patch & {id: string})[];
@@ -10,19 +11,27 @@ type PatchesListProps = {
 
 export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
   const { patches } = props;
+  const navigate = useNavigate();
 
-  const onClickAddNew = useCallback(() => {
-    addDoc(patchesRef, {
+  console.log(patches);
+
+  const patchesSorted = useMemo(() => {
+    return [...patches].sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
+  }, [patches]);
+
+  const onClickAddNew = useCallback(async () => {
+    const newDoc = await addDoc(patchesRef, {
       name: `new page on ${new Date().toLocaleString()}`,
       ownerUid: getAuth().currentUser!.uid,
-      createdAt: new Date(),
+      createdAt: Timestamp.fromDate(new Date()),
       toolProgram: slotWithCode(''),
-    })
-  }, []);
+    });
+    navigate(`/${newDoc.id}/edit`);
+  }, [navigate]);
 
   return <table className="table">
     <tbody>
-      {patches.map(patch => {
+      {patchesSorted.map(patch => {
         const onClickDelete = () => {
           deleteDoc(doc(patchesRef, patch.id));
         };
@@ -32,8 +41,8 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
             <div className="d-flex flex-row align-items-center justify-content-between">
             {patch.name}
             <div className="btn-group btn-group-sm" role="group" aria-label="Basic example">
-              <a href={`#/edit/${patch.id}`} className="btn btn-outline-primary">edit</a>
-              <a href={`#/view/${patch.id}`} className="btn btn-outline-primary">view</a>
+              <Link to={`/${patch.id}/edit`} className="btn btn-outline-primary">edit</Link>
+              <Link to={`/${patch.id}/view`} className="btn btn-outline-primary">view</Link>
               <button type="button" className="btn btn-outline-danger" onClick={onClickDelete}>delete</button>
             </div>
             </div>
@@ -41,7 +50,7 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
         </tr>
       })}
       { patches.length === 0 && <tr>
-        <td><i>no patches yet</i></td>
+        <td><i>no pages yet</i></td>
       </tr> }
       <tr>
         <td>

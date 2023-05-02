@@ -30,7 +30,7 @@ depcheck(process.cwd(), options).then((unused) => {
   // TODO: handle unused.invalidFiles and unused.invalidDirs?
 
   if (problem) {
-    process.exit(1);
+    process.exitCode = 1;
   } else {
     console.log("No problems found by our-depcheck.cjs");
   }

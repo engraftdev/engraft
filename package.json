@@ -17,6 +17,7 @@
     "graft-garden:dev": "lerna run dev --scope @engraft/graft-garden",
     "cli:build-app": "lerna run build-app --scope @engraft/cli",
     "cli:build-app:watch": "npm run cli:build-app; lerna watch -- npm run cli:build-app --scope @engraft/cli",
+    "cli:link": "cd packages/cli && yarn link",
     "use-engraft-demo:dev": "lerna run dev --scope @engraft/use-engraft-demo"
   },
   "workspaces": [
