@@ -7,7 +7,7 @@ def run_engraft(data, program, *, edit):
 
     data = json.dumps(data)   
     
-    command = ["node", "../../packages/cli/lib/run.js", program, "--json-only"]
+    command = ["engraft", program, "--json-only"]
 
     if edit:
         command.append("--edit")
