@@ -112,11 +112,10 @@ type ObservableExtEmbedProps = {
   inputs: {[name: string]: any} | undefined,
   programString: ToolProgram,
   order: number,
-  hide?: boolean
 }
 
 export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: ObservableExtEmbedProps) {
-  const {inputs = {}, reportOutputState, reportOutputP, programString, order, hide = false} = props;
+  const {inputs = {}, reportOutputState, reportOutputP, programString, order} = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
@@ -176,7 +175,7 @@ export const ObservableExtEmbed = memo(function ObservableExtEmbed(props: Observ
               return <ObservableInspector value={value}/>;
             }}
         />
-        { !hide &&
+        { !inputs.hide &&
             <div style={{marginTop: 10}}>
               <IsolateStyles>
                 <ToolWithView
