@@ -22,7 +22,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   const [stdin, updateStdin] = useState<string | null>(null);
   const [program, updateProgram] = useState<ToolProgram | null>(null);
   const [darkMode, setDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
-  const [json_only, setJsonOnly] = useState<boolean>(false);
+  const [jsonOnly, setJsonOnly] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (stdin === null) {
@@ -54,7 +54,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       const json_only = await resp.text();
       setJsonOnly(json_only === 'true');
     })();
-  }, [json_only]);
+  }, []);
 
   const [copyPasteMessage, setCopyPasteMessage] = useState('');
 
@@ -62,12 +62,12 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     <style>
       {appCss}
     </style>
-    { program !== null && stdin !== null
+    { program !== null && stdin !== null && jsonOnly !== null
       ? <AppWithRunningProgram
           program={program}
           stdin={stdin}
           updateProgram={updateProgram as Updater<ToolProgram>}
-          json_only={json_only}
+          jsonOnly={jsonOnly}
         />
       : <div>Loading...</div>
     }
@@ -116,11 +116,11 @@ type AppWithRunningProgramProps = {
   program: ToolProgram,
   updateProgram: Updater<ToolProgram>,
   stdin: string,
-  json_only: boolean,
+  jsonOnly: boolean,
 }
 
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
-  const {program, updateProgram, stdin, json_only} = props;
+  const {program, updateProgram, stdin, jsonOnly} = props;
 
   const input = useMemo(() => valueFromStdin(stdin), [stdin]);
 
@@ -132,7 +132,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
   const {outputP, view} = useRefunction(runTool, { program, varBindings });
 
   const stdoutP = useMemo(() => {
-    return outputP.then(({value}) => ({value: valueToStdout(value, json_only)}));
+    return outputP.then(({value}) => ({value: valueToStdout(value, jsonOnly)}));
   }, [outputP]);
 
   const stdoutState = usePromiseState(stdoutP);
