@@ -19,5 +19,8 @@
     "react-contenteditable": "^3.3.6",
     "react-dom": "^18.0.0",
     "react-error-boundary": "^3.1.4"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.7"
   }
 }

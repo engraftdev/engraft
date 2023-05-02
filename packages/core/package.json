@@ -15,13 +15,8 @@
   "dependencies": {
     "@engraft/refunc": "^0.0.1",
     "@engraft/shared": "^0.0.1",
-    "@types/lodash-es": "^4.17.6",
     "friendly-words": "^1.2.0",
-    "lodash-es": "^4.17.21",
     "synchronous-promise": "^2.0.16"
-  },
-  "devDependencies": {
-    "@types/lodash-es": "^4.17.6"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
