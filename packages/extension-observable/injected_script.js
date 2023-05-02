@@ -33,6 +33,9 @@ window.addEventListener("message", (event) => {
     }
     if (event.data.type === 'engraft-update') {
       const {order, program} = event.data;
+
+      if (order === -1 || order === undefined) return
+
       const view = getView(getCell(order));
       console.log('updating engraft in cell ', order)
 
