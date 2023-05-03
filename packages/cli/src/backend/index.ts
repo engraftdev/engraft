@@ -37,11 +37,12 @@ const argv = yargs(process.argv.slice(2))
       type: 'string',
     }).options({
       edit: { type: 'boolean', default: false },
+      'json-only' : { type: 'boolean', default: false },
     })
   )
   .parseSync();
 
-const opts = argv as unknown as { program: string, edit: boolean };
+const opts = argv as unknown as { program: string, edit: boolean, jsonOnly: boolean };
 
 let program: ToolProgram | null = null;
 try {
@@ -79,7 +80,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
-      console.log(valueToStdout(output.value))
+      console.log(valueToStdout(output.value, opts.jsonOnly))
       exit(0);
     } catch (e) {
       console.error(e);
@@ -111,6 +112,10 @@ async function read(stream: NodeJS.ReadStream) {
 
     app.get('/api/program', async (_req, res) => {
       res.send(program);
+    });
+    
+    app.get('/api/json_only', async (_req, res) => {
+      res.send(opts.jsonOnly);
     });
 
     app.post('/api/program', async (req, res) => {

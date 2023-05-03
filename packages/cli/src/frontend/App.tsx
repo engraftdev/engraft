@@ -7,7 +7,6 @@ import { ErrorBoundary } from "react-error-boundary";
 import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
 import appCss from "./App.css?inline";
 
-
 registerAllTheTools();
 
 const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
@@ -20,7 +19,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   const [stdin, updateStdin] = useState<string | null>(null);
   const [program, updateProgram] = useState<ToolProgram | null>(null);
   const [darkMode, setDarkMode] = useLocalStorage('engraft-2022-testbed-darkMode', () => false);
-
+  const [jsonOnly, setJsonOnly] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (stdin === null) {
@@ -46,17 +45,26 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
     window.document.firstElementChild!.classList.toggle('darkMode', darkMode);
   }, [darkMode]);
 
+  useEffect(() => {
+    (async () => {
+      const resp = await fetch('/api/json_only');
+      const json_only = await resp.text();
+      setJsonOnly(json_only === 'true');
+    })();
+  }, []);
+
   const [copyPasteMessage, setCopyPasteMessage] = useState('');
 
   return <Fragment key={version}>
     <style>
       {appCss}
     </style>
-    { program !== null && stdin !== null
+    { program !== null && stdin !== null && jsonOnly !== null
       ? <AppWithRunningProgram
           program={program}
           stdin={stdin}
           updateProgram={updateProgram as Updater<ToolProgram>}
+          jsonOnly={jsonOnly}
         />
       : <div>Loading...</div>
     }
@@ -105,10 +113,11 @@ type AppWithRunningProgramProps = {
   program: ToolProgram,
   updateProgram: Updater<ToolProgram>,
   stdin: string,
+  jsonOnly: boolean,
 }
 
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
-  const {program, updateProgram, stdin} = props;
+  const {program, updateProgram, stdin, jsonOnly} = props;
 
   const input = useMemo(() => valueFromStdin(stdin), [stdin]);
 
@@ -120,8 +129,8 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.unresolved());
 
   const stdoutP = useMemo(() => {
-    return outputP.then(({value}) => ({value: valueToStdout(value)}));
-  }, [outputP]);
+    return outputP.then(({value}) => ({value: valueToStdout(value, jsonOnly)}));
+  }, [outputP, jsonOnly]);
 
   const stdoutState = usePromiseState(stdoutP);
 
