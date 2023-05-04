@@ -36,24 +36,30 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
           <span>{(program as any).debugId}</span>
         }
       </div>
-      <h3>Program</h3>
+      <h3>Program {refId(program)}</h3>
       { updateProgram ?
         <ValueEditable value={program} updater={updateProgram}/> :
         <Value value={program}/>
       }
-      <div><small>Object reference ID: <code>{runtimeObjectId(program)}</code></small></div>
-      <h3>Program updater</h3>
-      <div><small>Object reference ID: <code>{runtimeObjectId(updateProgram)}</code></small></div>
-      <h3>References</h3>
+      <h3>Program updater {refId(updateProgram)}</h3>
+      <h3>Reported references {refId(references(program))}</h3>
       <ul>
         { [...references(program)].map((ref) =>
           <li key={ref}><small><code>{ref}</code></small></li>
         ) }
       </ul>
-      <h3>Variable bindings</h3>
+      <h3>Variable bindings {refId(varBindings)}</h3>
       <Value value={varBindings}/>
-      <h3>Scope variable bindings</h3>
+      <h3>Scope variable bindings {refId(scopeVarBindings)}</h3>
       <Value value={scopeVarBindings}/>
     </IsolateStyles>
   </WindowPortal>;
 });
+
+function refId(value: any) {
+  return <code
+    style={{fontSize: 'small', verticalAlign: 'super'}}
+  >
+    {runtimeObjectId(value)}
+  </code>;
+}
