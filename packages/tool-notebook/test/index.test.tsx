@@ -1,21 +1,22 @@
 import { EngraftPromise, makeVarBindings, newVar, registerTool, runTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
+import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
+import { empty, noOp } from "@engraft/shared/lib/noOp.js";
+import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
+import Slot from "@engraft/tool-slot";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
-import { empty, noOp } from "@engraft/shared/lib/noOp.js";
-import { ToolWithView } from "@engraft/hostkit";
-import Slot from "@engraft/tool-slot";
-import * as TestKnownOutput from "@engraft/tool-test-known-output";
 import * as Notebook from "../lib/index.js";
 
 // @vitest-environment happy-dom
 
 const notebookTool = toolFromModule(Notebook);
 
+registerTestingComponents();
+
 registerTool(notebookTool);
-registerTool(toolFromModule(TestKnownOutput));
 registerTool(toolFromModule(Slot));
 
 const prevVarId = 'IDprev000000';
@@ -32,19 +33,19 @@ describe('notebook', () => {
         {
           var_: {id: 'cell1', label: ''},
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 1 }),
             onRun: () => { cell1Runs++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 2 }),
             onRun: () => { cell2Runs++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -72,7 +73,7 @@ describe('notebook', () => {
     expect(cell2Runs).toEqual(1);
 
     program = updateWithUP(program, (programUP) => {
-      programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
+      programUP.cells[1].program.$as<TestingKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
     });
 
     // console.log("run 3");
@@ -178,19 +179,19 @@ describe('notebook', () => {
         {
           var_: {id: 'cell1', label: ''},
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 1 }),
             onViewRender: () => { cell1ViewRenders++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 2 }),
             onViewRender: () => { cell2ViewRenders++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -222,7 +223,7 @@ describe('notebook', () => {
     expect(cell2ViewRenders).toEqual(1);
 
     program = updateWithUP(program, (programUP) => {
-      programUP.cells[1].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
+      programUP.cells[1].program.$as<TestingKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 3 }));
     });
 
     // console.log("run 3");
@@ -249,29 +250,29 @@ describe('notebook', () => {
         {
           var_: cell1,
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 1 }),
             onRun: () => { cell1Runs++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: cell2,
           program: slotWithCode(`${cell2Run.id}(); return ${cell1.id} + 1`),
           // program: {
-          //   toolName: 'test-known-output',
+          //   toolName: 'testing-known-output',
           //   outputP: EngraftPromise.resolve({ value: 2 }),
           //   onRun: () => { cell2Runs++ },
-          // } satisfies TestKnownOutput.Program,
+          // } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
         {
           var_: cell3,
           program: {
-            toolName: 'test-known-output',
+            toolName: 'testing-known-output',
             outputP: EngraftPromise.resolve({ value: 3 }),
             onRun: () => { cell3Runs++ },
-          } satisfies TestKnownOutput.Program,
+          } satisfies TestingKnownOutput.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -300,7 +301,7 @@ describe('notebook', () => {
 
     // run with change to cell 3
     program = updateWithUP(program, (programUP) => {
-      programUP.cells[2].program.$as<TestKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 4 }));
+      programUP.cells[2].program.$as<TestingKnownOutput.Program>().outputP.$set(EngraftPromise.resolve({ value: 4 }));
     });
     expect(runProgram()).toEqual({status: 'fulfilled', value: {value: 4}});
     expect(cell1Runs).toEqual(1);

@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/tool-test-known-output",
+  "name": "@engraft/testing-components",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "Engraft component for testing purposes",
+  "description": "Engraft components for testing purposes",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

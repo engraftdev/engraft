@@ -1,15 +1,15 @@
 import { EngraftPromise, Tool, ToolOutput, ToolOutputView, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 
 export type Program = {
-  toolName: 'test-known-output',
+  toolName: 'testing-known-output',
   outputP: EngraftPromise<ToolOutput>,  // TODO: for testing, breaks serialization
   onRun?: () => void,  // TODO: for testing, breaks serialization
   onViewRender?: () => void,  // TODO: for testing, breaks serialization
 }
 
-const tool: Tool<Program> = {
+export const tool: Tool<Program> = {
   programFactory: () => ({
-    toolName: 'test-known-output',
+    toolName: 'testing-known-output',
     outputP: EngraftPromise.unresolved(),
   }),
 
@@ -24,7 +24,7 @@ const tool: Tool<Program> = {
     const view = hookMemo(() => ({
       render: () => {
         if (onViewRender) { onViewRender(); }
-        return <div className="TestKnownOutput">
+        return <div className="TestingKnownOutput">
           <ToolOutputView outputP={outputP} />
         </div>;
       }
@@ -33,5 +33,3 @@ const tool: Tool<Program> = {
     return { outputP, view };
   })),
 };
-
-export default tool;
