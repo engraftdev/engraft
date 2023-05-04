@@ -26,6 +26,16 @@ function splice(source, index, text) {
   return source.slice(0, index) + text + source.slice(index);
 }
 
+// Adds double quotes around keywords in a JSON string that were not already quoted
+// Necessary to not break JSON.parse() if user manually defines inputs or programs without using quotes
+function quoteJSON(str) {
+  // Use a regular expression to match keys that are not already quoted
+  const regex = /([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g;
+
+  // Replace each matched key with a quoted key
+  return str.replace(regex, '$1"$2":');
+}
+
 window.addEventListener("message", (event) => {
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
     console.log("parent got event", event.data);
@@ -44,15 +54,23 @@ window.addEventListener("message", (event) => {
       console.log('updating engraft in cell ', order)
 
 
-      // Detects the keyword engraft(this), selecting everything between this and )
-      const funcCall_re = /(?<=engraft\(this).*(?=\)$)/
+      /*
+      Explanation:
+        (?<=engraft\(this[^,]*,)
+          is a positive lookbehind assertion that matches the string "engraft(this" followed by any number of non-comma characters, and a comma. This is not included in the final match.
+        [^)]*
+          matches any number of non-closing-parenthesis characters.
+        (?=\)$)
+          is a positive lookahead assertion that matches a ")" at the end of the line, without including it in the final match.
+       */
+      const funcCall_re = /(?<=engraft\(this[^,]*,)[^)]*(?=\)$)/
       const oldString = view.editorView.state.doc.toString()
 
       const content = oldString.match(funcCall_re)
       const index = content.index
       const params = content[0]
 
-      const progAndInputs = "{inputs: {}, program:{}}"
+      const progAndInputs = "{\"inputs\": {}, \"program\":{}}"
       console.log(params)
 
 
@@ -61,10 +79,13 @@ window.addEventListener("message", (event) => {
         replaceText(view.editorView, splice(oldString, index, ", " + progAndInputs))
       } else {
         // engraft(this, {inputs: {}, program:{}})
-        const input_re = /(?<=input\s*:\s*_){.*}(?=})/
+
         console.log(params)
-        console.log(params.match(input_re))
+        const obj = JSON.parse(quoteJSON(params))
+        console.log(obj)
+        console.log(JSON.stringify(obj))
       }
     }
   }
 });
+
