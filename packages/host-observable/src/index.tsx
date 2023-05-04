@@ -1,11 +1,9 @@
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import { ErrorBoundary } from '@engraft/original/lib/util/ErrorBoundary.js';
-import { ObservableInspector } from '@engraft/original/lib/util/ObservableInspector.js';
-import IsolateStyles from '@engraft/original/lib/view/IsolateStyles.js';
-import { ToolWithView } from '@engraft/original/lib/view/ToolWithView.js';
-import { ToolOutputBuffer } from '@engraft/original/lib/view/Value.js';
+import { ErrorBoundary } from '@engraft/shared/lib/ErrorBoundary.js';
+import {IsolateStyles, ToolWithView, ToolOutputBuffer, EngraftPromise, PromiseState, slotWithCode, ToolOutput, ToolProgram, VarBinding} from '@engraft/hostkit';
 import { isObject } from '@engraft/shared/lib/isObject.js';
-import { EngraftPromise, PromiseState, slotWithCode, ToolOutput, ToolProgram, VarBinding } from '@engraft/toolkit';
+import { ObservableInspector } from './ObservableInspector.js'
+
 import React, { isValidElement, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 // React exports for Observable to use
