@@ -1,5 +1,5 @@
 import { EngraftPromise, hookAttachNewScopeVarBindings, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, ToolResultWithNewScopeVarBindings, Var, VarBindings } from "@engraft/core";
-import { hookCache, hookDedupe, hookFork, hookMemo, hooks } from "@engraft/refunc";
+import { hookCache, hookDedupe, hookFork, hookMemo, hooks } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
 import _ from "lodash";

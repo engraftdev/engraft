@@ -1,17 +1,14 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { slotWithCode } from "@engraft/core";
-import { noOp } from "@engraft/original/lib/util/noOp.js";
-import IsolateStyles from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolWithView } from "@engraft/original/lib/view/ToolWithView.js";
-import { ValueEditable } from "@engraft/original/lib/view/ValueEditable.js";
-import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
+import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, useUpdateProxy } from "@engraft/hostkit";
+import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
-import { doc } from "firebase/firestore";
+import 'bootstrap/js/dist/dropdown';
+import { deleteDoc, doc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
 import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
@@ -27,25 +24,6 @@ const myCss = `
   }
 }
 `
-
-
-export function usePrevious <T>(value: T, initialValue: T): T {
-  const ref = useRef(initialValue);
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
-
-export function useLogChanges(values: any) {
-  const prevValues = usePrevious(values, null);
-  for (const key in values) {
-    if (prevValues && values[key] !== prevValues[key]) {
-      console.log(`${key}: ${prevValues[key]} → ${values[key]}`);
-    }
-  }
-}
-
 
 export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
   const { safeMode = false } = props;
@@ -74,7 +52,7 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
     <div className="container mt-5">
       <div className="col-lg-6 mx-auto mb-3">
         <div className="d-flex flex-row-reverse align-items-center justify-content-between">
-          <a href="#/" className="btn btn-outline-secondary btn-sm">back</a>
+          <Link to="/" className="btn btn-outline-secondary btn-sm">back</Link>
           <h3 className="text-secondary">graft garden</h3>
         </div>
       </div>
@@ -98,10 +76,22 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   safeMode: boolean,
 }) {
   const { patchId, patch, patchUP, safeMode } = props;
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const willFocusNameInputRef = useRef<boolean | undefined>();
+  if (willFocusNameInputRef.current === undefined) {
+    willFocusNameInputRef.current = patch.name.startsWith("new page on");
+  }
+  useEffect(() => {
+    if (willFocusNameInputRef.current) {
+      nameInputRef.current?.focus();
+    }
+  }, []);
 
   const program = patch.toolProgram;
   const programIsEmpty = _.isEqual(program, slotWithCode(''));
@@ -110,13 +100,31 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
 
   const [initialStateJSONDraft, setInitialStateJSONDraft] = useState(patch.initialStateJSON || "");
 
+  const onClickDelete = useCallback(() => {
+    deleteDoc(doc(patchesRef, patchId));
+    navigate('/');
+  }, [navigate, patchId]);
+
   return <>
     <div className="col-lg-6 mx-auto">
       <div className="input-group">
         <input className="form-control form-control-lg" type="text"
           value={patch!.name} onChange={(e) => patchUP.name.$set(e.target.value)}
-          placeholder="patch name"/>
-        <a href={`#/view/${patchId}`} className="btn btn-primary btn-lg">view</a>
+          placeholder="patch name"
+          ref={nameInputRef}/>
+        <Link to='../view' className="btn btn-outline-primary btn-lg">view</Link>
+        <button className="btn btn-lg btn-outline-primary dropdown-toggle" type="button" id="dotdotdot-dropdown-button" data-bs-toggle="dropdown" aria-expanded="false">
+        ⋯
+        </button>
+        <ul className="dropdown-menu" aria-labelledby="dotdotdot-dropdown-button">
+          <li><Link to='../tinker' className="dropdown-item">tinker mode</Link></li>
+          { safeMode
+            ? <li><Link to='../edit' className="dropdown-item">exciting mode</Link></li>
+            : <li><Link to='../edit/safe' className="dropdown-item">safe mode</Link></li>
+          }
+          <li><hr className="dropdown-divider" /></li>
+          <li><button className="dropdown-item" style={{color: '#dc3545'}} onClick={onClickDelete}>delete page</button></li>
+        </ul>
       </div>
     </div>
     <div className="tool-wrapper mx-auto mt-5">
@@ -137,7 +145,9 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
       >
         { safeMode
           ? <div>
-              <p>Safe mode is on. Edit the program below, then <a href={`#/edit/${patchId}`}>click here</a> to turn off safe mode.</p>
+              <div className="alert alert-warning" role="alert">
+                This is safe mode. Edit the program below, then <Link to={`../edit`}>turn off safe mode</Link>.
+              </div>
               <IsolateStyles>
                 <ValueEditable value={program} updater={patchUP.toolProgram.$} expandedDepth={Infinity}/>
               </IsolateStyles>
@@ -146,7 +156,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
               program={program} updateProgram={patchUP.toolProgram.$}
               reportOutputState={noOp}
               varBindings={varBindings}
-              autoFocus={true}
+              autoFocus={!willFocusNameInputRef.current}
               expand={true}
             />
         }

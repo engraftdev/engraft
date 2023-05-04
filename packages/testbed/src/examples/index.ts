@@ -1,4 +1,4 @@
-import { ToolProgram } from "@engraft/core";
+import { ToolProgram } from "@engraft/hostkit";
 
 const modules = import.meta.glob('./*.json', { eager: true });
 export const examples =

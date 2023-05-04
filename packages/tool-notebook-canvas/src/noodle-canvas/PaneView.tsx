@@ -1,7 +1,7 @@
-import { memo, useCallback, useMemo } from "react";
-import { startDrag } from "@engraft/original/lib/util/drag.js";
-import { useUpdateProxy } from "@engraft/toolkit";
+import { startDrag } from "@engraft/shared/lib/drag.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
+import { useUpdateProxy } from "@engraft/toolkit";
+import { memo, useCallback, useMemo } from "react";
 
 import { Pane, PaneGeo, roundTo } from "./model.js";
 import { PaneResizers } from "./PaneResizers.js";

@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
-import * as tmp from "tmp";
-import { writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
-import { fileURLToPath } from 'node:url';
-import { registerTool, slotWithCode, toolFromModule } from "@engraft/core";
+import { registerTool, slotWithCode, toolFromModule } from "@engraft/hostkit";
 import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
-import * as slot from "@engraft/original/lib/builtin-tools/slot/index.js";
+import Slot from "@engraft/tool-slot";
+import { spawnSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
+import { fileURLToPath } from 'node:url';
+import * as tmp from "tmp";
+import { describe, expect, it } from "vitest";
 
-const slotTool = toolFromModule(slot);
+const slotTool = toolFromModule(Slot);
 registerTool(slotTool);
 
 function relative(path: string) {

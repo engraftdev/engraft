@@ -1,0 +1,50 @@
+{
+  "private": true,
+  "name": "@engraft/original-tools",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Temporary package to port over old tools into the monorepo.",
+  "scripts": {
+    "build-lib": "tsc && cpy 'src/**/*.css' lib",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dependencies": {
+    "@engraft/codemirror-helpers": "^0.0.1",
+    "@engraft/core": "^0.0.1",
+    "@engraft/core-widgets": "^0.0.1",
+    "@engraft/hostkit": "^0.0.1",
+    "@engraft/refunc": "^0.0.1",
+    "@engraft/refunc-react": "^0.0.1",
+    "@engraft/shared": "^0.0.1",
+    "@engraft/toolkit": "^0.0.1",
+    "@engraft/update-proxy": "^0.0.1",
+    "@engraft/update-proxy-react": "^0.0.1",
+    "d3-dsv": "^3.0.1",
+    "lodash": "^4.17.21",
+    "react": "^18.0.0",
+    "react-colorful": "^5.5.1",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^12.0.4",
+    "react-select": "^5.7.0 <5.7.1",
+    "react-vega": "^7.6.0",
+    "seedrandom": "^3.0.5",
+    "vega": "^5.22.1",
+    "vega-lite": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/d3-dsv": "^3.0.1",
+    "@types/google.maps": "^3.52.0",
+    "@types/lodash": "^4.14.178",
+    "@types/object-inspect": "^1.8.1",
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.0",
+    "@types/react-inspector": "^4.0.2",
+    "@types/react-test-renderer": "^18.0.0",
+    "@types/seedrandom": "^3.0.2"
+  }
+}

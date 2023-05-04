@@ -1,16 +1,13 @@
 /// <reference types="@types/wicg-file-system-access" />
 
-import ShadowDOM from "@engraft/original/lib/util/ShadowDOM.js";
-import { useDedupe } from "@engraft/original/lib/util/useDedupe.js";
-import { RootStyles } from "@engraft/original/lib/view/IsolateStyles.js";
-import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
-import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { EngraftPromise, ShowViewWithNewScopeVarBindings, ToolOutput, ToolProgram, VarBinding, VarBindings, ViewWithNewScopeVarBindings, randomId, runToolWithNewScopeVarBindings, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { EngraftPromise, RootStyles, ShowViewWithNewScopeVarBindings, ToolOutput, ToolOutputView, ToolProgram, VarBinding, VarBindings, VarDefinition, ViewWithNewScopeVarBindings, randomId, runToolWithNewScopeVarBindings, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
+import { DOM } from "@engraft/shared/lib/DOM.js";
+import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
+import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import * as IDBKV from 'idb-keyval';
 import _ from "lodash";
 import React, { ReactNode, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { DOM } from "./DOM.js";
 import css from "./index.css?inline";
 
 export type SavedProgram = {

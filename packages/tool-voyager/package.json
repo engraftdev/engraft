@@ -15,7 +15,6 @@
   "dependencies": {
     "@engraft/toolkit": "^0.0.1",
     "@engraft/vendor-voyager": "^0.0.1",
-    "@engraft/original": "^0.0.1",
     "@engraft/shared": "^0.0.1",
     "lodash": "^4.17.21"
   },

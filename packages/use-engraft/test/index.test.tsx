@@ -1,6 +1,6 @@
 import { EngraftPromise, registerTool, slotWithCode, toolFromModule, ToolOutput } from "@engraft/core";
-import * as Slot from "@engraft/original/lib/builtin-tools/slot/index.js";
-import * as TestKnownOutput from "@engraft/original/lib/builtin-tools/test-known-output/index.js";
+import Slot from "@engraft/tool-slot";
+import * as TestKnownOutput from "@engraft/tool-test-known-output";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { useEngraft } from "../lib/index.js";

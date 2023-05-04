@@ -1,10 +1,7 @@
-import { startDrag } from "@engraft/original/lib/util/drag.js";
-import { unusedLabel } from "@engraft/original/lib/util/unusedLabel.js";
-import { useContextMenu } from "@engraft/original/lib/util/useContextMenu.js";
-import { MyContextMenu, MyContextMenuHeading } from "@engraft/original/lib/view/MyContextMenu.js";
-import { ToolOutputView } from "@engraft/original/lib/view/Value.js";
-import { VarDefinition } from "@engraft/original/lib/view/Vars.js";
-import { ComputeReferences, EngraftPromise, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxy, Var, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { startDrag } from "@engraft/shared/lib/drag.js";
+import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
+import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
+import { ComputeReferences, EngraftPromise, MyContextMenu, MyContextMenuHeading, ProgramFactory, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";

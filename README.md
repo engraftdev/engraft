@@ -43,8 +43,11 @@ Code is divided into separate packages located in the `packages` directory. Each
   * [**refunc**](packages/refunc/): Defines Refunc, Engraft's system for incremental computation.
     * [**refunc-react**](packages/refunc-react/): Helpers connecting Refunc with React.
     * [**eslint-plugin-refunc-hooks**](packages/eslint-plugin-refunc-hooks/): [ESLint](https://github.com/eslint/eslint) plugin ensuring proper use of Refunc hooks.
+  * [**core-widgets**](packages/core/): A few visual elements that seem to be central to the Engraft experience, such as displaying values, var tokens, etc. Its long-term identity remains to be seen.
 * *Tool development*
   * [**toolkit**](packages/toolkit/): Your one-stop shop for tool development – should be the only package most tools need to import from `@engraft`.
+* *Host development*
+  * [**hostkit**](packages/toolkit/): Your one-stop shop for host development – should be the only package most hosts need to import from `@engraft`.
 * *Tools*
     * **tool-\***: Each of these packages defines a tool maintained by the Engraft team.
 * *Hosts*
@@ -54,11 +57,12 @@ Code is divided into separate packages located in the `packages` directory. Each
     * [**use-engraft-demo**](packages/use-engraft-demo/) & [**use-engraft-demo-js**](packages/use-engraft-demo-js/): Illustrations of useEngraft embedded into simple React web-application codebases (in TypeScript and JavaScript, respectively).
   * [**testbed**](packages/testbed/): Testbed used in Engraft development.
 * *Utilities*
-  * [**shared**](packages/shared/): An assortment of utilities shared across this codebase.
+  * [**shared**](packages/shared/): An assortment of utilities shared across this codebase. It should not be used outside this monorepo.
   * [**update-proxy**](packages/update-proxy/): A helper that makes it easy to perform immutable updates, used often in tools.
     * [**update-proxy-react**](packages/update-proxy-react/): Helpers connecting update-proxy with React.
+  * [**codemirror-helpers**](packages/codemirror-helpers/): Extensions to CodeMirror, including `FancyCodeEditor` (which powers `slot`, `text`, `python`, etc.).
 * *Provisional*
-  * [**original**](packages/original/): A big mess of things that haven't been properly sorted into packages yet. Needs some work.
+  * [**original-tools**](packages/original/): A bunch of tools that haven't been sorted into packages yet.
   * [**all-the-tools**](packages/all-the-tools/): A hard-coded assembly of all the tools the Engraft team has built, to be bundled into every Engraft host. Not the way things will work long-term.
 
 ### Build system overview

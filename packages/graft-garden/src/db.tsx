@@ -1,6 +1,6 @@
+import { ToolProgram } from "@engraft/hostkit";
 import { initializeApp } from "firebase/app";
-import { collection, CollectionReference, deleteDoc, doc, getDocs, getFirestore, initializeFirestore, setDoc } from "firebase/firestore";
-import { ToolProgram } from "@engraft/core";
+import { collection, CollectionReference, deleteDoc, doc, getDocs, getFirestore, initializeFirestore, setDoc, Timestamp } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBtFUvC-EUgrQeZSiXwzJG3I3TIdqHctCE",
@@ -22,7 +22,7 @@ export const patchesRef = collection(db, "patches") as CollectionReference<Patch
 export type Patch = {
   name: string,
   ownerUid: string,
-  createdAt: Date,
+  createdAt: Timestamp,
   toolProgram: ToolProgram,
   initialStateJSON?: string,
 }
