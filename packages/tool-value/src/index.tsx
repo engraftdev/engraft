@@ -1,5 +1,5 @@
-import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy, Value } from "@engraft/toolkit";
-import { memo, ReactNode, useState, useCallback } from "react";
+import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy } from "@engraft/toolkit";
+import { memo, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
 export type Program = {
@@ -7,9 +7,9 @@ export type Program = {
   subProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = () => ({
+const programFactory: ProgramFactory<Program> = (defaultInputCode) => ({
   toolName: 'value',
-  subProgram: slotWithCode(''),
+  subProgram: slotWithCode(defaultInputCode),
 });
 
 const computeReferences: ComputeReferences<Program> = (program) =>
@@ -58,10 +58,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { 
       frameBarBackdropElem
     ) }
     <div style={{...outputBackgroundStyle}}>
-      <ToolOutputView
-        outputP={subResult.outputP}
-        valueWrapper={myValueWrapper}
-      />
+      <ToolOutputView outputP={subResult.outputP} />
     </div>
     { showTool &&
       <ShowView
@@ -75,21 +72,3 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { 
     }
   </div>
 })
-
-// TODO: we're hacking in support for cute little tables; generalization TBD
-function myValueWrapper(valueNode: ReactNode, value: unknown) {
-  const colSpacing = 10;
-
-  if (value instanceof Array) {
-    if (value.length > 0 && value[0] instanceof Array) {
-      return <table style={{margin: `${colSpacing / 2}px 0`}}>
-        <tbody>
-          {value.map((row, i) => <tr key={i}>
-            {(row as unknown[]).map((cell, j) => <td key={j} style={{padding: `0 ${colSpacing / 2}px`}}><Value value={cell}/></td>)}
-          </tr>)}
-        </tbody>
-      </table>
-    }
-  }
-  return valueNode;
-}

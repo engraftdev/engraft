@@ -149,6 +149,32 @@ const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
     );
   }
 
+  // TODO: and another
+  if (hasProperty(value, 'tuples') && hasProperty(value, 'types')) {
+    if (value.tuples instanceof Array) {
+      if (value.tuples.length > 0 && value.tuples[0] instanceof Array) {
+        const colSpacing = 10;
+
+        return wrapInline(
+          <ValueFrame type="relation">
+            <table style={{margin: `${colSpacing / 2}px 0`}}>
+              <tbody>
+                {value.tuples.map((row, i) => <tr key={i}>
+                  {(row as unknown[]).map((cell, j) =>
+                    <td key={j} style={{padding: `0 ${colSpacing / 2}px`}}>
+                      {/* TODO: we're not using ValueInternal or passing things along here */}
+                      <Value value={cell}/>
+                    </td>
+                  )}
+                </tr>)}
+              </tbody>
+            </table>
+          </ValueFrame>
+        );
+      }
+    }
+  }
+
   if (hasProperty(value, 'constructor') && (value.constructor as Function).name === 'PyProxy') {
     return wrapInline(
       <ValueFrame type='python object'>
