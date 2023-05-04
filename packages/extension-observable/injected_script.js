@@ -71,19 +71,21 @@ window.addEventListener("message", (event) => {
       const params = content[0]
 
       const progAndInputs = "{\"inputs\": {}, \"program\":{}}"
-      console.log(params)
-
 
       if (params.length === 0) {
         // engraft(this)
+        // post-startup, insert our necessary fields
         replaceText(view.editorView, splice(oldString, index, ", " + progAndInputs))
       } else {
         // engraft(this, {inputs: {}, program:{}})
 
-        console.log(params)
+        // params is a JSON (potentially unquoted)
+        // parse into JSON obj to access 'program' field
         const obj = JSON.parse(quoteJSON(params))
-        console.log(obj)
-        console.log(JSON.stringify(obj))
+        // replace program string with new version
+        obj.program = program
+        // dispatch changes
+        replaceText(view.editorView, oldString.slice(0, index) + JSON.stringify(obj) + ")")
       }
     }
   }
