@@ -1,4 +1,5 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, hookRunToolWithNewScopeVarBindings, newVar, ProgramFactory, references, ShowView, ShowViewWithNewScopeVarBindings, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithNewScopeVarBindings, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ErrorView, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
 import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
@@ -7,8 +8,6 @@ import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import { CSSProperties, memo, ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
-import { ErrorView, ToolOutputView } from "@engraft/core-widgets";
-import { VarDefinition } from "@engraft/core-widgets";
 
 
 export type Program = {
@@ -47,7 +46,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
   }), [inputResult]);
 
   // TODO: This block is pretty bad. Worth thinking about a bit.
-  const itemResultsP: EngraftPromise<ToolResultWithNewScopeVarBindings<ToolProgram>[]> =
+  const itemResultsWithScopeP: EngraftPromise<ToolResultWithScope[]> =
     hookMemo(() => {
       const later = hookLater();
       return inputArrayP.then((inputArray) => later(() =>
@@ -61,11 +60,10 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
                   ...varBindings,
                   ...newVarBindings,
                 }), [varBindings, newVarBindings]);
-                const itemResult = hookRunToolWithNewScopeVarBindings(
-                  {program: program.perItemProgram, varBindings: itemVarBindings},
-                  newVarBindings,
+                const result = hookRunTool(
+                  {program: program.perItemProgram, varBindings: itemVarBindings}
                 )
-                return itemResult
+                return { result, newScopeVarBindings: newVarBindings };
               })
             )
           )
@@ -73,20 +71,20 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
       );
     }, [inputArrayP, varBindings, program.itemVar, program.perItemProgram])
 
-  const outputP: EngraftPromise<ToolOutput> = hookMemo(() => itemResultsP.then((itemResults) =>
-    EngraftPromise.all(itemResults.map((itemResult) => itemResult.outputP)).then((itemOutputs) => {
+  const outputP: EngraftPromise<ToolOutput> = hookMemo(() => itemResultsWithScopeP.then((itemResultsWithScope) =>
+    EngraftPromise.all(itemResultsWithScope.map((itemResultWithScope) => itemResultWithScope.result.outputP)).then((itemOutputs) => {
       return {value: itemOutputs.map((itemOutput) => itemOutput.value)};
     })
-  ), [itemResultsP]);
+  ), [itemResultsWithScopeP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (viewProps) =>
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
-        itemResultsP={itemResultsP}
+        itemResultsWithScopeP={itemResultsWithScopeP}
       />,
-  }), [inputResult, itemResultsP, props]);
+  }), [inputResult, itemResultsWithScopeP, props]);
 
   return {outputP, view};
 }));
@@ -96,20 +94,20 @@ const MAX_ITEMS_DISPLAYED = 10;
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,
-  itemResultsP: EngraftPromise<ToolResultWithNewScopeVarBindings<ToolProgram>[]>,
+  itemResultsWithScopeP: EngraftPromise<ToolResultWithScope<ToolProgram>[]>,
 }) => {
-  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, itemResultsP } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, itemResultsWithScopeP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(0 as number | null);
 
-  const itemResultsState = usePromiseState(itemResultsP);
+  const itemResultsWithScopeState = usePromiseState(itemResultsWithScopeP);
 
   let tabs: ReactNode = null;
   let perItem: ReactNode = null;
-  if (itemResultsState.status === 'fulfilled') {
-    const numItems = itemResultsState.value.length;
+  if (itemResultsWithScopeState.status === 'fulfilled') {
+    const numItems = itemResultsWithScopeState.value.length;
     const numTabs = Math.min(numItems, MAX_ITEMS_DISPLAYED);
 
     tabs = <div className="MapTool-indices xRow xAlignVCenter" style={{alignSelf: 'flex-end'}}>
@@ -155,7 +153,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
       }
     </div>;
 
-    const shownIndex = Math.min(hoveredIndex !== null ? hoveredIndex : selectedIndex, itemResultsState.value.length - 1);
+    const shownIndex = Math.min(hoveredIndex !== null ? hoveredIndex : selectedIndex, itemResultsWithScopeState.value.length - 1);
 
     if (shownIndex >= 0) {
       perItem = <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
@@ -167,8 +165,8 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
           </div>
         </div>
         <div>
-          <ShowViewWithNewScopeVarBindings
-            {...itemResultsState.value[shownIndex].viewWithNewScopeVarBinding}
+          <ShowViewWithScope
+            resultWithScope={itemResultsWithScopeState.value[shownIndex]}
             updateProgram={programUP.perItemProgram.$}
           />
         </div>
@@ -185,8 +183,8 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />
       <div className="MapTool-top xRow xGap10 xPad10">
-        {itemResultsState.status === 'rejected' &&
-          <ErrorView error={itemResultsState.reason}/>
+        {itemResultsWithScopeState.status === 'rejected' &&
+          <ErrorView error={itemResultsWithScopeState.reason}/>
         }
         { tabs }
       </div>

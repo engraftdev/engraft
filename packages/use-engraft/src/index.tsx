@@ -1,6 +1,6 @@
 /// <reference types="@types/wicg-file-system-access" />
 
-import { EngraftPromise, RootStyles, ShowViewWithNewScopeVarBindings, ToolOutput, ToolOutputView, ToolProgram, VarBinding, VarBindings, VarDefinition, ViewWithNewScopeVarBindings, randomId, runToolWithNewScopeVarBindings, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
+import { EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, randomId, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
@@ -61,12 +61,15 @@ export function useEngraft(props: UseEngraftProps) {
     program || { savedProgramId: randomId(), program: slotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
-  const {outputP, viewWithNewScopeVarBinding} = useRefunction(
-    runToolWithNewScopeVarBindings,
+  const result = useRefunction(
+    runTool,
     { program: draft.program, varBindings },
-    varBindings
   );
-  const outputState = usePromiseState(outputP);
+  const resultWithScope: ToolResultWithScope = useMemo(
+    () => ({ result, newScopeVarBindings: varBindings }),
+    [result, varBindings],
+  );
+  const outputState = usePromiseState(result.outputP);
 
   const [useDefault, setUseDefault] = useState(!!edit);
 
@@ -81,8 +84,7 @@ export function useEngraft(props: UseEngraftProps) {
             <UseEngraftRHS
               varBindings={varBindings}
               defaultValue={defaultValue}
-              outputP={outputP}
-              viewWithNewScopeVarBindings={viewWithNewScopeVarBinding}
+              resultWithScope={resultWithScope}
               draft={draft}
               updateDraft={updateDraft}
               useDefault={useDefault}
@@ -92,7 +94,7 @@ export function useEngraft(props: UseEngraftProps) {
         />
       }
     </>);
-  }, [defaultValue, varBindings, newRoot, origContainer, useDefault, outputP, edit, draft, viewWithNewScopeVarBinding]);
+  }, [defaultValue, varBindings, newRoot, origContainer, useDefault, edit, draft, resultWithScope]);
 
   if (useDefault || outputState.status !== 'fulfilled') {
     return defaultValue;
@@ -104,8 +106,7 @@ export function useEngraft(props: UseEngraftProps) {
 type UseEngraftRHSProps = {
   varBindings: VarBindings,
   defaultValue: any,
-  outputP: EngraftPromise<ToolOutput>,
-  viewWithNewScopeVarBindings: ViewWithNewScopeVarBindings<ToolProgram>,
+  resultWithScope: ToolResultWithScope<ToolProgram>,
   draft: SavedProgram,
   updateDraft: (f: (old: SavedProgram) => SavedProgram) => void,
   useDefault: boolean,
@@ -115,7 +116,7 @@ type UseEngraftRHSProps = {
 // TODO: TODO: TODO: put the program's ID outside of the program itself, so slots don't break it
 
 const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
-  const { varBindings, defaultValue, viewWithNewScopeVarBindings, outputP, draft, updateDraft, useDefault, setUseDefault } = props;
+  const { varBindings, defaultValue, resultWithScope, draft, updateDraft, useDefault, setUseDefault } = props;
   const draftUP = useUpdateProxy(updateDraft);
 
   const id = draft.savedProgramId!;
@@ -238,13 +239,16 @@ const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
 
         <div className="card" style={{flexShrink: 0}}>
           <h2>Program</h2>
-          <ShowViewWithNewScopeVarBindings {...viewWithNewScopeVarBindings} updateProgram={draftUP.program.$}/>
+          <ShowViewWithScope
+            resultWithScope={resultWithScope}
+            updateProgram={draftUP.program.$}
+          />
         </div>
 
         <div className="card" style={{minHeight: 0}}>
           <h2>Output</h2>
           {/* <ValueFrame outerStyle={{ flexGrow: 1, minHeight: 0, display: 'flex', alignSelf: 'stretch' }} innerStyle={{ flexGrow: 1 }}> */}
-            <ToolOutputView outputP={outputP} />
+            <ToolOutputView outputP={resultWithScope.result.outputP} />
           {/* </ValueFrame> */}
           { defaultValue !== undefined &&
             <label className="xRow xGap10 xAlignVCenter" style={{marginTop: 20}}>

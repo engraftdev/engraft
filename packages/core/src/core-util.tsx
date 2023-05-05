@@ -1,7 +1,6 @@
 import { ReactNode, memo, useContext, useMemo } from 'react';
-import { Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewContext, ToolViewRenderProps, VarBindings } from './core.js';
-import { hookMemo, hooks } from '@engraft/refunc';
-import { hookRunTool } from './runTool.js';
+import { ShowView } from './ShowView.js';
+import { Tool, ToolProgram, ToolResult, ToolViewContext, ToolViewRenderProps, VarBindings } from './core.js';
 
 export type ProgramOf<T> = T extends Tool<infer P> ? P : never;
 // alt: Parameters<T['run']>[1]['program'];
@@ -25,45 +24,20 @@ export const AddScopeVarBindings = memo((props: {
   </ToolViewContext.Provider>
 })
 
-export type ViewWithNewScopeVarBindings<P extends ToolProgram> = {
-  view: ToolView<P>,
-  newScopeVarBindings: VarBindings
-};
-
-export type ToolResultWithNewScopeVarBindings<P extends ToolProgram = ToolProgram> =
-  Omit<ToolResult<P>, 'view'> & { viewWithNewScopeVarBinding: ViewWithNewScopeVarBindings<P> };
-
-export function hookAttachNewScopeVarBindings<P extends ToolProgram>(
+export type ToolResultWithScope<P extends ToolProgram = ToolProgram> = {
   result: ToolResult<P>,
   newScopeVarBindings: VarBindings,
-): ToolResultWithNewScopeVarBindings<P> {
-  return hookMemo(() => ({
-    ...result,
-    view: undefined,
-    viewWithNewScopeVarBinding: {
-      view: result.view,
-      newScopeVarBindings,
-    }
-  }), [result, newScopeVarBindings]);
 }
 
-export function hookRunToolWithNewScopeVarBindings<P extends ToolProgram>(
-  props: ToolProps<P>,
-  newScopeVarBindings: VarBindings,
-): ToolResultWithNewScopeVarBindings<P> {
-  const result = hookRunTool(props);
-  return hookAttachNewScopeVarBindings(result, newScopeVarBindings);
-}
+export type ShowViewWithScopeProps<P extends ToolProgram> = Omit<ToolViewRenderProps<P>, 'view'> & {
+  resultWithScope: ToolResultWithScope<P>,
+};
 
-export const runToolWithNewScopeVarBindings = hooks(hookRunToolWithNewScopeVarBindings);
-
-export type ShowViewWithNewScopeVarBindingsProps<P extends ToolProgram> = ToolViewRenderProps<P> & ViewWithNewScopeVarBindings<P>;
-
-const ShowViewWithNewScopeVarBindingsNoMemo = function ShowView<P extends ToolProgram>(props: ShowViewWithNewScopeVarBindingsProps<P>) {
-  const {view, newScopeVarBindings, ...rest} = props;
-  return <AddScopeVarBindings newScopeVarBindings={newScopeVarBindings}>
-    {view.render(rest)}
+const ShowViewWithScopeNoMemo = function <P extends ToolProgram>(props: ShowViewWithScopeProps<P>) {
+  const {resultWithScope, ...rest} = props;
+  return <AddScopeVarBindings newScopeVarBindings={resultWithScope.newScopeVarBindings}>
+    <ShowView {...rest} view={resultWithScope.result.view} />
   </AddScopeVarBindings>;
 };
 
-export const ShowViewWithNewScopeVarBindings = memo(ShowViewWithNewScopeVarBindingsNoMemo) as typeof ShowViewWithNewScopeVarBindingsNoMemo;
+export const ShowViewWithScope = memo(ShowViewWithScopeNoMemo) as typeof ShowViewWithScopeNoMemo;

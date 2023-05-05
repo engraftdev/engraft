@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/core-widgets";
-import { ComputeReferences, defineTool, EngraftPromise, hookRefunction, hookLater, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, runTool, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, useRefunction, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, ProgramFactory, SetOps, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, references, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -53,11 +53,11 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         const closure = closureOutput.value as GadgetClosure;
         const { def, closureVarBindings } = closure;
 
-        const outputResults = hookRefunction(
+        const outputResultEtc = hookRefunction(
           runOutputProgram,
           def, closureVarBindings, gadgetProgram
         );
-        return outputResults.outputP;
+        return outputResultEtc.result.outputP;
       }));
     }, [closureResults.outputP, gadgetProgramP]);
 
@@ -111,11 +111,11 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
     }
   }, [gadgetProgram, gadgetProgramUP, program.gadgetProgram]);
 
-  const viewResults = useRefunction(runViewProgram,
+  const viewResultEtc = useRefunction(runViewProgram,
     closure.def, closure.closureVarBindings, gadgetProgram, gadgetProgramUP
   );
 
-  return <ToolOutputView outputP={viewResults.outputP} displayReactElementsDirectly={true} />;
+  return <ToolOutputView outputP={viewResultEtc.result.outputP} displayReactElementsDirectly={true} />;
 });
 
 export const GadgetUser = defineTool({ programFactory, computeReferences, run });

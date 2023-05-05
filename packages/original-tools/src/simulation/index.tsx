@@ -1,4 +1,5 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, hookRunToolWithNewScopeVarBindings, newVar, ProgramFactory, references, runTool, ShowView, ShowViewWithNewScopeVarBindings, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
 import { isObject } from "@engraft/shared/lib/isObject.js";
@@ -7,7 +8,6 @@ import { Updater } from "@engraft/shared/lib/Updater.js";
 import { outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxy, useStateUP, useUpdateProxy } from "@engraft/update-proxy-react";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ToolOutputView } from "@engraft/core-widgets";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
 
@@ -43,14 +43,14 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const initResult = hookRunTool({ program: program.initProgram, varBindings });
 
-  const onTickResults = hookRefunction(runSimulation, {
+  const onTickResultsWithScope = hookRefunction(runSimulation, {
     program, varBindings, initOutputP: initResult.outputP, ticksCount: program.ticksCount
   });
 
   const allTickOutputsP = hookMemo(() => EngraftPromise.all([
     initResult.outputP,
-    ...onTickResults.map(onTickResult => onTickResult.outputP)
-  ]), [initResult.outputP, onTickResults]);
+    ...onTickResultsWithScope.map(onTickResultWithScope => onTickResultWithScope.result.outputP)
+  ]), [initResult.outputP, onTickResultsWithScope]);
 
   const outputP = hookMemo(() => allTickOutputsP.then((tickOutputs) => {
     return {value: tickOutputs.map((tickOutput, tick) => {
@@ -68,9 +68,9 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
       {...props}
       {...renderProps}
       initResult={initResult}
-      onTickResults={onTickResults}
+      onTickResultsWithScope={onTickResultsWithScope}
     />
-  }), [props, initResult, onTickResults]);
+  }), [props, initResult, onTickResultsWithScope]);
 
   return { outputP, view };
 }));
@@ -89,7 +89,7 @@ const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
     // Even if the tick function is async, we can synchronously construct the computation graph.
     // Hence, no need for hookForkLater here.
 
-    const onTickResults: ToolResultWithNewScopeVarBindings[] = [];
+    const onTickResultsWithScope: ToolResultWithScope[] = [];
     let lastOutputP = initOutputP;
     for (let i = 0; i < ticksCount; i++) {
       // TODO: memoize?
@@ -100,16 +100,14 @@ const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
         ...varBindings,
         ...newVarBindings,
       };
-      const onTickResult = branch(`${i}`, () => {
-        return hookRunToolWithNewScopeVarBindings(
-          { program: program.onTickProgram, varBindings: varBindingsWithState },
-          newVarBindings,
-        );
+      const onTickResultWithScope = branch(`${i}`, () => {
+        const result = hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState });
+        return { result, newScopeVarBindings: newVarBindings };
       });
-      onTickResults.push(onTickResult);
-      lastOutputP = onTickResult.outputP;
+      onTickResultsWithScope.push(onTickResultWithScope);
+      lastOutputP = onTickResultWithScope.result.outputP;
     }
-    return onTickResults;
+    return onTickResultsWithScope;
   });
 }))
 
@@ -146,11 +144,11 @@ const runSimulationOnDraft = memoizeProps(hooks((props: {
 
 type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   initResult: ToolResult,
-  onTickResults: ToolResultWithNewScopeVarBindings[],
+  onTickResultsWithScope: ToolResultWithScope[],
 }
 
 const View = memo((props: ViewProps) => {
-  const { program, updateProgram, varBindings, initResult, onTickResults } = props;
+  const { program, updateProgram, varBindings, initResult, onTickResultsWithScope } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [draft, draftUP] = useStateUP<Draft | undefined>(() => undefined);
@@ -185,17 +183,17 @@ const View = memo((props: ViewProps) => {
         initTick: draft.initTick,
         initView: undefined,
         initOutputP: draft.initOutputP,
-        onTickResults: onTickResultsDraft!,
+        onTickResultsWithScope: onTickResultsDraft!,
       };
     } else {
       return {
         initTick: 0,
         initView: initResult.view,
         initOutputP: initResult.outputP,
-        onTickResults,
+        onTickResultsWithScope,
       };
     }
-  }, [draft, initResult, onTickResults, onTickResultsDraft]);
+  }, [draft, initResult.outputP, initResult.view, onTickResultsDraft, onTickResultsWithScope]);
 
   // TODO: Interesting pattern – viewProgram is only being used in the view, not in the output, so
   // the program is run BY the view. Hmm!
@@ -203,7 +201,7 @@ const View = memo((props: ViewProps) => {
     if (selection.type === 'init') {
       return activeTimeline.initOutputP;
     } else {
-      return activeTimeline.onTickResults[selection.tick - activeTimeline.initTick].outputP;
+      return activeTimeline.onTickResultsWithScope[selection.tick - activeTimeline.initTick].result.outputP;
     }
   }, [activeTimeline, selection]);
   const toDrawVarBindings = useMemo(() => ({
@@ -234,9 +232,12 @@ const View = memo((props: ViewProps) => {
               initProgramUP={programUP.initProgram}
             />
           : <OnTickEditor
-              onTickResult={activeTimeline.onTickResults[selection.tick - activeTimeline.initTick]}
+              onTickResultWithScope={activeTimeline.onTickResultsWithScope[selection.tick - activeTimeline.initTick]}
               onTickProgramUP={programUP.onTickProgram}
-              incomingOutputP={selection.tick - activeTimeline.initTick === 0 ? activeTimeline.initOutputP : activeTimeline.onTickResults[selection.tick - activeTimeline.initTick - 1].outputP}
+              incomingOutputP={
+                selection.tick - activeTimeline.initTick === 0
+                ? activeTimeline.initOutputP
+                : activeTimeline.onTickResultsWithScope[selection.tick - activeTimeline.initTick - 1].result.outputP}
               draft={draft}
               draftUP={draftUP}
               tick={selection.tick}
@@ -284,14 +285,14 @@ export const InitEditor = memo((props: {
 })
 
 export const OnTickEditor = memo((props: {
-  onTickResult: ToolResultWithNewScopeVarBindings,
+  onTickResultWithScope: ToolResultWithScope,
   onTickProgramUP: UpdateProxy<ToolProgram>,
   incomingOutputP: EngraftPromise<ToolOutput>,
   draft: Draft | undefined,
   draftUP: UpdateProxy<Draft | undefined>,
   tick: number,
 }) => {
-  const { onTickResult, onTickProgramUP, incomingOutputP, draft, draftUP, tick } = props;
+  const { onTickResultWithScope, onTickProgramUP, incomingOutputP, draft, draftUP, tick } = props;
 
   const updateProgram: Updater<ToolProgram> = useCallback((f) => {
     if (tick !== 0 && tick !== draft?.initTick) {
@@ -314,16 +315,16 @@ export const OnTickEditor = memo((props: {
         </div>
         <ToolOutputView outputP={incomingOutputP} />
       </div>
-      <ShowViewWithNewScopeVarBindings
-        {...onTickResult.viewWithNewScopeVarBinding}
+      <ShowViewWithScope
+        resultWithScope={onTickResultWithScope}
         updateProgram={updateProgram}
       />
-      {!onTickResult.viewWithNewScopeVarBinding.view.showsOwnOutput &&
+      {!onTickResultWithScope.result.view.showsOwnOutput &&
         <div className='xPad10 xRelative' style={{...outputBackgroundStyle}}>
           <div style={{ position: 'absolute', top: 0, right: 0, padding: 5, opacity: 0.5 }}>
             outgoing state
           </div>
-          <ToolOutputView outputP={onTickResult.outputP} />
+          <ToolOutputView outputP={onTickResultWithScope.result.outputP} />
         </div>
       }
     </div>

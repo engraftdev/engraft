@@ -1,7 +1,7 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { ComputeReferences, EngraftPromise, MyContextMenu, MyContextMenuHeading, ProgramFactory, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, MyContextMenu, MyContextMenuHeading, ProgramFactory, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -53,21 +53,21 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { cells } = program;
 
-  const cellResults = hookRefunction(cellNetwork, { cells, varBindings });
+  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
-    const lastCellResult = lastCell && cellResults[lastCell.var_.id];
+    const lastCellResult = lastCell && cellResultsWithScope[lastCell.var_.id];
     if (!lastCellResult) {
       throw new Error("no cells");
     }
-    return lastCellResult.outputP;
-  }), [cellResults, cells]);
+    return lastCellResult.result.outputP;
+  }), [cellResultsWithScope, cells]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
+    render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResultsWithScope} />,
     showsOwnOutput: cells.length > 0,
-  }), [cells.length, props, cellResults]);
+  }), [cells.length, props, cellResultsWithScope]);
 
   return { outputP, view };
 }));
@@ -75,7 +75,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 export default defineTool({ programFactory, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
-  cellResults: {[id: string]: ToolResultWithNewScopeVarBindings},
+  cellResults: {[id: string]: ToolResultWithScope},
 }) => {
   const { program, updateProgram, cellResults, frameBarBackdropElem } = props;
   const programUP = useUpdateProxy(updateProgram);
@@ -144,7 +144,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
               idx={i}
               cell={cell}
               cellsUP={programUP.cells}
-              cellResult={cellResults[cell.var_.id]}
+              cellResultWithScope={cellResults[cell.var_.id]}
               onMouseDownDragPane={onMouseDownDragPane}
             />,
           transparent: cell.showOutputOnly,
@@ -173,13 +173,13 @@ type CellViewProps = {
   cell: Cell;
   cellsUP: UpdateProxy<Cell[]>,
 
-  cellResult: ToolResultWithNewScopeVarBindings,
+  cellResultWithScope: ToolResultWithScope,
 
   onMouseDownDragPane: (startEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {idx, cell, cellsUP, cellResult, onMouseDownDragPane} = props;
+  const {idx, cell, cellsUP, cellResultWithScope, onMouseDownDragPane} = props;
   const cellUP = cellsUP[idx];
 
   const removeCell = useCallback(() => {
@@ -228,7 +228,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
   if (cell.showOutputOnly) {
     return <div className="NotebookCanvasTool-CellView xCol" onContextMenu={openMenu} onMouseDown={onMouseDownDragPane} style={{height: '100%'}}>
       {menuNode}
-      <ToolOutputView outputP={cellResult.outputP} displayReactElementsDirectly={true}/>
+      <ToolOutputView outputP={cellResultWithScope.result.outputP} displayReactElementsDirectly={true}/>
     </div>;
   }
 
@@ -269,11 +269,15 @@ const CellView = memo(function CellView(props: CellViewProps) {
     </div>
 
     <div className="NotebookCanvasTool-CellView-tool xCol" style={{background: 'rgb(251, 251, 251)', minHeight: 0, overflowY: 'auto'}}>
-      <ShowView {...cellResult.viewWithNewScopeVarBinding} updateProgram={cellUP.program.$} expand={true}/>
+      <ShowViewWithScope
+        resultWithScope={cellResultWithScope}
+        updateProgram={cellUP.program.$}
+        expand={true}
+      />
     </div>
-    { !cellResult.viewWithNewScopeVarBinding.view.showsOwnOutput &&
+    { !cellResultWithScope.result.view.showsOwnOutput &&
       <div className="NotebookCanvasTool-CellView-output" style={{padding: 5, overflow: 'scroll', minHeight: 6, flexShrink: 1000000}}>
-        <ToolOutputView outputP={cellResult.outputP}/>
+        <ToolOutputView outputP={cellResultWithScope.result.outputP}/>
       </div>
     }
   </div>
