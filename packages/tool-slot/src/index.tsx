@@ -203,7 +203,7 @@ const runCodeMode = (props: CodeModeProps) => {
       let logs: {lineNum: number, text: string}[] = [];
 
       // Reset the global logger to user our versions of `lineNum` and `logs`.
-      (window as any).__log = (...vals: any[]) => {
+      (globalThis as any).__log = (...vals: any[]) => {
         const text = vals.map((v) => objectInspect(v)).join(", ");
         logs.push({lineNum, text});
         return vals[vals.length - 1];
@@ -213,7 +213,7 @@ const runCodeMode = (props: CodeModeProps) => {
         lineNum = newLineNum;
       };
       const log = (...vals: any[]) => {
-        (window as any).__log(...vals);
+        (globalThis as any).__log(...vals);
       };
       const rand = makeRand();
       const scope = {
