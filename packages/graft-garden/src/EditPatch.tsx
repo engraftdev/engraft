@@ -23,7 +23,9 @@ const myCss = `
     max-width: 100%;
   }
 }
-`
+`;
+
+const LinkMemo = memo(Link);
 
 export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
   const { safeMode = false } = props;
@@ -52,7 +54,7 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
     <div className="container mt-5">
       <div className="col-lg-6 mx-auto mb-3">
         <div className="d-flex flex-row-reverse align-items-center justify-content-between">
-          <Link to="/" className="btn btn-outline-secondary btn-sm">back</Link>
+          <LinkMemo to="/" className="btn btn-outline-secondary btn-sm">back</LinkMemo>
           <h3 className="text-secondary">graft garden</h3>
         </div>
       </div>
@@ -112,15 +114,15 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
           value={patch!.name} onChange={(e) => patchUP.name.$set(e.target.value)}
           placeholder="patch name"
           ref={nameInputRef}/>
-        <Link to='../view' className="btn btn-outline-primary btn-lg">view</Link>
+        <LinkMemo to='../view' className="btn btn-outline-primary btn-lg">view</LinkMemo>
         <button className="btn btn-lg btn-outline-primary dropdown-toggle" type="button" id="dotdotdot-dropdown-button" data-bs-toggle="dropdown" aria-expanded="false">
         ⋯
         </button>
         <ul className="dropdown-menu" aria-labelledby="dotdotdot-dropdown-button">
-          <li><Link to='../tinker' className="dropdown-item">tinker mode</Link></li>
+          <li><LinkMemo to='../tinker' className="dropdown-item">tinker mode</LinkMemo></li>
           { safeMode
-            ? <li><Link to='../edit' className="dropdown-item">exciting mode</Link></li>
-            : <li><Link to='../edit/safe' className="dropdown-item">safe mode</Link></li>
+            ? <li><LinkMemo to='../edit' className="dropdown-item">exciting mode</LinkMemo></li>
+            : <li><LinkMemo to='../edit/safe' className="dropdown-item">safe mode</LinkMemo></li>
           }
           <li><hr className="dropdown-divider" /></li>
           <li><button className="dropdown-item" style={{color: '#dc3545'}} onClick={onClickDelete}>delete page</button></li>
@@ -146,7 +148,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
         { safeMode
           ? <div>
               <div className="alert alert-warning" role="alert">
-                This is safe mode. Edit the program below, then <Link to={`../edit`}>turn off safe mode</Link>.
+                This is safe mode. Edit the program below, then <LinkMemo to={`../edit`}>turn off safe mode</LinkMemo>.
               </div>
               <IsolateStyles>
                 <ValueEditable value={program} updater={patchUP.toolProgram.$} expandedDepth={Infinity}/>
