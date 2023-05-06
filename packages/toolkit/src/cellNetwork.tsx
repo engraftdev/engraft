@@ -98,17 +98,17 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
         }
         cellVarBindings = hookDedupe(cellVarBindings, objEqWithRefEq);
 
-        const { outputP, view } = hookRunTool({
+        cellResults[cellId] = hookRunTool({
           program: cell.program,
           varBindings: cellVarBindings,
         });
-
-        cellResults[cellId] = { outputP, view };
       }));
     });
 
-    // Now we have results for all the cells, so we can attach bindings to the views.
+    // Now we have results for all the cells, so we can attach newScopeVarBindings.
     // (Order doesn't matter here)
+
+    // TODO: all the memoization below may be pointless
 
     const allVarBindings = hookMemo(() =>
       Object.fromEntries(cells.map((cell) => [cell.var_.id, {
