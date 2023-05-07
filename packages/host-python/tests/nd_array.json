@@ -1,0 +1,23 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDsink087783",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDinput000000",
+          "defaultCode": "IDinput000000",
+          "subPrograms": {}
+        }
+      }
+    ],
+    "prevVarId": "IDfalcon969827"
+  }
+}
