@@ -15,26 +15,30 @@ registerAllTheTools();
 type ObservableEmbedProps = {
   reportOutputState?: (outputState: PromiseState<ToolOutput>) => void,
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
-  inputs: {[name: string]: any} | undefined,
-  programString: ToolProgram,
+  parameters?: {
+    inputs: {[name: string]: any} | undefined,
+    programString: ToolProgram,
+    ext: boolean
+    hide?: boolean
+  }
   order: number,
 }
 
 export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEmbedProps) {
-  const {inputs = {}, reportOutputState, reportOutputP, programString, order} = props;
+  const {parameters, reportOutputState, reportOutputP, order} = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
     let varBindings: {[id: string]: VarBinding} = {};
-    Object.entries(inputs || {}).forEach(([name, value]) => {
+    Object.entries(parameters?.inputs || {}).forEach(([name, value]) => {
       const id = `ID${name}000000`;
       varBindings[id] = {var_: {id, label: name}, outputP: EngraftPromise.resolve({value: value})};
     });
     return varBindings;
-  }, [inputs]);
+  }, [parameters?.inputs]);
 
   const [program, updateProgram] = useState<ToolProgram>(
-      programString || slotWithCode(defaultCodeFromInputs(inputs))
+      parameters?.programString || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
 
@@ -46,17 +50,17 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
-  }, [program])
+  }, [order, program])
 
   // manual program string change -> local program changes -> Engraft GUI changes
   useEffect(() => {
     try {
       // definitely needs debouncing
-      programString && updateProgram(programString)
+      parameters?.programString && updateProgram(parameters?.programString)
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
-  }, [programString])
+  }, [parameters?.programString])
 
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
@@ -81,7 +85,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
               return <ObservableInspector value={value}/>;
             }}
         />
-        { !inputs.hide &&
+        { !parameters?.hide &&
             <div style={{marginTop: 10}}>
               <IsolateStyles>
                 <ToolWithView
