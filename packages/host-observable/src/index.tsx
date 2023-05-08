@@ -12,15 +12,17 @@ export { React };
 
 registerAllTheTools();
 
+type ObservableParameters = {
+  inputs: {[name: string]: any} | undefined,
+  programString: ToolProgram,
+  ext: boolean
+  hide?: boolean
+}
+
 type ObservableEmbedProps = {
   reportOutputState?: (outputState: PromiseState<ToolOutput>) => void,
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
-  parameters?: {
-    inputs: {[name: string]: any} | undefined,
-    programString: ToolProgram,
-    ext: boolean
-    hide?: boolean
-  }
+  parameters?: ObservableParameters,
   order: number,
 }
 
