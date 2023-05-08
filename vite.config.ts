@@ -26,9 +26,6 @@ export default defineConfig(() => {
     define: {
       'process.env.BABEL_TYPES_8_BREAKING': false,
     },
-    // build: {
-    //   minify: false,
-    // },
     test: {
       passWithNoTests: true,
       css: true,
@@ -47,6 +44,14 @@ export default defineConfig(() => {
     build: {
       // enables @rollup/plugin-commonjs (for @engraft/vendor-voyager)
       commonjsOptions: { },
+      // exclude pyodide NPM module from front-end bundles
+      // TODO: might be solvable with the right env variables & dead-code elimination instead
+      // TODO: what about build systems used by Engraft clients?
+      rollupOptions: {
+        external: [
+          'pyodide/pyodide.js',
+        ],
+      },
     },
   };
 });
