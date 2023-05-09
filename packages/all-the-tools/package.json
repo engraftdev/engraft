@@ -20,6 +20,7 @@
     "@engraft/tool-example-datasets": "^0.0.1",
     "@engraft/tool-gadget": "^0.0.1",
     "@engraft/tool-hider": "^0.0.1",
+    "@engraft/tool-markdown": "^0.0.1",
     "@engraft/tool-notebook": "^0.0.1",
     "@engraft/tool-notebook-canvas": "^0.0.1",
     "@engraft/tool-python": "^0.0.1",
