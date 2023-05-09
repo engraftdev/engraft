@@ -1,7 +1,7 @@
 import { VarBinding } from "@engraft/hostkit";
-import { loadPyodide } from 'pyodide';
+import type { PyodideInterface } from "pyodide/pyodide.js";
 
-let _pyodide: any = undefined;
+let _pyodide: PyodideInterface | undefined = undefined;
 
 export function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
@@ -9,42 +9,55 @@ export function varBindingsObject(varBindings: VarBinding[]) {
 
 async function getPyodide() {
   if (_pyodide === undefined) {
-    _pyodide = await loadPyodide();
+    const pyodideModule = await import("pyodide/pyodide.js")
+    _pyodide = await pyodideModule.loadPyodide() as PyodideInterface;
     await _pyodide.loadPackage("numpy");
   }
   return _pyodide;
 }
 
-function customReviver(key : string, value: any) {
-  if (typeof value === 'object' && value !== null && '__type' in value) {
-    switch (value.__type) {
-      case 'nd-array':
-        (async () => {
-          let code = value.__value;
-          const pyodide = await getPyodide();
-          const result = await pyodide.runPythonAsync(
-            code,
-          );
-          return result;
-        })();
-        break;
-      default:
-        // in case we run into other custom types
-        return value.__value;
+async function traverseObject(obj : any) {
+  const keys = Object.keys(obj);
+  console.error("keys", keys)
+  let prevType = "";
+  for (const key of keys) {
+    if (key === '__type') {
+      if (obj[key] === 'nd-array') {
+        prevType = 'nd-array'
+      } else {
+        prevType = 'other'
+      }
+    }
+    else if (key === '__value') {
+      let val = obj[key];
+      if (prevType === "nd-array") {
+        console.error("Val", val);
+        const pyodide = await getPyodide();
+        console.log('customReviver: pyodide:', pyodide, 'code:', val);
+        const result = await pyodide.runPythonAsync('np.array(' + JSON.stringify(val) + ')');
+        console.log('customReviver: result:', result);
+        obj[key] = result;
+      }
     }
   }
-  return value;
+  return obj;
 }
 
-export function valueFromStdin(input: string) {
-  // try to JSON parse it
+export async function valueFromStdin(input : string) {
+  console.log('valueFromStdin called with input:', input);
+
   try {
-    return JSON.parse(input, customReviver);
-  } catch (e) { }
-
-  // otherwise, trim off whitespace and return it as lines
-  return input.trim().split("\n");
+    const parsed = JSON.parse(input);
+    console.log('valueFromStdin: input is JSON, parsed:', parsed);
+    const revived = await traverseObject(parsed);
+    console.log('valueFromStdin: revived:', revived);
+    return revived;
+  } catch (e) {
+    console.error('valueFromStdin: JSON.parse failed:', e);
+    return input.trim().split("\n");
+  }
 }
+
 
 export function valueToStdout(value: any, jsonOnly=false) {
   if (!jsonOnly) {
