@@ -403,7 +403,7 @@ type ToolModeViewProps = ToolModeProps & ToolViewRenderProps<Program> & {
 };
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView, onBlur} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const updateSubProgram = programUP.subProgram.$;
@@ -429,7 +429,13 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
       setFrameBarBackdropElem={setFrameBarBackdropElem}
       onClose={onCloseFrame}
     >
-      <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} frameBarBackdropElem={frameBarBackdropElem}/>
+      <ShowView
+        view={subView}
+        updateProgram={updateSubProgram}
+        autoFocus={autoFocus}
+        frameBarBackdropElem={frameBarBackdropElem}
+        onBlur={onBlur}
+      />
     </ToolFrame>;
   }
 });

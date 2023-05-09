@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/tool-python",
+  "name": "@engraft/tool-markdown",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "Engraft tool for Python code (via Pyodide)",
+  "description": "Engraft tool for Markdown (MDX, actually)",
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
@@ -13,10 +13,10 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@codemirror/lang-python": "^6.1.2",
+    "@codemirror/lang-markdown": "^6.1.1",
     "@engraft/codemirror-helpers": "^0.0.1",
     "@engraft/toolkit": "^0.0.1",
-    "pyodide": "^0.23.2"
+    "@mdx-js/mdx": "^2.3.0"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
