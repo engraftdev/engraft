@@ -1,0 +1,22 @@
+{
+  "name": "extension-observable-wp",
+  "version": "1.0.0",
+  "main": "src/content_script.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "babel-loader": "^9.1.2",
+    "copy-webpack-plugin": "^11.0.0",
+    "webpack": "^5.82.0",
+    "webpack-cli": "^5.1.1"
+  },
+  "dependencies": {
+    "esprima": "^4.0.1"
+  }
+}
