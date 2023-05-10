@@ -1,5 +1,5 @@
 import { VarBinding } from "@engraft/hostkit";
-import type { PyodideInterface } from "pyodide/pyodide.js";
+import { PyodideInterface } from "pyodide/pyodide.js";
 
 let _pyodide: PyodideInterface | undefined = undefined;
 
@@ -9,17 +9,32 @@ export function varBindingsObject(varBindings: VarBinding[]) {
 
 async function getPyodide() {
   if (_pyodide === undefined) {
-    const pyodideModule = await import("pyodide/pyodide.js")
+    const isNode = (globalThis as any)?.process?.release?.name === 'node';
+    const pyodideModule = isNode
+      ? await import("pyodide/pyodide.js")
+      // @ts-ignore
+      : await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
     _pyodide = await pyodideModule.loadPyodide() as PyodideInterface;
     await _pyodide.loadPackage("numpy");
   }
   return _pyodide;
 }
 
-async function traverseObject(obj : any) {
+
+async function runPython(code: string) {
+  const pyodide = await getPyodide();
+  await pyodide.loadPackagesFromImports(code);
+  const result = await pyodide.runPythonAsync(
+    code,
+  );
+  // if (result?.toJs) return result.toJs();
+  return result;
+}
+
+async function reviveIn(obj : any) {
   const keys = Object.keys(obj);
-  console.error("keys", keys)
   let prevType = "";
+  let ret = [];
   for (const key of keys) {
     if (key === '__type') {
       if (obj[key] === 'nd-array') {
@@ -31,33 +46,30 @@ async function traverseObject(obj : any) {
     else if (key === '__value') {
       let val = obj[key];
       if (prevType === "nd-array") {
-        console.error("Val", val);
         const pyodide = await getPyodide();
-        console.log('customReviver: pyodide:', pyodide, 'code:', val);
+        const _ = await pyodide.runPythonAsync('import numpy as np');
         const result = await pyodide.runPythonAsync('np.array(' + JSON.stringify(val) + ')');
-        console.log('customReviver: result:', result);
-        obj[key] = result;
+        ret.push(result);
       }
+    } else {
+      ret.push(obj[key]);
     }
   }
-  return obj;
+  if (ret.length === 1) {
+    return ret[0];
+  }
+  return ret;
 }
 
 export async function valueFromStdin(input : string) {
-  console.log('valueFromStdin called with input:', input);
-
   try {
     const parsed = JSON.parse(input);
-    console.log('valueFromStdin: input is JSON, parsed:', parsed);
-    const revived = await traverseObject(parsed);
-    console.log('valueFromStdin: revived:', revived);
+    const revived = await reviveIn(parsed);
     return revived;
   } catch (e) {
-    console.error('valueFromStdin: JSON.parse failed:', e);
     return input.trim().split("\n");
   }
 }
-
 
 export function valueToStdout(value: any, jsonOnly=false) {
   if (!jsonOnly) {

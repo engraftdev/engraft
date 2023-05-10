@@ -1,5 +1,5 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState } from "@engraft/hostkit";
+import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState, slotWithProgram, lookUpToolByName } from "@engraft/hostkit";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
@@ -34,8 +34,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   useEffect(() => {
     if (program === null) {
       (async () => {
-        const resp = await fetch('/api/program');
-        const program = await resp.json();
+        const program = slotWithProgram(lookUpToolByName('notebook').programFactory('IDinput000000'));
         updateProgram(program);
       })();
     }
