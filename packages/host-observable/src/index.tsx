@@ -75,7 +75,19 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
   }, [reportOutputP]);
 
   return (
+
       <div>
+        <div style={{backgroundColor:'lightgray'}}>
+          {
+            (parameters?.ext) ?
+                <div>Extension Active</div>
+                :
+                <div>No Extension</div>
+          }
+          <div style={{backgroundColor:'lightpink'}}>
+            {JSON.stringify(parameters)}
+          </div>
+        </div>
         <ToolOutputBuffer
             outputP={outputP}
             renderValue={(value) => {
