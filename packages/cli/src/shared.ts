@@ -20,17 +20,6 @@ async function getPyodide() {
   return _pyodide;
 }
 
-
-async function runPython(code: string) {
-  const pyodide = await getPyodide();
-  await pyodide.loadPackagesFromImports(code);
-  const result = await pyodide.runPythonAsync(
-    code,
-  );
-  // if (result?.toJs) return result.toJs();
-  return result;
-}
-
 async function reviveIn(obj : any) {
   const keys = Object.keys(obj);
   let prevType = "";
@@ -72,6 +61,11 @@ export async function valueFromStdin(input : string) {
 }
 
 export function valueToStdout(value: any, jsonOnly=false) {
+  //iterate through value, printing the type of each element
+  for (const element of value) {
+    console.log(typeof element);
+  }
+
   if (!jsonOnly) {
     // return it raw if it's a string
     if (typeof value === 'string') {
@@ -93,3 +87,7 @@ export function valueToStdout(value: any, jsonOnly=false) {
   // otherwise, return it as JSON
   return JSON.stringify(value, null, 2);
 }
+
+// todos
+// write backward pass of reviver (need to figure out how to detect from outputs of engraft)
+// fix pyproxy stuff
