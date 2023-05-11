@@ -1,5 +1,5 @@
 {
-  "name": "Observable Writer Webpack",
+  "name": "Observable Writer [Webpack]",
   "description": "Write to Observable cells from their output",
   "version": "1.0",
   "manifest_version": 3,
