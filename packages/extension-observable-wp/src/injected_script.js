@@ -1,11 +1,12 @@
 /* eslint-disable */
 const esprima = require('esprima');
-
+const estraverse = require('estraverse')
+const escodegen = require('escodegen')
 
 console.log("Observable Writer: injected_script.js running")
 
-function replaceText (editorView, text) {
-  editorView.dispatch({changes: { from: 0, to: editorView.state.doc.length, insert: text}});
+function replaceText (editorView, text, index = 0) {
+  editorView.dispatch({changes: { from: index, to: editorView.state.doc.length, insert: text}});
 }
 
 function getCell(i) {
@@ -24,18 +25,139 @@ function getText(view) {
   return view?.editorView.state.doc.toString();
 }
 
-function splice(source, index, text) {
-  return source.slice(0, index) + text + source.slice(index);
+function handleEngraftUpdate(event) {
+  const {order, program} = event.data;
+  const defaultParams = {
+    type: "ObjectExpression",
+    properties: [
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'inputs' },
+        value: {type: "ObjectExpression", properties:[]},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'program' },
+        value: {type: "ObjectExpression", properties:[]},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'ext' },
+        value: {type: "Literal", value: true},
+      }
+    ]
+  }
+
+  if (order === -1 || order === undefined) return
+
+  const view = getView(getCell(order));
+  console.log('updating engraft in cell ', order)
+
+  // full old string
+  const oldString = view.editorView.state.doc.toString()
+
+  // everything except the 'viewof' keyword since esprima can't parse that
+  const content = oldString.replace(/\bviewof\b\s*/, '')
+  const original_ast = esprima.parseScript(content)
+
+  const num_args = AST_countArgs(original_ast)
+  console.log(`number of args: ${num_args}`)
+
+  if (num_args === 1) {
+    // engraft(this)
+    // post-startup, insert our necessary fields
+    const replaced_ast = estraverse.replace(original_ast, {
+      enter: function(node) {
+        if (node.type === 'CallExpression') {
+          node.arguments.push(defaultParams)
+        }
+      }
+    })
+
+    const replacement = escodegen.generate(replaced_ast)
+    replaceText(view.editorView, `viewof ${replacement}`)
+    return
+  }
+
+  // Otherwise, there are existing parameters:
+  // replace [program] in parameters with updated program
+
+
+  // stringify to use in parser
+  const program_str = JSON.stringify(program)
+  // parse
+  let program_ast =  esprima.parseScript(`let a = ` + program_str )
+  console.log(program_ast)
+
+
+
+  // this is an expression, extract the object to replace in the original string
+  estraverse.traverse(program_ast, {
+    enter: function(node) {
+      if (node.type === 'ObjectExpression') {
+        program_ast = node
+        this.break()
+      }
+    }
+  })
+  //latest program string now represented as an AST
+
+
+  console.log('FLAG')
+  const program_code = escodegen.generate(program_ast)
+  console.log(program_code)
+
+  // clean up old parameters for replacement
+  // let old_params_ast = esprima.parse("let a = " + old_params_str)
+  // estraverse.traverse(old_params_ast, {
+  //   enter: function(node) {
+  //     if (node.type === 'ObjectExpression') {
+  //       old_params_ast = node
+  //       this.break()
+  //     }
+  //   }
+  // })
+
+
+  console.log('original')
+  console.log(original_ast)
+  console.log(escodegen.generate(original_ast))
+
+  const new_params_ast = estraverse.replace(original_ast, {
+    enter: function(node) {
+      if (node.type === 'Property' && node.key.name === 'program') {
+        return {
+          type: 'Property',
+          key: { type: 'Identifier', name: 'program' },
+          value: program_ast,
+          kind: 'init',
+        }
+      }
+    }
+  });
+
+
+
+  console.log('replaced')
+  const replacement = escodegen.generate(new_params_ast)
+  console.log(replacement)
+
+  // replace program string with new version
+  // dispatch changes
+  replaceText(view.editorView, `viewof ${replacement}`)
 }
 
-// Adds double quotes around keywords in a JSON string that were not already quoted
-// Necessary to not break JSON.parse() if user manually defines inputs or programs without using quotes
-function quoteJSON(str) {
-  // Use a regular expression to match keys that are not already quoted
-  const regex = /([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g;
+function AST_countArgs(ast) {
+  let call;
+  estraverse.traverse(ast, {
+    enter: function(node) {
+      if (node.type === 'CallExpression') {
+        call = node
+      }
+    }
+  })
 
-  // Replace each matched key with a quoted key
-  return str.replace(regex, '$1"$2":');
+  return call?.arguments.length || 0
 }
 
 window.addEventListener("message", (event) => {
@@ -47,48 +169,9 @@ window.addEventListener("message", (event) => {
       const view = getView(getCell(order));
       replaceText(view.editorView, "WOW");
     }
+
     if (event.data.type === 'engraft-update') {
-      const {order, program} = event.data;
-
-      if (order === -1 || order === undefined) return
-
-      const view = getView(getCell(order));
-      console.log('updating engraft in cell ', order)
-      /*
-      Explanation:
-        (?<=engraft\(this[^,]*,)
-          is a positive lookbehind assertion that matches the string "engraft(this" followed by any number of non-comma characters, and a comma. This is not included in the final match.
-        [^)]*
-          matches any number of non-closings-parenthesis characters.
-        (?=\)$)
-          is a positive lookahead assertion that matches a ")" at the end of the line, without including it in the final match.
-       */
-      const funcCall_re = /(?<=engraft\(this)[^)]*(?=\)$)/
-      const oldString = view.editorView.state.doc.toString()
-
-      const content = oldString.match(funcCall_re)
-      const index = content.index
-      const params = content[0]
-
-      const progAndInputs = "{\"inputs\": {}, \"program\":{}}"
-
-      if (params.length === 0) {
-        // engraft(this)
-        // post-startup, insert our necessary fields
-        replaceText(view.editorView, splice(oldString, index, ", " + progAndInputs))
-      } else {
-        // engraft(this, {inputs: {}, program:{}})
-
-        // trim excess comma and whitespace from start of stirng
-        const cleaned = params.replace(/^\s*,\s*/, '');
-        console.log("var a = " + cleaned)
-        const parsed = esprima.parse("var a = " + cleaned)
-        console.log(parsed)
-        // replace program string with new version
-        // dispatch changes
-        // replaceText(view.editorView, oldString.slice(0, index) + JSON.stringify(obj) + ")")
-      }
+      handleEngraftUpdate(event)
     }
   }
 });
-
