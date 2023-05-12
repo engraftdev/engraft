@@ -96,7 +96,7 @@ function handleEngraftUpdate(event) {
   const original_ast = esprima.parseScript(content)
 
   const num_args = AST_countArgs(original_ast)
-  console.log(`number of args: ${num_args}`)
+  // console.log(`number of args: ${num_args}`)
 
   if (num_args === 1) {
     // engraft(this)
@@ -122,7 +122,7 @@ function handleEngraftUpdate(event) {
   const program_str = JSON.stringify(program)
   // parse
   let program_ast =  esprima.parseScript(`let a = ` + program_str )
-  console.log(program_ast)
+  // console.log(program_ast)
 
 
 
@@ -136,15 +136,7 @@ function handleEngraftUpdate(event) {
     }
   })
   //latest program string now represented as an AST
-  //
-  //
-  // console.log('FLAG')
-  // const program_code = escodegen.generate(program_ast)
-  // console.log(program_code)
-  //
-  // console.log('original')
-  // console.log(original_ast)
-  // console.log(escodegen.generate(original_ast))
+
   let program_found = false
   let new_params_ast = estraverse.replace(original_ast, {
     enter: function(node) {
@@ -163,9 +155,9 @@ function handleEngraftUpdate(event) {
 
 
 
-  console.log('replaced')
+  // console.log('replaced')
   const replacement = escodegen.generate(new_params_ast, {format: {compact: true}})
-  console.log(replacement)
+  // console.log(replacement)
 
   // replace program string with new version
   // dispatch changes
@@ -199,4 +191,11 @@ window.addEventListener("message", (event) => {
       handleEngraftUpdate(event)
     }
   }
-});
+
+  if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-check") {
+    console.log('msgchanel')
+    const count = event.data.count
+    if (count > 100) return
+    event.ports[0].postMessage({msg: `ack count ${count}`, count: count});
+  }
+  });
