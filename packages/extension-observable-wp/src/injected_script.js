@@ -27,6 +27,46 @@ function getText(view) {
 
 function handleEngraftUpdate(event) {
   const {order, program} = event.data;
+  // toolFromInputs()
+  const a = {
+    'toolName': 'slot',
+    'modeName': 'code',
+    'code': '',
+    'defaultCode': '',
+    'subPrograms': {}
+  }
+
+  const defaultProgram = {
+    type: 'ObjectExpression',
+    properties: [
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'toolName' },
+        value: {type: 'Literal', value: 'slot'},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'modeName' },
+        value: {type: 'Literal', value: 'code'},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'code' },
+        value: {type: 'Literal', value: ''},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'defaultCode' },
+        value: {type: 'Literal', value: ''},
+      },
+      {
+        type: 'Property',
+        key: { type: 'Identifier', name: 'subPrograms' },
+        value: {type: 'ObjectExpression', properties: []},
+      },
+    ]
+  }
+
   const defaultParams = {
     type: "ObjectExpression",
     properties: [
@@ -38,12 +78,7 @@ function handleEngraftUpdate(event) {
       {
         type: 'Property',
         key: { type: 'Identifier', name: 'program' },
-        value: {type: "ObjectExpression", properties:[]},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'ext' },
-        value: {type: "Literal", value: true},
+        value: defaultProgram
       }
     ]
   }
@@ -74,7 +109,7 @@ function handleEngraftUpdate(event) {
       }
     })
 
-    const replacement = escodegen.generate(replaced_ast)
+    const replacement = escodegen.generate(replaced_ast, {format: {compact: true}})
     replaceText(view.editorView, `viewof ${replacement}`)
     return
   }
@@ -101,31 +136,20 @@ function handleEngraftUpdate(event) {
     }
   })
   //latest program string now represented as an AST
-
-
-  console.log('FLAG')
-  const program_code = escodegen.generate(program_ast)
-  console.log(program_code)
-
-  // clean up old parameters for replacement
-  // let old_params_ast = esprima.parse("let a = " + old_params_str)
-  // estraverse.traverse(old_params_ast, {
-  //   enter: function(node) {
-  //     if (node.type === 'ObjectExpression') {
-  //       old_params_ast = node
-  //       this.break()
-  //     }
-  //   }
-  // })
-
-
-  console.log('original')
-  console.log(original_ast)
-  console.log(escodegen.generate(original_ast))
-
-  const new_params_ast = estraverse.replace(original_ast, {
+  //
+  //
+  // console.log('FLAG')
+  // const program_code = escodegen.generate(program_ast)
+  // console.log(program_code)
+  //
+  // console.log('original')
+  // console.log(original_ast)
+  // console.log(escodegen.generate(original_ast))
+  let program_found = false
+  let new_params_ast = estraverse.replace(original_ast, {
     enter: function(node) {
       if (node.type === 'Property' && node.key.name === 'program') {
+        program_found = true
         return {
           type: 'Property',
           key: { type: 'Identifier', name: 'program' },
@@ -138,8 +162,9 @@ function handleEngraftUpdate(event) {
 
 
 
+
   console.log('replaced')
-  const replacement = escodegen.generate(new_params_ast)
+  const replacement = escodegen.generate(new_params_ast, {format: {compact: true}})
   console.log(replacement)
 
   // replace program string with new version
