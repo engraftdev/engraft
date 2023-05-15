@@ -17,6 +17,7 @@ export type Program = {
   paramsProgram: ToolProgram,
   pauseRequest: boolean,
   forceText: boolean,
+  useCorsProxy: boolean,
 };
 
 export const programFactory: ProgramFactory<Program> = () => {
@@ -26,6 +27,7 @@ export const programFactory: ProgramFactory<Program> = () => {
     paramsProgram: slotWithCode(paramsDefault),
     pauseRequest: false,
     forceText: false,
+    useCorsProxy: false,
   };
 };
 const paramsDefault = `{
@@ -62,7 +64,11 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
           typeof v === "string" ? v : JSON.stringify(v as any)
         )
       );
-      const resp = await fetch(urlObj.toString());
+      let url = urlObj.toString();
+      if (program.useCorsProxy) {
+        url = "https://corsproxy.io/?" + encodeURIComponent(url);
+      }
+      const resp = await fetch(url);
       const contentType = resp.headers.get("content-type");
       // TODO: handle other content types, merge with file-tool's mime-type handling, etc
       if (program.forceText) {
@@ -93,7 +99,7 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
       //   });
       // }
     })
-  ), [urlResult.outputP, paramsResult.outputP, program.pauseRequest, program.forceText]);
+  ), [urlResult.outputP, paramsResult.outputP, program.pauseRequest, program.useCorsProxy, program.forceText]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) =>
@@ -150,6 +156,16 @@ const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<
           ></input>
           <span style={{marginLeft: 5}}>
             Output as text
+          </span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={program.useCorsProxy}
+            onChange={(ev) => programUP.useCorsProxy.$set(ev.target.checked)}
+          ></input>
+          <span style={{marginLeft: 5}}>
+            Use CORS proxy
           </span>
         </label>
       </div>
