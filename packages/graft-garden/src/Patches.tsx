@@ -13,8 +13,6 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
   const { patches } = props;
   const navigate = useNavigate();
 
-  console.log(patches);
-
   const patchesSorted = useMemo(() => {
     return [...patches].sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
   }, [patches]);
