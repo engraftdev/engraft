@@ -6,7 +6,6 @@ import * as Formatter from "./formatter/index.js";
 import * as Function from "./function/index.js";
 import * as HelloWorld from "./hello-world/index.js";
 import * as Import from "./import/index.js";
-import * as Map from "./map/index.js";
 import * as NotFound from "./not-found/index.js";
 import * as Request from "./request/index.js";
 import * as SimpleChart from "./simple-chart/index.js";
@@ -27,7 +26,6 @@ export const originalTools: Tool[] = [
   forgetP(toolFromModule(Function)),
   forgetP(toolFromModule(HelloWorld)),
   forgetP(toolFromModule(Import)),
-  forgetP(toolFromModule(Map)),
   forgetP(toolFromModule(NotFound)),
   forgetP(toolFromModule(Request)),
   forgetP(toolFromModule(SimpleChart)),

@@ -1,13 +1,9 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, hookThen, newVar, ProgramFactory, randomId, references, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
-import { ErrorView, Value, VarDefinition } from "@engraft/core-widgets";
-import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
-import { inputFrameBarBackdrop, InputHeading, outputBackgroundStyle } from "@engraft/toolkit";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { ComputeReferences, EngraftPromise, ErrorView, InputHeading, ProgramFactory, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, references, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
-import { CSSProperties, memo, ReactNode, useState } from "react";
+import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
 
 
@@ -19,7 +15,7 @@ export type Program = {
   perItemProgram: ToolProgram,
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
   const itemVar = newVar('item');
   return {
     toolName: 'map',
@@ -30,10 +26,10 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
   };
 };
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
+const computeReferences: ComputeReferences<Program> = (program) =>
   union(references(program.inputProgram), difference(references(program.perItemProgram), [program.itemVar.id]));
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
 
   const inputResult = hookRunTool({program: program.inputProgram, varBindings});
@@ -108,6 +104,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 
   return {outputP, view};
 }));
+
+export default defineTool({ programFactory, computeReferences, run });
 
 
 const MAX_ITEMS_DISPLAYED = 10;
