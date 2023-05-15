@@ -118,17 +118,17 @@ type AppWithRunningProgramProps = {
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
   const {program, updateProgram, stdin, jsonOnly} = props;
 
-  const input = useMemo(() => valueFromStdin(stdin), [stdin]);
+  const inputP = useMemo(() => valueFromStdin(stdin), [stdin]);
 
   const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: input})},
-  ]), [input]);
+    {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve(inputP.then((input) => ({value : input}))),
+  }]), [inputP]);
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.unresolved());
 
   const stdoutP = useMemo(() => {
-    return outputP.then(({value}) => ({value: valueToStdout(value, jsonOnly)}));
+    return outputP.then(async ({value}) => ({value: await valueToStdout(value, jsonOnly)}));
   }, [outputP, jsonOnly]);
 
   const stdoutState = usePromiseState(stdoutP);
@@ -145,7 +145,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
       throw new Error(`Error saving program: ${resp.status} ${resp.statusText}`);
     }
   };
-
+  // function revive out
   const saveStdout = stdoutState.status === 'fulfilled' && (async () => {
     console.log('saving stdout', stdoutState.value.value)
     const resp = await fetch('/api/stdout', {
@@ -195,7 +195,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
             await saveProgram();
             await saveStdout();
             // TODO: close tab
-            window.close();
+            //window.close();
           }}
         >
           Save script and return to stdout

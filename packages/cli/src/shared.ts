@@ -1,5 +1,6 @@
+/// <reference path="./shared.d.ts" />
 import { VarBinding } from "@engraft/hostkit";
-import { PyodideInterface } from "pyodide/pyodide.js";
+import type { PyodideInterface } from "pyodide/pyodide.js";
 
 let _pyodide: PyodideInterface | undefined = undefined;
 
@@ -12,7 +13,6 @@ async function getPyodide() {
     const isNode = (globalThis as any)?.process?.release?.name === 'node';
     const pyodideModule = isNode
       ? await import("pyodide/pyodide.js")
-      // @ts-ignore
       : await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
     _pyodide = await pyodideModule.loadPyodide() as PyodideInterface;
     await _pyodide.loadPackage("numpy");
@@ -20,7 +20,7 @@ async function getPyodide() {
   return _pyodide;
 }
 
-async function reviveIn(obj : any) {
+async function reviveIn(obj : any) : Promise<any> {
   const keys = Object.keys(obj);
   let prevType = "";
   let ret = [];
@@ -40,6 +40,8 @@ async function reviveIn(obj : any) {
         const result = await pyodide.runPythonAsync('np.array(' + JSON.stringify(val) + ')');
         ret.push(result);
       }
+    } else if (typeof obj[key] === 'object') {
+      ret.push(await reviveIn(obj[key]));
     } else {
       ret.push(obj[key]);
     }
@@ -60,12 +62,38 @@ export async function valueFromStdin(input : string) {
   }
 }
 
-export function valueToStdout(value: any, jsonOnly=false) {
-  //iterate through value, printing the type of each element
-  for (const element of value) {
-    console.log(typeof element);
+async function reviveOut(value : any) {
+  let ret = "";
+  const pyodide = await getPyodide();
+  let isArr = false;
+  if (!Array.isArray(value) ) {
+    value = [value];
+  } else {
+    isArr = true;
+    ret += "[";
   }
+  for (const element of value) {
+    if (element instanceof pyodide.ffi.PyProxy) {
+        ret += "__type: " + element.__type + ", __value: " + element.__repr__() + ", ";
+    } else if (typeof element == "object") {
+        const val = await reviveOut(element);
+        ret += val + ", ";
+    } else {
+      const val = JSON.stringify(element)
+      ret += val + ", ";
+    }
+  };
+  ret = ret.slice(0, -2);
+  if (isArr) {
+    ret += "]";
+  }
+  console.log("ret: " + ret);
+  return ret;
+}
 
+// need to fix pyproxy not working in python cell (can't see type of python array if calling repr)
+
+export async function valueToStdout(value: any, jsonOnly=false) {
   if (!jsonOnly) {
     // return it raw if it's a string
     if (typeof value === 'string') {
@@ -85,9 +113,8 @@ export function valueToStdout(value: any, jsonOnly=false) {
     }
   }
   // otherwise, return it as JSON
+  value = await reviveOut(value);
+  console.log("received value", value)
+  console.log("stringified", JSON.stringify(value))
   return JSON.stringify(value, null, 2);
 }
-
-// todos
-// write backward pass of reviver (need to figure out how to detect from outputs of engraft)
-// fix pyproxy stuff

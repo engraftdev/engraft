@@ -80,7 +80,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
-      console.log(valueToStdout(output.value, opts.jsonOnly))
+      console.log(await valueToStdout(output.value, opts.jsonOnly))
       exit(0);
     } catch (e) {
       console.error(e);

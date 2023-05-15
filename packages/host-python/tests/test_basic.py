@@ -1,6 +1,6 @@
 import requests
 import sys
-sys.path.append("../")
+sys.path.append("..")
 import engraft
 import unittest
 import numpy as np
@@ -37,7 +37,8 @@ class MyTest(unittest.TestCase):
     """
 
     def test_nd_array(self):
-        a = np.array([[1,2,3],[4,5,6]])
+        #a = np.array([[1,2,3],[4,5,6]])
+        a = [[1,2,3], np.array([4,5,6]), 3]
         b = engraft.run_engraft(a, "nd_array.json", edit=True)
         print(b)
 
