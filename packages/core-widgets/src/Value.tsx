@@ -501,7 +501,7 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
         no value yet
       </div>;
 
-  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xInlineFlex">
+  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xFlex">
     {valueView}
     {outputState.status === 'rejected' && <ErrorView error={outputState.reason} />}
   </div>
