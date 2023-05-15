@@ -3,6 +3,7 @@ export * from "./core-util.js";
 export * from "./globals.js";
 export * from "./EngraftPromise.js";
 export * from "./EngraftPromise-react.js";
+export * from "./EngraftPromise-refunc.js";
 export * from "./randomId.js";
 export * from "./runTool.js";
 export * from "./ShowView.js";
