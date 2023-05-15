@@ -1,9 +1,10 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
-import { ErrorView, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
-import { hookFork, hookLater, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { ComputeReferences, EngraftPromise, hookRunTool, hookThen, newVar, ProgramFactory, randomId, references, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, Var, VarBindings } from "@engraft/core";
+import { ErrorView, Value, VarDefinition } from "@engraft/core-widgets";
+import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
-import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
+import { inputFrameBarBackdrop, InputHeading, outputBackgroundStyle } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import _ from "lodash";
 import { CSSProperties, memo, ReactNode, useState } from "react";
@@ -11,10 +12,11 @@ import { createPortal } from "react-dom";
 
 
 export type Program = {
-  toolName: 'map';
-  inputProgram: ToolProgram;
-  itemVar: Var;
-  perItemProgram: ToolProgram;
+  toolName: 'map',
+  inputProgram: ToolProgram,
+  itemVar: Var,  // TODO: should be a string, but leave it like this until we have migrations
+  itemKeyVarId: string,
+  perItemProgram: ToolProgram,
 }
 
 export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
@@ -23,6 +25,7 @@ export const programFactory: ProgramFactory<Program> = (defaultCode?: string) =>
     toolName: 'map',
     inputProgram: slotWithCode(defaultCode || ''),
     itemVar,
+    itemKeyVarId: randomId(),
     perItemProgram: slotWithCode(itemVar.id)
   };
 };
@@ -35,56 +38,73 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 
   const inputResult = hookRunTool({program: program.inputProgram, varBindings});
 
-  const inputArrayP = hookMemo(() => inputResult.outputP.then((inputOutput) => {
-    if (inputOutput.value instanceof Array) {
-      return inputOutput.value;
-    } else if (isObject(inputOutput.value)) {
-      return Object.entries(inputOutput.value);
-    } else {
-      throw new Error("input is not array or object")
-    }
-  }), [inputResult]);
+  const computedStuffP = hookMemo(() => (
+    hookThen(inputResult.outputP, (inputOutput) => {
+      const inputOutputValue = inputOutput.value;
+      if (!(inputOutputValue instanceof Array || isObject(inputOutputValue))) {
+        throw new Error("input is not array or object")
+      }
+      const inputOutputIsArrayLike = hasProperty(inputOutputValue, Symbol.iterator) && hasProperty(inputOutputValue, 'length');
 
-  // TODO: This block is pretty bad. Worth thinking about a bit.
-  const itemResultsWithScopeP: EngraftPromise<ToolResultWithScope[]> =
-    hookMemo(() => {
-      const later = hookLater();
-      return inputArrayP.then((inputArray) => later(() =>
-          hookFork((branch) =>
-            inputArray.map((inputElem, i) =>
-              branch(`${i}`, () => {
-                const newVarBindings: VarBindings = hookMemo(() => ({
-                  [program.itemVar.id]: {var_: program.itemVar, outputP: EngraftPromise.resolve({value: inputElem})},
-                }), [program.itemVar, inputElem]);
-                const itemVarBindings: VarBindings = hookMemo(() => ({
-                  ...varBindings,
-                  ...newVarBindings,
-                }), [varBindings, newVarBindings]);
-                const result = hookRunTool(
-                  {program: program.perItemProgram, varBindings: itemVarBindings}
-                )
-                return { result, newScopeVarBindings: newVarBindings };
-              })
+      const itemKeyVar = hookMemo(() => (
+        // TODO: defensive for old versions
+        program.itemKeyVarId !== undefined
+        ? {
+            id: program.itemKeyVarId,
+            label: inputOutputIsArrayLike ? 'index' : 'key',
+          }
+        : undefined
+      ), [inputOutputIsArrayLike, program.itemKeyVarId])
+
+      const itemResultsWithScope: ToolResultWithScope[] = hookFork((branch) =>
+        _.map(inputOutputValue, (inputElem, key) =>
+          branch(`${key}`, () => {
+            const newVarBindings: VarBindings = hookMemo(() => ({
+              [program.itemVar.id]: {var_: program.itemVar, outputP: EngraftPromise.resolve({value: inputElem})},
+              // TODO: defensive for old versions
+              ...itemKeyVar && {
+                [itemKeyVar.id]: {var_: itemKeyVar, outputP: EngraftPromise.resolve({value: key})},
+              }
+            }), [program.itemVar, inputElem, itemKeyVar, key]);
+            const itemVarBindings: VarBindings = hookMemo(() => ({
+              ...varBindings,
+              ...newVarBindings,
+            }), [varBindings, newVarBindings]);
+            const result = hookRunTool(
+              {program: program.perItemProgram, varBindings: itemVarBindings}
             )
-          )
+            return { result, newScopeVarBindings: newVarBindings };
+          })
         )
-      );
-    }, [inputArrayP, varBindings, program.itemVar, program.perItemProgram])
+      )
 
-  const outputP: EngraftPromise<ToolOutput> = hookMemo(() => itemResultsWithScopeP.then((itemResultsWithScope) =>
-    EngraftPromise.all(itemResultsWithScope.map((itemResultWithScope) => itemResultWithScope.result.outputP)).then((itemOutputs) => {
-      return {value: itemOutputs.map((itemOutput) => itemOutput.value)};
+      return {
+        inputOutput,
+        inputOutputIsArrayLike,
+        itemResultsWithScope,
+        itemKeyVar,
+      }
     })
-  ), [itemResultsWithScopeP]);
+  ), [inputResult.outputP, program.itemKeyVarId, program.itemVar, program.perItemProgram, varBindings])
+
+  const outputP: EngraftPromise<ToolOutput> = hookMemo(() => (
+    computedStuffP.then(({itemResultsWithScope}) =>
+      EngraftPromise.all(
+        itemResultsWithScope.map((itemResultWithScope) => itemResultWithScope.result.outputP)
+      ).then((itemOutputs) =>
+        ({value: itemOutputs.map((itemOutput) => itemOutput.value)})
+      )
+    )
+  ), [computedStuffP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (viewProps) =>
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
-        itemResultsWithScopeP={itemResultsWithScopeP}
+        computedStuffP={computedStuffP}
       />,
-  }), [inputResult, itemResultsWithScopeP, props]);
+  }), [computedStuffP, inputResult, props]);
 
   return {outputP, view};
 }));
@@ -94,20 +114,26 @@ const MAX_ITEMS_DISPLAYED = 10;
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,
-  itemResultsWithScopeP: EngraftPromise<ToolResultWithScope<ToolProgram>[]>,
+  computedStuffP: EngraftPromise<{
+    inputOutput: ToolOutput,
+    inputOutputIsArrayLike: boolean,
+    itemResultsWithScope: ToolResultWithScope<ToolProgram>[],
+    itemKeyVar: Var | undefined,
+  }>
 }) => {
-  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, itemResultsWithScopeP } = props;
+  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, computedStuffP } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(0 as number | null);
 
-  const itemResultsWithScopeState = usePromiseState(itemResultsWithScopeP);
+  const computedStuffState = usePromiseState(computedStuffP);
 
   let tabs: ReactNode = null;
   let perItem: ReactNode = null;
-  if (itemResultsWithScopeState.status === 'fulfilled') {
-    const numItems = itemResultsWithScopeState.value.length;
+  if (computedStuffState.status === 'fulfilled') {
+    const { inputOutput, inputOutputIsArrayLike, itemResultsWithScope, itemKeyVar } = computedStuffState.value;
+    const numItems = itemResultsWithScope.length;
     const numTabs = Math.min(numItems, MAX_ITEMS_DISPLAYED);
 
     tabs = <div className="MapTool-indices xRow xAlignVCenter" style={{alignSelf: 'flex-end'}}>
@@ -153,20 +179,29 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
       }
     </div>;
 
-    const shownIndex = Math.min(hoveredIndex !== null ? hoveredIndex : selectedIndex, itemResultsWithScopeState.value.length - 1);
+    const shownIndex = Math.min(hoveredIndex !== null ? hoveredIndex : selectedIndex, itemResultsWithScope.length - 1);
 
     if (shownIndex >= 0) {
       perItem = <div className="xCol xGap10 xPad10" style={{ border: '3px solid lightblue' }}>
         <div className="xRow xAlignTop xGap10">
-          <VarDefinition var_={program.itemVar} updateVar={programUP.itemVar.$}/>
-          <div style={{lineHeight: 1}}>=</div>
-          <div style={{minWidth: 0}}>
-            <ToolOutputView outputP={inputResult.outputP.then(output => ({value: (output.value as unknown[])[shownIndex]}))} />
+          <div className="xCol xAlignLeft">
+            <VarDefinition var_={program.itemVar} attach="down"/>
+            <div className='xPad10 xRelative' style={{alignSelf: 'stretch', ...outputBackgroundStyle}}>
+              <Value value={Object.values(inputOutput.value as any)[shownIndex]} />
+            </div>
           </div>
+          { itemKeyVar &&
+            <div className="xCol xAlignLeft">
+              <VarDefinition var_={itemKeyVar} attach="down"/>
+              <div className='xPad10 xRelative' style={{alignSelf: 'stretch', ...outputBackgroundStyle}}>
+                <Value value={inputOutputIsArrayLike ? shownIndex : Object.keys(inputOutput.value as any)[shownIndex]} />
+              </div>
+            </div>
+          }
         </div>
         <div>
           <ShowViewWithScope
-            resultWithScope={itemResultsWithScopeState.value[shownIndex]}
+            resultWithScope={itemResultsWithScope[shownIndex]}
             updateProgram={programUP.perItemProgram.$}
           />
         </div>
@@ -183,8 +218,8 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
         slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
       />
       <div className="MapTool-top xRow xGap10 xPad10">
-        {itemResultsWithScopeState.status === 'rejected' &&
-          <ErrorView error={itemResultsWithScopeState.reason}/>
+        {computedStuffState.status === 'rejected' &&
+          <ErrorView error={computedStuffState.reason}/>
         }
         { tabs }
       </div>
