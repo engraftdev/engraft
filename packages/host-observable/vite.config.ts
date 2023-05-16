@@ -1,8 +1,14 @@
 /// <reference types="vitest" />
 import { resolve } from 'path';
 import { defineConfig } from "vite";
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+
+
 
 export default defineConfig({
+  plugins: [
+    cssInjectedByJsPlugin(),
+  ],
   resolve: {
     alias: {
       // Not sure how `chalk` is getting into builds, but it breaks things. This works!

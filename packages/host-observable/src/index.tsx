@@ -4,10 +4,12 @@ import {IsolateStyles, ToolWithView, ToolOutputBuffer, EngraftPromise, PromiseSt
 import { isObject } from '@engraft/shared/lib/isObject.js';
 import { ObservableInspector } from './ObservableInspector.js'
 
-import css from "./ObservableInspector.css?inline";
+import "./index.css";
+
 
 
 import React, { isValidElement, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import ExtensionBanner from "./ExtensionBanner.js";
 
 // React exports for Observable to use
 export * as ReactDOM from 'react-dom';
@@ -28,10 +30,11 @@ type ObservableEmbedProps = {
   parameters?: ObservableParameters,
   order: number,
   extension?: boolean
+  version?: number
 }
 
 export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEmbedProps) {
-  const {parameters, reportOutputState, reportOutputP, order, extension = false} = props;
+  const {parameters, reportOutputState, reportOutputP, order, extension = false, version = 0.1} = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
@@ -78,32 +81,9 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     setOutputP(outputP);
   }, [reportOutputP]);
 
-  const ExtensionBanner = ({active} : {active: boolean}) => {
-    if (active) {
-      return (
-          <div style={{width:'100%'}} id={'banner'}>
-            Extension Found
-          </div>
-      )
-    } else {
-      return (
-          <div style={NoExtContainerStyle}>
-            <div>
-              <div>Warning: Engraft Extension Not Installed!</div>
-              <div>Changes are not saved, copy cell contents manually.</div>
-            </div>
-            <button style={ButtonStyle} onClick={()=> navigator.clipboard.writeText(JSON.stringify(program))}>
-              Copy Cell
-            </button>
-          </div>
-      )
-    }
-  }
-
   return (
 
       <div>
-        <ExtensionBanner active={extension}/>
         <ToolOutputBuffer
             outputP={outputP}
             renderValue={(value) => {
@@ -128,6 +108,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
               </IsolateStyles>
             </div>
         }
+        <ExtensionBanner active={extension} program={program} version={version}/>
       </div>
   );
 });
@@ -142,27 +123,3 @@ function defaultCodeFromInputs(inputs: {[name: string]: any}) {
     return '';
   }
 }
-
-
-
-
-const NoExtContainerStyle: React.CSSProperties = {
-  width: "100%",
-  backgroundColor: "rgba(255, 0, 0, 0.05)",
-  color: "rgba(255, 100, 100, 0.8)",
-  fontSize: "0.8em",
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "1em 1em"
-};
-
-const ButtonStyle: React.CSSProperties = {
-  outline: "none",
-  borderRadius: "5%",
-  backgroundColor: "rgba(255, 0, 0, 0.06)",
-  color: "rgba(255, 100, 100, 0.8)",
-  border: "1px solid transparent",
-  cursor: 'pointer'
-};
