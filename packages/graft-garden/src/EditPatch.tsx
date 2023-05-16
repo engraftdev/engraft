@@ -4,7 +4,7 @@ import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, 
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import 'bootstrap/js/dist/dropdown';
-import { deleteDoc, doc } from "firebase/firestore";
+import { Timestamp, addDoc, deleteDoc, doc } from "firebase/firestore";
 import _ from "lodash";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -13,6 +13,7 @@ import { Patch, patchesRef } from "./db.js";
 import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
 import { useUser } from "./util.js";
+import { getAuth } from "firebase/auth";
 
 const myCss = `
 @media (min-width: 992px) {
@@ -102,6 +103,16 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
 
   const [initialStateJSONDraft, setInitialStateJSONDraft] = useState(patch.initialStateJSON || "");
 
+  const onClickDuplicate = useCallback(async () => {
+    const newDoc = await addDoc(patchesRef, {
+      name: `${patch.name} (copy)`,
+      ownerUid: getAuth().currentUser!.uid,
+      createdAt: Timestamp.fromDate(new Date()),
+      toolProgram: patch.toolProgram,
+    });
+    navigate(`/${newDoc.id}/edit`);
+  }, [navigate, patch.name, patch.toolProgram]);
+
   const onClickDelete = useCallback(() => {
     deleteDoc(doc(patchesRef, patchId));
     navigate('/');
@@ -124,6 +135,8 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
             ? <li><LinkMemo to='../edit' className="dropdown-item">exciting mode</LinkMemo></li>
             : <li><LinkMemo to='../edit/safe' className="dropdown-item">safe mode</LinkMemo></li>
           }
+          <li><hr className="dropdown-divider" /></li>
+          <li><button className="dropdown-item" onClick={onClickDuplicate}>duplicate page</button></li>
           <li><hr className="dropdown-divider" /></li>
           <li><button className="dropdown-item" style={{color: '#dc3545'}} onClick={onClickDelete}>delete page</button></li>
         </ul>
