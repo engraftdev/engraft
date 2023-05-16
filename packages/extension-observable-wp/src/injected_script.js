@@ -3,7 +3,10 @@ const esprima = require('esprima');
 const estraverse = require('estraverse')
 const escodegen = require('escodegen')
 
-console.log("Observable Writer: injected_script.js running")
+const VERSION = 1.0
+
+console.log(`Observable Writer v${VERSION} running`)
+
 
 function replaceText (editorView, text, index = 0) {
   editorView.dispatch({changes: { from: index, to: editorView.state.doc.length, insert: text}});
@@ -193,9 +196,7 @@ window.addEventListener("message", (event) => {
   }
 
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-check") {
-    console.log('msgchanel')
-    const count = event.data.count
-    if (count > 100) return
-    event.ports[0].postMessage({msg: `ack count ${count}`, count: count});
+    console.log('Extension Received Health Check')
+    event.ports[0].postMessage({version : VERSION});
   }
   });
