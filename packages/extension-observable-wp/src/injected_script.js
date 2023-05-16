@@ -30,15 +30,8 @@ function getText(view) {
 
 function handleEngraftUpdate(event) {
   const {order, program} = event.data;
-  // toolFromInputs()
-  const a = {
-    'toolName': 'slot',
-    'modeName': 'code',
-    'code': '',
-    'defaultCode': '',
-    'subPrograms': {}
-  }
 
+  // toolFromInputs()
   const defaultProgram = {
     type: 'ObjectExpression',
     properties: [
