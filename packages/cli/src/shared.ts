@@ -36,8 +36,8 @@ async function reviveIn(obj : any) : Promise<any> {
       let val = obj[key];
       if (prevType === "nd-array") {
         const pyodide = await getPyodide();
-        const _ = await pyodide.runPythonAsync('import numpy as np');
-        const result = await pyodide.runPythonAsync('np.array(' + JSON.stringify(val) + ')');
+        const result = await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: val})});
+        console.log("type of result", typeof result);
         ret.push(result);
       }
     } else if (typeof obj[key] === 'object') {
@@ -63,34 +63,18 @@ export async function valueFromStdin(input : string) {
 }
 
 async function reviveOut(value : any) {
-  let ret = "";
   const pyodide = await getPyodide();
-  let isArr = false;
-  if (!Array.isArray(value) ) {
-    value = [value];
-  } else {
-    isArr = true;
-    ret += "[";
-  }
-  for (const element of value) {
-    if (element instanceof pyodide.ffi.PyProxy) {
-        ret += "__type: " + element.__type + ", __value: " + element.__repr__() + ", ";
-    } else if (typeof element == "object") {
-        const val = await reviveOut(element);
-        ret += val + ", ";
-    } else {
-      const val = JSON.stringify(element)
-      ret += val + ", ";
+  if (value instanceof pyodide.ffi.PyProxy) {
+    return {__type: value.__type, __value: value.__repr__()};
+  } else if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      value[i] = await reviveOut(value[i]);
     }
-  };
-  ret = ret.slice(0, -2);
-  if (isArr) {
-    ret += "]";
+    return value;
+  } else {
+    return value;
   }
-  console.log("ret: " + ret);
-  return ret;
 }
-
 // need to fix pyproxy not working in python cell (can't see type of python array if calling repr)
 
 export async function valueToStdout(value: any, jsonOnly=false) {
@@ -99,7 +83,6 @@ export async function valueToStdout(value: any, jsonOnly=false) {
     if (typeof value === 'string') {
       return value;
     }
-
     // return it as lines if it's an array
     if (Array.isArray(value)) {
       // string lines are raw, other lines are JSON
