@@ -21,35 +21,18 @@ async function getPyodide() {
 }
 
 async function reviveIn(obj : any) : Promise<any> {
-  const keys = Object.keys(obj);
-  let prevType = "";
-  let ret = [];
-  for (const key of keys) {
-    if (key === '__type') {
-      if (obj[key] === 'nd-array') {
-        prevType = 'nd-array'
-      } else {
-        prevType = 'other'
-      }
+  console.log("reviving", obj);
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      obj[i] = await reviveIn(obj[i]);
     }
-    else if (key === '__value') {
-      let val = obj[key];
-      if (prevType === "nd-array") {
-        const pyodide = await getPyodide();
-        const result = await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: val})});
-        console.log("type of result", typeof result);
-        ret.push(result);
-      }
-    } else if (typeof obj[key] === 'object') {
-      ret.push(await reviveIn(obj[key]));
-    } else {
-      ret.push(obj[key]);
+  } else if (typeof obj === 'object') {
+    if (obj.__type === 'nd-array') {
+      const pyodide = await getPyodide();
+      obj = await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: obj.__value})});
     }
   }
-  if (ret.length === 1) {
-    return ret[0];
-  }
-  return ret;
+  return obj;
 }
 
 export async function valueFromStdin(input : string) {
@@ -65,7 +48,7 @@ export async function valueFromStdin(input : string) {
 async function reviveOut(value : any) {
   const pyodide = await getPyodide();
   if (value instanceof pyodide.ffi.PyProxy) {
-    return {__type: value.__type, __value: value.__repr__()};
+    return 2;
   } else if (Array.isArray(value)) {
     for (let i = 0; i < value.length; i++) {
       value[i] = await reviveOut(value[i]);
