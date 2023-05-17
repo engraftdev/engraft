@@ -53,10 +53,8 @@ async function reviveOut(value : any) {
     for (let i = 0; i < value.length; i++) {
       value[i] = await reviveOut(value[i]);
     }
-    return value;
-  } else {
-    return value;
   }
+  return value; 
 }
 // need to fix pyproxy not working in python cell (can't see type of python array if calling repr)
 
