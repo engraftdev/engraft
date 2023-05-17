@@ -50,6 +50,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
       parameters?.program || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
+  const [hide, setHide] = useState(parameters?.hide || false)
 
   // Engraft GUI change -> local program changes -> [Extension] -> program changes
   useEffect(() => {
@@ -95,7 +96,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
               return <ObservableInspector value={value}/>;
             }}
         />
-        { !parameters?.hide &&
+        { !hide &&
             <div style={{marginTop: 10}}>
               <IsolateStyles>
                 <ToolWithView
@@ -108,7 +109,12 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
               </IsolateStyles>
             </div>
         }
-        <ExtensionBanner active={extension} program={program} version={version}/>
+        <ExtensionBanner
+            active={extension}
+            program={program}
+            version={version}
+            hide={hide} setHide={setHide}
+        />
       </div>
   );
 });
