@@ -21,15 +21,18 @@ async function getPyodide() {
 }
 
 async function reviveIn(obj : any) : Promise<any> {
-  console.log("reviving", obj);
   if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
-      obj[i] = await reviveIn(obj[i]);
-    }
+    return Promise.all(obj.map(reviveIn));
   } else if (typeof obj === 'object') {
     if (obj.__type === 'nd-array') {
       const pyodide = await getPyodide();
-      obj = await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: obj.__value})});
+      return await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: obj.__value})});
+    } else {
+      const newValue : any = {};
+      for (const key in obj) {
+        newValue[key] = await reviveIn(obj[key]);
+      }
+      return newValue; 
     }
   }
   return obj;
@@ -45,18 +48,17 @@ export async function valueFromStdin(input : string) {
   }
 }
 
-async function reviveOut(value : any) {
+async function reviveOut(value : any) : Promise<any> {
   const pyodide = await getPyodide();
   if (value instanceof pyodide.ffi.PyProxy) {
-    return 2;
-  } else if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      value[i] = await reviveOut(value[i]);
+    if (value.type === 'numpy.ndarray') {
+      return { __type: 'nd-array', __value: value.toJs() }; // todo: can use repr here instead
     }
+  } else if (Array.isArray(value)) {
+    return Promise.all(value.map(reviveOut));
   }
   return value; 
 }
-// need to fix pyproxy not working in python cell (can't see type of python array if calling repr)
 
 export async function valueToStdout(value: any, jsonOnly=false) {
   if (!jsonOnly) {
