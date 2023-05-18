@@ -50,7 +50,9 @@ export async function valueFromStdin(input : string) {
 
 async function reviveOut(value : any) : Promise<any> {
   const pyodide = await getPyodide();
-  if (typeof value === 'object') {
+  if (Array.isArray(value)) {
+    return Promise.all(value.map(reviveOut));
+  } else if (typeof value === 'object') {
     if (value instanceof pyodide.ffi.PyProxy) {
       if (value.type === 'numpy.ndarray') {
         return { __type: 'nd-array', __value: value.toJs() }; // todo: can use repr here instead
@@ -62,8 +64,6 @@ async function reviveOut(value : any) : Promise<any> {
       }
       return newValue;
     }
-  } else if (Array.isArray(value)) {
-    return Promise.all(value.map(reviveOut));
   }
   return value; 
 }
