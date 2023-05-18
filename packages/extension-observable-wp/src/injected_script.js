@@ -1,15 +1,30 @@
 /* eslint-disable */
+import {replace} from "estraverse";
+
 const esprima = require('esprima');
 const estraverse = require('estraverse')
 const escodegen = require('escodegen')
 
-const VERSION = 1.0
+import version from "./util/version";
+import {defaultParams, countArgs} from "./util/ASTLibrary";
+
+const VERSION = version
+
+const codegen_options = {
+  format: {
+    compact: true,
+    quotes: 'single',
+  }
+}
 
 console.log(`Observable Writer v${VERSION} running`)
 
 
 function replaceText (editorView, text, index = 0) {
-  editorView.dispatch({changes: { from: index, to: editorView.state.doc.length, insert: text}});
+  editorView.dispatch({
+    changes: { from: 0, to: editorView.state.doc.length, insert: text},
+    addToHistory: true
+  });
 }
 
 function getCell(i) {
@@ -24,6 +39,11 @@ function getView(cell) {
   return cell.querySelector(".cm-content")?.cmView;
 }
 
+function getButton(cell) {
+  return cell?.querySelector("button")
+
+}
+
 function getText(view) {
   return view?.editorView.state.doc.toString();
 }
@@ -32,66 +52,21 @@ function handleEngraftUpdate(event) {
   const {order, program} = event.data;
 
   // toolFromInputs()
-  const defaultProgram = {
-    type: 'ObjectExpression',
-    properties: [
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'toolName' },
-        value: {type: 'Literal', value: 'slot'},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'modeName' },
-        value: {type: 'Literal', value: 'code'},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'code' },
-        value: {type: 'Literal', value: ''},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'defaultCode' },
-        value: {type: 'Literal', value: ''},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'subPrograms' },
-        value: {type: 'ObjectExpression', properties: []},
-      },
-    ]
-  }
 
-  const defaultParams = {
-    type: "ObjectExpression",
-    properties: [
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'inputs' },
-        value: {type: "ObjectExpression", properties:[]},
-      },
-      {
-        type: 'Property',
-        key: { type: 'Identifier', name: 'program' },
-        value: defaultProgram
-      }
-    ]
-  }
 
   if (order === -1 || order === undefined) return
 
-  const view = getView(getCell(order));
+  const view = getView(getCell(order))
   console.log('updating engraft in cell ', order)
 
   // full old string
-  const oldString = view.editorView.state.doc.toString()
+  const oldString = getText(view)
 
   // everything except the 'viewof' keyword since esprima can't parse that
   const content = oldString.replace(/\bviewof\b\s*/, '')
   const original_ast = esprima.parseScript(content)
 
-  const num_args = AST_countArgs(original_ast)
+  const num_args = countArgs(original_ast)
   // console.log(`number of args: ${num_args}`)
 
   if (num_args === 1) {
@@ -100,12 +75,12 @@ function handleEngraftUpdate(event) {
     const replaced_ast = estraverse.replace(original_ast, {
       enter: function(node) {
         if (node.type === 'CallExpression') {
-          node.arguments.push(defaultParams)
+          node?.arguments.push(defaultParams)
         }
       }
     })
 
-    const replacement = escodegen.generate(replaced_ast, {format: {compact: true}})
+    const replacement = escodegen.generate(replaced_ast, )
     replaceText(view.editorView, `viewof ${replacement}`)
     return
   }
@@ -152,44 +127,47 @@ function handleEngraftUpdate(event) {
 
 
   // console.log('replaced')
-  const replacement = escodegen.generate(new_params_ast, {format: {compact: true}})
+  const replacement = escodegen.generate(new_params_ast, codegen_options)
   // console.log(replacement)
 
   // replace program string with new version
   // dispatch changes
+  // console.log(oldString)
+  // console.log(`writing ${replacement}`)
   replaceText(view.editorView, `viewof ${replacement}`)
 }
 
-function AST_countArgs(ast) {
-  let call;
-  estraverse.traverse(ast, {
-    enter: function(node) {
-      if (node.type === 'CallExpression') {
-        call = node
-      }
-    }
-  })
 
-  return call?.arguments.length || 0
-}
 
 window.addEventListener("message", (event) => {
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
     console.log("parent got event", event.data);
-    if (event.data.type === "click") {
-      console.log("click!");
-      const { order } = event.data;
-      const view = getView(getCell(order));
-      replaceText(view.editorView, "WOW");
-    }
 
     if (event.data.type === 'engraft-update') {
-      handleEngraftUpdate(event)
+      const firstRun = event.data.firstRun
+
+      if (firstRun) {
+        console.log('INTERCEPTED')
+      } else {
+        handleEngraftUpdate(event)
+      }
+
+
+
     }
   }
 
   if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-check") {
-    console.log('Extension Received Health Check')
+    const order = event.data.order
+    console.log(`Extension Received Health Check: Cell ${order}`)
+
+    // click run on startup
+    const button = getButton(getCell(order))
+    const buttonActive = button?.firstChild?.getAttribute('fill') !== 'none'
+    if (button && buttonActive) {
+      button.click()
+    }
+
     event.ports[0].postMessage({version : VERSION});
   }
   });
