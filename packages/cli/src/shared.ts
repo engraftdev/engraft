@@ -28,6 +28,9 @@ async function reviveIn(obj : any) : Promise<any> {
       const pyodide = await getPyodide();
       return await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: obj.__value})});
     } else {
+      if (hasCircularReference(obj)) {
+        return "circular reference";
+      }
       const newValue : any = {};
       for (const key in obj) {
         newValue[key] = await reviveIn(obj[key]);
@@ -48,6 +51,27 @@ export async function valueFromStdin(input : string) {
   }
 }
 
+function hasCircularReference(obj : any) {
+  const visited = new Set();
+  function traverse(obj : any) {
+    if (typeof obj !== 'object' || obj === null) {
+      return false;
+    }
+    if (visited.has(obj)) {
+      return true;
+    }
+    visited.add(obj);
+    for (const key in obj) {
+      if (traverse(obj[key])) {
+        return true;
+      }
+    }
+    visited.delete(obj);
+    return false;
+  }
+  return traverse(obj);
+}
+
 async function reviveOut(value : any) : Promise<any> {
   const pyodide = await getPyodide();
   if (Array.isArray(value)) {
@@ -58,6 +82,9 @@ async function reviveOut(value : any) : Promise<any> {
         return { __type: 'nd-array', __value: value.toJs() }; // todo: can use repr here instead
       } 
     } else {
+      if (hasCircularReference(value)) {
+        return "circular reference";
+      }
       const newValue : any = {};
       for (const key in value) {
         newValue[key] = await reviveOut(value[key]);
