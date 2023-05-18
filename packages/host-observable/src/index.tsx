@@ -50,13 +50,17 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
       parameters?.program || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
-  const [hide, setHide] = useState(parameters?.hide || false)
-
+  const [hide, setHide] = useState<boolean>(parameters?.hide || false)
   // Engraft GUI change -> local program changes -> [Extension] -> program changes
   useEffect(() => {
     try {
       // definitely needs debouncing
-      window.parent.postMessage({source: 'observable-writer', type: 'engraft-update', order: order, program: program}, "*")
+      window.parent.postMessage({
+        source: 'observable-writer',
+        type: 'engraft-update',
+        order: order,
+        program: program,
+      }, "*")
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
@@ -65,7 +69,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
   // manual program string change -> local program changes -> Engraft GUI changes
   useEffect(() => {
     try {
-      // definitely needs debouncing
+      // debouncing?
       parameters?.program && updateProgram(parameters?.program)
     } catch (e) {
       console.warn("error writing program string to cell", e);
