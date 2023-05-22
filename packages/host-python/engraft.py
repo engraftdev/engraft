@@ -23,8 +23,6 @@ def run_engraft(data, program, *, edit):
 
     data = json.dumps(data, cls=CustomEncoder)  
 
-    print(data)
-
     command = ["engraft", program, "--json-only"]
 
     if edit:
@@ -32,5 +30,4 @@ def run_engraft(data, program, *, edit):
 
     output = subprocess.check_output(command, input=data.encode())
     output = CustomDecoder().decode(output)
-
     return output

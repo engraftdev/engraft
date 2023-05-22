@@ -52,7 +52,6 @@ try {
   // it's fine
 }
 
-
 async function read(stream: NodeJS.ReadStream) {
   const chunks = [];
   for await (const chunk of stream) chunks.push(chunk);
@@ -80,7 +79,6 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
-      console.error('output', output.value);
       console.log(await valueToStdout(output.value, opts.jsonOnly))
       exit(0);
     } catch (e) {

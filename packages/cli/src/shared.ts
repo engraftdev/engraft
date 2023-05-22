@@ -15,7 +15,10 @@ async function getPyodide() {
       ? await import("pyodide/pyodide.js")
       : await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
     _pyodide = await pyodideModule.loadPyodide() as PyodideInterface;
+    const originalConsoleLog = console.log;
+    console.log = () => {};
     await _pyodide.loadPackage("numpy");
+    console.log = originalConsoleLog;
   }
   return _pyodide;
 }
