@@ -42,7 +42,7 @@ async function reviveIn(obj : any) : Promise<any> {
 }
 
 export async function valueFromStdin(input : string) {
-  try {
+  try { 
     const parsed = JSON.parse(input);
     const revived = await reviveIn(parsed);
     return revived;
@@ -78,9 +78,11 @@ async function reviveOut(value : any) : Promise<any> {
     return Promise.all(value.map(reviveOut));
   } else if (typeof value === 'object') {
     if (value instanceof pyodide.ffi.PyProxy) {
+      const jsValue = value.toJs();
       if (value.type === 'numpy.ndarray') {
-        return { __type: 'nd-array', __value: value.toJs() }; // todo: can use repr here instead
-      } 
+         return { __type: 'nd-array', __value: Object.keys(jsValue).map(key => jsValue[key])};
+      }
+      return jsValue;
     } else {
       if (hasCircularReference(value)) {
         return "circular reference";
@@ -115,7 +117,5 @@ export async function valueToStdout(value: any, jsonOnly=false) {
   }
   // otherwise, return it as JSON
   value = await reviveOut(value);
-  console.log("received value", value)
-  console.log("stringified", JSON.stringify(value))
   return JSON.stringify(value, null, 2);
 }

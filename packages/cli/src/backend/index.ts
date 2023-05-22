@@ -70,7 +70,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     const varBindings = varBindingsObject([
       // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-      {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: valueFromStdin(stdin)})},
+      {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: await valueFromStdin(stdin)})},
     ]);
 
     global.window = {} as any;
@@ -80,6 +80,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
+      console.error('output', output.value);
       console.log(await valueToStdout(output.value, opts.jsonOnly))
       exit(0);
     } catch (e) {

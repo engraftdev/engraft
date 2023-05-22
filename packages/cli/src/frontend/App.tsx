@@ -145,7 +145,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
       throw new Error(`Error saving program: ${resp.status} ${resp.statusText}`);
     }
   };
-  // function revive out
+  
   const saveStdout = stdoutState.status === 'fulfilled' && (async () => {
     console.log('saving stdout', stdoutState.value.value)
     const resp = await fetch('/api/stdout', {
@@ -195,7 +195,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
             await saveProgram();
             await saveStdout();
             // TODO: close tab
-            //window.close();
+            window.close();
           }}
         >
           Save script and return to stdout
