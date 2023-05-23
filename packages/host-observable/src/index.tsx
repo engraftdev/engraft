@@ -8,7 +8,7 @@ import "./index.css";
 
 
 
-import React, { isValidElement, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {isValidElement, memo, useCallback, useEffect, useMemo, useState} from 'react';
 import ExtensionBanner from "./ExtensionBanner.js";
 
 // React exports for Observable to use
@@ -51,8 +51,13 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
   );
 
   const [hide, setHide] = useState<boolean>(parameters?.hide || false)
+
   // Engraft GUI change -> local program changes -> [Extension] -> program changes
   useEffect(() => {
+    if (order === -1) {
+      return
+    }
+
     try {
       // definitely needs debouncing
       window.parent.postMessage({
@@ -64,7 +69,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
-  }, [order, program])
+  }, [order, parameters?.program, program])
 
   // manual program string change -> local program changes -> Engraft GUI changes
   useEffect(() => {
