@@ -8,6 +8,7 @@ import version from "./util/version";
 import {defaultParams, countArgs} from "./util/ASTLibrary";
 
 const VERSION = version
+let count = 0;
 
 const codegen_options = {
   format: {
@@ -30,10 +31,6 @@ function getCell(i) {
   return document.querySelectorAll("[data-node-id]")[i];
 }
 
-function getCellId(cell) {
-  return cellElem.getAttribute("data-node-id");
-}
-
 function getView(cell) {
   return cell.querySelector(".cm-content")?.cmView;
 }
@@ -49,8 +46,6 @@ function getText(view) {
 
 function handleEngraftUpdate(event) {
   const {order, program} = event.data;
-
-  // toolFromInputs()
 
 
   if (order === -1 || order === undefined) return
@@ -79,7 +74,7 @@ function handleEngraftUpdate(event) {
       }
     })
 
-    const replacement = escodegen.generate(replaced_ast, )
+    const replacement = escodegen.generate(replaced_ast, codegen_options)
     replaceText(view.editorView, `viewof ${replacement}`)
     return
   }
@@ -139,34 +134,44 @@ function handleEngraftUpdate(event) {
 
 
 window.addEventListener("message", (event) => {
-  if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-writer") {
-    console.log("parent got event", event.data);
+  if (!event.data) return;
+  if (typeof event.data !== "object") return;
+  if (event.data.source !== "observable-writer") return;
 
-    if (event.data.type === 'engraft-update') {
-      const firstRun = event.data.firstRun
+  const {order} = event.data;
+  if (!order || order === -1) return;
 
-      if (firstRun) {
-        console.log('INTERCEPTED')
-      } else {
-        handleEngraftUpdate(event)
-      }
+  console.log("[Engraft] Got event:", event.data);
 
+  if (event.data.type === 'engraft-update' ) {
+    if (count === 0) {
+      // Page refreshes and script is restarted
+      // We rely on Observable's last cached editor value, push that to React component with the play button
 
+      const button = getButton(getCell(order))
+      const buttonActive = button?.firstChild?.getAttribute('fill') !== 'none'
+      if (button && buttonActive) button.click()
 
+    } else {
+      // General case, update as usual, component program and editor are kept in sync by extension
+      // This handles the case where users manually update the editor and press 'sync', in which case our program manually syncs.
+      handleEngraftUpdate(event)
     }
+    count++;
   }
 
-  if (event.data !== null && typeof event.data === "object" && event.data.source === "observable-check") {
-    const order = event.data.order
-    console.log(`Extension Received Health Check: Cell ${order}`)
+  if (event.data.type === "engraft-check") {
+    console.log(`[Extension] Got health Check: Cell ${order}`)
 
     // click run on startup
-    const button = getButton(getCell(order))
-    const buttonActive = button?.firstChild?.getAttribute('fill') !== 'none'
-    if (button && buttonActive) {
-      button.click()
-    }
+
 
     event.ports[0].postMessage({version : VERSION});
   }
+
+
+
+
+
+
   });
