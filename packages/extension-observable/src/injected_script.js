@@ -6,9 +6,10 @@ import escodegen from 'escodegen'
 
 import version from "./util/version";
 import {defaultParams, countArgs} from "./util/ASTLibrary";
+import {count} from "@engraft/shared/lib/count.js";
 
 const VERSION = version
-let count = 0;
+const count_map = new Map();
 
 const codegen_options = {
   format: {
@@ -143,8 +144,12 @@ window.addEventListener("message", (event) => {
 
   console.log("[Engraft] Got event:", event.data);
 
+  const cell_count = count_map.get(order) || 0; // get count, or 0 if we haven't seen this cell before
+
+
   if (event.data.type === 'engraft-update' ) {
-    if (count === 0) {
+    console.log([...count_map.entries()])
+    if (cell_count === 0) {
       // Page refreshes and script is restarted
       // We rely on Observable's last cached editor value, push that to React component with the play button
 
@@ -157,7 +162,7 @@ window.addEventListener("message", (event) => {
       // This handles the case where users manually update the editor and press 'sync', in which case our program manually syncs.
       handleEngraftUpdate(event)
     }
-    count++;
+    count_map.set(order, cell_count + 1);
   }
 
   if (event.data.type === "engraft-check") {
