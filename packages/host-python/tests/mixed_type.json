@@ -1,0 +1,23 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDspice017082",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "IDinput000000[2]",
+          "defaultCode": "IDinput000000",
+          "subPrograms": {}
+        }
+      }
+    ],
+    "prevVarId": "IDend151100"
+  }
+}

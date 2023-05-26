@@ -6,18 +6,21 @@
     "cells": [
       {
         "var_": {
-          "id": "IDspice017082",
+          "id": "IDwallet206970",
           "label": "A"
         },
         "program": {
           "toolName": "slot",
-          "modeName": "code",
-          "code": "IDinput000000[2]",
-          "defaultCode": "IDinput000000",
-          "subPrograms": {}
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "python",
+            "code": "IDinput000000 + 4",
+            "subPrograms": {}
+          },
+          "defaultCode": "IDinput000000"
         }
       }
     ],
-    "prevVarId": "IDend151100"
+    "prevVarId": "IDbag909751"
   }
 }
