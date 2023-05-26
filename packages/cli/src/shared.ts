@@ -1,27 +1,8 @@
-/// <reference path="./shared.d.ts" />
 import { VarBinding } from "@engraft/hostkit";
-import type { PyodideInterface } from "pyodide/pyodide.js";
-
-let _pyodide: PyodideInterface | undefined = undefined;
+import { getPyodide } from  "@engraft/shared/lib/engraftPyodide.js";
 
 export function varBindingsObject(varBindings: VarBinding[]) {
-  return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
-}
-
-async function getPyodide() {
-  if (_pyodide === undefined) {
-    const isNode = (globalThis as any)?.process?.release?.name === 'node';
-    const pyodideModule = isNode
-      ? await import("pyodide/pyodide.js")
-      : await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
-    _pyodide = await pyodideModule.loadPyodide() as PyodideInterface;
-    const originalConsoleLog = console.log;
-    console.log = () => {};
-    await _pyodide.loadPackage("numpy");
-    console.log = originalConsoleLog;
-  }
-  return _pyodide;
-}
+  return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));}
 
 async function reviveIn(obj : any) : Promise<any> {
   if (Array.isArray(obj)) {
