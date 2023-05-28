@@ -93,7 +93,7 @@ export async function valueToStdout(value: any, jsonOnly=false) {
       return lines.join("\n");
     }
   }
-  // otherwise, return it as JSO
+  // otherwise, return it as JSON
   if (hasCircularReference(value)) {
     return "Circular reference detected.";
   }
