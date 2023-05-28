@@ -1,5 +1,5 @@
 import { VarBinding } from "@engraft/hostkit";
-import { getPyodide } from  "@engraft/shared/lib/engraftPyodide.js";
+import { getPyodide } from  "@engraft/pyodide";
 
 export function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));}
@@ -12,9 +12,6 @@ async function reviveIn(obj : any) : Promise<any> {
       const pyodide = await getPyodide();
       return await pyodide.runPythonAsync('import numpy as np; np.array(input)', { globals: pyodide.toPy({input: obj.__value})});
     } else {
-      if (hasCircularReference(obj)) {
-        return "circular reference";
-      }
       const newValue : any = {};
       for (const key in obj) {
         newValue[key] = await reviveIn(obj[key]);
@@ -56,24 +53,21 @@ function hasCircularReference(obj : any) {
   return traverse(obj);
 }
 
-async function reviveOut(value : any) : Promise<any> {
-  const pyodide = await getPyodide();
+async function prepareForStringify(value : any) : Promise<any> {
   if (Array.isArray(value)) {
-    return Promise.all(value.map(reviveOut));
+    return Promise.all(value.map(prepareForStringify));
   } else if (typeof value === 'object') {
+    const pyodide = await getPyodide();
     if (value instanceof pyodide.ffi.PyProxy) {
-      const jsValue = value.toJs();
       if (value.type === 'numpy.ndarray') {
-         return { __type: 'nd-array', __value: Object.keys(jsValue).map(key => jsValue[key])};
+         value = await pyodide.runPythonAsync('input.tolist()', { globals: pyodide.toPy({input: value})});
+         return { __type: 'nd-array', __value: value.toJs() };
       }
-      return jsValue;
+      return value.toJs();
     } else {
-      if (hasCircularReference(value)) {
-        return "circular reference";
-      }
       const newValue : any = {};
       for (const key in value) {
-        newValue[key] = await reviveOut(value[key]);
+        newValue[key] = await prepareForStringify(value[key]);
       }
       return newValue;
     }
@@ -99,7 +93,10 @@ export async function valueToStdout(value: any, jsonOnly=false) {
       return lines.join("\n");
     }
   }
-  // otherwise, return it as JSON
-  value = await reviveOut(value);
+  // otherwise, return it as JSO
+  if (hasCircularReference(value)) {
+    return "Circular reference detected.";
+  }
+  value = await prepareForStringify(value);
   return JSON.stringify(value, null, 2);
 }

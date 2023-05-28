@@ -1,0 +1,10 @@
+{
+    "name": "@engraft/host-python",
+    "version": "0.0.1",
+    "description": "Python embedding of Engraft",
+    "type": "module",
+    "scripts": {
+      "test": "cd tests; python3 test_basic.py"
+    }
+  }
+  

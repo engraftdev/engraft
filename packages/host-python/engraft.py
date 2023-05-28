@@ -2,13 +2,13 @@ import subprocess
 import json
 import numpy as np
 
-class CustomEncoder(json.JSONEncoder):
+class _CustomEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return {"__type": "nd-array", "__value": obj.tolist()}
         return json.JSONEncoder.default(self, obj)    
 
-class CustomDecoder(json.JSONDecoder):
+class _CustomDecoder(json.JSONDecoder):
     def decode(self, json_string):
         def object_hook(obj):
             if '__type' in obj:
@@ -21,7 +21,7 @@ def run_engraft(data, program, *, edit):
     if hasattr(data, "json"):
         data = data.json()
 
-    data = json.dumps(data, cls=CustomEncoder)  
+    data = json.dumps(data, cls=_CustomEncoder)  
 
     command = ["engraft", program, "--json-only"]
 
@@ -29,5 +29,5 @@ def run_engraft(data, program, *, edit):
         command.append("--edit")
 
     output = subprocess.check_output(command, input=data.encode())
-    output = CustomDecoder().decode(output)
+    output = _CustomDecoder().decode(output)
     return output

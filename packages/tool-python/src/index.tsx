@@ -3,7 +3,7 @@
 import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { ComputeReferences, ProgramFactory, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 import { python } from "@codemirror/lang-python";
-import { getPyodide } from  "@engraft/shared/lib/engraftPyodide.js";
+import { getPyodide } from  "@engraft/pyodide";
 
 export type Program = {
   toolName: 'python',
@@ -55,11 +55,14 @@ export default defineTool({ programFactory, computeReferences, run })
 
 async function runPython(code: string, globals: {[key: string]: any}) {
   const pyodide = await getPyodide();
+  const originalConsoleLog = console.log;
+  console.log = () => {};
   await pyodide.loadPackagesFromImports(code);
   const result = await pyodide.runPythonAsync(
     code,
     {globals: pyodide.toPy(globals)}
   );
+  console.log = originalConsoleLog;
   // if (result?.toJs) return result.toJs();
   return result;
 }

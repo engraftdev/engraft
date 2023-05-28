@@ -1,4 +1,4 @@
-/// <reference path="./engraftPyodide.d.ts" />
+/// <reference path="./index.d.ts" />
 import type { PyodideInterface } from "pyodide/pyodide.js";
 
 let _pyodide: PyodideInterface | undefined = undefined;
