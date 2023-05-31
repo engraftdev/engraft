@@ -6,9 +6,9 @@ import escodegen from 'escodegen'
 
 import version from "./util/version";
 import {defaultParams, countArgs} from "./util/ASTLibrary";
-import {count} from "@engraft/shared/lib/count.js";
 
 const VERSION = version
+
 const count_map = new Map();
 
 const codegen_options = {
@@ -19,7 +19,6 @@ const codegen_options = {
 }
 
 console.log(`Observable Writer v${VERSION} running`)
-
 
 function replaceText (editorView, text, index = 0) {
   editorView.dispatch({
@@ -119,18 +118,13 @@ function handleEngraftUpdate(event) {
   });
 
 
-
-
-  // console.log('replaced')
   const replacement = escodegen.generate(new_params_ast, codegen_options)
-  // console.log(replacement)
 
   // replace program string with new version
   // dispatch changes
-  // console.log(oldString)
-  // console.log(`writing ${replacement}`)
   replaceText(view.editorView, `viewof ${replacement}`)
 }
+
 
 
 
@@ -169,14 +163,7 @@ window.addEventListener("message", (event) => {
     console.log(`[Extension] Got health Check: Cell ${order}`)
 
     // click run on startup
-
-
     event.ports[0].postMessage({version : VERSION});
   }
-
-
-
-
-
 
   });
