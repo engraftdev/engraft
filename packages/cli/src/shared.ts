@@ -57,8 +57,8 @@ async function prepareForStringify(value : any) : Promise<any> {
   if (Array.isArray(value)) {
     return Promise.all(value.map(prepareForStringify));
   } else if (typeof value === 'object') {
-    const pyodide = await getPyodide();
-    if (value instanceof pyodide.ffi.PyProxy) {
+    if (value.constructor.name === 'PyProxy') {
+      const pyodide = await getPyodide();
       if (value.type === 'numpy.ndarray') {
          value = await pyodide.runPythonAsync('input.tolist()', { globals: pyodide.toPy({input: value})});
          return { __type: 'nd-array', __value: value.toJs() };

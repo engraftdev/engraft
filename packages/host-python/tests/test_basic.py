@@ -55,9 +55,22 @@ class MyTest(unittest.TestCase):
     def test_decoder(self):
         json_string = '[4, [1, 2, 3], {"__type": "nd-array", "__value": [4, 5, 6]}, 3]'
         output = engraft._CustomDecoder().decode(json_string)
-        output[2] = output[2].all()
-        expected = [4, [1, 2, 3], np.array([4, 5, 6]).all(), 3]
-        self.assertEqual(output, expected)
+        expected = [4, [1, 2, 3], np.array([4, 5, 6]), 3]
+
+        def are_equal(a, b):
+            if isinstance(a, list) and isinstance(b, list):
+                if len(a) != len(b):
+                    return False
+                for x, y in zip(a, b):
+                    if not are_equal(x, y):
+                        return False
+                return True
+            elif isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
+                return np.array_equal(a, b)
+            else:
+                return a == b
+
+        self.assertTrue(are_equal(output, expected)) 
 
     def test_encoder(self):
         input = [4, [1, 2, 3], np.array([4, 5, 6]), 3]

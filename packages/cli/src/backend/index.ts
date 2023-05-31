@@ -1,7 +1,7 @@
 import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, RefuncMemory, runTool, ToolProgram } from '@engraft/hostkit';
+import { EngraftPromise, RefuncMemory, runTool, ToolProgram, slotWithProgram, lookUpToolByName} from '@engraft/hostkit';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
 import { exit } from 'node:process';
@@ -86,6 +86,10 @@ async function read(stream: NodeJS.ReadStream) {
       exit(1);
     }
   } else {
+    if (program === null) {
+      program = slotWithProgram(lookUpToolByName('notebook').programFactory('IDinput000000'));
+    }
+
     const app = express();
     const PORT = 8888;
     console.error(`Editor running at http://localhost:${PORT}/`);
@@ -103,6 +107,10 @@ async function read(stream: NodeJS.ReadStream) {
       // idk why it's not working, but w/e
       res.setHeader('content-type', 'text/plain');
       res.send(stdin);
+    });
+
+    app.get('/api/program', async (_req, res) => {
+      res.send(program);
     });
 
     app.get('/api/json_only', async (_req, res) => {
