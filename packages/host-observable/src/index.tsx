@@ -6,8 +6,6 @@ import { ObservableInspector } from './ObservableInspector.js'
 
 import "./index.css";
 
-
-
 import React, {isValidElement, memo, useCallback, useEffect, useMemo, useState} from 'react';
 import ExtensionBanner from "./ExtensionBanner.js";
 
@@ -69,17 +67,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     } catch (e) {
       console.warn("error writing program string to cell", e);
     }
-  }, [order, parameters?.program, program])
-
-  // manual program string change -> local program changes -> Engraft GUI changes
-  useEffect(() => {
-    try {
-      // debouncing?
-      parameters?.program && updateProgram(parameters?.program)
-    } catch (e) {
-      console.warn("error writing program string to cell", e);
-    }
-  }, [parameters?.program])
+  }, [order, program])
 
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.resolve({value: undefined}));
