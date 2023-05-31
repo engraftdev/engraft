@@ -61,7 +61,6 @@ function handleEngraftUpdate(event) {
   const original_ast = esprima.parseScript(content)
 
   const num_args = countArgs(original_ast)
-  // console.log(`number of args: ${num_args}`)
 
   if (num_args === 1) {
     // engraft(this)
@@ -87,7 +86,6 @@ function handleEngraftUpdate(event) {
   const program_str = JSON.stringify(program)
   // parse
   let program_ast =  esprima.parseScript(`let a = ` + program_str )
-  // console.log(program_ast)
 
 
 
