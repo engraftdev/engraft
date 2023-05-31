@@ -13,3 +13,4 @@ On the notebook side, there is another React component that wraps this embedding
 
 By convention, code should be written as close to Observable as possible (i.e. in the notebook), and only in this repo when necessary. (e.g. when needing strictly typed code, etc.)
 
+This codebase is meant to be bundled into a .js lib with Vite, and imported into the [Observable host notebook](https://observablehq.com/@wongyuhao/engraft-embed).
