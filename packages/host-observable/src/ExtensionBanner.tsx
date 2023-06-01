@@ -10,7 +10,7 @@ type ExtensionBannerProps = {
 }
 const ExtensionBanner = ({active, program, version, editorHidden, setEditorHidden}:ExtensionBannerProps) => (
     <div className={`bannerContainer`}>
-        <div className={'toolbar'}>
+        <div className={'bannerToolbar'}>
             <button onClick={()=> navigator.clipboard.writeText(JSON.stringify(program))}>
                 Copy Program
             </button>
