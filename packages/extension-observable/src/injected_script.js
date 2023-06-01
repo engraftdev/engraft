@@ -9,9 +9,9 @@ import {defaultParams, countArgs} from "./util/ASTLibrary";
 
 const VERSION = version
 
-const count_map = new Map();
+const countMap = new Map();
 
-const codegen_options = {
+const codegenOptions = {
   format: {
     compact: true,
     quotes: 'single',
@@ -57,14 +57,14 @@ function handleEngraftUpdate(event) {
 
   // everything except the 'viewof' keyword since esprima can't parse that
   const content = oldString.replace(/\bviewof\b\s*/, '')
-  const original_ast = esprima.parseScript(content)
+  const originalAST = esprima.parseScript(content)
 
-  const num_args = countArgs(original_ast)
+  const numArgs = countArgs(originalAST)
 
-  if (num_args === 1) {
+  if (numArgs === 1) {
     // engraft(this)
     // post-startup, insert our necessary fields
-    const replaced_ast = estraverse.replace(original_ast, {
+    const replacedAST = estraverse.replace(originalAST, {
       enter: function(node) {
         if (node.type === 'CallExpression') {
           node?.arguments.push(defaultParams)
@@ -72,7 +72,7 @@ function handleEngraftUpdate(event) {
       }
     })
 
-    const replacement = escodegen.generate(replaced_ast, codegen_options)
+    const replacement = escodegen.generate(replacedAST, codegenOptions)
     replaceText(view.editorView, `viewof ${replacement}`)
     return
   }
@@ -82,30 +82,30 @@ function handleEngraftUpdate(event) {
 
 
   // stringify to use in parser
-  const program_str = JSON.stringify(program)
+  const programStr = JSON.stringify(program)
   // parse
-  let program_ast =  esprima.parseScript(`let a = ` + program_str )
+  let programAST =  esprima.parseScript(`let a = ` + programStr )
 
 
 
   // this is an expression, extract the object to replace in the original string
-  estraverse.traverse(program_ast, {
+  estraverse.traverse(programAST, {
     enter: function(node) {
       if (node.type === 'ObjectExpression') {
-        program_ast = node
+        programAST = node
         this.break()
       }
     }
   })
   //latest program string now represented as an AST
 
-  let new_params_ast = estraverse.replace(original_ast, {
+  let newParamsAST = estraverse.replace(originalAST, {
     enter: function(node) {
       if (node.type === 'Property' && node.key.name === 'program') {
         return {
           type: 'Property',
           key: { type: 'Identifier', name: 'program' },
-          value: program_ast,
+          value: programAST,
           kind: 'init',
         }
       }
@@ -113,7 +113,7 @@ function handleEngraftUpdate(event) {
   });
 
 
-  const replacement = escodegen.generate(new_params_ast, codegen_options)
+  const replacement = escodegen.generate(newParamsAST, codegenOptions)
 
   // replace program string with new version
   // dispatch changes
@@ -131,7 +131,7 @@ window.addEventListener("message", (event) => {
   if (event.data.type === 'engraft-update' ) {
     const {order} = event.data;
     if (!order || order === -1) return;
-    const cell_count = count_map.get(order) || 0; // get count, or 0 if we haven't seen this cell before
+    const cell_count = countMap.get(order) || 0; // get count, or 0 if we haven't seen this cell before
     if (cell_count === 0) {
       // Page refreshes and script is restarted
       // We rely on Observable's last cached editor value, push that to React component with the play button
@@ -145,7 +145,7 @@ window.addEventListener("message", (event) => {
       // This handles the case where users manually update the editor and press 'sync', in which case our program manually syncs.
       handleEngraftUpdate(event)
     }
-    count_map.set(order, cell_count + 1);
+    countMap.set(order, cell_count + 1);
   }
 
   if (event.data.type === "engraft-check") {
