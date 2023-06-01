@@ -100,11 +100,9 @@ function handleEngraftUpdate(event) {
   })
   //latest program string now represented as an AST
 
-  let program_found = false
   let new_params_ast = estraverse.replace(original_ast, {
     enter: function(node) {
       if (node.type === 'Property' && node.key.name === 'program') {
-        program_found = true
         return {
           type: 'Property',
           key: { type: 'Identifier', name: 'program' },
