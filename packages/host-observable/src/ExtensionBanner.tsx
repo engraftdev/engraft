@@ -2,13 +2,13 @@ import React, {Dispatch, SetStateAction} from 'react';
 import {ToolProgram} from "@engraft/core";
 
 type ExtensionBannerProps = {
-    active: boolean,
+    extensionDetected: boolean,
     program: ToolProgram,
     version: number,
     editorHidden: boolean,
     setEditorHidden: Dispatch<SetStateAction<boolean>>
 }
-const ExtensionBanner = ({active, program, version, editorHidden, setEditorHidden}:ExtensionBannerProps) => (
+const ExtensionBanner = ({extensionDetected, program, version, editorHidden, setEditorHidden}:ExtensionBannerProps) => (
     <div className={`bannerContainer`}>
         <div className={'bannerToolbar'}>
             <button onClick={()=> navigator.clipboard.writeText(JSON.stringify(program))}>
@@ -19,7 +19,7 @@ const ExtensionBanner = ({active, program, version, editorHidden, setEditorHidde
             </div>
         </div>
         {
-            (active) ?
+            (extensionDetected) ?
             <ExtensionActive version={version}/>
             :
             <ExtensionInactive/>

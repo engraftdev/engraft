@@ -26,12 +26,12 @@ type ObservableEmbedProps = {
   reportOutputP?: (outputState: EngraftPromise<ToolOutput>) => void,
   parameters?: ObservableParameters,
   order: number,
-  extension?: boolean
+  extensionDetected?: boolean
   version?: number
 }
 
 export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEmbedProps) {
-  const {parameters, reportOutputState, reportOutputP, order, extension = false, version = 0.1} = props;
+  const {parameters, reportOutputState, reportOutputP, order, extensionDetected = false, version = 0.1} = props;
 
   // turn inputs provided from Observable into varBindings
   const varBindings = useMemo(() => {
@@ -105,7 +105,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
             </div>
         }
         <ExtensionBanner
-            active={extension}
+            extensionDetected={extensionDetected}
             program={program}
             version={version}
             editorHidden={editorHidden} setEditorHidden={setEditorHidden}
