@@ -56,7 +56,7 @@ function hasCircularReference(obj : any) {
 async function prepareForStringify(value : any) : Promise<any> {
   if (Array.isArray(value)) {
     return Promise.all(value.map(prepareForStringify));
-  } else if (value != null && typeof value === 'object') {
+  } else if (value !== null && typeof value === 'object') {
     if (value.constructor.name === 'PyProxy') {
       const pyodide = await getPyodide();
       if (value.type === 'numpy.ndarray') {
