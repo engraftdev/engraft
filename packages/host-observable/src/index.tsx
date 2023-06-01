@@ -48,7 +48,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
       parameters?.program || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
-  const [hide, setHide] = useState<boolean>(parameters?.hide || false)
+  const [editorHidden, setEditorHidden] = useState<boolean>(parameters?.hide || false)
 
   // Engraft GUI change -> local program changes -> [Extension] -> program changes
   useEffect(() => {
@@ -93,7 +93,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
               return <ObservableInspector value={value}/>;
             }}
         />
-        { !hide &&
+        { !editorHidden &&
             <div style={{marginTop: 10}}>
               <IsolateStyles>
                 <ToolWithView
@@ -110,7 +110,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
             active={extension}
             program={program}
             version={version}
-            hide={hide} setHide={setHide}
+            editorHidden={editorHidden} setEditorHidden={setEditorHidden}
         />
       </div>
   );

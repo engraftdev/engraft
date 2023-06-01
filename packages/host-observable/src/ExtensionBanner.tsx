@@ -5,17 +5,17 @@ type ExtensionBannerProps = {
     active: boolean,
     program: ToolProgram,
     version: number,
-    hide: boolean,
-    setHide: Dispatch<SetStateAction<boolean>>
+    editorHidden: boolean,
+    setEditorHidden: Dispatch<SetStateAction<boolean>>
 }
-const ExtensionBanner = ({active, program, version, hide, setHide}:ExtensionBannerProps) => (
+const ExtensionBanner = ({active, program, version, editorHidden, setEditorHidden}:ExtensionBannerProps) => (
     <div className={`bannerContainer`}>
         <div className={'toolbar'}>
             <button onClick={()=> navigator.clipboard.writeText(JSON.stringify(program))}>
                 Copy Program
             </button>
             <div>
-                <b>Show Editor</b> <input type="checkbox" checked={!hide} onChange={()=>setHide(!hide)} style={{margin: 0}}/>
+                <b>Show Editor</b> <input type="checkbox" checked={!editorHidden} onChange={()=>setEditorHidden(!editorHidden)} style={{margin: 0}}/>
             </div>
         </div>
         {
