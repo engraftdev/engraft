@@ -57,7 +57,6 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     }
 
     try {
-      // definitely needs debouncing
       window.parent.postMessage({
         source: 'observable-writer',
         type: 'engraft-update',
