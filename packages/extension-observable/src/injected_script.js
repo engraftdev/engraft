@@ -51,7 +51,6 @@ function handleEngraftUpdate(event) {
   if (order === -1 || order === undefined) return
 
   const view = getView(getCell(order))
-  console.log('updating engraft in cell ', order)
 
   // full old string
   const oldString = getText(view)
@@ -132,13 +131,11 @@ window.addEventListener("message", (event) => {
   const {order} = event.data;
   if (!order || order === -1) return;
 
-  console.log("[Engraft] Got event:", event.data);
 
   const cell_count = count_map.get(order) || 0; // get count, or 0 if we haven't seen this cell before
 
 
   if (event.data.type === 'engraft-update' ) {
-    console.log([...count_map.entries()])
     if (cell_count === 0) {
       // Page refreshes and script is restarted
       // We rely on Observable's last cached editor value, push that to React component with the play button
@@ -156,7 +153,6 @@ window.addEventListener("message", (event) => {
   }
 
   if (event.data.type === "engraft-check") {
-    console.log(`[Extension] Got health Check: Cell ${order}`)
 
     // click run on startup
     event.ports[0].postMessage({version : VERSION});
