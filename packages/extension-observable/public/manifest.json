@@ -1,5 +1,5 @@
 {
-  "name": "Observable Writer [Vite]",
+  "name": "Engraft-Observable Writer",
   "description": "Write to Observable cells from their output",
   "version": "1.0",
   "manifest_version": 3,
