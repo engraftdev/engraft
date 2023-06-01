@@ -1,5 +1,5 @@
 import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState } from "@engraft/hostkit";
+import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState} from "@engraft/hostkit";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
@@ -119,17 +119,17 @@ type AppWithRunningProgramProps = {
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
   const {program, updateProgram, stdin, jsonOnly} = props;
 
-  const input = useMemo(() => valueFromStdin(stdin), [stdin]);
+  const inputP = useMemo(() => valueFromStdin(stdin), [stdin]);
 
   const varBindings = useMemo(() => varBindingsObject([
     // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-    {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: input})},
-  ]), [input]);
+    {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve(inputP.then((input) => ({value : input}))),
+  }]), [inputP]);
 
   const [outputP, setOutputP] = useState<EngraftPromise<ToolOutput>>(EngraftPromise.unresolved());
 
   const stdoutP = useMemo(() => {
-    return outputP.then(({value}) => ({value: valueToStdout(value, jsonOnly)}));
+    return outputP.then(async ({value}) => ({value: await valueToStdout(value, jsonOnly)}));
   }, [outputP, jsonOnly]);
 
   const stdoutState = usePromiseState(stdoutP);
@@ -146,7 +146,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
       throw new Error(`Error saving program: ${resp.status} ${resp.statusText}`);
     }
   };
-
+  
   const saveStdout = stdoutState.status === 'fulfilled' && (async () => {
     console.log('saving stdout', stdoutState.value.value)
     const resp = await fetch('/api/stdout', {

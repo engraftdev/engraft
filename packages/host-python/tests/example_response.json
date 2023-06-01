@@ -1,0 +1,42 @@
+{
+    "continue":{
+       "excontinue":1,
+       "grncontinue":"0.661051795907|0.661051795907|0|0",
+       "continue":"grncontinue||pageimages"
+    },
+    "warnings":{
+       "extracts":{
+          "*":"\"exlimit\" was too large for a whole article extracts request, lowered to 1.\nHTML may be malformed and/or unbalanced and may omit inline images. Use at your own risk. Known problems are listed at https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:TextExtracts#Caveats."
+       }
+    },
+    "query":{
+       "pages":{
+          "73623959":{
+             "pageid":73623959,
+             "ns":0,
+             "title":"2023 Hart District Council election",
+             "extract":"<p>The <b>2023 Hart District Council election</b> took place on 4 May 2023 to elect members of Hart District Council in Hampshire, England. This would be on the same day as other local elections across England.\n</p>\n<meta property=\"mw:PageProp/toc\"><h2><span id=\"Summary\">Summary</span></h2>\n<h3><span id=\"Election_result\">Election result</span></h3>\n<h2><span id=\"Candidates\">Candidates</span></h2>\n<p>The Statement of Persons Nominated, which details the candidates standing in each ward, was released by Hart District Council following the close of nominations on 5 April 2023.</p>\n<h3><span id=\"Blackwater_.26_Hawley\"></span><span id=\"Blackwater_&amp;_Hawley\">Blackwater &amp; Hawley</span></h3>\n<h3><span id=\"Crookham_East\">Crookham East</span></h3>\n<h3><span id=\"Crookham_West_.26_Ewshot\"></span><span id=\"Crookham_West_&amp;_Ewshot\">Crookham West &amp; Ewshot</span></h3>\n<h3><span id=\"Fleet_Central\">Fleet Central</span></h3>\n<h3><span id=\"Fleet_East\">Fleet East</span></h3>\n<h3><span id=\"Fleet_West\">Fleet West</span></h3>\n<h3><span id=\"Hartley_Wintney\">Hartley Wintney</span></h3>\n<h3><span id=\"Hook\">Hook</span></h3>\n<h3><span id=\"Odiham\">Odiham</span></h3>\n<h3><span id=\"Yateley_East\">Yateley East</span></h3>\n<h3><span id=\"Yateley_West\">Yateley West</span></h3>\n<h2><span id=\"References\">References</span></h2>\n\n\n\n<!-- \nNewPP limit report\nParsed by mw2299\nCached time: 20230528200355\nCache expiry: 1814400\nReduced expiry: false\nComplications: [vary‐revision‐sha1, show‐toc]\nCPU time usage: 0.622 seconds\nReal time usage: 0.787 seconds\nPreprocessor visited node count: 9004/1000000\nPost‐expand include size: 252324/2097152 bytes\nTemplate argument size: 15016/2097152 bytes\nHighest expansion depth: 20/100\nExpensive parser function count: 4/500\nUnstrip recursion depth: 1/20\nUnstrip post‐expand size: 26887/5000000 bytes\nLua time usage: 0.337/10.000 seconds\nLua memory usage: 12589472/52428800 bytes\nNumber of Wikibase entities loaded: 0/400\n-->\n<!--\nTransclusion expansion time report (%,ms,calls,template)\n100.00%  612.784      1 -total\n 27.43%  168.100      1 Template:Infobox_election\n 17.22%  105.503     40 Template:Election_box_candidate_with_party_link\n 16.49%  101.071      3 Template:Infobox_election/row\n 13.70%   83.968      3 Template:Navbox\n 13.30%   81.500      1 Template:Primary\n 12.80%   78.441      1 Template:Reflist\n 11.94%   73.141      1 Template:Hampshire_elections\n 11.12%   68.158      2 Template:Cite_web\n 10.65%   65.288      1 Template:Ambox\n-->"
+          },
+          "58942982":{
+             "pageid":58942982,
+             "ns":0,
+             "title":"Azure Beach Club Paris Hilton"
+          },
+          "12029518":{
+             "pageid":12029518,
+             "ns":0,
+             "title":"Baby Be Mine (Blackstreet song)"
+          },
+          "37477660":{
+             "pageid":37477660,
+             "ns":0,
+             "title":"Válicka"
+          },
+          "53059642":{
+             "pageid":53059642,
+             "ns":0,
+             "title":"Jenny Herz"
+          }
+       }
+    }
+ }
