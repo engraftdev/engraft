@@ -149,8 +149,6 @@ window.addEventListener("message", (event) => {
   }
 
   if (event.data.type === "engraft-check") {
-
-    // click run on startup
     event.ports[0].postMessage({version : VERSION});
   }
 
