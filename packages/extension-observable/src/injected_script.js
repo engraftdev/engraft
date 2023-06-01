@@ -128,14 +128,10 @@ window.addEventListener("message", (event) => {
   if (typeof event.data !== "object") return;
   if (event.data.source !== "observable-writer") return;
 
-  const {order} = event.data;
-  if (!order || order === -1) return;
-
-
-  const cell_count = count_map.get(order) || 0; // get count, or 0 if we haven't seen this cell before
-
-
   if (event.data.type === 'engraft-update' ) {
+    const {order} = event.data;
+    if (!order || order === -1) return;
+    const cell_count = count_map.get(order) || 0; // get count, or 0 if we haven't seen this cell before
     if (cell_count === 0) {
       // Page refreshes and script is restarted
       // We rely on Observable's last cached editor value, push that to React component with the play button
