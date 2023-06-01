@@ -5,8 +5,7 @@ let _pyodide: PyodideInterface | undefined = undefined;
 
 export async function getPyodide() : Promise<PyodideInterface> {
     if (_pyodide === undefined) {
-      const process = (globalThis as any).process;
-      const isNode = process && (process.release.name === 'node');
+      const isNode = (globalThis as any)?.process?.release?.name === 'node';
       const pyodideModule = isNode
         ? await import("pyodide/pyodide.js")
         : await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
