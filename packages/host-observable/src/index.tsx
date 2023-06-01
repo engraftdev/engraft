@@ -19,7 +19,6 @@ type ObservableParameters = {
   inputs: {[name: string]: any} | undefined,
   program: ToolProgram,
   ext: boolean
-  hide?: boolean
 }
 
 type ObservableEmbedProps = {
@@ -48,7 +47,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
       parameters?.program || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
-  const [editorHidden, setEditorHidden] = useState<boolean>(parameters?.hide || false)
+  const [editorHidden, setEditorHidden] = useState<boolean>(false)
 
   // Engraft GUI change -> local program changes -> [Extension] -> program changes
   useEffect(() => {
