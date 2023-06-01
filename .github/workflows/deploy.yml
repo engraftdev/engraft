@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  # avoid "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"
+  NODE_OPTIONS: "--max_old_space_size=8192"
+
 jobs:
   build-and-deploy:
     name: Build and deploy
@@ -33,9 +37,6 @@ jobs:
 
       - name: Build graft-garden
         run: npx lerna run build-app --scope @engraft/graft-garden
-        env:
-          # avoid "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"
-          NODE_OPTIONS: "--max_old_space_size=8192"
 
       - name: Build use-engraft-demo
         run: npx lerna run build-app --scope @engraft/use-engraft-demo

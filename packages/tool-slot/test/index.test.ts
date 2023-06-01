@@ -50,6 +50,25 @@ describe('slot', () => {
     )
   });
 
+  it('object literals work', () => {
+    expect(
+      EngraftPromise.state(
+        runTool(new RefuncMemory(), {
+          program: {
+            toolName: 'slot',
+            modeName: 'code',
+            code: '{ x: 1, y: 2 }',
+            subPrograms: {},
+            defaultCode: undefined,
+          },
+          varBindings: empty,
+        }).outputP
+      ),
+    ).toEqual(
+      {status: 'fulfilled', value: {value: {x: 1, y : 2}}},
+    )
+  });
+
   it('returned promises are resolved into output', async () => {
     const {outputP} = runTool(new RefuncMemory(), {
       program: {
