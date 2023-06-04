@@ -3,54 +3,6 @@ import esprima from "esprima";
 import estree, {CallExpression} from 'estree';
 
 
-
-const defaultProgramAST = {
-    type: 'ObjectExpression',
-    properties: [
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'toolName' },
-            value: {type: 'Literal', value: 'slot'},
-        },
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'modeName' },
-            value: {type: 'Literal', value: 'code'},
-        },
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'code' },
-            value: {type: 'Literal', value: ''},
-        },
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'defaultCode' },
-            value: {type: 'Literal', value: ''},
-        },
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'subPrograms' },
-            value: {type: 'ObjectExpression', properties: []},
-        },
-    ]
-}
-
-export const defaultParamsAST = {
-    type: "ObjectExpression",
-    properties: [
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'inputs' },
-            value: {type: "ObjectExpression", properties:[]},
-        },
-        {
-            type: 'Property',
-            key: { type: 'Identifier', name: 'program' },
-            value: defaultProgramAST
-        }
-    ]
-}
-
 export function countArgs(ast: estree.Node) {
     const call = findFirstMatchingNode(ast, 'CallExpression');
 
