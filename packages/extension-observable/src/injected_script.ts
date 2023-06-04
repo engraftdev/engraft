@@ -7,14 +7,13 @@ import escodegen from 'escodegen'
 import version from "./util/version.js";
 // @ts-ignore
 import {defaultParams, countArgs, parseObjectToAST} from "./util/ASTLibrary.ts";
-import estree, {CallExpression, Literal, ObjectExpression, PrivateIdentifier, Property} from "estree";
+import estree, {CallExpression, Literal, ObjectExpression, Property} from "estree";
 import {ToolProgram} from "@engraft/core";
 import {EditorView} from "@codemirror/view";
-import CodeMirror from "codemirror";
-import {ChangeSpec, EditorState} from "@codemirror/state";
+import {ChangeSpec} from "@codemirror/state";
 
 const VERSION = version
-const DEBUG = true
+const DEBUG = import.meta.env.DEV // vite: boolean if we are running in dev env or not
 const countMap = new Map();
 
 const codegenOptions = {
