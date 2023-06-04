@@ -26,7 +26,7 @@ console.log(`Engraft-Observable Writer v${VERSION} running`)
 
 function replaceText (editorView: EditorView, text:string) {
   editorView.dispatch({
-    changes: <ChangeSpec> {from: 0, to: editorView.state.doc.length, insert: text},
+    changes: {from: 0, to: editorView.state.doc.length, insert: text},
   });
 }
 
