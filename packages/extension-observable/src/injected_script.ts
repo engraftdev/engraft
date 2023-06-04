@@ -5,8 +5,7 @@ import estraverse from 'estraverse'
 import escodegen from 'escodegen'
 
 import version from "./util/version.js";
-// @ts-ignore
-import {defaultParams, countArgs, parseObjectToAST} from "./util/ASTLibrary.ts";
+import {defaultParams, countArgs, parseObjectToAST} from "./util/ASTLibrary.js";
 import estree, {CallExpression, Literal, ObjectExpression, Property} from "estree";
 import {ToolProgram} from "@engraft/core";
 import {EditorView} from "@codemirror/view";
