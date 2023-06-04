@@ -18,7 +18,6 @@ registerAllTheTools();
 type ObservableParameters = {
   inputs: {[name: string]: any} | undefined,
   program: ToolProgram,
-  ext: boolean
 }
 
 type ObservableEmbedProps = {
