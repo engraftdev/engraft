@@ -27,8 +27,6 @@ const codegenOptions = {
 console.log(`Engraft-Observable Writer v${VERSION} running`)
 
 function replaceText (editorView: EditorView, text:string) {
-  console.log('dispatch')
-  console.log(text)
   editorView.dispatch({
     changes: <ChangeSpec> {from: 0, to: editorView.state.doc.length, insert: text},
   });
