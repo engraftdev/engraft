@@ -6,10 +6,9 @@ import escodegen from 'escodegen'
 
 import version from "./util/version.js";
 import {defaultParams, countArgs, parseObjectToAST} from "./util/ASTLibrary.js";
-import estree, {CallExpression, Literal, ObjectExpression, Property} from "estree";
+import {CallExpression, Literal, ObjectExpression, Property} from "estree";
 import {ToolProgram} from "@engraft/core";
 import {EditorView} from "@codemirror/view";
-import {ChangeSpec} from "@codemirror/state";
 
 const VERSION = version
 const DEBUG = import.meta.env.DEV // vite: boolean if we are running in dev env or not
@@ -90,7 +89,7 @@ function handleEngraftUpdate(event: MessageEvent): void {
   // this is necessary to only replace the top-level object called 'program'
   // tools like /notebook that have nested 'program' fields will recurse infinitely without this.
   let newParamsAST = estraverse.replace(originalAST, {
-    enter: function(node) : estree.Node | void | estraverse.VisitorOption{
+    enter: function(node){
 
       if (node.type === 'Property') {
         const prop = node as Property
