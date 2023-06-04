@@ -18,8 +18,11 @@ describe('ASTLibrary.ts', ()=> {
     describe('parseObjectToAST()', ()=> {
         test('general case', ()=> {
             // covered by findFirstMatchingNode() test
-            const ast = parseObjectToAST({a:10});
+            const test = {a:10}
+            const ast = parseObjectToAST(test);
             expect(ast.type).toMatch('ObjectExpression')
+            const gen = escodegen.generate(ast, {format:{json:true}})
+            expect(JSON.parse(gen)).toMatchObject(test)
         })
 
         test('error case', ()=> {
