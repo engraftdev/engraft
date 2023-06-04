@@ -99,13 +99,8 @@ function handleEngraftUpdate(event: MessageEvent): void {
         if (key === 'program' && nestedLevel == 0) {
           nestedLevel++
           return  ({
-            type: 'Property',
-            key: {type: 'Literal', value: 'program'},
+            ...node,
             value: programObjExprAST,
-            kind: 'init',
-            method: false,
-            shorthand: false,
-            computed: false
           } as Property)
         }
 
