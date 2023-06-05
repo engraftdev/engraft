@@ -33,18 +33,16 @@ function getCell(i : number) {
   return document.querySelectorAll("[data-node-id]")[i];
 }
 
-function getView(cell : any) {
-
-  return cell.querySelector(".cm-content")?.cmView;
+function getView(cell : any) : EditorView{
+  return cell.querySelector(".cm-content")?.cmView.editorView;
 }
 
 function getButton(cell : any) : HTMLElement{
   return cell?.querySelector("button")
-
 }
 
-function getText(view : any) : string{
-  return view?.editorView.state.doc.toString();
+function getText(view : EditorView) : string{
+  return view.state.doc.toString();
 }
 
 function handleEngraftUpdate(event: MessageEvent): void {
@@ -112,7 +110,7 @@ function handleEngraftUpdate(event: MessageEvent): void {
   const replacement = escodegen.generate(newParamsAST, codegenOptions)
   // replace program string with new version
   // dispatch changes
-  replaceText(view.editorView, `viewof ${replacement}`)
+  replaceText(view, `viewof ${replacement}`)
 }
 
 
