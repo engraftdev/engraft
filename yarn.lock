@@ -1152,10 +1152,10 @@
   resolved "https://registry.npmjs.org/@codemirror/state/-/state-6.2.0.tgz"
   integrity sha512-69QXtcrsc3RYtOtd+GsvczJ319udtBf1PTrr2KbLWM/e2CXUPnh0Nz9AUo8WfhSQ7GeL8dPVNUmhQVgpmuaNGA==
 
-"@codemirror/view@^6.0.0", "@codemirror/view@^6.2.0", "@codemirror/view@^6.6.0":
-  version "6.10.1"
-  resolved "https://registry.npmjs.org/@codemirror/view/-/view-6.10.1.tgz"
-  integrity sha512-Q3FAmkajqcoqBUlfrlD6p58lnuffYxS/6ImIrsLd4SZOZItCBysqAXvQ/OqWxMCyVuDoh5KaNErl9/FDlWM5IA==
+"@codemirror/view@^6.0.0", "@codemirror/view@^6.13.0", "@codemirror/view@^6.2.0", "@codemirror/view@^6.6.0":
+  version "6.13.0"
+  resolved "https://registry.npmjs.org/@codemirror/view/-/view-6.13.0.tgz"
+  integrity sha512-oXTfJzHJ5Tl7f6T8ZO0HKf981zubxgKohjddLobbntbNZHlOZGMRL+pPZGtclDWFaFJWtGBYRGyNdjQ6Xsx5yA==
   dependencies:
     "@codemirror/state" "^6.1.4"
     style-mod "^4.0.0"
@@ -6034,6 +6034,7 @@ express@^4.18.2:
   version "1.0.0"
   resolved "file:packages/extension-observable"
   dependencies:
+    "@codemirror/view" "^6.13.0"
     escodegen "^2.0.0"
     esprima "^4.0.1"
     estraverse "^5.3.0"
