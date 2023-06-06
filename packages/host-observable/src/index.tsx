@@ -4,7 +4,7 @@ import {IsolateStyles, ToolWithView, ToolOutputBuffer, EngraftPromise, PromiseSt
 import { isObject } from '@engraft/shared/lib/isObject.js';
 import { ObservableInspector } from './ObservableInspector.js'
 
-import "./index.css";
+import css from "./index.css?inline";
 
 import React, {isValidElement, memo, useCallback, useEffect, useMemo, useState} from 'react';
 import ExtensionBanner from "./ExtensionBanner.js";
@@ -14,6 +14,12 @@ export * as ReactDOM from 'react-dom';
 export { React };
 
 registerAllTheTools();
+
+export const RootStyles = memo(function RootStyles(){
+  return <style>
+    {css}
+  </style>
+})
 
 type ObservableParameters = {
   inputs: {[name: string]: any} | undefined,
@@ -79,6 +85,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
   return (
 
       <div>
+        <RootStyles/>
         <ToolOutputBuffer
             outputP={outputP}
             renderValue={(value) => {
