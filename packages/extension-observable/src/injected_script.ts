@@ -6,7 +6,7 @@ import escodegen from 'escodegen'
 
 import version from "./util/version.js";
 import {defaultParams, countArgs, parseObjectToAST} from "./util/ASTLibrary.js";
-import {CallExpression, Literal, ObjectExpression, Property} from "estree";
+import type {Literal, ObjectExpression, Property} from "estree";
 import {ToolProgram} from "@engraft/core";
 import {EditorView} from "@codemirror/view";
 

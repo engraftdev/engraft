@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest';
 import esprima from 'esprima';
 import {countArgs, defaultParams, findFirstMatchingNode, parseObjectToAST} from "../src/util/ASTLibrary.js";
-import {CallExpression, Literal, ObjectExpression, Property} from "estree";
+import type {CallExpression, Literal, ObjectExpression, Property} from "estree";
 import escodegen from "escodegen";
 
 describe('ASTLibrary.ts', ()=> {
