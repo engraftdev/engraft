@@ -66,7 +66,7 @@ function handleEngraftUpdate(event: MessageEvent): void {
     const replacedAST = estraverse.replace(originalAST, {
       enter: function(node) {
         if (node.type === 'CallExpression') {
-          (node as CallExpression).arguments.push(defaultParams())
+          node.arguments.push(defaultParams())
           this.break()
         }
 
