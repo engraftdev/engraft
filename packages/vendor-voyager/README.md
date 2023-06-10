@@ -13,7 +13,7 @@ Note: This package will only install without errors if `canvas` and `canvas-preb
 ```
 (This doesn't work if put in this package's `package.json` because of [this issue](https://github.com/yarnpkg/yarn/issues/5039).)
 
-Note also: For this package to compile with Vite, we need to add it to the `optimizeDeps` list in the monorepo's root `vite.config.js`:
+Note also: For this package to compile with Vite, we need to add it to the `optimizeDeps` list in the monorepo's root `vite.config.ts`:
 ```
     optimizeDeps: {
       include: [
