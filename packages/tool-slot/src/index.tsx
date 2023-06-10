@@ -1,4 +1,6 @@
+/// <reference path="babel_plugin-proposal-do-expressions.d.ts" />
 import { NodePath, PluginItem, TransformOptions } from "@babel/core";
+import proposalDoExpressions from "@babel/plugin-proposal-do-expressions";
 import { transform } from "@babel/standalone";
 import TemplateDefault, * as TemplateModule from "@babel/template";
 import babelTypes from "@babel/types";
@@ -8,7 +10,7 @@ import { Decoration, EditorView, WidgetType, keymap } from "@codemirror/view";
 import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
-import { compileBodyCached, compileExpressionCached } from "@engraft/shared/lib/compile.js";
+import { compileBodyCached } from "@engraft/shared/lib/compile.js";
 import { EngraftPromise, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, references, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
@@ -136,19 +138,13 @@ const lineNumPlugin: PluginItem = function({types: t}: {types: typeof babelTypes
   };
 }
 
-const transformExpressionOptions: TransformOptions = {
+const transformBodyOptions: TransformOptions = {
   presets: [
     "react",
   ],
-};
-const transformExpressionCached = cache((code: string) => {
-  return transform(code, transformExpressionOptions);
-});
-
-const transformBodyOptions: TransformOptions = {
-  ...transformExpressionOptions,
   plugins: [
-    lineNumPlugin
+    lineNumPlugin,
+    proposalDoExpressions,
   ],
   parserOpts: { allowReturnOutsideFunction: true },
   generatorOpts: { retainLines: true }
@@ -175,20 +171,16 @@ const runCodeMode = (props: CodeModeProps) => {
       throw new Error("Empty code");
     }
 
-    // TODO: this split between "expression" and "body" pipelines is wrong. (e.g., logs in .map callbacks of expressions fail.)
-    //       really, we should parse everything as body and then identify single-expression bodies which need "return" added.
-    // TODO: it probably isn't performant either.
+    // TODO: `__inst_lineNum`s are multiplying
     // TODO: async function bodies? low priority
+    // TODO: double-parsing isn't great
+    let transformed: string;
     try {
-      // Try to interpret as expression
-      let transformed = transformExpressionCached("(" + program.code + ")").code!
-      transformed = transformed.replace(/;$/, "");
-      return compileExpressionCached(transformed);
+      transformed = transformBodyCached(`return ( ${program.code} )`).code!;
     } catch {
-      // Try to interpret as function body
-      let transformed = transformBodyCached(program.code).code!;
-      return compileBodyCached(transformed);
+      transformed = transformBodyCached(`return do { ${program.code} }`).code!;
     }
+    return compileBodyCached(transformed);
   }), [program.code])
 
   const outputAndLogsP = hookMemo(() => {
@@ -203,7 +195,7 @@ const runCodeMode = (props: CodeModeProps) => {
       let logs: {lineNum: number, text: string}[] = [];
 
       // Reset the global logger to user our versions of `lineNum` and `logs`.
-      (window as any).__log = (...vals: any[]) => {
+      (globalThis as any).__log = (...vals: any[]) => {
         const text = vals.map((v) => objectInspect(v)).join(", ");
         logs.push({lineNum, text});
         return vals[vals.length - 1];
@@ -213,7 +205,7 @@ const runCodeMode = (props: CodeModeProps) => {
         lineNum = newLineNum;
       };
       const log = (...vals: any[]) => {
-        (window as any).__log(...vals);
+        (globalThis as any).__log(...vals);
       };
       const rand = makeRand();
       const scope = {
@@ -403,7 +395,7 @@ type ToolModeViewProps = ToolModeProps & ToolViewRenderProps<Program> & {
 };
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView} = props;
+  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView, onBlur} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const updateSubProgram = programUP.subProgram.$;
@@ -429,7 +421,13 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
       setFrameBarBackdropElem={setFrameBarBackdropElem}
       onClose={onCloseFrame}
     >
-      <ShowView view={subView} updateProgram={updateSubProgram} autoFocus={autoFocus} frameBarBackdropElem={frameBarBackdropElem}/>
+      <ShowView
+        view={subView}
+        updateProgram={updateSubProgram}
+        autoFocus={autoFocus}
+        frameBarBackdropElem={frameBarBackdropElem}
+        onBlur={onBlur}
+      />
     </ToolFrame>;
   }
 });

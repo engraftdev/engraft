@@ -1,0 +1,26 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDmoustache918852",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "python",
+            "code": "import numpy as np\nnp.dot(IDinput000000, np.array([1, 2, 3]))",
+            "subPrograms": {}
+          },
+          "defaultCode": "IDinput000000"
+        }
+      }
+    ],
+    "prevVarId": "IDtendency543356"
+  }
+}

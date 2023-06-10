@@ -92,7 +92,7 @@ export function referencesFancyCodeEditor(code: string, subPrograms: SubPrograms
   );
 };
 
-export const FancyCodeEditor = memo(function FancyCodeEditor(props: {
+type FancyCodeEditorProps = {
   extensions?: Extension[],
   defaultCode: string | undefined,
   code: string,
@@ -104,11 +104,17 @@ export const FancyCodeEditor = memo(function FancyCodeEditor(props: {
   varBindings: VarBindings,
   autoFocus?: boolean,
   onBlur?: () => void,
-}) {
-  const { extensions, defaultCode, code, codeUP, subPrograms, subProgramsUP, replaceWithProgram, subResults, varBindings, autoFocus, onBlur } = props;
+}
 
+export const FancyCodeEditor = memo(function FancyCodeEditor(props: FancyCodeEditorProps) {
   const { scopeVarBindings } = useContext(ToolViewContext);
   const scopeVarBindingsRef = useRefForCallback(scopeVarBindings);
+
+  return <FancyCodeEditorWithScopeVarBindingsRef {...props} scopeVarBindingsRef={scopeVarBindingsRef} />;
+});
+
+export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEditor(props: FancyCodeEditorProps & {scopeVarBindingsRef: React.MutableRefObject<VarBindings>}) {
+  const { extensions, defaultCode, code, codeUP, subPrograms, subProgramsUP, replaceWithProgram, subResults, varBindings, autoFocus, onBlur, scopeVarBindingsRef } = props;
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 

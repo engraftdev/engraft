@@ -3,6 +3,7 @@
 import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { ComputeReferences, ProgramFactory, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 import { python } from "@codemirror/lang-python";
+import { getPyodide } from  "@engraft/pyodide";
 
 export type Program = {
   toolName: 'python',
@@ -52,25 +53,16 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
 export default defineTool({ programFactory, computeReferences, run })
 
-
-let _pyodide: any = undefined;
-
-async function getPyodide() {
-  if (_pyodide === undefined) {
-    const pyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.23.1/full/pyodide.mjs");
-    _pyodide = await pyodideModule.loadPyodide()
-    await _pyodide.loadPackage("numpy");
-  }
-  return _pyodide;
-}
-
 async function runPython(code: string, globals: {[key: string]: any}) {
   const pyodide = await getPyodide();
+  const originalConsoleLog = console.log;
+  console.log = () => {};
   await pyodide.loadPackagesFromImports(code);
   const result = await pyodide.runPythonAsync(
     code,
     {globals: pyodide.toPy(globals)}
   );
+  console.log = originalConsoleLog;
   // if (result?.toJs) return result.toJs();
   return result;
 }

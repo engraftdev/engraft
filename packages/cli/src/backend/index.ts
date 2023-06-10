@@ -1,7 +1,7 @@
 import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, lookUpToolByName, RefuncMemory, runTool, slotWithProgram, ToolProgram } from '@engraft/hostkit';
+import { EngraftPromise, RefuncMemory, runTool, ToolProgram, slotWithProgram, lookUpToolByName} from '@engraft/hostkit';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
 import { exit } from 'node:process';
@@ -52,7 +52,6 @@ try {
   // it's fine
 }
 
-
 async function read(stream: NodeJS.ReadStream) {
   const chunks = [];
   for await (const chunk of stream) chunks.push(chunk);
@@ -70,7 +69,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     const varBindings = varBindingsObject([
       // TODO: kinda weird we need funny IDs here, since editor regex only recognizes these
-      {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: valueFromStdin(stdin)})},
+      {var_: {id: 'IDinput000000', label: 'input'}, outputP: EngraftPromise.resolve({value: await valueFromStdin(stdin)})},
     ]);
 
     global.window = {} as any;
@@ -80,7 +79,7 @@ async function read(stream: NodeJS.ReadStream) {
 
     try {
       const output = await outputP;
-      console.log(valueToStdout(output.value, opts.jsonOnly))
+      console.log(await valueToStdout(output.value, opts.jsonOnly))
       exit(0);
     } catch (e) {
       console.error(e);
@@ -113,7 +112,7 @@ async function read(stream: NodeJS.ReadStream) {
     app.get('/api/program', async (_req, res) => {
       res.send(program);
     });
-    
+
     app.get('/api/json_only', async (_req, res) => {
       res.send(opts.jsonOnly);
     });

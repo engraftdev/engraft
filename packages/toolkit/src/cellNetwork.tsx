@@ -1,4 +1,4 @@
-import { EngraftPromise, hookAttachNewScopeVarBindings, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, ToolResultWithNewScopeVarBindings, Var, VarBindings } from "@engraft/core";
+import { EngraftPromise, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, ToolResultWithScope, Var, VarBindings } from "@engraft/core";
 import { hookCache, hookDedupe, hookFork, hookMemo, hooks } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
@@ -19,7 +19,7 @@ export type Cell = {
   program: ToolProgram,
 }
 
-export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolResultWithNewScopeVarBindings<ToolProgram>> => {
+export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolResultWithScope> => {
   const { cells, varBindings, prevVarId } = props;
 
   // TODO: Now that we have hookCache, we might want to get rid of the explicit
@@ -98,17 +98,17 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
         }
         cellVarBindings = hookDedupe(cellVarBindings, objEqWithRefEq);
 
-        const { outputP, view } = hookRunTool({
+        cellResults[cellId] = hookRunTool({
           program: cell.program,
           varBindings: cellVarBindings,
         });
-
-        cellResults[cellId] = { outputP, view };
       }));
     });
 
-    // Now we have results for all the cells, so we can attach bindings to the views.
+    // Now we have results for all the cells, so we can attach newScopeVarBindings.
     // (Order doesn't matter here)
+
+    // TODO: all the memoization below may be pointless
 
     const allVarBindings = hookMemo(() =>
       Object.fromEntries(cells.map((cell) => [cell.var_.id, {
@@ -125,7 +125,7 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
             newScopeVarBindings[prevVarId] = prevVarBindingCache.get(cellToPrev[cellId]);
           }
           newScopeVarBindings = hookDedupe(newScopeVarBindings, objEqWithRefEq);
-          return hookAttachNewScopeVarBindings(result, newScopeVarBindings);
+          return { result, newScopeVarBindings };
         }, [allVarBindings, cellId, cellToPrev, prevVarBindingCache, prevVarId, result])
       ))
     );

@@ -5,9 +5,9 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, ProgramFactory, randomId, ScrollShadow, ShowViewWithNewScopeVarBindings, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithNewScopeVarBindings, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition } from "@engraft/toolkit";
+import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, ProgramFactory, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition } from "@engraft/toolkit";
 import _ from "lodash";
-import { Fragment, memo, useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
 
 
@@ -46,21 +46,21 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { cells, prevVarId } = program;
 
-  const cellResults = hookRefunction(cellNetwork, { cells, varBindings, prevVarId });
+  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings, prevVarId });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
-    const lastCellResult = lastCell && cellResults[lastCell.var_.id];
-    if (!lastCellResult) {
+    const lastCellResultWithScope = lastCell && cellResultsWithScope[lastCell.var_.id];
+    if (!lastCellResultWithScope) {
       throw new Error("no cells");
     }
-    return lastCellResult.outputP;
-  }), [cellResults, cells]);
+    return lastCellResultWithScope.result.outputP;
+  }), [cellResultsWithScope, cells]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResults} />,
+    render: (renderProps) => <View {...renderProps} {...props} cellResultsWithScope={cellResultsWithScope} />,
     showsOwnOutput: cells.length > 0,
-  }), [cells.length, props, cellResults]);
+  }), [cells.length, props, cellResultsWithScope]);
 
   return { outputP, view };
 }));
@@ -68,11 +68,11 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 export default defineTool({programFactory, computeReferences, run});
 
 type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
-  cellResults: {[id: string]: ToolResultWithNewScopeVarBindings},
+  cellResultsWithScope: {[id: string]: ToolResultWithScope},
 }
 
 const View = memo((props: ViewProps) => {
-  const { program, updateProgram, cellResults, autoFocus } = props;
+  const { program, updateProgram, cellResultsWithScope, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const smallestUnusedLabel = unusedLabel(alphaLabels, program.cells.map(cell => cell.var_.label)) || 'ZZZ';
@@ -125,7 +125,7 @@ const View = memo((props: ViewProps) => {
           <Fragment key={cell.var_.id}>
             <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId} outputBelowInput={program.outputBelowInput} />
             <CellView cell={cell} cellUP={programUP.cells[i]}
-              cellResult={cellResults[cell.var_.id]}
+              cellResultWithScope={cellResultsWithScope[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
               outputBelowInput={program.outputBelowInput || false}
               autoFocus={i === 0 && autoFocus}
@@ -201,7 +201,7 @@ type CellViewProps = {
   cell: Cell,
   cellUP: UpdateProxyRemovable<Cell>,
 
-  cellResult: ToolResultWithNewScopeVarBindings,
+  cellResultWithScope: ToolResultWithScope,
 
   notebookMenuMaker: MenuMaker,
 
@@ -211,9 +211,9 @@ type CellViewProps = {
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {cell, cellUP, cellResult, notebookMenuMaker, outputBelowInput, autoFocus} = props;
+  const {cell, cellUP, cellResultWithScope, notebookMenuMaker, outputBelowInput, autoFocus} = props;
 
-  const cellShowsOwnOutput = cellResult.viewWithNewScopeVarBinding.view.showsOwnOutput;
+  const cellShowsOwnOutput = cellResultWithScope.result.view.showsOwnOutput;
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -256,6 +256,64 @@ const CellView = memo(function CellView(props: CellViewProps) {
     keepCursor: true,
   }), [cellUP.outputManualHeight]);
 
+  const valueWrapper = useCallback((view: ReactNode) =>
+    <div style={{position: 'relative'}} ref={outputOuterRef}>
+      <ScrollShadow
+        innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}
+        contentRef={outputContentRef}
+      >
+        {view}
+      </ScrollShadow>
+      { isOutputHovered && outputContentSize && toolSize && outputContentSize.height > toolSize.height &&
+        <div
+          style={{
+            position: 'absolute',
+            left: 0, top: 0,
+            height: '100%', width: '100%',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end',
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            className="xRow xAlignRight"
+            style={{
+              position: 'sticky',
+              bottom: 5,
+              width: '100%',
+              height: 15,
+              fontSize: 15,
+              margin: 5,
+              ...outputMaxHeight && outputMaxHeight < outputContentSize.height && {
+                marginRight: 15,  // shift over to make room for scroll-bar
+              },
+              userSelect: 'none',
+            }}
+          >
+            <div
+              onClick={() => cellUP.outputManualHeight.$apply((old) => old === 'infinity' ? undefined : 'infinity')}
+              style={{
+                cursor: 'pointer',
+                pointerEvents: 'initial'
+              }}
+            >
+              {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
+            </div>
+            <div
+              onMouseDown={onMouseDownResizer}
+              style={{
+                cursor: 'ns-resize',
+                pointerEvents: 'initial'
+              }}
+            >
+              ↕
+            </div>
+          </div>
+        </div>
+      }
+    </div>,
+    [cell.outputManualHeight, cellUP.outputManualHeight, isOutputHovered, onMouseDownResizer, outputContentRef, outputContentSize, outputMaxHeight, toolSize]
+  );
+
   return <>
     {menuNode}
     <div className="NotebookTool-CellView-cell-cell" onContextMenu={openMenu}>
@@ -273,8 +331,8 @@ const CellView = memo(function CellView(props: CellViewProps) {
       onContextMenu={openMenu}
     >
       <div className="xStickyTop10" ref={toolRef}>
-        <ShowViewWithNewScopeVarBindings
-          {...cellResult.viewWithNewScopeVarBinding}
+        <ShowViewWithScope
+          resultWithScope={cellResultWithScope}
           updateProgram={cellUP.program.$apply}
           autoFocus={autoFocus}
         />
@@ -302,68 +360,11 @@ const CellView = memo(function CellView(props: CellViewProps) {
         <div className="NotebookTool-CellView-output-cell-sticky xStickyTop10" ref={mergeRefs([outputHoverRef])}>
           {/* TODO: clean this up */}
           { outputBelowInput
-            ? <ToolOutputView outputP={cellResult.outputP}/>
-            : <>
-                <ToolOutputView
-                  outputP={cellResult.outputP}
-                  valueWrapper={(view) =>
-                    <div style={{position: 'relative'}} ref={outputOuterRef}>
-                      <ScrollShadow
-                        innerStyle={{overflow: 'auto', ...outputMaxHeight !== undefined && {maxHeight: outputMaxHeight}}}
-                        contentRef={outputContentRef}
-                      >
-                        {view}
-                      </ScrollShadow>
-                      { isOutputHovered && outputContentSize && toolSize && outputContentSize.height > toolSize.height &&
-                        <div
-                          style={{
-                            position: 'absolute',
-                            left: 0, top: 0,
-                            height: '100%', width: '100%',
-                            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end',
-                            pointerEvents: 'none'
-                          }}
-                        >
-                          <div
-                            className="xRow xAlignRight"
-                            style={{
-                              position: 'sticky',
-                              bottom: 5,
-                              width: '100%',
-                              height: 15,
-                              fontSize: 15,
-                              margin: 5,
-                              ...outputMaxHeight && outputMaxHeight < outputContentSize.height && {
-                                marginRight: 15,  // shift over to make room for scroll-bar
-                              },
-                              userSelect: 'none',
-                            }}
-                          >
-                            <div
-                              onClick={() => cellUP.outputManualHeight.$apply((old) => old === 'infinity' ? undefined : 'infinity')}
-                              style={{
-                                cursor: 'pointer',
-                                pointerEvents: 'initial'
-                              }}
-                            >
-                              {cell.outputManualHeight === 'infinity' ? '⊖' : '⊕'}
-                            </div>
-                            <div
-                              onMouseDown={onMouseDownResizer}
-                              style={{
-                                cursor: 'ns-resize',
-                                pointerEvents: 'initial'
-                              }}
-                            >
-                              ↕
-                            </div>
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  }
-                />
-              </>
+            ? <ToolOutputView outputP={cellResultWithScope.result.outputP}/>
+            : <ToolOutputView
+                outputP={cellResultWithScope.result.outputP}
+                valueWrapper={valueWrapper}
+              />
           }
         </div>
       </div>

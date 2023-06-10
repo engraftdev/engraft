@@ -1,23 +1,23 @@
 import { EngraftPromise, registerTool, slotWithCode, toolFromModule, ToolOutput } from "@engraft/core";
+import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
 import Slot from "@engraft/tool-slot";
-import * as TestKnownOutput from "@engraft/tool-test-known-output";
+import React from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { useEngraft } from "../lib/index.js";
-import React from "react";
 
 // @vitest-environment happy-dom
 
+registerTestingComponents();
 registerTool(toolFromModule(Slot));
-registerTool(toolFromModule(TestKnownOutput));
 
 describe('useEngraft', () => {
   it('basically works', () => {
     const MyComponent = (props: {}) => {
       const program = {
-        toolName: 'test-known-output',
+        toolName: 'testing-known-output',
         outputP: EngraftPromise.resolve({value: 10}),
-      } satisfies TestKnownOutput.Program;
+      } satisfies TestingKnownOutput.Program;
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,
@@ -47,9 +47,9 @@ describe('useEngraft', () => {
   it('uses the default value if output is pending', () => {
     const MyComponent = (props: {}) => {
       const program = {
-        toolName: 'test-known-output',
+        toolName: 'testing-known-output',
         outputP: EngraftPromise.unresolved(),
-      } satisfies TestKnownOutput.Program;
+      } satisfies TestingKnownOutput.Program;
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,
@@ -65,9 +65,9 @@ describe('useEngraft', () => {
     const outputP = EngraftPromise.unresolved<ToolOutput>();
     const MyComponent = (props: {}) => {
       const program = {
-        toolName: 'test-known-output',
+        toolName: 'testing-known-output',
         outputP,
-      } satisfies TestKnownOutput.Program;
+      } satisfies TestingKnownOutput.Program;
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,

@@ -1,20 +1,18 @@
-import { EngraftPromise, toolFromModule } from "@engraft/core";
+import { EngraftPromise } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { describe, expect, it } from "vitest";
-import * as testKnownOutput from "../lib/index.js";
+import * as TestingKnownOutput from "../lib/testing-known-output.js";
 
 // @vitest-environment happy-dom
 
-const testKnownOutputTool = toolFromModule(testKnownOutput);
-
-describe('test-known-output', () => {
+describe('testing-known-output', () => {
   it('output basically works', () => {
     const memory = new RefuncMemory();
     [1, 2, 3].forEach((value) => {
-      const {outputP} = testKnownOutputTool.run(memory, {
+      const {outputP} = TestingKnownOutput.tool.run(memory, {
         program: {
-          toolName: 'test-known-output',
+          toolName: 'testing-known-output',
           outputP: EngraftPromise.resolve({value}),
         },
         varBindings: {},
@@ -27,14 +25,14 @@ describe('test-known-output', () => {
     const memory = new RefuncMemory();
 
     let runs = 0;
-    let program: testKnownOutput.Program = {
-      toolName: 'test-known-output',
+    let program: TestingKnownOutput.Program = {
+      toolName: 'testing-known-output',
       outputP: EngraftPromise.resolve({value: 1}),
       onRun: () => { runs++ },
     };
     function runProgram() {
       return EngraftPromise.state(
-        testKnownOutputTool.run(memory, {
+        TestingKnownOutput.tool.run(memory, {
           program,
           varBindings: empty,
         }).outputP

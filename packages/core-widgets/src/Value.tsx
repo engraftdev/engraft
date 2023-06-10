@@ -149,6 +149,32 @@ const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
     );
   }
 
+  // TODO: and another
+  if (hasProperty(value, 'tuples') && hasProperty(value, 'types')) {
+    if (value.tuples instanceof Array) {
+      if (value.tuples.length > 0 && value.tuples[0] instanceof Array) {
+        const colSpacing = 10;
+
+        return wrapInline(
+          <ValueFrame type="relation">
+            <table style={{margin: `${colSpacing / 2}px 0`}}>
+              <tbody>
+                {value.tuples.map((row, i) => <tr key={i}>
+                  {(row as unknown[]).map((cell, j) =>
+                    <td key={j} style={{padding: `0 ${colSpacing / 2}px`}}>
+                      {/* TODO: we're not using ValueInternal or passing things along here */}
+                      <Value value={cell}/>
+                    </td>
+                  )}
+                </tr>)}
+              </tbody>
+            </table>
+          </ValueFrame>
+        );
+      }
+    }
+  }
+
   if (hasProperty(value, 'constructor') && (value.constructor as Function).name === 'PyProxy') {
     return wrapInline(
       <ValueFrame type='python object'>
@@ -279,6 +305,11 @@ const ValueComposite = memo(function ValueComposite(props: ValueInternalProps & 
   }
   const moreEntries = numEntriesTotal - entriesToShow.length;
 
+  const onExpand = useCallback((ev: React.UIEvent) => {
+    ev.preventDefault();
+    setIsExpanded(true);
+  }, []);
+
   if (isExpanded) {
     return <>
       <div className='ValueComposite-open-row xRow' style={{width: '100%'}}>
@@ -347,7 +378,10 @@ const ValueComposite = memo(function ValueComposite(props: ValueInternalProps & 
     if (isArrayLike) {
       abbreviated = <>
         [
-        <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
+        <div
+          style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5, cursor: 'pointer'}}
+          onClick={onExpand}
+        >
           {count(value.length as number, 'element', 'elements')}
         </div>
         ]
@@ -356,7 +390,10 @@ const ValueComposite = memo(function ValueComposite(props: ValueInternalProps & 
       abbreviated = <>
         {classLabel}
         {'{'}
-        <div style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5}}>
+        <div
+          style={{fontStyle: 'italic', marginLeft: 3, marginRight: 3, opacity: 0.5, cursor: 'pointer'}}
+          onClick={onExpand}
+        >
           {entriesToShow.map(([key]) => key).join(', ')}
           {moreEntries > 0 && `, and ${moreEntries} more`}
         </div>
@@ -374,10 +411,7 @@ const ValueComposite = memo(function ValueComposite(props: ValueInternalProps & 
         { isHovered &&
             <span
               style={{...valueFont, marginLeft: 3, cursor: 'pointer', flexGrow: 1}}
-              onClick={(ev) => {
-                ev.preventDefault();
-                setIsExpanded(true);
-              }}
+              onClick={onExpand}
             >
               ⊕
             </span>
@@ -475,7 +509,7 @@ export const ToolOutputBuffer = memo(function ToolValueBuffer(props: ToolOutputB
         no value yet
       </div>;
 
-  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xInlineFlex">
+  return <div className="ToolOutputBuffer xCol xGap10 xAlignLeft xFlex">
     {valueView}
     {outputState.status === 'rejected' && <ErrorView error={outputState.reason} />}
   </div>

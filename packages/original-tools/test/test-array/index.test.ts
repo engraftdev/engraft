@@ -1,15 +1,15 @@
-import { EngraftPromise, registerTool, toolFromModule } from "@engraft/core";
+import { EngraftPromise, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
+import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
 import { updateWithUP } from "@engraft/update-proxy";
 import { describe, expect, it } from "vitest";
 import * as TestArray from "../../lib/test-array/index.js";
-import TestKnownOutput from "@engraft/tool-test-known-output";
 
 // @vitest-environment happy-dom
 
 const testArrayTool = toolFromModule(TestArray);
-registerTool(TestKnownOutput);
+registerTestingComponents();
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
@@ -21,15 +21,15 @@ describe('test-array', () => {
       toolName: 'test-array',
       subToolPrograms: [
         {
-          toolName: 'test-known-output',
+          toolName: 'testing-known-output',
           outputP: EngraftPromise.resolve({value: 1}),
           onRun: () => { subTool1Runs++ },
-        },
+        } satisfies TestingKnownOutput.Program,
         {
-          toolName: 'test-known-output',
+          toolName: 'testing-known-output',
           outputP: EngraftPromise.resolve({value: 2}),
           onRun: () => { subTool2Runs++ },
-        },
+        } satisfies TestingKnownOutput.Program,
       ],
     };
     function runProgram() {
