@@ -20,5 +20,12 @@ export default defineConfig({
       name: 'EngraftObservableHost',
       fileName: 'engraft-observable-host',
     },
+    // TODO: these are copied from the root vite.config.js; idk the best way to share them
+    commonjsOptions: { },
+    rollupOptions: {
+      external: [
+        'pyodide/pyodide.js',
+      ],
+    },
   },
 });
