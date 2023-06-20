@@ -52,6 +52,18 @@ describe('cellNetwork', () => {
     expect(result2.B.result).toBe(result1.B.result);
   });
 
+  test('works with 0 cells (and prevVarId)', () => {
+    const props: CellNetworkProps = {
+      cells: [],
+      varBindings: empty,
+      prevVarId: "IDprev000000",
+    };
+
+    const mem = new RefuncMemory();
+    const result = cellNetwork(mem, props);
+    expect(result).toEqual({});
+  });
+
   test('varBindings is referentially stable (direct ref)', () => {
     const varA = {id: 'A', label: ''};
     const varB = {id: 'B', label: ''};

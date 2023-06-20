@@ -4,7 +4,7 @@ import { EngraftPromise, Tool, ToolOutput, ToolProps, hookMemo, hooks, memoizePr
 export type Program = {
   toolName: 'testing-refs-func',
   refs: string[],
-  func?: (refOutputs: ToolOutput[]) => EngraftPromise<ToolOutput>,
+  func?: (refOutputs: ToolOutput[]) => ToolOutput | EngraftPromise<ToolOutput>,
   onRun?: (props: ToolProps<Program>) => void,
   onViewRender?: () => void,
 }

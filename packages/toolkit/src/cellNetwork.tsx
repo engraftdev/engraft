@@ -28,7 +28,7 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
   const cellById = hookMemo(() => Object.fromEntries(cells.map(cell => [cell.var_.id, cell])), [cells]);
   const cellIds = hookMemo(() => new Set(Object.keys(cellById)), [cellById]);
   const cellToPrev = hookMemo(() =>
-    prevVarId
+    prevVarId && cells.length > 1  // length check cuz _.range(1, 0) is not empty
     ? Object.fromEntries(_.range(1, cells.length).map((i) => [cells[i].var_.id, cells[i - 1].var_.id]))
     : {}
   , [cells, prevVarId]);
