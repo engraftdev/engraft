@@ -5,7 +5,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, ProgramFactory, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition } from "@engraft/toolkit";
+import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, MakeProgram, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition } from "@engraft/toolkit";
 import _ from "lodash";
 import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
@@ -25,7 +25,7 @@ type Cell = {
     // 'infinity' means 'show entire output' (not Infinity cuz that isn't JSON-serializable)
 }
 
-const programFactory: ProgramFactory<Program> = (defaultInput) => {
+const makeProgram: MakeProgram<Program> = (defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
@@ -65,7 +65,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return { outputP, view };
 }));
 
-export default defineTool({programFactory, computeReferences, run});
+export default defineTool({makeProgram, computeReferences, run});
 
 type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
   cellResultsWithScope: {[id: string]: ToolResultWithScope},

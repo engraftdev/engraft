@@ -25,7 +25,7 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: (defaultInputCode) => ({
+  makeProgram: (defaultInputCode) => ({
     toolName: 'extractor',
     inputProgram: slotWithCode(defaultInputCode || ''),
     patternsWithIds: [],

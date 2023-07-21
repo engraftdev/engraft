@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, ProgramFactory, ToolRun, ToolView } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, MakeProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ControlledTextInput } from "@engraft/shared/lib/ControlledTextInput.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
@@ -8,7 +8,7 @@ export type Program = {
   packageName: string,
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
+export const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'npm',
   packageName: '',
 });

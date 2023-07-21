@@ -1,4 +1,4 @@
-import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, ProgramFactory, references, ShowView, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, MakeProgram, references, ShowView, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -7,7 +7,7 @@ export type Program = {
   subProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultInputCode) => ({
+const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
   toolName: 'value',
   subProgram: slotWithCode(defaultInputCode),
 });
@@ -28,7 +28,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP: subResult.outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { subResult: ToolResult }) => {
   const { updateProgram, subResult, frameBarBackdropElem } = props;

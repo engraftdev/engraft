@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
@@ -22,7 +22,7 @@ export type Program = {
   rootElement: FormatterElement;
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   return {
     toolName: 'formatter',
     inputProgram: slotWithCode(defaultCode || ''),

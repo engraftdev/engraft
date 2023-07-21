@@ -1,5 +1,5 @@
 import { CodeMirror, setup } from "@engraft/codemirror-helpers"
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, PromiseState, randomId, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
+import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, PromiseState, randomId, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core"
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc"
 import { compileExpressionCached } from "@engraft/shared/lib/compile.js"
 import { updateProxy, UpdateProxyRemovable } from "@engraft/update-proxy"
@@ -23,7 +23,7 @@ export type Program = {
   inOutPairs: InOutPair[];
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   return {
     toolName: 'synthesizer',
     inputProgram: slotWithCode(defaultCode || ''),

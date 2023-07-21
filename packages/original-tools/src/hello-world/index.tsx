@@ -6,7 +6,7 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: (_defaultInputCode) => ({
+  makeProgram: (_defaultInputCode) => ({
     toolName: 'hello-world',
   }),
 

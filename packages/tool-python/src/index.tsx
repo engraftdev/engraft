@@ -1,7 +1,7 @@
 /// <reference path="./index.d.ts" />
 
 import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
-import { ComputeReferences, ProgramFactory, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { ComputeReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 import { python } from "@codemirror/lang-python";
 import { getPyodide } from  "@engraft/pyodide";
 
@@ -11,7 +11,7 @@ export type Program = {
   subPrograms: {[id: string]: ToolProgram},
 }
 
-const programFactory: ProgramFactory<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'python',
   code: '',
   subPrograms: {},
@@ -51,7 +51,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })
 
 async function runPython(code: string, globals: {[key: string]: any}) {
   const pyodide = await getPyodide();

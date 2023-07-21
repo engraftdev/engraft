@@ -1,4 +1,4 @@
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, UseUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, memoizeProps, MakeProgram, references, SetOps, ShowView, slotWithCode, ToolProgram, ToolProps, ToolView, UseUpdateProxy } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'toy-adder',
@@ -6,7 +6,7 @@ export type Program = {
   yProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'toy-adder',
   xProgram: slotWithCode(''),
   yProgram: slotWithCode(''),
@@ -57,4 +57,4 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })

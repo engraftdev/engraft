@@ -1,7 +1,7 @@
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
 import { difference, union } from "@engraft/shared/lib/sets.js";
-import { ComputeReferences, EngraftPromise, ErrorView, InputHeading, ProgramFactory, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, references, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, references, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -15,7 +15,7 @@ export type Program = {
   perItemProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const itemVar = newVar('item');
   return {
     toolName: 'map',
@@ -105,7 +105,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   return {outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run });
+export default defineTool({ makeProgram, computeReferences, run });
 
 
 const MAX_ITEMS_DISPLAYED = 10;

@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, ProgramFactory, references, runTool, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, newVar, MakeProgram, references, runTool, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
 import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
@@ -20,7 +20,7 @@ export type Program = {
   toDrawProgram: ToolProgram,
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const stateVar = newVar('state');
   return {
     toolName: 'simulation',

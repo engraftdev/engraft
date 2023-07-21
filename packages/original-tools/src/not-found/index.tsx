@@ -1,11 +1,11 @@
-import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 
 export type Program = {
   toolName: 'not-found',
 }
 
-export const programFactory: ProgramFactory<Program> = () => ({
+export const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'not-found',
 });
 

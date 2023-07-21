@@ -10,7 +10,7 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: () => ({
+  makeProgram: () => ({
     toolName: 'test-seeing-double',
     subProgram: slotWithCode(''),
     rerenderOnProgramChange: false,

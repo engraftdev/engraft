@@ -121,7 +121,7 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
   const allExtensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = randomId();
-      const newProgram = slotWithProgram(tool.programFactory());
+      const newProgram = slotWithProgram(tool.makeProgram());
       subProgramsUP[id].$set(newProgram);
       // TODO: we never remove these! lol
       return id;
@@ -129,7 +129,7 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
 
     const completions = [
       refCompletions(() => scopeVarBindingsRef.current),
-      toolCompletions(insertTool, replaceWithProgram && ((tool) => replaceWithProgram(tool.programFactory(defaultCode)))),
+      toolCompletions(insertTool, replaceWithProgram && ((tool) => replaceWithProgram(tool.makeProgram(defaultCode)))),
     ];
 
     // TODO: We're storing some state here for inter-extension communication.

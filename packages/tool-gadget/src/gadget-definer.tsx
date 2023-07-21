@@ -1,5 +1,5 @@
 import { ToolOutputView, Value, VarDefinition } from "@engraft/core-widgets";
-import { ComputeReferences, EngraftPromise, ProgramFactory, SetOps, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, references, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, MakeProgram, SetOps, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, references, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -8,7 +8,7 @@ export type Program = {
   def: GadgetDef,
 }
 
-const programFactory: ProgramFactory<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'gadget-definer',
   def: {
     initialProgramProgram: slotWithCode(''),
@@ -139,4 +139,4 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   );
 });
 
-export const GadgetDefiner = defineTool({ programFactory, computeReferences, run });
+export const GadgetDefiner = defineTool({ makeProgram, computeReferences, run });

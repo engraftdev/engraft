@@ -8,7 +8,7 @@ import { EngraftPromise, IsolateStyles, ShowView, ToolOutputView, ToolProgram, V
 
 registerAllTheTools();
 
-const defaultProgram = lookUpToolByName('slot').programFactory();
+const defaultProgram = lookUpToolByName('slot').makeProgram();
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
@@ -87,7 +87,7 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          setProgram(slotWithProgram(lookUpToolByName(ev.target.value).programFactory()));
+          setProgram(slotWithProgram(lookUpToolByName(ev.target.value).makeProgram()));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
         {Object.keys(getFullToolIndex()).map((name) =>

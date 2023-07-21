@@ -15,7 +15,7 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: () => ({
+  makeProgram: () => ({
     toolName: 'slider',
     value: 0,
     min: -10,

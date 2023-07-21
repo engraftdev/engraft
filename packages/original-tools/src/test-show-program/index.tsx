@@ -1,4 +1,4 @@
-import { ComputeReferences, hookRunTool, ProgramFactory, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
+import { ComputeReferences, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { ValueEditable } from "@engraft/core-widgets";
@@ -8,7 +8,7 @@ export type Program = {
   subProgram: ToolProgram,
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultInputCode) => ({
+export const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
   toolName: 'test-show-program',
   subProgram: slotWithCode(defaultInputCode || ''),
 });

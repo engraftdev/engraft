@@ -11,7 +11,7 @@ import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from 
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { compileBodyCached } from "@engraft/shared/lib/compile.js";
-import { EngraftPromise, ProgramFactory, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, references, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, references, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { ToolFrame } from "./ToolFrame.js";
@@ -44,7 +44,7 @@ type ProgramToolMode = ProgramShared & {
   subProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultCode?: string) => ({
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => ({
   toolName: 'slot',
   modeName: 'code',
   defaultCode,
@@ -110,7 +110,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   });
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })
 
 
 ///////////////

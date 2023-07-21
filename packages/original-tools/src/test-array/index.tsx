@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { union } from "@engraft/shared/lib/sets.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
@@ -9,7 +9,7 @@ export type Program = {
   subToolPrograms: ToolProgram[],
 }
 
-export const programFactory: ProgramFactory<Program> = () => {
+export const makeProgram: MakeProgram<Program> = () => {
   return {
     toolName: 'test-array',
     subToolPrograms: [],

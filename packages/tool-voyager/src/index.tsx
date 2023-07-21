@@ -1,6 +1,6 @@
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, ProgramFactory, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, MakeProgram, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
 import voyagerStyle from "@engraft/vendor-voyager/src/style.css?inline";
 import _ from "lodash";
@@ -16,7 +16,7 @@ type Program = {
   spec: Spec | undefined,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultCode) => ({
+const makeProgram: MakeProgram<Program> = (defaultCode) => ({
   toolName: 'voyager',
   inputProgram: slotWithCode(defaultCode),
   spec: undefined,
@@ -45,7 +45,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   return {outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,

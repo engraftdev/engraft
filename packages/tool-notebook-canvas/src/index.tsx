@@ -1,7 +1,7 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { ComputeReferences, EngraftPromise, MyContextMenu, MyContextMenuHeading, ProgramFactory, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, MyContextMenu, MyContextMenuHeading, MakeProgram, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, cellNetworkReferences, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -24,7 +24,7 @@ type Cell = {
   showOutputOnly: boolean,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultInput) => ({
+const makeProgram: MakeProgram<Program> = (defaultInput) => ({
   toolName: 'notebook-canvas',
   cells: [
     {
@@ -72,7 +72,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return { outputP, view };
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   cellResults: {[id: string]: ToolResultWithScope},

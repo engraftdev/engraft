@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/core-widgets";
-import { ComputeReferences, EngraftPromise, ProgramFactory, SetOps, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, references, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, EngraftPromise, MakeProgram, SetOps, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, references, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -13,7 +13,7 @@ type Program = {
   gadgetProgram: unknown,
 }
 
-const programFactory: ProgramFactory<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'gadget-user',
 
   closureProgram: slotWithCode(''),
@@ -118,4 +118,4 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   return <ToolOutputView outputP={viewResultEtc.result.outputP} displayReactElementsDirectly={true} />;
 });
 
-export const GadgetUser = defineTool({ programFactory, computeReferences, run });
+export const GadgetUser = defineTool({ makeProgram, computeReferences, run });

@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, newVar, ProgramFactory, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, newVar, MakeProgram, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
 import { MyContextMenu, MyContextMenuHeading, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
 import { ToolWithView } from "@engraft/hostkit";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
@@ -27,7 +27,7 @@ type Example = {
   // TODO: values may not be serializable; represent with tool programs, not directly
 }
 
-export const programFactory: ProgramFactory<Program> = (defaultCode?: string) => {
+export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const var1 = newVar('input 1')
   const exampleId = randomId();
   return {

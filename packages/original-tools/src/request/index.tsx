@@ -1,5 +1,5 @@
 import {
-  ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
+  ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
   ToolProps, ToolRun, ToolView, ToolViewRenderProps
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
@@ -20,7 +20,7 @@ export type Program = {
   useCorsProxy: boolean,
 };
 
-export const programFactory: ProgramFactory<Program> = () => {
+export const makeProgram: MakeProgram<Program> = () => {
   return {
     toolName: "request",
     urlProgram: slotWithCode('"https://httpbin.org/get"'),

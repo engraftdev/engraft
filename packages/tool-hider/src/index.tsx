@@ -1,4 +1,4 @@
-import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, ProgramFactory, references, SetOps, ShowView, slotWithCode, slotWithProgram, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy } from "@engraft/toolkit";
+import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, MakeProgram, references, SetOps, ShowView, slotWithCode, slotWithProgram, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy } from "@engraft/toolkit";
 import { Program as CheckboxProgram } from "@engraft/tool-checkbox";
 
 // TODO: can this tool ensure that CheckboxProgram is registered, as a
@@ -10,7 +10,7 @@ type Program = {
   actualProgram: ToolProgram,
 }
 
-const programFactory: ProgramFactory<Program> = (defaultCode) => ({
+const makeProgram: MakeProgram<Program> = (defaultCode) => ({
   toolName: 'hider',
   isShownProgram: slotWithProgram<CheckboxProgram>({
     toolName: 'checkbox',
@@ -55,4 +55,4 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   return {outputP, view};
 }));
 
-export default defineTool({ programFactory, computeReferences, run })
+export default defineTool({ makeProgram, computeReferences, run })

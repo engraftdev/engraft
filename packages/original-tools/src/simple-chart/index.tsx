@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, ProgramFactory, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from "@engraft/update-proxy";
@@ -24,7 +24,7 @@ export type Program = {
 export type Mark = 'bar' | 'line' | 'area' | 'point';
 const marks: Mark[] = ['bar', 'line', 'area', 'point'];
 
-export const programFactory: ProgramFactory<Program> = (defaultInputCode?: string) => {
+export const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => {
   return {
     toolName: 'simple-chart',
     dataProgram: slotWithCode(defaultInputCode || ''),

@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, ProgramFactory, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
@@ -23,7 +23,7 @@ type OutputMode = 'text' | 'data-uri' | 'react-image' | 'json' | 'csv';
 
 export const computeReferences: ComputeReferences<P> = (program) => new Set();
 
-export const programFactory: ProgramFactory<P> = () => ({
+export const makeProgram: MakeProgram<P> = () => ({
   toolName: 'file',
   file: null,
 });

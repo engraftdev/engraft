@@ -25,7 +25,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "IDneptune546180.programFactory()",
+          "code": "IDneptune546180.makeProgram()",
           "defaultCode": "",
           "subPrograms": {}
         },
@@ -67,7 +67,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    IDneptune546180.programFactory()\n  );\n  const mem = new RefuncMemory();\n  const result = IDneptune546180.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
+          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    IDneptune546180.makeProgram()\n  );\n  const mem = new RefuncMemory();\n  const result = IDneptune546180.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },
@@ -81,7 +81,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// And just in case you're curious: Here's the Refunc\n// memory backing the tool, after one run.\n\nconst program = IDneptune546180.programFactory()\n\nconst mem = new RefuncMemory();\nconst result = IDneptune546180.run(mem, {\n  program\n})\n\nreturn mem",
+          "code": "// And just in case you're curious: Here's the Refunc\n// memory backing the tool, after one run.\n\nconst program = IDneptune546180.makeProgram()\n\nconst mem = new RefuncMemory();\nconst result = IDneptune546180.run(mem, {\n  program\n})\n\nreturn mem",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },

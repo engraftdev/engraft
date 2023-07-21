@@ -14,7 +14,7 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
-  programFactory: () => ({
+  makeProgram: () => ({
     toolName: 'test-text-latency',
     text: '',
   }),

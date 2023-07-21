@@ -87,7 +87,7 @@ async function read(stream: NodeJS.ReadStream) {
     }
   } else {
     if (program === null) {
-      program = slotWithProgram(lookUpToolByName('notebook').programFactory('IDinput000000'));
+      program = slotWithProgram(lookUpToolByName('notebook').makeProgram('IDinput000000'));
     }
 
     const app = express();

@@ -6,7 +6,7 @@ export type Program = {
 }
 
 export default defineTool<Program>({
-  programFactory: () => ({
+  makeProgram: () => ({
     toolName: 'checkbox',
     checked: false,
   }),

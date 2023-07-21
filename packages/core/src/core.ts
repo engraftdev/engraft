@@ -10,7 +10,7 @@ import { randomId } from "./randomId.js";
 
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
-  programFactory: ProgramFactory<P>;
+  makeProgram: MakeProgram<P>;
   computeReferences: ComputeReferences<P>;
   isInternal?: boolean;
 }
@@ -75,7 +75,7 @@ export const ToolViewContext = createContext<ToolViewContextValue>({
   scopeVarBindings: {},
 });
 
-export type ProgramFactory<P extends ToolProgram> =
+export type MakeProgram<P extends ToolProgram> =
   (defaultInputCode?: string) => P;
 
 export type ComputeReferences<P extends ToolProgram> =
@@ -110,8 +110,8 @@ export function getFullToolIndex(): { [toolName: string]: Tool<ToolProgram> } {
 
 export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
   // do some checks to make sure the tool is valid
-  if (!tool.programFactory) {
-    throw new Error(`Tool has no programFactory`);
+  if (!tool.makeProgram) {
+    throw new Error(`Tool has no makeProgram`);
   }
   if (!tool.run) {
     console.error(tool);
@@ -120,12 +120,12 @@ export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
   if (!tool.computeReferences) {
     let toolName = 'UNKNOWN';
     try {
-      toolName = tool.programFactory().toolName;
+      toolName = tool.makeProgram().toolName;
     } catch { }
     throw new Error(`Tool has no references: ${toolName}`);
   }
 
-  const { toolName } = tool.programFactory();
+  const { toolName } = tool.makeProgram();
   toolIndex[toolName] = forgetP(tool);
 }
 
