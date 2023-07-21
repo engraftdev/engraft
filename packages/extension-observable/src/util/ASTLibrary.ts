@@ -1,6 +1,6 @@
 import estraverse from "estraverse";
 import esprima from "esprima";
-import estree, {CallExpression} from 'estree';
+import type estree from 'estree';
 
 
 export function countArgs(ast: estree.Node) {
@@ -10,7 +10,7 @@ export function countArgs(ast: estree.Node) {
         return 0;
     }
 
-    return (call as CallExpression).arguments.length
+    return (call as estree.CallExpression).arguments.length
 
 }
 
