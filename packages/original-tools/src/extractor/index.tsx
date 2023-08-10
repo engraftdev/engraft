@@ -380,7 +380,11 @@ const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolVi
       </div>
       <div className="xPad10" style={{minHeight: 0, overflow: 'scroll', userSelect: 'none', WebkitUserSelect: 'none'}}>
         <ExtractorContext.Provider value={{activePattern, setActivePattern, otherPatterns, multiSelectMode}}>
-          <ToolOutputView outputP={inputResult.outputP}  customizations={customizations} />
+          <ToolOutputView
+            outputP={inputResult.outputP}
+            customizations={customizations}
+            expandedDepth={Infinity}
+          />
         </ExtractorContext.Provider>
       </div>
     </div>

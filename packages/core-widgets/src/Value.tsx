@@ -448,15 +448,14 @@ const ValuePromise = memo(function ValuePromise(props: {
 
 
 
-export type ToolOutputViewProps = {
-  outputP: EngraftPromise<ToolOutput>;
-  customizations?: ValueCustomizations;
-  displayReactElementsDirectly?: boolean;
-  valueWrapper?: (valueNode: ReactNode, value: unknown) => ReactNode;
+export type ToolOutputViewProps = Omit<ValueProps, 'value'> & {
+  outputP: EngraftPromise<ToolOutput>,
+  displayReactElementsDirectly?: boolean,
+  valueWrapper?: (valueNode: ReactNode, value: unknown) => ReactNode,
 }
 
 export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps) {
-  const {outputP, customizations, displayReactElementsDirectly, valueWrapper = identity} = props;
+  const {outputP, displayReactElementsDirectly, valueWrapper = identity, ...rest} = props;
 
   return <ToolOutputBuffer
     outputP={outputP}
@@ -471,7 +470,7 @@ export const ToolOutputView = memo(function ToolValue(props: ToolOutputViewProps
           return valueWrapper(<ErrorBoundary>{maybeElement}</ErrorBoundary>, value);
         }
       }
-      return valueWrapper(<Value value={value} customizations={customizations}/>, value);
+      return valueWrapper(<Value value={value} {...rest}/>, value);
     }}
   />;
 });
