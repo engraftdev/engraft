@@ -1,4 +1,6 @@
-import { ToolProgram } from "./core.js";
+import { weakMapCache } from "@engraft/shared/lib/cache.js";
+import { Dispatcher } from "./Dispatcher.js";
+import { ReferenceCollection, ToolProgram } from "./core.js";
 
 // Engraft tools expect access to some features from their environment, like a
 // registry of tools and a way to make slots. Eventually, we will want to handle
@@ -7,9 +9,50 @@ import { ToolProgram } from "./core.js";
 // TODO: move tool registry to globals
 
 const _globals = {
+  dispatcher: new Dispatcher(),
   slotWithCode: null as null | typeof slotWithCode,
   slotWithProgram: null as null | typeof slotWithProgram,
   debugMode: false
+}
+
+export function dispatcher(): Dispatcher {
+  return _globals.dispatcher;
+}
+export const references = weakMapCache(<P extends ToolProgram>(program: P): Set<string> => {
+  // TODO: The one risk of caching this is that lookUpTool might produce varying results if someday
+  // the registry changes.
+  const tool = dispatcher().lookUpToolByProgram(program);
+  const collection = tool.collectReferences(program);
+  return resolveReferenceCollection(collection);
+});
+export function resolveReferenceCollection(collection: ReferenceCollection): Set<string> {
+  // collection: ReferenceCollectionArrayElem[]
+  if (Array.isArray(collection)) {
+    const toReturn: Set<string> = new Set();
+    for (const entry of collection) {
+      if ('-' in entry) {
+        const negCollection = entry['-'] as ReferenceCollection;
+        const negRefs = resolveReferenceCollection(negCollection);
+        for (const ref of negRefs) {
+          toReturn.delete(ref);
+        }
+      } else {
+        const refs = resolveReferenceCollection(entry);
+        for (const ref of refs) {
+          toReturn.add(ref);
+        }
+      }
+    }
+    return toReturn;
+  }
+
+  // collection: ToolProgram
+  if ('toolName' in collection) {
+    return references(collection);
+  }
+
+  // collection: Var | { id: string }
+  return new Set([collection.id]);
 }
 
 export function slotWithCode(program: string = ''): ToolProgram {

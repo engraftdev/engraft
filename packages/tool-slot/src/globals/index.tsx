@@ -1,7 +1,7 @@
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import Diagram from "@engraft/shared/lib/Diagram.js";
 import { alphaLabels } from "@engraft/shared/lib/unusedLabel.js";
-import { EngraftPromise, RefuncMemory, hookFork, hookMemo, hookRef, hookRefunction, hooks, lookUpToolByName, usePromiseState } from "@engraft/toolkit";
+import { EngraftPromise, RefuncMemory, dispatcher, hookFork, hookMemo, hookRef, hookRefunction, hooks, usePromiseState } from "@engraft/toolkit";
 import * as d3dsv from "d3-dsv";
 import update from "immutability-helper";
 import _ from "lodash";
@@ -93,7 +93,7 @@ export const globals = {
   },
   RefuncMemory,
   Meta: {
-    lookUpToolByName,
+    dispatcher,
   },
   EngraftPromise,
   csvParse,

@@ -1,11 +1,11 @@
-import { EngraftPromise, newVar, randomId, registerTool, runTool, toolFromModule } from "@engraft/core";
+import { EngraftPromise, dispatcher, newVar, randomId, runTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as Map from "../lib/index.js";
 import { TestingKnownOutput, TestingRefsFunc, registerTestingComponents } from "@engraft/testing-components";
 
 registerTestingComponents();
-registerTool(toolFromModule(Map));
+dispatcher().registerTool(toolFromModule(Map));
 
 describe('checkbox', () => {
   it('basically works for arrays', () => {

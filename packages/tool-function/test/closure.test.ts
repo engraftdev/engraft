@@ -1,6 +1,6 @@
 import { empty } from "@engraft/shared/lib/noOp.js";
 import Slot from "@engraft/tool-slot";
-import { EngraftPromise, ToolOutput, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/toolkit";
+import { EngraftPromise, ToolOutput, dispatcher, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import { Closure, closureToAsyncFunction, closureToSyncFunction } from "../lib/closure.js";
 import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
@@ -8,7 +8,7 @@ import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-
 // @vitest-environment happy-dom
 
 registerTestingComponents();
-registerTool(toolFromModule(Slot));
+dispatcher().registerTool(toolFromModule(Slot));
 
 describe('closureToSyncFunction', () => {
   it('basically works', () => {

@@ -1,14 +1,14 @@
-import { EngraftPromise, makeVarBindings, newVar, references, registerTool, toolFromModule } from "@engraft/core";
+import { EngraftPromise, dispatcher, makeVarBindings, newVar, references, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
-import { TestingKnownOutput, TestingRefsFunc, registerTestingComponents } from "@engraft/testing-components";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
+import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
 
 registerTestingComponents();
 const simulationTool = toolFromModule(simulation);
-registerTool(simulationTool);
+dispatcher().registerTool(simulationTool);
 
 describe('simulation', () => {
   it('basically works', () => {

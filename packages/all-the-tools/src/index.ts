@@ -1,4 +1,4 @@
-import { forgetP, registerTool, Tool, toolFromModule } from "@engraft/core";
+import { Tool, dispatcher, forgetP, toolFromModule } from "@engraft/core";
 import { originalTools } from "@engraft/original-tools";
 import Checkbox from "@engraft/tool-checkbox";
 import DataTable from "@engraft/tool-data-table";
@@ -48,5 +48,5 @@ export const allTheTools: Tool[] = [
 ]
 
 export function registerAllTheTools() {
-  allTheTools.forEach(registerTool);
+  allTheTools.forEach((tool) => dispatcher().registerTool(tool));
 }

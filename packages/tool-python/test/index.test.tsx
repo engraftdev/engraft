@@ -1,4 +1,4 @@
-import { registerTool, runTool, toolFromModule } from "@engraft/core";
+import { dispatcher, runTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { registerTestingComponents } from "@engraft/testing-components";
@@ -9,7 +9,7 @@ import * as Python from "../lib/index.js";
 
 registerTestingComponents();
 
-registerTool(toolFromModule(Python));
+dispatcher().registerTool(toolFromModule(Python));
 
 describe('python', () => {
   it('basically works', async () => {

@@ -4,7 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { IsolateStyles, VarUse } from "@engraft/core-widgets";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, getFullToolIndex, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, slotWithProgram } from "@engraft/toolkit";
+import { EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, dispatcher, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, slotWithProgram } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
@@ -305,7 +305,7 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
     return {
       from: word.from,
       options: [
-        ...Object.entries(getFullToolIndex())
+        ...Object.entries(dispatcher().getFullToolIndex())
           .filter(([_, tool]) => !tool.isInternal)
           .map(([toolName, tool]) => ({
             label: '/' + toolName,

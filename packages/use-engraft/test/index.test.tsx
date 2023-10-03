@@ -1,4 +1,4 @@
-import { EngraftPromise, registerTool, slotWithCode, toolFromModule, ToolOutput } from "@engraft/core";
+import { dispatcher, EngraftPromise, slotWithCode, toolFromModule, ToolOutput } from "@engraft/core";
 import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
 import Slot from "@engraft/tool-slot";
 import React from "react";
@@ -9,7 +9,7 @@ import { useEngraft } from "../lib/index.js";
 // @vitest-environment happy-dom
 
 registerTestingComponents();
-registerTool(toolFromModule(Slot));
+dispatcher().registerTool(toolFromModule(Slot));
 
 describe('useEngraft', () => {
   it('basically works', () => {

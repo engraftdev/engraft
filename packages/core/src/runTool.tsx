@@ -1,13 +1,13 @@
 import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks } from "@engraft/refunc/lib/index.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings, lookUpToolByProgram, references } from "./core.js";
-import { debugMode } from "./globals.js";
+import { ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core.js";
+import { debugMode, dispatcher, references } from "./globals.js";
 
 export function hookRunTool<P extends ToolProgram>(
   props: ToolProps<P>
 ): ToolResults<P> {
   const toolName = props.program.toolName;
-  const tool = lookUpToolByProgram(props.program);
+  const tool = dispatcher().lookUpToolByProgram(props.program);
 
   // A tool only receives the varBindings that it references
   const varBindings = hookRelevantVarBindings(props);

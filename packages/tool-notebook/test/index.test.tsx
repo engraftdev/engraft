@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, newVar, references, registerTool, runTool, toolFromModule, VarBindings } from "@engraft/core";
+import { dispatcher, EngraftPromise, makeVarBindings, newVar, references, runTool, toolFromModule, VarBindings } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
@@ -14,7 +14,8 @@ import * as Notebook from "../lib/index.js";
 const notebookTool = toolFromModule(Notebook);
 
 registerTestingComponents();
-registerTool(notebookTool);
+
+dispatcher().registerTool(notebookTool);
 
 const prevVarId = 'IDprev000000';
 

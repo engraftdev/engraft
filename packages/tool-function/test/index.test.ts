@@ -1,17 +1,17 @@
 import { empty } from "@engraft/shared/lib/noOp.js";
+import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
 import Slot from "@engraft/tool-slot";
-import { EngraftPromise, RefuncMemory, ToolOutput, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/toolkit";
+import { EngraftPromise, RefuncMemory, ToolOutput, dispatcher, newVar, slotWithCode, toolFromModule } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as functionM from "../lib/index.js";
-import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
 
 const functionTool = toolFromModule(functionM);
 
 registerTestingComponents();
-registerTool(functionTool);
-registerTool(toolFromModule(Slot));
+dispatcher().registerTool(functionTool);
+dispatcher().registerTool(toolFromModule(Slot));
 
 describe('function', () => {
   it('output works', () => {

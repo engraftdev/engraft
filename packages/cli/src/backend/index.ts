@@ -1,7 +1,7 @@
 import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
 import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, RefuncMemory, runTool, ToolProgram, slotWithProgram, lookUpToolByName} from '@engraft/hostkit';
+import { EngraftPromise, RefuncMemory, ToolProgram, dispatcher, runTool, slotWithProgram } from '@engraft/hostkit';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
 import { exit } from 'node:process';
@@ -87,7 +87,8 @@ async function read(stream: NodeJS.ReadStream) {
     }
   } else {
     if (program === null) {
-      program = slotWithProgram(lookUpToolByName('notebook').makeProgram('IDinput000000'));
+      // TODO: bakes in notebook?
+      program = slotWithProgram(dispatcher().lookUpToolByName('notebook').makeProgram('IDinput000000'));
     }
 
     const app = express();

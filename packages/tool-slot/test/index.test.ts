@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, references, registerTool, runTool, toolFromModule, ToolOutput } from "@engraft/core";
+import { dispatcher, EngraftPromise, makeVarBindings, references, runTool, toolFromModule, ToolOutput } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { updateWithUP } from "@engraft/update-proxy";
@@ -9,7 +9,7 @@ import * as slot from "../lib/index.js";
 // @vitest-environment happy-dom
 
 const slotTool = toolFromModule(slot);
-registerTool(slotTool);  // we test it embedded in itself
+dispatcher().registerTool(slotTool);  // we test it embedded in itself
 
 describe('slot', () => {
   it('basic code works', () => {

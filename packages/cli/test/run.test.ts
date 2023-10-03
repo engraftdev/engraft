@@ -1,4 +1,4 @@
-import { registerTool, slotWithCode, toolFromModule } from "@engraft/hostkit";
+import { dispatcher, slotWithCode, toolFromModule } from "@engraft/hostkit";
 import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
 import Slot from "@engraft/tool-slot";
 import { spawnSync } from "node:child_process";
@@ -8,7 +8,7 @@ import * as tmp from "tmp";
 import { describe, expect, it } from "vitest";
 
 const slotTool = toolFromModule(Slot);
-registerTool(slotTool);
+dispatcher().registerTool(slotTool);
 
 function relative(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
