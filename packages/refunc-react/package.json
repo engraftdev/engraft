@@ -1,9 +1,11 @@
 {
-  "private": true,
   "name": "@engraft/refunc-react",
   "version": "0.0.1",
   "license": "MIT",
   "description": "React features for Refunc",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

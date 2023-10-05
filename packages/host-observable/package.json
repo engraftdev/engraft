@@ -4,6 +4,9 @@
   "license": "MIT",
   "description": "A library for embedding Engraft in Observable",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

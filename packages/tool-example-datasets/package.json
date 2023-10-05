@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Observable example datasets, as an Engraft tool",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Engraft tool for Voyager 2",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

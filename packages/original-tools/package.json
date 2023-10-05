@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Temporary package to port over old tools into the monorepo.",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

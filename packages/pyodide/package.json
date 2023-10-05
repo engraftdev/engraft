@@ -6,6 +6,9 @@
   "bin": {
     "engraft": "./lib/run.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",

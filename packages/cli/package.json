@@ -6,6 +6,9 @@
     "engraft": "./lib/run.js"
   },
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",

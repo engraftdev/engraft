@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Engraft tool to edit table in an interactive table",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",

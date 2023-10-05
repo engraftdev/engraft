@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Vendored-in Voyager for @engraft/tool-voyager",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {},
   "main": "src/lib-voyager.cjs",
   "dependencies": {}

@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "A little gadget to make it easier to perform functional updates",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build-lib": "tsc && cpy 'src/**/*.css' lib",
     "test:watch": "vitest",
