@@ -23,12 +23,12 @@
     "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
     "@engraft/core-widgets": "^0.0.1",
-    "@engraft/toolkit": "^0.0.1",
     "@engraft/shared": "^0.0.1",
-    "lodash": "^4.17.21"
+    "@engraft/toolkit": "^0.0.1",
+    "lodash": "^4.17.21",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178"

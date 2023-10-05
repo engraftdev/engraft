@@ -7,6 +7,5 @@
     "access": "public"
   },
   "scripts": {},
-  "main": "src/lib-voyager.cjs",
-  "dependencies": {}
+  "main": "src/lib-voyager.cjs"
 }
