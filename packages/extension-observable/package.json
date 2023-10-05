@@ -1,5 +1,5 @@
 {
-  "name": "extension-observable",
+  "name": "@engraft/extension-observable",
   "private": true,
   "version": "1.0.0",
   "type": "module",
