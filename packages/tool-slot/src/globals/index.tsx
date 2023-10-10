@@ -1,5 +1,6 @@
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import Diagram from "@engraft/shared/lib/Diagram.js";
+import * as Graphic from "@engraft/shared/lib/Graphic.js";
 import { alphaLabels } from "@engraft/shared/lib/unusedLabel.js";
 import { EngraftPromise, RefuncMemory, hookFork, hookMemo, hookRef, hookRefunction, hooks, usePromiseState } from "@engraft/toolkit";
 import * as d3dsv from "d3-dsv";
@@ -84,6 +85,8 @@ export const globals = {
   GoogleMap,
   html,
   Diagram,
+  Graphic,
+  G: Graphic,
   Refunc: {
     hooks,
     hookRef,

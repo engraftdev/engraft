@@ -2,6 +2,7 @@ import { EngraftPromise, ToolOutput } from "@engraft/core";
 import { usePromiseState } from "@engraft/react";
 import { count } from "@engraft/shared/lib/count.js";
 import Diagram from "@engraft/shared/lib/Diagram.js";
+import * as Graphic from "@engraft/shared/lib/Graphic.js";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ErrorBoundary } from "@engraft/shared/lib/ErrorBoundary.js";
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
@@ -147,6 +148,13 @@ const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
   if (hasProperty(value, 'isDiagram') && value.isDiagram) {
     return wrapInline(
       <Diagram width={130} height={130} diagram={value} />
+    );
+  }
+  if (value instanceof Graphic.Graphic) {
+    return wrapInline(
+      <ErrorBoundary>
+        <Graphic.DisplayGraphic width={130} height={130} graphic={value} />
+      </ErrorBoundary>
     );
   }
 
