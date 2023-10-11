@@ -27,7 +27,16 @@ depcheck(process.cwd(), options).then((unused) => {
     problem = true;
   }
 
-  // TODO: handle unused.invalidFiles and unused.invalidDirs?
+  const invalidFiles = Object.keys(unused.invalidFiles);
+  if (invalidFiles.length > 0) {
+    console.log("Invalid files");
+    for (const file of invalidFiles) {
+      console.log(`  ${file}: ${unused.invalidFiles[file]}`);
+    }
+    problem = true;
+  }
+
+  // TODO: unused.invalidDirs?
 
   if (problem) {
     process.exitCode = 1;
