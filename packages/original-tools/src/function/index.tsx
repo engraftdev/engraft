@@ -171,6 +171,11 @@ const VarHeading = memo((props: VarHeadingProps) => {
     programUP.examples.$all.argValuePrograms.$helper({$splice: [[index + 1, 0, slotWithCode('')]]});
   }, [index, programUP]);
 
+  const removeVar = useCallback(() => {
+    programUP.argVars[index].$remove();
+    programUP.examples.$all.argValuePrograms[index].$remove();
+  }, [index, programUP]);
+
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
       <MyContextMenuHeading>Var</MyContextMenuHeading>
@@ -187,7 +192,7 @@ const VarHeading = memo((props: VarHeadingProps) => {
       {<div>
         <button
           onClick={() => {
-            varUP.$remove();
+            removeVar();
             closeMenu();
           }}
         >
@@ -195,7 +200,7 @@ const VarHeading = memo((props: VarHeadingProps) => {
         </button>
       </div>}
     </MyContextMenu>
-  , [insertVarAfter, varUP]));
+  , [insertVarAfter, removeVar]));
 
   return <td onContextMenu={openMenu}>
     {menuNode}
