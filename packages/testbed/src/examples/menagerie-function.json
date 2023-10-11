@@ -14,7 +14,7 @@
           "modeName": "tool",
           "subProgram": {
             "toolName": "function",
-            "vars": [
+            "argVars": [
               {
                 "id": "IDcartoon848035",
                 "label": "name"
@@ -75,14 +75,26 @@
             "examples": [
               {
                 "id": "IDradish841865",
-                "values": [
-                  "David Attenborough"
+                "argValuePrograms": [
+                  {
+                    "toolName": "slot",
+                    "modeName": "code",
+                    "code": "\"David Attenborough\"",
+                    "defaultCode": "",
+                    "subPrograms": {}
+                  }
                 ]
               },
               {
                 "id": "IDmanta532542",
-                "values": [
-                  "George Washington Carver"
+                "argValuePrograms": [
+                  {
+                    "toolName": "slot",
+                    "modeName": "code",
+                    "code": "\"George Washington Carver\"",
+                    "defaultCode": "",
+                    "subPrograms": {}
+                  }
                 ]
               }
             ],

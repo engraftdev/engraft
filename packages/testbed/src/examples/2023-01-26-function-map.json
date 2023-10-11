@@ -14,7 +14,7 @@
           "modeName": "tool",
           "subProgram": {
             "toolName": "function",
-            "vars": [
+            "argVars": [
               {
                 "id": "IDcare266465",
                 "label": "input 1"
@@ -42,8 +42,14 @@
             "examples": [
               {
                 "id": "IDbarometer380680",
-                "values": [
-                  10
+                "argValuePrograms": [
+                  {
+                    "toolName": "slot",
+                    "modeName": "code",
+                    "code": "10",
+                    "defaultCode": "",
+                    "subPrograms": {}
+                  }
                 ]
               }
             ],

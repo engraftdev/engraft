@@ -1,4 +1,4 @@
-import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
+import { EngraftPromise, runTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 
 export type Closure = {
@@ -7,15 +7,19 @@ export type Closure = {
   closureVarBindings: VarBindings,
 }
 
-export function valuesToVarBindings(values: unknown[], vars: Var[]): VarBindings {
+export function argValueOutputPsToVarBindings(argValueOutputPs: EngraftPromise<ToolOutput>[], vars: Var[]): VarBindings {
   const varBindings: VarBindings = {};
   for (let i = 0; i < vars.length; i++) {
     varBindings[vars[i].id] = {
       var_: vars[i],
-      outputP: EngraftPromise.resolve({value: values[i]}),
+      outputP: argValueOutputPs[i],
     }
   }
   return varBindings;
+}
+
+export function argValuesToVarBindings(values: unknown[], vars: Var[]): VarBindings {
+  return argValueOutputPsToVarBindings(values.map(value => EngraftPromise.resolve({value})), vars);
 }
 
 export function closureToSyncFunction(closure: Closure) {
@@ -25,7 +29,7 @@ export function closureToSyncFunction(closure: Closure) {
       throw new Error(`Expected ${vars.length} arguments, got ${args.length}`);
     }
 
-    const varBindings = valuesToVarBindings(args, vars);
+    const varBindings = argValuesToVarBindings(args, vars);
 
     const result = runTool(
       new RefuncMemory(),  // no incrementality

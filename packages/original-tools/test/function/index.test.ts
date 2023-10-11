@@ -21,7 +21,7 @@ describe('function', () => {
 
     let program: functionM.Program = {
       toolName: 'function',
-      vars: [ input1, input2 ],
+      argVars: [ input1, input2 ],
       bodyProgram: slotWithCode(`10 * ${input1.id} + ${input2.id}`),
       examples: [],
       activeExampleId: 'hmmmm',

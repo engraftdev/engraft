@@ -1,21 +1,18 @@
-import { ComputeReferences, EngraftPromise, newVar, MakeProgram, randomId, references, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, Var } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, references, slotWithCode } from "@engraft/core";
 import { MyContextMenu, MyContextMenuHeading, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
-import { ToolWithView } from "@engraft/hostkit";
-import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { useRefunction } from "@engraft/hostkit";
+import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { noOp } from "@engraft/shared/lib/noOp.js";
 import { difference } from "@engraft/shared/lib/sets.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
-import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
-import { Closure, closureToSyncFunction, valuesToVarBindings } from "./closure.js";
-import { SettableValue } from "./SettableValue.js";
+import { Closure, argValueOutputPsToVarBindings, closureToSyncFunction } from "./closure.js";
 
 export type Program = {
   toolName: 'function',
-  vars: Var[],
+  argVars: Var[],
   bodyProgram: ToolProgram,
   examples: Example[],
   activeExampleId: string,
@@ -23,8 +20,7 @@ export type Program = {
 
 type Example = {
   id: string,
-  values: unknown[],  // parallel with vars
-  // TODO: values may not be serializable; represent with tool programs, not directly
+  argValuePrograms: ToolProgram[],  // parallel with vars
 }
 
 export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
@@ -32,19 +28,19 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const exampleId = randomId();
   return {
     toolName: 'function',
-    vars: [var1],
+    argVars: [var1],
     bodyProgram: slotWithCode(var1.id),
-    examples: [{id: exampleId, values: [undefined]}],
+    examples: [{id: exampleId, argValuePrograms: [slotWithCode('')]}],
     activeExampleId: exampleId,
   }
 };
 
 export const computeReferences: ComputeReferences<Program> = (program) =>
-  difference(references(program.bodyProgram), program.vars.map((v) => v.id));
+  difference(references(program.bodyProgram), program.argVars.map((v) => v.id));
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
-  const { vars, bodyProgram } = program;
+  const { argVars: vars, bodyProgram } = program;
 
   const closure: Closure = hookDedupe({
     vars,
@@ -73,19 +69,52 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   syncFunction: (...args: unknown[]) => unknown,
 }
 
+const runExampleArgValuePrograms = hooks((example: Example, argVars: Var[], varBindings: VarBindings) => {
+  return hookFork((branch) =>
+    example.argValuePrograms.map((argValueProgram, i) => branch(argVars[i].id, () =>
+      hookRunTool({ program: argValueProgram, varBindings })
+    ))
+  );
+})
+const runExamplesArgValuePrograms = hooks((examples: Example[], argVars: Var[], varBindings: VarBindings) => {
+  return hookFork((branch) =>
+    examples.map((example) => branch(example.id, () =>
+      hookRefunction(runExampleArgValuePrograms, example, argVars, varBindings)
+    ))
+  );
+})
+
+const runBodyOnExample = hooks((bodyProgram: ToolProgram, argValueResults: ToolResult<ToolProgram>[], argVars: Var[], varBindings: VarBindings) => {
+  const argValueOutputPs = argValueResults.map((result) => result.outputP);
+  const bodyVarBindings = {
+    ...varBindings,
+    ...argValueOutputPsToVarBindings(argValueOutputPs, argVars),
+  };
+  return hookRunTool({ program: bodyProgram, varBindings: bodyVarBindings})
+})
+const runBodyOnExamples = hooks((bodyProgram: ToolProgram, examples: Example[], examplesArgValueResults: ToolResult<ToolProgram>[][], argVars: Var[], varBindings: VarBindings) => {
+  return hookFork((branch) =>
+    examples.map((example, i) => branch(example.id, () =>
+      hookRefunction(runBodyOnExample, bodyProgram, examplesArgValueResults[i], argVars, varBindings)
+    ))
+  );
+})
+
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, syncFunction } = props;
 
   const programUP = useUpdateProxy(updateProgram);
 
-  const bodyVarBindings = useMemo(() => {
-    const activeExample = _.find(program.examples, {id: program.activeExampleId})!;
+  // run all the programs for all the example arg values
+  const examplesArgValueResults = useRefunction(runExamplesArgValuePrograms, program.examples, program.argVars, varBindings);
 
-    return {
-      ...varBindings,
-      ...valuesToVarBindings(activeExample.values, program.vars),
-    };
-  }, [program.activeExampleId, program.examples, program.vars, varBindings]);
+  // run the body on each set of example inputs
+  const bodyResults = useRefunction(runBodyOnExamples, program.bodyProgram, program.examples, examplesArgValueResults, program.argVars, varBindings)
+
+  const activeBodyResult = useMemo(() => {
+    const activeExampleIdx = program.examples.findIndex((example) => example.id === program.activeExampleId);
+    return bodyResults[activeExampleIdx];
+  }, [bodyResults, program.activeExampleId, program.examples]);
 
   return <div className="xCol xGap10 xPad10">
     <div className="xRow xGap10">
@@ -93,7 +122,7 @@ const View = memo((props: ViewProps) => {
         <thead>
           <tr>
             <td>{/* for option buttons */}</td>
-            {program.vars.map((var_, i) =>
+            {program.argVars.map((var_, i) =>
               <VarHeading key={var_.id}
                 var_={var_} index={i}
                 programUP={programUP}
@@ -108,8 +137,10 @@ const View = memo((props: ViewProps) => {
           {program.examples.map((example, i) =>
             <ExampleRow key={example.id}
               example={example} index={i}
+              exampleArgValueResults={examplesArgValueResults[i]}
+              bodyResults={bodyResults[i]}
               programUP={programUP}
-              numVars={program.vars.length}
+              numVars={program.argVars.length}
               activeExampleId={program.activeExampleId}
               syncFunction={syncFunction}
             />)}
@@ -118,7 +149,7 @@ const View = memo((props: ViewProps) => {
     </div>
 
     <div className="xRow xGap10">
-      <ToolWithView program={program.bodyProgram} updateProgram={programUP.bodyProgram.$apply} reportOutputState={noOp} varBindings={bodyVarBindings}/>
+      <ShowView view={activeBodyResult.view} updateProgram={programUP.bodyProgram.$apply}/>
     </div>
 
   </div>;
@@ -133,13 +164,12 @@ type VarHeadingProps = {
 const VarHeading = memo((props: VarHeadingProps) => {
   const {var_, index, programUP} = props;
 
-  const varUP = programUP.vars[index];
+  const varUP = programUP.argVars[index];
 
   const insertVarAfter = useCallback(() => {
-    programUP.vars.$helper({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]});
-    programUP.examples.$all.values.$helper({$splice: [[index + 1, 0, '']]});
+    programUP.argVars.$helper({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]});
+    programUP.examples.$all.argValuePrograms.$helper({$splice: [[index + 1, 0, slotWithCode('')]]});
   }, [index, programUP]);
-
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>
@@ -179,13 +209,16 @@ type ExampleRowProps = {
   index: number,
   programUP: UpdateProxy<Program>,
 
+  exampleArgValueResults: ToolResult<ToolProgram>[],
+  bodyResults: ToolResult<ToolProgram>,
+
   numVars: number,
   activeExampleId: string,
   syncFunction: (...args: unknown[]) => unknown,
 };
 
 const ExampleRow = memo((props: ExampleRowProps) => {
-  const { example, index, programUP, numVars, activeExampleId, syncFunction } = props;
+  const { example, index, programUP, exampleArgValueResults, bodyResults, numVars, activeExampleId } = props;
 
   const exampleUP = programUP.examples[index];
 
@@ -202,15 +235,11 @@ const ExampleRow = memo((props: ExampleRowProps) => {
   const insertExampleAfter = useCallback(() => {
     const newExample: Example = {
       id: randomId(),
-      values: Array.from({length: numVars}, () => undefined),
+      argValuePrograms: Array.from({length: numVars}, () => slotWithCode('')),
     };
     programUP.examples.$helper({$splice: [[index + 1, 0, newExample]]});
     programUP.activeExampleId.$set(newExample.id);
   }, [index, numVars, programUP.activeExampleId, programUP.examples]);
-
-  const outputP = useMemo(() => EngraftPromise.try(() => {
-    return {value: syncFunction(...example.values)};
-  }), [example.values, syncFunction]);
 
   const makeThisRowActive = useCallback(() => {
     programUP.activeExampleId.$set(example.id);
@@ -251,13 +280,13 @@ const ExampleRow = memo((props: ExampleRowProps) => {
         onChange={makeThisRowActive}
       />
     </td>
-    {example.values.map((value, i) =>
+    {exampleArgValueResults.map((result, i) =>
       <td key={i}>
-        <SettableValue value={value} setValue={exampleUP.values[i].$set}/>
+        <ShowView view={result.view} updateProgram={exampleUP.argValuePrograms[i].$apply}/>
       </td>
     )}
     <td>
-      <ToolOutputView outputP={outputP}/>
+      <ToolOutputView outputP={bodyResults.outputP}/>
     </td>
   </tr>
 });
