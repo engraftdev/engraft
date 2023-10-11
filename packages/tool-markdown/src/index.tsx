@@ -1,7 +1,7 @@
 /// <reference path="./jsx-runtime.d.ts" />
 import { markdown } from "@codemirror/lang-markdown";
-import { FancyCodeEditor, hookFancyCodeEditor, refREDirect, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
-import { ComputeReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { FancyCodeEditor, hookFancyCodeEditor, refREDirect, collectReferencesForFancyCodeEditor } from "@engraft/codemirror-helpers";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 import { evaluate } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 
@@ -17,8 +17,8 @@ const makeProgram: MakeProgram<Program> = () => ({
   subPrograms: {},
 });
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  referencesFancyCodeEditor(program.code, program.subPrograms);
+const collectReferences: CollectReferences<Program> = (program) =>
+  collectReferencesForFancyCodeEditor(program.code, program.subPrograms);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -59,4 +59,4 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, computeReferences, run })
+export default defineTool({ makeProgram, collectReferences, run })

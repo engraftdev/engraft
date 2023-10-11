@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, registerTool, runTool, toolFromModule, ToolOutput } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, references, registerTool, runTool, toolFromModule, ToolOutput } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { updateWithUP } from "@engraft/update-proxy";
@@ -87,7 +87,7 @@ describe('slot', () => {
 
   it('computes references correctly in code-mode', () => {
     expect(
-      slotTool.computeReferences({
+      references({
         toolName: 'slot',
         modeName: 'code',
         code: '1 + 1',
@@ -99,7 +99,7 @@ describe('slot', () => {
     );
 
     expect(
-      slotTool.computeReferences({
+      references({
         toolName: 'slot',
         modeName: 'code',
         code: 'IDfox000000 + 1',
@@ -113,7 +113,7 @@ describe('slot', () => {
 
   it('computes references correctly in code-mode with subprograms', () => {
     expect(
-      slotTool.computeReferences({
+      references({
         toolName: 'slot',
         modeName: 'code',
         code: '1 + IDsubtool000000',
@@ -135,7 +135,7 @@ describe('slot', () => {
 
   it('computes references correctly in tool-mode', () => {
     expect(
-      slotTool.computeReferences({
+      references({
         toolName: 'slot',
         modeName: 'tool',
         subProgram: {

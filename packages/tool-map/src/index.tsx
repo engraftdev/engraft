@@ -1,7 +1,6 @@
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { difference, union } from "@engraft/shared/lib/sets.js";
-import { ComputeReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, references, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -26,8 +25,8 @@ const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   };
 };
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  union(references(program.inputProgram), difference(references(program.perItemProgram), [program.itemVar.id]));
+const collectReferences: CollectReferences<Program> = (program) =>
+  [ program.inputProgram, program.perItemProgram, { '-': [program.itemVar] } ]
 
 const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -105,7 +104,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, computeReferences, run });
+export default defineTool({ makeProgram, collectReferences, run });
 
 
 const MAX_ITEMS_DISPLAYED = 10;

@@ -1,7 +1,6 @@
-import { EngraftPromise, hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
-import { union } from "@engraft/shared/lib/sets.js";
 import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
 import { useCallback } from "react";
 
@@ -56,11 +55,7 @@ export function defineSimpleTool<Name extends string, Fields extends object, Sub
         ) as Record<SubToolKey, ToolProgram>,
       }
     ),
-    computeReferences: (program) => {
-      const subToolPrograms = Object.values(program.subTools) as ToolProgram[];
-      const subToolReferences = subToolPrograms.map(references);
-      return union(...subToolReferences);
-    },
+    collectReferences: (program) => Object.values(program.subTools),
     run: memoizeProps(hooks((props) => {
       const { program, varBindings } = props;
 

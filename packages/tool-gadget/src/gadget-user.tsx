@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/core-widgets";
-import { ComputeReferences, EngraftPromise, MakeProgram, SetOps, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, references, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -20,8 +20,7 @@ const makeProgram: MakeProgram<Program> = () => ({
   gadgetProgram: null,
 });
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  SetOps.union(references(program.closureProgram));
+const collectReferences: CollectReferences<Program> = (program) => program.closureProgram;
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -118,4 +117,4 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   return <ToolOutputView outputP={viewResultEtc.result.outputP} displayReactElementsDirectly={true} />;
 });
 
-export const GadgetUser = defineTool({ makeProgram, computeReferences, run });
+export const GadgetUser = defineTool({ makeProgram, collectReferences, run });

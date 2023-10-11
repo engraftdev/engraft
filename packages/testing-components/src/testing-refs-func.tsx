@@ -16,7 +16,7 @@ export const tool: Tool<Program> = {
     func: () => EngraftPromise.unresolved(),
   }),
 
-  computeReferences: (program) => new Set(program.refs),
+  collectReferences: (program) => program.refs.map(id => ({ id })),
 
   run: memoizeProps(hooks((props) => {
     const { program, varBindings } = props;

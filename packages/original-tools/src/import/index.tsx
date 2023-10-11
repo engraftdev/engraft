@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, MakeProgram, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ControlledTextInput } from "@engraft/shared/lib/ControlledTextInput.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
@@ -13,7 +13,7 @@ export const makeProgram: MakeProgram<Program> = () => ({
   packageName: '',
 });
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+export const collectReferences: CollectReferences<Program> = (_program) => [];
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program } = props;

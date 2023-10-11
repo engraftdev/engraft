@@ -1,10 +1,9 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, newVar, MakeProgram, references, runTool, ShowView, ShowViewWithScope, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, runTool, slotWithCode } from "@engraft/core";
 import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
-import { isObject } from "@engraft/shared/lib/isObject.js";
-import { difference, union } from "@engraft/shared/lib/sets.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
+import { isObject } from "@engraft/shared/lib/isObject.js";
 import { outputBackgroundStyle } from "@engraft/toolkit";
 import { UpdateProxy, useStateUP, useUpdateProxy } from "@engraft/update-proxy-react";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
@@ -32,11 +31,8 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   };
 };
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  difference(
-    union(references(program.initProgram), references(program.onTickProgram), references(program.toDrawProgram)),
-    [program.stateVar.id]
-  );
+export const collectReferences: CollectReferences<Program> = (program) =>
+  [ program.initProgram, program.onTickProgram, program.toDrawProgram, {'-': program.stateVar} ];
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

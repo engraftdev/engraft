@@ -1,8 +1,7 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
+import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { union } from "@engraft/shared/lib/sets.js";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { arrEqWithRefEq } from "@engraft/shared/lib/eq.js";
+import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {
   toolName: 'test-array',
@@ -16,8 +15,7 @@ export const makeProgram: MakeProgram<Program> = () => {
   }
 };
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  union(...program.subToolPrograms.map(subToolProgram => references(subToolProgram)));
+export const collectReferences: CollectReferences<Program> = (program) => program.subToolPrograms;
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

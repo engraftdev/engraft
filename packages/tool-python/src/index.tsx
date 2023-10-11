@@ -1,9 +1,9 @@
 /// <reference path="./index.d.ts" />
 
-import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
-import { ComputeReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 import { python } from "@codemirror/lang-python";
-import { getPyodide } from  "@engraft/pyodide";
+import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEditor } from "@engraft/codemirror-helpers";
+import { getPyodide } from "@engraft/pyodide";
+import { CollectReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'python',
@@ -17,8 +17,8 @@ const makeProgram: MakeProgram<Program> = () => ({
   subPrograms: {},
 });
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  referencesFancyCodeEditor(program.code, program.subPrograms);
+const collectReferences: CollectReferences<Program> = (program) =>
+  collectReferencesForFancyCodeEditor(program.code, program.subPrograms);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -51,7 +51,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, computeReferences, run })
+export default defineTool({ makeProgram, collectReferences, run })
 
 async function runPython(code: string, globals: {[key: string]: any}) {
   const pyodide = await getPyodide();

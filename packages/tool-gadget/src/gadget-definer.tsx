@@ -1,5 +1,5 @@
 import { ToolOutputView, Value, VarDefinition } from "@engraft/core-widgets";
-import { ComputeReferences, EngraftPromise, MakeProgram, SetOps, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, references, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -19,18 +19,10 @@ const makeProgram: MakeProgram<Program> = () => ({
   },
 });
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  SetOps.difference(
-    SetOps.union(
-      references(program.def.initialProgramProgram),
-      references(program.def.outputProgram),
-      references(program.def.viewProgram),
-    ),
-    [
-      program.def.programVar.id,
-      program.def.programUPVar.id,
-    ]
-  );
+const collectReferences: CollectReferences<Program> = (program) => [
+  program.def.initialProgramProgram, program.def.outputProgram, program.def.viewProgram,
+  { '-': [ program.def.programVar, program.def.programUPVar ] }
+];
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -139,4 +131,4 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   );
 });
 
-export const GadgetDefiner = defineTool({ makeProgram, computeReferences, run });
+export const GadgetDefiner = defineTool({ makeProgram, collectReferences, run });

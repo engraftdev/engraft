@@ -13,7 +13,7 @@ export const tool: Tool<Program> = {
     outputP: EngraftPromise.unresolved(),
   }),
 
-  computeReferences: () => new Set(),
+  collectReferences: () => [],
 
   run: memoizeProps(hooks((props) => {
     const { program } = props;

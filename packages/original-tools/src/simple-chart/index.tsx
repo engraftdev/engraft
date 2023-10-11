@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from "@engraft/update-proxy";
@@ -34,8 +34,7 @@ export const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => 
   }
 };
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  references(program.dataProgram);
+export const collectReferences: CollectReferences<Program> = (program) => program.dataProgram;
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

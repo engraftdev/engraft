@@ -4,7 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { IsolateStyles, VarUse } from "@engraft/core-widgets";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { EngraftPromise, SetOps, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, getFullToolIndex, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, references, slotWithProgram } from "@engraft/toolkit";
+import { EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, getFullToolIndex, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, slotWithProgram } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
@@ -79,18 +79,18 @@ export function hookFancyCodeEditor(props: {
   return { subResults, referenceValuesP };
 }
 
-export function referencesFancyCodeEditor(code: string, subPrograms: SubPrograms) {
-  return SetOps.difference(
+export function collectReferencesForFancyCodeEditor(code: string, subPrograms: SubPrograms): ReferenceCollection {
+  return [
     // references from code & subprograms...
-    SetOps.union(
-      referencesFromCodeDirect(code),
-      referencesFromCodePromise(code),
-      ...Object.values(subPrograms).map(references),
-    ),
+    [...referencesFromCodeDirect(code)].map(id => ({id})),
+    [...referencesFromCodePromise(code)].map(id => ({id})),
+    Object.values(subPrograms),
+
     // ...minus the subprogram ids themselves
-    Object.keys(subPrograms)
-  );
-};
+    { '-': Object.keys(subPrograms).map(id => ({id})) },
+  ];
+}
+
 
 type FancyCodeEditorProps = {
   extensions?: Extension[],

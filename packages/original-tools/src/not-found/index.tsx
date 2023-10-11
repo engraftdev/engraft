@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 
 export type Program = {
@@ -9,7 +9,7 @@ export const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'not-found',
 });
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+export const collectReferences: CollectReferences<Program> = (_program) => [];
 
 export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { toolName } = props.program;

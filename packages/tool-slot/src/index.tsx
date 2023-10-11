@@ -7,11 +7,11 @@ import babelTypes from "@babel/types";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorState, RangeSet } from "@codemirror/state";
 import { Decoration, EditorView, WidgetType, keymap } from "@codemirror/view";
-import { FancyCodeEditor, hookFancyCodeEditor, referencesFancyCodeEditor } from "@engraft/codemirror-helpers";
+import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { compileBodyCached } from "@engraft/shared/lib/compile.js";
-import { EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, references, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { ToolFrame } from "./ToolFrame.js";
@@ -78,11 +78,11 @@ function slotWithProgram(program: ToolProgram, defaultCode?: string): Program {
 }
 setSlotWithProgram(slotWithProgram);
 
-const computeReferences = (program: Program) => {
+const collectReferences: CollectReferences<Program> = (program: Program) => {
   if (program.modeName === 'code') {
-    return referencesFancyCodeEditor(program.code, program.subPrograms);
+    return collectReferencesForFancyCodeEditor(program.code, program.subPrograms);
   } else {
-    return references(program.subProgram);
+    return program.subProgram;
   }
 };
 
@@ -110,7 +110,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   });
 }));
 
-export default defineTool({ makeProgram, computeReferences, run })
+export default defineTool({ makeProgram, collectReferences, run })
 
 
 ///////////////

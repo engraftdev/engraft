@@ -11,7 +11,7 @@ export default defineTool<Program>({
     checked: false,
   }),
 
-  computeReferences: () => new Set(),
+  collectReferences: () => [],
 
   run: memoizeProps(hooks((props) => {
     const { program } = props;

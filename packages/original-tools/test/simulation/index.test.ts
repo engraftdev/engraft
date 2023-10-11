@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, references, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
@@ -8,6 +8,7 @@ import Slot from "@engraft/tool-slot";
 
 const simulationTool = toolFromModule(simulation);
 registerTool(Slot);
+registerTool(simulationTool);
 
 describe('simulation', () => {
   it('basically works', () => {
@@ -38,7 +39,7 @@ describe('simulation', () => {
     );
 
     expect(
-      simulationTool.computeReferences(program),
+      references(program),
     ).toEqual(
       new Set(['IDone000000'])
     );

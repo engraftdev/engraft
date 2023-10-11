@@ -1,15 +1,15 @@
-import { EngraftPromise, hookRunTool, randomId, references, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, randomId, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "@engraft/core-widgets";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
+import { Use } from "@engraft/shared/lib/Use.js";
 import { useWindowEventListener } from "@engraft/shared/lib/useEventListener.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
+import { useKeyHeld } from "@engraft/shared/lib/useKeyHeld.js";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Use } from "@engraft/shared/lib/Use.js";
-import { useKeyHeld } from "@engraft/shared/lib/useKeyHeld.js";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
 
 interface PatternWithId {
@@ -32,7 +32,7 @@ export const tool: Tool<Program> = {
     minimized: false,
   }),
 
-  computeReferences: (program) => references(program.inputProgram),
+  collectReferences: (program) => program.inputProgram,
 
   run: memoizeProps(hooks((props) => {
     const { program, varBindings } = props;

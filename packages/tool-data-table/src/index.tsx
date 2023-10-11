@@ -6,7 +6,7 @@ import { count } from "@engraft/shared/lib/count.js";
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { isoformat } from "@engraft/shared/lib/isoformat.js";
 import { useHover } from '@engraft/shared/lib/useHover.js';
-import { ComputeReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, references, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -39,7 +39,7 @@ const makeProgram: MakeProgram<P> = (defaultCode) => ({
   cellWidths: {},
 });
 
-const computeReferences: ComputeReferences<P> = (program) => references(program.inputProgram);
+const collectReferences: CollectReferences<P> = (program) => program.inputProgram;
 
 const run = memoizeProps(hooks((props: ToolProps<P>) => {
   const { program, varBindings } = props;
@@ -72,7 +72,7 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, computeReferences, run });
+export default defineTool({ makeProgram, collectReferences, run });
 
 const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   inputResult: ToolResult,

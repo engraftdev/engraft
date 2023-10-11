@@ -1,4 +1,4 @@
-import { EngraftPromise, makeVarBindings, newVar, registerTool, runTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, references, registerTool, runTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
@@ -118,7 +118,7 @@ describe('notebook', () => {
     );
 
     expect(
-      notebookTool.computeReferences(program),
+      references(program),
     ).toEqual(
       new Set()
     );

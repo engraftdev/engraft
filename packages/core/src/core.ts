@@ -11,7 +11,7 @@ import { randomId } from "./randomId.js";
 export type Tool<P extends ToolProgram = ToolProgram> = {
   run: ToolRun<P>;
   makeProgram: MakeProgram<P>;
-  computeReferences: ComputeReferences<P>;
+  collectReferences: CollectReferences<P>;
   isInternal?: boolean;
 }
 
@@ -78,10 +78,18 @@ export const ToolViewContext = createContext<ToolViewContextValue>({
 export type MakeProgram<P extends ToolProgram> =
   (defaultInputCode?: string) => P;
 
-export type ComputeReferences<P extends ToolProgram> =
-  (program: P) => Set<string>;
+export type CollectReferences<P extends ToolProgram> =
+  (program: P) => ReferenceCollection;
 
+export type ReferenceCollection =
+  | ReferenceCollectionArrayElem[]
+  | ToolProgram
+  | Var
+  | {id: string}
 
+export type ReferenceCollectionArrayElem =
+  | ReferenceCollection
+  | {'-': ReferenceCollection}
 
 // We use Tool<ToolProgram> as the generic tool type, in lieu of existential types.
 export function forgetP<P extends ToolProgram>(tool: Tool<P>): Tool {
@@ -117,7 +125,7 @@ export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
     console.error(tool);
     throw new Error(`Tool has no run`);
   }
-  if (!tool.computeReferences) {
+  if (!tool.collectReferences) {
     let toolName = 'UNKNOWN';
     try {
       toolName = tool.makeProgram().toolName;
@@ -143,8 +151,38 @@ export const references = weakMapCache(<P extends ToolProgram>(program: P): Set<
   // TODO: The one risk of caching this is that lookUpTool might produce varying results if someday
   // the registry changes.
   const tool = lookUpToolByProgram(program);
-  return tool.computeReferences(program);
+  const collection = tool.collectReferences(program);
+  return resolveReferenceCollection(collection);
 });
+export function resolveReferenceCollection(collection: ReferenceCollection): Set<string> {
+  // collection: ReferenceCollectionArrayElem[]
+  if (Array.isArray(collection)) {
+    const toReturn: Set<string> = new Set();
+    for (const entry of collection) {
+      if ('-' in entry) {
+        const negCollection = entry['-'] as ReferenceCollection;
+        const negRefs = resolveReferenceCollection(negCollection);
+        for (const ref of negRefs) {
+          toReturn.delete(ref);
+        }
+      } else {
+        const refs = resolveReferenceCollection(entry);
+        for (const ref of refs) {
+          toReturn.add(ref);
+        }
+      }
+    }
+    return toReturn;
+  }
+
+  // collection: ToolProgram
+  if ('toolName' in collection) {
+    return references(collection);
+  }
+
+  // collection: Var | { id: string }
+  return new Set([collection.id]);
+}
 
 export function programSummary(program: ToolProgram): string {
   let summary = program.toolName;

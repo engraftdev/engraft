@@ -1,4 +1,4 @@
-import { ComputeReferences, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { ValueEditable } from "@engraft/core-widgets";
@@ -13,7 +13,7 @@ export const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
   subProgram: slotWithCode(defaultInputCode || ''),
 });
 
-export const computeReferences: ComputeReferences<Program> = (program) => new Set();
+export const collectReferences: CollectReferences<Program> = (_program) => [];
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program, varBindings} = props;

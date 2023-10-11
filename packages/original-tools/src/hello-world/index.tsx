@@ -10,7 +10,7 @@ export const tool: Tool<Program> = {
     toolName: 'hello-world',
   }),
 
-  computeReferences: (_program) => new Set(),
+  collectReferences: (_program) => [],
 
   run: memoizeProps(hooks((_props) => {
     const outputP = hookMemo(() => EngraftPromise.resolve({

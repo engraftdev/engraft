@@ -1,7 +1,7 @@
-import { EngraftPromise, hookRunTool, references, ToolOutput, ToolProgram, ToolResult, ToolResultWithScope, Var, VarBindings } from "@engraft/core";
+import { EngraftPromise, ReferenceCollection, ToolOutput, ToolProgram, ToolResult, ToolResultWithScope, Var, VarBindings, hookRunTool, references } from "@engraft/core";
 import { hookCache, hookDedupe, hookFork, hookMemo, hooks } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { difference, intersection, union } from "@engraft/shared/lib/sets.js";
+import { intersection, union } from "@engraft/shared/lib/sets.js";
 import _ from "lodash";
 import { toposort } from "./toposort.js";
 
@@ -137,8 +137,8 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
   }, [cellById, cellIds, cellToPrev, cells, cyclic, prevVarId, sorted, varBindings]);
 });
 
-export const cellNetworkReferences = (cells: Cell[], prevVarId?: string) =>
-  difference(
-    union(...Object.values(cells).map(cell => references(cell.program))),
-    union(Object.keys(cells), prevVarId ? [prevVarId] : [])
-  );
+export const collectReferencesForCellNetwork = (cells: Cell[], prevVarId?: string): ReferenceCollection => [
+  Object.values(cells).map(cell => cell.program),
+  { '-': Object.values(cells).map(cell => cell.var_) },
+  { '-': prevVarId ? [ {id: prevVarId} ] : [] },
+];

@@ -5,7 +5,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, cellNetworkReferences, ComputeReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, MakeProgram, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition } from "@engraft/toolkit";
+import { cellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, MakeProgram, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, CollectReferences, collectReferencesForCellNetwork } from "@engraft/toolkit";
 import _ from "lodash";
 import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
@@ -39,8 +39,8 @@ const makeProgram: MakeProgram<Program> = (defaultInput) => {
   };
 }
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  cellNetworkReferences(program.cells, program.prevVarId);
+const collectReferences: CollectReferences<Program> = (program) =>
+  collectReferencesForCellNetwork(program.cells, program.prevVarId);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
@@ -65,7 +65,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return { outputP, view };
 }));
 
-export default defineTool({makeProgram, computeReferences, run});
+export default defineTool({makeProgram, collectReferences, run});
 
 type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
   cellResultsWithScope: {[id: string]: ToolResultWithScope},

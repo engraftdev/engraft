@@ -1,6 +1,5 @@
-import { ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { union } from "@engraft/shared/lib/sets.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
 export type Program = {
@@ -9,8 +8,7 @@ export type Program = {
   actualProgram: ToolProgram,
 }
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  union(references(program.delayProgram), references(program.actualProgram));
+export const collectReferences: CollectReferences<Program> = (program) => [ program.delayProgram, program.actualProgram ];
 
 export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => ({
   toolName: 'test-delay',

@@ -1,7 +1,7 @@
-import { hookRunTool, references, ShowView, slotWithCode, Tool, ToolProgram, ToolView } from "@engraft/core";
+import { hookRunTool, ShowView, slotWithCode, Tool, ToolProgram, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 
 export type Program = {
   toolName: 'test-seeing-double',
@@ -16,7 +16,7 @@ export const tool: Tool<Program> = {
     rerenderOnProgramChange: false,
   }),
 
-  computeReferences: (program) => references(program.subProgram),
+  collectReferences: (program) => program.subProgram,
 
   run: memoizeProps(hooks((props) => {
     const { program, varBindings } = props;

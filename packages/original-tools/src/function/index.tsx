@@ -1,9 +1,8 @@
-import { ComputeReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, references, slotWithCode } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, slotWithCode } from "@engraft/core";
 import { MyContextMenu, MyContextMenuHeading, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
 import { useRefunction } from "@engraft/hostkit";
 import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { difference } from "@engraft/shared/lib/sets.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { UpdateProxy } from "@engraft/update-proxy";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -35,8 +34,8 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   }
 };
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  difference(references(program.bodyProgram), program.argVars.map((v) => v.id));
+export const collectReferences: CollectReferences<Program> = (program) =>
+  [ program.bodyProgram, {'-': program.argVars} ];
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

@@ -1,9 +1,9 @@
 import {
-  ComputeReferences, EngraftPromise, hookRunTool, MakeProgram, references, ShowView, slotWithCode, ToolOutput, ToolProgram,
+  CollectReferences, EngraftPromise, hookRunTool, MakeProgram,
+  ShowView, slotWithCode, ToolOutput, ToolProgram,
   ToolProps, ToolRun, ToolView, ToolViewRenderProps
 } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { union } from "@engraft/shared/lib/sets.js";
 import { useCommonWidth } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
 import * as d3dsv from "d3-dsv";
@@ -34,8 +34,8 @@ const paramsDefault = `{
   my_param: "hello world!"
 }`;
 
-export const computeReferences: ComputeReferences<Program> = (program) =>
-  union(references(program.urlProgram), references(program.paramsProgram));
+export const collectReferences: CollectReferences<Program> = (program) =>
+  [ program.urlProgram, program.paramsProgram ];
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;

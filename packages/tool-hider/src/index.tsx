@@ -1,5 +1,5 @@
-import { ComputeReferences, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, MakeProgram, references, SetOps, ShowView, slotWithCode, slotWithProgram, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy } from "@engraft/toolkit";
 import { Program as CheckboxProgram } from "@engraft/tool-checkbox";
+import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, slotWithCode, slotWithProgram } from "@engraft/toolkit";
 
 // TODO: can this tool ensure that CheckboxProgram is registered, as a
 // dependency?
@@ -19,8 +19,7 @@ const makeProgram: MakeProgram<Program> = (defaultCode) => ({
   actualProgram: slotWithCode(defaultCode),
 });
 
-const computeReferences: ComputeReferences<Program> = (program) =>
-  SetOps.union(references(program.isShownProgram), references(program.actualProgram));
+const collectReferences: CollectReferences<Program> = (program) => [ program.isShownProgram, program.actualProgram ];
 
 const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program, varBindings } = props;
@@ -55,4 +54,4 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, computeReferences, run })
+export default defineTool({ makeProgram, collectReferences, run })

@@ -19,7 +19,7 @@ export const tool: Tool<Program> = {
     text: '',
   }),
 
-  computeReferences: () => new Set(),
+  collectReferences: () => [],
 
   run: memoizeProps(hooks((props) => {
     const { program } = props;
