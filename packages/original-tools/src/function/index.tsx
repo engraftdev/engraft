@@ -1,4 +1,4 @@
-import { ComputeReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, references, slotWithCode } from "@engraft/core";
+import { ComputeReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, references, slotWithCode } from "@engraft/core";
 import { MyContextMenu, MyContextMenuHeading, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
 import { useRefunction } from "@engraft/hostkit";
 import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
@@ -86,11 +86,10 @@ const runExamplesArgValuePrograms = hooks((examples: Example[], argVars: Var[], 
 
 const runBodyOnExample = hooks((bodyProgram: ToolProgram, argValueResults: ToolResult<ToolProgram>[], argVars: Var[], varBindings: VarBindings) => {
   const argValueOutputPs = argValueResults.map((result) => result.outputP);
-  const bodyVarBindings = {
-    ...varBindings,
-    ...argValueOutputPsToVarBindings(argValueOutputPs, argVars),
-  };
-  return hookRunTool({ program: bodyProgram, varBindings: bodyVarBindings})
+  const newVarBindings = argValueOutputPsToVarBindings(argValueOutputPs, argVars);
+  const bodyVarBindings = { ...varBindings, ...newVarBindings };
+  const result = hookRunTool({ program: bodyProgram, varBindings: bodyVarBindings});
+  return { result, newScopeVarBindings: newVarBindings } satisfies ToolResultWithScope;
 })
 const runBodyOnExamples = hooks((bodyProgram: ToolProgram, examples: Example[], examplesArgValueResults: ToolResult<ToolProgram>[][], argVars: Var[], varBindings: VarBindings) => {
   return hookFork((branch) =>
@@ -109,12 +108,12 @@ const View = memo((props: ViewProps) => {
   const examplesArgValueResults = useRefunction(runExamplesArgValuePrograms, program.examples, program.argVars, varBindings);
 
   // run the body on each set of example inputs
-  const bodyResults = useRefunction(runBodyOnExamples, program.bodyProgram, program.examples, examplesArgValueResults, program.argVars, varBindings)
+  const bodyResultsWithScope = useRefunction(runBodyOnExamples, program.bodyProgram, program.examples, examplesArgValueResults, program.argVars, varBindings)
 
-  const activeBodyResult = useMemo(() => {
+  const activeBodyResultWithScope = useMemo(() => {
     const activeExampleIdx = program.examples.findIndex((example) => example.id === program.activeExampleId);
-    return bodyResults[activeExampleIdx];
-  }, [bodyResults, program.activeExampleId, program.examples]);
+    return bodyResultsWithScope[activeExampleIdx];
+  }, [bodyResultsWithScope, program.activeExampleId, program.examples]);
 
   return <div className="xCol xGap10 xPad10">
     <div className="xRow xGap10">
@@ -138,7 +137,7 @@ const View = memo((props: ViewProps) => {
             <ExampleRow key={example.id}
               example={example} index={i}
               exampleArgValueResults={examplesArgValueResults[i]}
-              bodyResults={bodyResults[i]}
+              bodyResultWithScope={bodyResultsWithScope[i]}
               programUP={programUP}
               numVars={program.argVars.length}
               activeExampleId={program.activeExampleId}
@@ -149,7 +148,7 @@ const View = memo((props: ViewProps) => {
     </div>
 
     <div className="xRow xGap10">
-      <ShowView view={activeBodyResult.view} updateProgram={programUP.bodyProgram.$apply}/>
+      <ShowViewWithScope resultWithScope={activeBodyResultWithScope} updateProgram={programUP.bodyProgram.$apply}/>
     </div>
 
   </div>;
@@ -214,8 +213,8 @@ type ExampleRowProps = {
   index: number,
   programUP: UpdateProxy<Program>,
 
-  exampleArgValueResults: ToolResult<ToolProgram>[],
-  bodyResults: ToolResult<ToolProgram>,
+  exampleArgValueResults: ToolResult[],
+  bodyResultWithScope: ToolResultWithScope,
 
   numVars: number,
   activeExampleId: string,
@@ -223,7 +222,7 @@ type ExampleRowProps = {
 };
 
 const ExampleRow = memo((props: ExampleRowProps) => {
-  const { example, index, programUP, exampleArgValueResults, bodyResults, numVars, activeExampleId } = props;
+  const { example, index, programUP, exampleArgValueResults, bodyResultWithScope, numVars, activeExampleId } = props;
 
   const exampleUP = programUP.examples[index];
 
@@ -291,7 +290,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
       </td>
     )}
     <td>
-      <ToolOutputView outputP={bodyResults.outputP}/>
+      <ToolOutputView outputP={bodyResultWithScope.result.outputP}/>
     </td>
   </tr>
 });
