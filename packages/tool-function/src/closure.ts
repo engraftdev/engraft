@@ -1,5 +1,4 @@
-import { EngraftPromise, runTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/core";
-import { RefuncMemory } from "@engraft/refunc";
+import { EngraftPromise, RefuncMemory, runTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/toolkit";
 
 export type Closure = {
   vars: Var[],

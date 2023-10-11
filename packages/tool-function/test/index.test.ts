@@ -1,9 +1,8 @@
-import { EngraftPromise, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
-import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { describe, expect, it } from "vitest";
-import * as functionM from "../../lib/function/index.js";
 import Slot from "@engraft/tool-slot";
+import { EngraftPromise, RefuncMemory, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/toolkit";
+import { describe, expect, it } from "vitest";
+import * as functionM from "../lib/index.js";
 
 // @vitest-environment happy-dom
 

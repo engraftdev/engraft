@@ -3,6 +3,7 @@ import { originalTools } from "@engraft/original-tools";
 import Checkbox from "@engraft/tool-checkbox";
 import DataTable from "@engraft/tool-data-table";
 import ExampleDatasets from "@engraft/tool-example-datasets";
+import Function from "@engraft/tool-function";
 import { GadgetDefiner, GadgetUser } from "@engraft/tool-gadget";
 import Hider from "@engraft/tool-hider";
 import Map from "@engraft/tool-map";
@@ -26,6 +27,7 @@ export const allTheTools: Tool[] = [
   forgetP(toolFromModule(Checkbox)),
   forgetP(toolFromModule(DataTable)),
   forgetP(toolFromModule(ExampleDatasets)),
+  forgetP(toolFromModule(Function)),
   forgetP(toolFromModule(GadgetDefiner)),
   forgetP(toolFromModule(GadgetUser)),
   forgetP(toolFromModule(Hider)),

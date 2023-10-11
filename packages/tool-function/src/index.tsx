@@ -1,11 +1,6 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, randomId, slotWithCode } from "@engraft/core";
-import { MyContextMenu, MyContextMenuHeading, ToolOutputView, VarDefinition } from "@engraft/core-widgets";
-import { useRefunction } from "@engraft/hostkit";
-import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { UpdateProxy } from "@engraft/update-proxy";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, newVar, randomId, slotWithCode, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
 import { Closure, argValueOutputPsToVarBindings, closureToSyncFunction } from "./closure.js";
 
@@ -22,7 +17,7 @@ type Example = {
   argValuePrograms: ToolProgram[],  // parallel with vars
 }
 
-export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const var1 = newVar('input 1')
   const exampleId = randomId();
   return {
@@ -34,10 +29,10 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   }
 };
 
-export const collectReferences: CollectReferences<Program> = (program) =>
+const collectReferences: CollectReferences<Program> = (program) =>
   [ program.bodyProgram, {'-': program.argVars} ];
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { argVars: vars, bodyProgram } = program;
 
@@ -62,6 +57,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 
   return {outputP, view};
 }));
+
+export default defineTool({ makeProgram, collectReferences, run })
 
 
 type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
