@@ -2,7 +2,7 @@ import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hooks, memoize, memoizeProps, newVar, randomId, slotWithCode, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
-import { Closure, argValueOutputPsToVarBindings, closureToSyncFunction } from "./closure.js";
+import { Closure, argValueOutputPsToVarBindings, closureToAsyncFunction, closureToSyncFunction } from "./closure.js";
 
 export type Program = {
   toolName: 'function',
@@ -42,9 +42,15 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
     closureVarBindings: varBindings,
   }, objEqWithRefEq);
 
-  const syncFunction = hookMemo(() => {
-    return closureToSyncFunction(closure);
+  const asyncFunction = hookMemo(() => {
+    return closureToAsyncFunction(closure);
   }, [closure]);
+
+  const syncFunction = hookMemo(() => {
+    const func = closureToSyncFunction(closure);
+    (func as any).async = asyncFunction;
+    return func;
+  }, [asyncFunction, closure]);
 
   const outputP = hookMemo(() => {
     return EngraftPromise.resolve({value: syncFunction});
