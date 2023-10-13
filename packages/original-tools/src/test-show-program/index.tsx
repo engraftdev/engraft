@@ -13,7 +13,7 @@ export const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
   subProgram: slotWithCode(defaultInputCode || ''),
 });
 
-export const collectReferences: CollectReferences<Program> = (_program) => [];
+export const collectReferences: CollectReferences<Program> = (program) => program.subProgram;
 
 export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program, varBindings} = props;
