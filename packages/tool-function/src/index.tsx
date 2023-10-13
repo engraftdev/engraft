@@ -1,6 +1,6 @@
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, newVar, randomId, slotWithCode, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hooks, memoize, memoizeProps, newVar, randomId, slotWithCode, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
 import { Closure, argValueOutputPsToVarBindings, closureToSyncFunction } from "./closure.js";
 
@@ -65,35 +65,35 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   syncFunction: (...args: unknown[]) => unknown,
 }
 
-const runExampleArgValuePrograms = hooks((example: Example, argVars: Var[], varBindings: VarBindings) => {
+const runExampleArgValuePrograms = memoize(hooks((example: Example, argVars: Var[], varBindings: VarBindings) => {
   return hookFork((branch) =>
     example.argValuePrograms.map((argValueProgram, i) => branch(argVars[i].id, () =>
       hookRunTool({ program: argValueProgram, varBindings })
     ))
   );
-})
-const runExamplesArgValuePrograms = hooks((examples: Example[], argVars: Var[], varBindings: VarBindings) => {
+}));
+const runExamplesArgValuePrograms = memoize(hooks((examples: Example[], argVars: Var[], varBindings: VarBindings) => {
   return hookFork((branch) =>
     examples.map((example) => branch(example.id, () =>
       hookRefunction(runExampleArgValuePrograms, example, argVars, varBindings)
     ))
   );
-})
+}));
 
-const runBodyOnExample = hooks((bodyProgram: ToolProgram, argValueResults: ToolResult<ToolProgram>[], argVars: Var[], varBindings: VarBindings) => {
-  const argValueOutputPs = argValueResults.map((result) => result.outputP);
-  const newVarBindings = argValueOutputPsToVarBindings(argValueOutputPs, argVars);
-  const bodyVarBindings = { ...varBindings, ...newVarBindings };
+const runBodyOnExample = memoize(hooks((bodyProgram: ToolProgram, argValueResults: ToolResult<ToolProgram>[], argVars: Var[], varBindings: VarBindings) => {
+  const argValueOutputPs = hookMemo(() => argValueResults.map((result) => result.outputP), [argValueResults]);
+  const newVarBindings = hookMemo(() => argValueOutputPsToVarBindings(argValueOutputPs, argVars), [argValueOutputPs, argVars]);
+  const bodyVarBindings = hookMemo(() => ({ ...varBindings, ...newVarBindings }), [newVarBindings, varBindings]);
   const result = hookRunTool({ program: bodyProgram, varBindings: bodyVarBindings});
   return { result, newScopeVarBindings: newVarBindings } satisfies ToolResultWithScope;
-})
-const runBodyOnExamples = hooks((bodyProgram: ToolProgram, examples: Example[], examplesArgValueResults: ToolResult<ToolProgram>[][], argVars: Var[], varBindings: VarBindings) => {
+}));
+const runBodyOnExamples = memoize(hooks((bodyProgram: ToolProgram, examples: Example[], examplesArgValueResults: ToolResult<ToolProgram>[][], argVars: Var[], varBindings: VarBindings) => {
   return hookFork((branch) =>
     examples.map((example, i) => branch(example.id, () =>
       hookRefunction(runBodyOnExample, bodyProgram, examplesArgValueResults[i], argVars, varBindings)
     ))
   );
-})
+}));
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, syncFunction } = props;
