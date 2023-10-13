@@ -30,6 +30,7 @@
     "@engraft/tool-notebook-canvas": "^0.0.1",
     "@engraft/tool-python": "^0.0.1",
     "@engraft/tool-slot": "^0.0.1",
+    "@engraft/tool-test-count-runs": "^0.0.1",
     "@engraft/tool-text": "^0.0.1",
     "@engraft/tool-toy-adder": "^0.0.1",
     "@engraft/tool-toy-adder-simple": "^0.0.1",
