@@ -71,15 +71,17 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
       const resp = await fetch(url);
       const contentType = resp.headers.get("content-type");
       // TODO: handle other content types, merge with file-tool's mime-type handling, etc
-      if (program.forceText) {
-        return { value: await resp.text() };
-      } else if (contentType?.startsWith("application/json")) {
-        return { value: await resp.json() };
-      } else if (contentType === "text/csv") {
-        return { value: d3dsv.csvParse(await resp.text(), d3dsv.autoType) }
-      } else {
-        return { value: await resp.text() };
+      if (!program.forceText) {
+        if (contentType === "text/csv") {
+          return { value: d3dsv.csvParse(await resp.text(), d3dsv.autoType) }
+        }
+        try {
+          return { value: await resp.json() };
+        } catch (e) {
+          // that's fine
+        }
       }
+      return { value: await resp.text() };
 
       // // Alternative, stricter treatment
       // } else if (contentType?.startsWith("text/")) {
