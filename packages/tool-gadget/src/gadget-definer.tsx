@@ -131,4 +131,4 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
   );
 });
 
-export const GadgetDefiner = defineTool({ makeProgram, collectReferences, run });
+export const GadgetDefiner = defineTool({ name: "gadget-definer", makeProgram, collectReferences, run });

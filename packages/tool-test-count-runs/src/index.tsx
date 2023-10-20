@@ -38,4 +38,4 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'test-count-runs', makeProgram, collectReferences, run })

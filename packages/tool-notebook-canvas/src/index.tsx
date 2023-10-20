@@ -72,7 +72,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return { outputP, view };
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'notebook-canvas', makeProgram, collectReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   cellResults: {[id: string]: ToolResultWithScope},

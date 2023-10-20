@@ -44,6 +44,7 @@ export function defineSimpleTool<Name extends string, Fields extends object, Sub
   simpleToolSpec: SimpleToolSpec<Name, Fields, SubToolKey>
 ): Tool<SimpleToolProgram<Name, Fields, SubToolKey>> {
   return {
+    name: simpleToolSpec.name,
     makeProgram: (defaultInputCode) => (
       {
         toolName: simpleToolSpec.name,

@@ -9,10 +9,11 @@ import { randomId } from "./randomId.js";
 // "components". This is outdated terminology that will be changed soon.
 
 export type Tool<P extends ToolProgram = ToolProgram> = {
-  run: ToolRun<P>;
-  makeProgram: MakeProgram<P>;
-  collectReferences: CollectReferences<P>;
-  isInternal?: boolean;
+  name: P['toolName'],
+  run: ToolRun<P>,
+  makeProgram: MakeProgram<P>,
+  collectReferences: CollectReferences<P>,
+  isInternal?: boolean,
 }
 
 export type ToolProgram = {
@@ -118,23 +119,19 @@ export function getFullToolIndex(): { [toolName: string]: Tool<ToolProgram> } {
 
 export function registerTool<P extends ToolProgram>(tool: Tool<P>) {
   // do some checks to make sure the tool is valid
+  if (!tool.name) {
+    throw new Error(`Tool has no name`);
+  }
   if (!tool.makeProgram) {
-    throw new Error(`Tool has no makeProgram`);
+    throw new Error(`Tool has no makeProgram: ${tool.name}`);
   }
   if (!tool.run) {
-    console.error(tool);
-    throw new Error(`Tool has no run`);
+    throw new Error(`Tool has no run: ${tool.name}`);
   }
   if (!tool.collectReferences) {
-    let toolName = 'UNKNOWN';
-    try {
-      toolName = tool.makeProgram().toolName;
-    } catch { }
-    throw new Error(`Tool has no references: ${toolName}`);
+    throw new Error(`Tool has no collectReferences: ${tool.name}`);
   }
-
-  const { toolName } = tool.makeProgram();
-  toolIndex[toolName] = forgetP(tool);
+  toolIndex[tool.name] = forgetP(tool);
 }
 
 export function newVar(label = 'new var') {

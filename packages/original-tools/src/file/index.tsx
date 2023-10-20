@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps, defineTool } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
@@ -10,7 +10,7 @@ import * as d3dsv from "d3-dsv";
 // TODO: what hath ESM wrought?
 const Dropzone = DropzoneModule.default as unknown as typeof import("react-dropzone").default;
 
-export type P = {
+type Program = {
   toolName: 'file';
   file: null | {
     dataURL: string,
@@ -21,14 +21,14 @@ export type P = {
 
 type OutputMode = 'text' | 'data-uri' | 'react-image' | 'json' | 'csv';
 
-export const collectReferences: CollectReferences<P> = (program) => [];
+const collectReferences: CollectReferences<Program> = (program) => [];
 
-export const makeProgram: MakeProgram<P> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'file',
   file: null,
 });
 
-export const run: ToolRun<P> = memoizeProps(hooks((props: ToolProps<P>) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program } = props;
 
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() => EngraftPromise.try(() => {
@@ -51,14 +51,14 @@ export const run: ToolRun<P> = memoizeProps(hooks((props: ToolProps<P>) => {
     }
   }), [program.file]);
 
-  const view: ToolView<P> = hookMemo(() => ({
+  const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} />,
   }), [props]);
 
   return { outputP, view };
 }));
 
-const View = memo((props: ToolProps<P> & ToolViewRenderProps<P>) => {
+const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const { program, updateProgram } = props;
   const programUP = useUpdateProxy(updateProgram);
 
@@ -117,6 +117,8 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P>) => {
     }
   </div>
 });
+
+export default defineTool({ name: 'file', makeProgram, collectReferences, run });
 
 // From https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
 function humanFileSize(bytes: number, si=false, dp=1) {

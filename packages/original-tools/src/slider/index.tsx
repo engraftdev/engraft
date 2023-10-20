@@ -15,6 +15,8 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
+  name: 'slider',
+
   makeProgram: () => ({
     toolName: 'slider',
     value: 0,

@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, hookRunTool, newVar, runTool, slotWithCode } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, newVar, runTool, slotWithCode } from "@engraft/core";
 import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
@@ -10,7 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
 
-export type Program = {
+type Program = {
   toolName: 'simulation',
   ticksCount: number,
   stateVar: Var,
@@ -19,7 +19,7 @@ export type Program = {
   toDrawProgram: ToolProgram,
 }
 
-export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   const stateVar = newVar('state');
   return {
     toolName: 'simulation',
@@ -31,10 +31,10 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   };
 };
 
-export const collectReferences: CollectReferences<Program> = (program) =>
+const collectReferences: CollectReferences<Program> = (program) =>
   [ program.initProgram, program.onTickProgram, program.toDrawProgram, {'-': program.stateVar} ];
 
-export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
 
   const initResult = hookRunTool({ program: program.initProgram, varBindings });
@@ -70,6 +70,8 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   return { outputP, view };
 }));
+
+export default defineTool({ name: 'simulation', makeProgram, collectReferences, run })
 
 type RunSimulationProps = {
   program: Program,

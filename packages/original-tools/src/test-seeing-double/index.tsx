@@ -10,6 +10,8 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
+  name: 'test-seeing-double',
+
   makeProgram: () => ({
     toolName: 'test-seeing-double',
     subProgram: slotWithCode(''),

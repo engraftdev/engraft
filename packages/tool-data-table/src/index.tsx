@@ -72,7 +72,7 @@ const run = memoizeProps(hooks((props: ToolProps<P>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run });
+export default defineTool({ name: "data-table", makeProgram, collectReferences, run });
 
 const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   inputResult: ToolResult,

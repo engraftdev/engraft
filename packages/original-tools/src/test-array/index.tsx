@@ -1,23 +1,23 @@
-import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
 import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { arrEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
-export type Program = {
+type Program = {
   toolName: 'test-array',
   subToolPrograms: ToolProgram[],
 }
 
-export const makeProgram: MakeProgram<Program> = () => {
+const makeProgram: MakeProgram<Program> = () => {
   return {
     toolName: 'test-array',
     subToolPrograms: [],
   }
 };
 
-export const collectReferences: CollectReferences<Program> = (program) => program.subToolPrograms;
+const collectReferences: CollectReferences<Program> = (program) => program.subToolPrograms;
 
-export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
 
   const subToolResults = hookMemo(() =>
@@ -56,3 +56,5 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   return { outputP, view };
 }));
+
+export default defineTool({ name: 'test-array', makeProgram, collectReferences, run })

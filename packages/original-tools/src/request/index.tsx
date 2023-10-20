@@ -1,8 +1,4 @@
-import {
-  CollectReferences, EngraftPromise, hookRunTool, MakeProgram,
-  ShowView, slotWithCode, ToolOutput, ToolProgram,
-  ToolProps, ToolRun, ToolView, ToolViewRenderProps
-} from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { useCommonWidth } from "@engraft/toolkit";
 import { useUpdateProxy } from "@engraft/update-proxy-react";
@@ -11,7 +7,7 @@ import { memo, useState } from "react";
 import { RowToCol } from "./RowToCol.js";
 
 
-export type Program = {
+type Program = {
   toolName: "request",
   urlProgram: ToolProgram,
   paramsProgram: ToolProgram,
@@ -20,7 +16,7 @@ export type Program = {
   useCorsProxy: boolean,
 };
 
-export const makeProgram: MakeProgram<Program> = () => {
+const makeProgram: MakeProgram<Program> = () => {
   return {
     toolName: "request",
     urlProgram: slotWithCode('"https://httpbin.org/get"'),
@@ -34,10 +30,10 @@ const paramsDefault = `{
   my_param: "hello world!"
 }`;
 
-export const collectReferences: CollectReferences<Program> = (program) =>
+const collectReferences: CollectReferences<Program> = (program) =>
   [ program.urlProgram, program.paramsProgram ];
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
 
   const urlResult = hookRunTool({program: program.urlProgram, varBindings});
@@ -115,6 +111,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 
   return { view, outputP };
 }));
+
+export default defineTool({ name: "request", makeProgram, collectReferences, run });
 
 const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   urlView: ToolView<ToolProgram>,

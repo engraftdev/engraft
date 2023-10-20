@@ -51,7 +51,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'python', makeProgram, collectReferences, run })
 
 async function runPython(code: string, globals: {[key: string]: any}) {
   const pyodide = await getPyodide();

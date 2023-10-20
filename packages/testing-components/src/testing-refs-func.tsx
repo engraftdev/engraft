@@ -10,6 +10,8 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
+  name: 'testing-refs-func',
+
   makeProgram: () => ({
     toolName: 'testing-refs-func',
     refs: [],

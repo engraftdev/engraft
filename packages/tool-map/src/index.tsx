@@ -104,7 +104,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run });
+export default defineTool({ name: 'map', makeProgram, collectReferences, run });
 
 
 const MAX_ITEMS_DISPLAYED = 10;

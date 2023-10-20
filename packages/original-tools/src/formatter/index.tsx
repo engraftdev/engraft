@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
@@ -16,13 +16,13 @@ import { getById, updateById } from "./id.js";
 
 // TODO: Style in the inspector too.
 
-export type Program = {
+type Program = {
   toolName: 'formatter';
   inputProgram: ToolProgram;
   rootElement: FormatterElement;
 }
 
-export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   return {
     toolName: 'formatter',
     inputProgram: slotWithCode(defaultCode || ''),
@@ -37,9 +37,9 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   };
 };
 
-export const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
+const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
 
@@ -67,6 +67,8 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Progra
 
   return {outputP, view};
 }));
+
+export default defineTool({ name: 'formatter', makeProgram, collectReferences, run })
 
 type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult,

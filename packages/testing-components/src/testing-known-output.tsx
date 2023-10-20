@@ -8,6 +8,8 @@ export type Program = {
 }
 
 export const tool: Tool<Program> = {
+  name: 'testing-known-output',
+
   makeProgram: () => ({
     toolName: 'testing-known-output',
     outputP: EngraftPromise.unresolved(),

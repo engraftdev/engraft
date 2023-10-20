@@ -27,7 +27,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP: subResult.outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'value', makeProgram, collectReferences, run })
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { subResult: ToolResult }) => {
   const { updateProgram, subResult, frameBarBackdropElem } = props;

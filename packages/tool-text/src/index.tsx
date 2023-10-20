@@ -48,4 +48,4 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   return {outputP, view};
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'text', makeProgram, collectReferences, run })

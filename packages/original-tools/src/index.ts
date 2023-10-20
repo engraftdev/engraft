@@ -4,7 +4,7 @@ import * as Extractor from "./extractor/index.js";
 import * as File from "./file/index.js";
 import * as Formatter from "./formatter/index.js";
 import * as HelloWorld from "./hello-world/index.js";
-import * as Import from "./import/index.js";
+import * as NPM from "./npm/index.js";
 import * as NotFound from "./not-found/index.js";
 import * as Request from "./request/index.js";
 import * as SimpleChart from "./simple-chart/index.js";
@@ -23,7 +23,7 @@ export const originalTools: Tool[] = [
   forgetP(toolFromModule(File)),
   forgetP(toolFromModule(Formatter)),
   forgetP(toolFromModule(HelloWorld)),
-  forgetP(toolFromModule(Import)),
+  forgetP(toolFromModule(NPM)),
   forgetP(toolFromModule(NotFound)),
   forgetP(toolFromModule(Request)),
   forgetP(toolFromModule(SimpleChart)),

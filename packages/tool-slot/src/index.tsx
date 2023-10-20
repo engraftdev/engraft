@@ -110,7 +110,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   });
 }));
 
-export default defineTool({ makeProgram, collectReferences, run })
+export default defineTool({ name: 'slot', makeProgram, collectReferences, run })
 
 
 ///////////////

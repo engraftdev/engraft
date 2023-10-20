@@ -1,5 +1,5 @@
 import { CodeMirror, setup } from "@engraft/codemirror-helpers"
-import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, hookRunTool, randomId, slotWithCode, usePromiseState } from "@engraft/core"
+import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookRunTool, randomId, slotWithCode, usePromiseState } from "@engraft/core"
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc"
 import { compileExpressionCached } from "@engraft/shared/lib/compile.js"
 import { UpdateProxyRemovable, updateProxy } from "@engraft/update-proxy"
@@ -16,14 +16,14 @@ interface InOutPair {
   outCode: string,
 }
 
-export type Program = {
+type Program = {
   toolName: 'synthesizer';
   inputProgram: ToolProgram;
   code: string;
   inOutPairs: InOutPair[];
 }
 
-export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   return {
     toolName: 'synthesizer',
     inputProgram: slotWithCode(defaultCode || ''),
@@ -32,9 +32,9 @@ export const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
   };
 };
 
-export const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
+const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program, varBindings } = props;
 
   const inputResult = hookRunTool({program: program.inputProgram, varBindings});
@@ -57,8 +57,10 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   return {outputP, view};
 }));
 
+export default defineTool({ name: 'synthesizer', makeProgram, collectReferences, run })
 
-export const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
+
+const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult<ToolProgram>,
   funcP: EngraftPromise<(input: any) => any>,
 }) => {

@@ -117,4 +117,4 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   return <ToolOutputView outputP={viewResultEtc.result.outputP} displayReactElementsDirectly={true} />;
 });
 
-export const GadgetUser = defineTool({ makeProgram, collectReferences, run });
+export const GadgetUser = defineTool({ name: "gadget-user", makeProgram, collectReferences, run });

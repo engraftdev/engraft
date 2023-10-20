@@ -1,17 +1,17 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, defineTool } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 
-export type Program = {
+type Program = {
   toolName: 'not-found',
 }
 
-export const makeProgram: MakeProgram<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'not-found',
 });
 
-export const collectReferences: CollectReferences<Program> = (_program) => [];
+const collectReferences: CollectReferences<Program> = (_program) => [];
 
-export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { toolName } = props.program;
   const message = `ToolNotFoundError: ${toolName}`;
 
@@ -25,3 +25,5 @@ export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   return { outputP, view };
 }));
+
+export default defineTool({ name: 'not-found', makeProgram, collectReferences, run })

@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from "@engraft/update-proxy";
@@ -13,7 +13,7 @@ import { gearIcon, markIcons, typeIcons } from "./icons.js";
 // TODO: what hath ESM wrought?
 const Select = SelectModule.default as unknown as typeof import("react-select").default;
 
-export type Program = {
+type Program = {
   toolName: 'simple-chart',
   dataProgram: ToolProgram,
   mark: Mark | undefined,
@@ -21,10 +21,10 @@ export type Program = {
   yChannel: ChannelSpec | undefined,
 }
 
-export type Mark = 'bar' | 'line' | 'area' | 'point';
+type Mark = 'bar' | 'line' | 'area' | 'point';
 const marks: Mark[] = ['bar', 'line', 'area', 'point'];
 
-export const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => {
+const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => {
   return {
     toolName: 'simple-chart',
     dataProgram: slotWithCode(defaultInputCode || ''),
@@ -34,9 +34,9 @@ export const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => 
   }
 };
 
-export const collectReferences: CollectReferences<Program> = (program) => program.dataProgram;
+const collectReferences: CollectReferences<Program> = (program) => program.dataProgram;
 
-export const run = memoizeProps(hooks((props: ToolProps<Program>) => {
+const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { program, varBindings } = props;
   const { mark = 'bar', xChannel, yChannel } = program;
 
@@ -116,6 +116,8 @@ function getChannelTemplatesFromData(data: TabularData): ChannelSpec[] {
   }
   return fields;
 }
+
+export default defineTool({ name: 'simple-chart', makeProgram, collectReferences, run })
 
 
 

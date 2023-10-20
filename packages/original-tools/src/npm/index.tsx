@@ -1,21 +1,21 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView, defineTool } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ControlledTextInput } from "@engraft/shared/lib/ControlledTextInput.js";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
-export type Program = {
+type Program = {
   toolName: 'npm',
   packageName: string,
 }
 
-export const makeProgram: MakeProgram<Program> = () => ({
+const makeProgram: MakeProgram<Program> = () => ({
   toolName: 'npm',
   packageName: '',
 });
 
-export const collectReferences: CollectReferences<Program> = (_program) => [];
+const collectReferences: CollectReferences<Program> = (_program) => [];
 
-export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
+const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const { program } = props;
 
   // TODO: debouncing?
@@ -43,3 +43,5 @@ export const run: ToolRun<Program> = memoizeProps(hooks((props) => {
 
   return { outputP, view };
 }));
+
+export default defineTool({ name: 'npm', makeProgram, collectReferences, run })
