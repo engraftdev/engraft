@@ -1,13 +1,13 @@
-import { EngraftPromise, makeVarBindings, newVar, references, registerTool, slotWithCode, toolFromModule } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, references, registerTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
+import { TestingKnownOutput, TestingRefsFunc, registerTestingComponents } from "@engraft/testing-components";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
-import Slot from "@engraft/tool-slot";
 
 // @vitest-environment happy-dom
 
+registerTestingComponents();
 const simulationTool = toolFromModule(simulation);
-registerTool(Slot);
 registerTool(simulationTool);
 
 describe('simulation', () => {
@@ -17,9 +17,19 @@ describe('simulation', () => {
       toolName: 'simulation',
       ticksCount: 3,
       stateVar,
-      initProgram: slotWithCode(`0`),
-      onTickProgram: slotWithCode(`${stateVar.id} + IDone000000`),
-      toDrawProgram: slotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+      initProgram: {
+        toolName: 'testing-known-output',
+        outputP: EngraftPromise.resolve({ value: 0 }),
+      } satisfies TestingKnownOutput.Program,
+      onTickProgram: {
+        toolName: 'testing-refs-func',
+        refs: [stateVar.id, 'IDone000000'],
+        func: ([stateVar, one]) => ({ value: stateVar.value as any + one.value as any }),
+      } satisfies TestingRefsFunc.Program,
+      toDrawProgram: {
+        toolName: 'testing-known-output',
+        outputP: EngraftPromise.unresolved(),
+      } satisfies TestingKnownOutput.Program,
     };
 
     expect(

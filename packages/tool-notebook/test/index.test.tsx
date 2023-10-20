@@ -1,9 +1,8 @@
-import { EngraftPromise, makeVarBindings, newVar, references, registerTool, runTool, slotWithCode, toolFromModule, VarBindings } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, references, registerTool, runTool, toolFromModule, VarBindings } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
-import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
-import Slot from "@engraft/tool-slot";
+import { registerTestingComponents, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-components";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";
@@ -15,9 +14,7 @@ import * as Notebook from "../lib/index.js";
 const notebookTool = toolFromModule(Notebook);
 
 registerTestingComponents();
-
 registerTool(notebookTool);
-registerTool(toolFromModule(Slot));
 
 const prevVarId = 'IDprev000000';
 
@@ -89,12 +86,20 @@ describe('notebook', () => {
       cells: [
         {
           var_: {id: 'cell1', label: ''},
-          program: slotWithCode('100'),
+          program: {
+            toolName: 'testing-refs-func',
+            refs: [],
+            func: () => ({ value: 100 }),
+          } satisfies TestingRefsFunc.Program,
           outputManualHeight: undefined,
         },
         {
           var_: {id: 'cell2', label: ''},
-          program: slotWithCode(`${prevVarId} + 1`),
+          program: {
+            toolName: 'testing-refs-func',
+            refs: [prevVarId],
+            func: ([prevVar]) => ({ value: prevVar.value as any + 1 }),
+          } satisfies TestingRefsFunc.Program,
           outputManualHeight: undefined,
         },
       ],
@@ -134,12 +139,20 @@ describe('notebook', () => {
       cells: [
         {
           var_: cell1,
-          program: slotWithCode(`${externalVar.id} + 10`),
+          program: {
+            toolName: 'testing-refs-func',
+            refs: [externalVar.id],
+            func: ([externalVar]) => ({ value: externalVar.value as any + 10 }),
+          } satisfies TestingRefsFunc.Program,
           outputManualHeight: undefined,
         },
         {
           var_: cell2,
-          program: slotWithCode(`${cell1.id} + 20`),
+          program: {
+            toolName: 'testing-refs-func',
+            refs: [cell1.id],
+            func: ([cell1]) => ({ value: cell1.value as any + 20 }),
+          } satisfies TestingRefsFunc.Program,
           outputManualHeight: undefined,
         }
       ],
@@ -258,12 +271,12 @@ describe('notebook', () => {
         },
         {
           var_: cell2,
-          program: slotWithCode(`${cell2Run.id}(); return ${cell1.id} + 1`),
-          // program: {
-          //   toolName: 'testing-known-output',
-          //   outputP: EngraftPromise.resolve({ value: 2 }),
-          //   onRun: () => { cell2Runs++ },
-          // } satisfies TestingKnownOutput.Program,
+          program: {
+            toolName: 'testing-refs-func',
+            refs: [cell1.id],
+            func: ([cell1]) => ({ value: cell1.value as any + 1 }),
+            onRun: () => { cell2Runs++ },
+          } satisfies TestingRefsFunc.Program,
           outputManualHeight: undefined,
         },
         {
