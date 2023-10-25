@@ -1,7 +1,7 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, slotWithCode, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -24,12 +24,12 @@ type Cell = {
   showOutputOnly: boolean,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultInput) => ({
+const makeProgram: MakeProgram<Program> = (context, defaultInput) => ({
   toolName: 'notebook-canvas',
   cells: [
     {
       var_: newVar(defaultCellLabels[0]),
-      program: slotWithCode(defaultInput),
+      program: context.makeSlotWithCode(defaultInput),
       geo: {
         x: 16 * 3,
         y: 16 * 2,
@@ -50,10 +50,10 @@ const collectReferences: CollectReferences<Program> = (program) =>
   collectReferencesForCellNetwork(program.cells);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
   const { cells } = program;
 
-  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings });
+  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings, context });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
@@ -77,7 +77,7 @@ export default defineTool({ name: 'notebook-canvas', makeProgram, collectReferen
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   cellResults: {[id: string]: ToolResultWithScope},
 }) => {
-  const { program, updateProgram, cellResults, frameBarBackdropElem } = props;
+  const { program, updateProgram, context, cellResults, frameBarBackdropElem } = props;
   const programUP = useUpdateProxy(updateProgram);
   const { cells } = program;
 
@@ -113,7 +113,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
     programUP.cells.$(oldCells => {
       const newCell = {
         var_: newVar(smallestUnusedLabel),
-        program: slotWithCode(''),
+        program: context.makeSlotWithCode(''),
         geo: {
           x: 16 * 3,
           y: 16 * 2,
@@ -124,7 +124,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
       };
       return [...oldCells, newCell];
     });
-  }, [programUP.cells, smallestUnusedLabel]);
+  }, [context, programUP.cells, smallestUnusedLabel]);
 
   return (
     <div

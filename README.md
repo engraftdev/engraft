@@ -48,8 +48,10 @@ Code is divided into separate packages located in the `packages` directory. Each
   * [**toolkit**](packages/toolkit/): Your one-stop shop for tool development – should be the only package most tools need to import from `@engraft`.
 * *Host development*
   * [**hostkit**](packages/toolkit/): Your one-stop shop for host development – should be the only package most hosts need to import from `@engraft`.
+  * [**basic-setup**](packages/basic-setup/): Actually, hosts will probably also need to import this package. It contains a basic setup (`EngraftContext`) with all the tools built by the Engraft team. This is probably not the way things will work long-term.
 * *Tools*
     * **tool-\***: Each of these packages defines a tool maintained by the Engraft team.
+    * [**original-tools**](packages/original/): A bunch of tools that haven't been sorted into packages yet. (Provisional.)
 * *Hosts*
   * [**graft-garden**](packages/graft-garden/): Our iconic web-app Engraft host.
   * [**cli**](packages/cli/): For running Engraft as a process, at the command line or as a subprocess.
@@ -61,9 +63,6 @@ Code is divided into separate packages located in the `packages` directory. Each
   * [**update-proxy**](packages/update-proxy/): A helper that makes it easy to perform immutable updates, used often in tools.
     * [**update-proxy-react**](packages/update-proxy-react/): Helpers connecting update-proxy with React.
   * [**codemirror-helpers**](packages/codemirror-helpers/): Extensions to CodeMirror, including `FancyCodeEditor` (which powers `slot`, `text`, `python`, etc.).
-* *Provisional*
-  * [**original-tools**](packages/original/): A bunch of tools that haven't been sorted into packages yet.
-  * [**all-the-tools**](packages/all-the-tools/): A hard-coded assembly of all the tools the Engraft team has built, to be bundled into every Engraft host. Not the way things will work long-term.
 
 ### Build system overview
 

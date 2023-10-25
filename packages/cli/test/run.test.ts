@@ -1,14 +1,10 @@
-import { dispatcher, slotWithCode, toolFromModule } from "@engraft/hostkit";
 import { normalizeIndent } from "@engraft/shared/lib/normalizeIndent.js";
-import Slot from "@engraft/tool-slot";
+import { makeSlotWithCode } from "@engraft/tool-slot";
 import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from 'node:url';
 import * as tmp from "tmp";
 import { describe, expect, it } from "vitest";
-
-const slotTool = toolFromModule(Slot);
-dispatcher().registerTool(slotTool);
 
 function relative(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
@@ -24,7 +20,7 @@ describe('run.js', () => {
       ghi
     `;
 
-    const program = JSON.stringify(slotWithCode(
+    const program = JSON.stringify(makeSlotWithCode(
       'IDinput000000.map((x) => x.toUpperCase())'
     ));
 

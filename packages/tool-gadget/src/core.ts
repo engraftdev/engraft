@@ -1,4 +1,4 @@
-import { EngraftPromise, ToolOutput, ToolProgram, ToolResultWithScope, Var, VarBindings, hookRunTool } from "@engraft/core";
+import { EngraftContext, EngraftPromise, ToolOutput, ToolProgram, ToolResultWithScope, Var, VarBindings, hookRunTool } from "@engraft/core";
 import { UpdateProxy, hookMemo, hooks } from "@engraft/toolkit";
 
 export type GadgetDef = {
@@ -20,6 +20,7 @@ export const runOutputProgram = hooks((
   def: GadgetDef,
   closureVarBindings: VarBindings,
   gadgetProgram: unknown,
+  context: EngraftContext,
 ): ToolResultWithScope => {
   const programVarBindings: VarBindings = hookMemo(() => ({
     [def.programVar.id]: {
@@ -34,7 +35,7 @@ export const runOutputProgram = hooks((
     ...closureVarBindings,
     ...programVarBindings,
   }), [closureVarBindings, programVarBindings]);
-  const result = hookRunTool({ program: def.outputProgram, varBindings });
+  const result = hookRunTool({ program: def.outputProgram, varBindings, context });
   const newScopeVarBindings = programVarBindings;
   return { result, newScopeVarBindings };
 });
@@ -44,6 +45,7 @@ export const runViewProgram = hooks((
   closureVarBindings: VarBindings,
   gadgetProgram: unknown,
   gadgetProgramUP: UpdateProxy<unknown>,
+  context: EngraftContext,
 ): ToolResultWithScope => {
   const programVarBindings: VarBindings = hookMemo(() => ({
     [def.programVar.id]: {
@@ -67,7 +69,7 @@ export const runViewProgram = hooks((
     ...programVarBindings,
     ...programUPVarBindings,
   }), [closureVarBindings, programVarBindings, programUPVarBindings]);
-  const result = hookRunTool({ program: def.viewProgram, varBindings });
+  const result = hookRunTool({ program: def.viewProgram, varBindings, context });
   const newScopeVarBindings = hookMemo(() => ({...programVarBindings, ...programUPVarBindings}), [programVarBindings, programUPVarBindings])
 
   return { result, newScopeVarBindings };

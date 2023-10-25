@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/core-widgets";
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -13,19 +13,19 @@ type Program = {
   gadgetProgram: unknown,
 }
 
-const makeProgram: MakeProgram<Program> = () => ({
+const makeProgram: MakeProgram<Program> = (context) => ({
   toolName: 'gadget-user',
 
-  closureProgram: slotWithCode(''),
+  closureProgram: context.makeSlotWithCode(''),
   gadgetProgram: null,
 });
 
 const collectReferences: CollectReferences<Program> = (program) => program.closureProgram;
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const closureResults = hookRunTool({program: program.closureProgram, varBindings});
+  const closureResults = hookRunTool({program: program.closureProgram, varBindings, context});
 
   const gadgetProgramP =
     hookMemo(() => {
@@ -36,14 +36,14 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
         const { initialProgramProgram } = def;
 
         // too lazy to conditionally run initialProgramProgram
-        const initialProgramResults = hookRunTool({program: initialProgramProgram, varBindings: closureVarBindings});
+        const initialProgramResults = hookRunTool({program: initialProgramProgram, varBindings: closureVarBindings, context});
         const gadgetProgramP = program.gadgetProgram !== null ?
           EngraftPromise.resolve(program.gadgetProgram) :
           initialProgramResults.outputP.then((initialProgramOutput) => initialProgramOutput.value);
 
         return gadgetProgramP;
       }));
-    }, [closureResults.outputP, program.gadgetProgram]);
+    }, [closureResults.outputP, context, program.gadgetProgram]);
 
   const outputP =
     hookMemo(() => {
@@ -54,11 +54,11 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
         const outputResultEtc = hookRefunction(
           runOutputProgram,
-          def, closureVarBindings, gadgetProgram
+          def, closureVarBindings, gadgetProgram, context
         );
         return outputResultEtc.result.outputP;
       }));
-    }, [closureResults.outputP, gadgetProgramP]);
+    }, [closureResults.outputP, context, gadgetProgramP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <View {...props} {...renderProps} gadgetProgramP={gadgetProgramP} />
@@ -70,10 +70,10 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   gadgetProgramP: EngraftPromise<unknown>,
 }) => {
-  const { program, updateProgram, varBindings, gadgetProgramP, autoFocus } = props;
+  const { program, updateProgram, varBindings, context, gadgetProgramP, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const closureResults = useRefunction(runTool, {program: program.closureProgram, varBindings});
+  const closureResults = useRefunction(runTool, {program: program.closureProgram, varBindings, context});
   const closureOutputState = usePromiseState(closureResults.outputP);
 
   const gadgetProgramState = usePromiseState(gadgetProgramP);
@@ -99,7 +99,7 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   closure: GadgetClosure,
   gadgetProgram: unknown,
 }) => {
-  const { program, updateProgram, closure, gadgetProgram } = props;
+  const { program, updateProgram, context, closure, gadgetProgram } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const gadgetProgramUP = programUP.gadgetProgram;
@@ -111,7 +111,7 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   }, [gadgetProgram, gadgetProgramUP, program.gadgetProgram]);
 
   const viewResultEtc = useRefunction(runViewProgram,
-    closure.def, closure.closureVarBindings, gadgetProgram, gadgetProgramUP
+    closure.def, closure.closureVarBindings, gadgetProgram, gadgetProgramUP, context,
   );
 
   return <ToolOutputView outputP={viewResultEtc.result.outputP} displayReactElementsDirectly={true} />;

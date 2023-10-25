@@ -1,6 +1,6 @@
 import { runtimeObjectId } from "@engraft/shared/lib/runtimeObjectId.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { IsolateStyles, references, ToolProgram, ToolViewContext, useUpdateProxy, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
+import { EngraftContext, IsolateStyles, ToolProgram, ToolViewContext, useUpdateProxy, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
 import { memo, useContext } from "react";
 import { WindowPortal } from "./WindowPortal.js";
 
@@ -11,10 +11,11 @@ export type ToolInspectorWindowProps = {
   program: ToolProgram,
   updateProgram?: Updater<ToolProgram>,
   varBindings: VarBindings,
+  context: EngraftContext,
 }
 
 export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspectorWindowProps) {
-  const {program, updateProgram, varBindings, show, onClose} = props;
+  const {program, updateProgram, varBindings, context, show, onClose} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const { scopeVarBindings } = useContext(ToolViewContext);
@@ -42,9 +43,9 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
         <Value value={program}/>
       }
       <h3>Program updater {refId(updateProgram)}</h3>
-      <h3>Reported references {refId(references(program))}</h3>
+      <h3>Reported references {refId(context.dispatcher.referencesForProgram(program))}</h3>
       <ul>
-        { [...references(program)].map((ref) =>
+        { [...context.dispatcher.referencesForProgram(program)].map((ref) =>
           <li key={ref}><small><code>{ref}</code></small></li>
         ) }
       </ul>

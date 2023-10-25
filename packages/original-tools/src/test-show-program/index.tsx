@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, defineTool, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { ValueEditable } from "@engraft/core-widgets";
@@ -8,17 +8,17 @@ type Program = {
   subProgram: ToolProgram,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
+const makeProgram: MakeProgram<Program> = (context, defaultInputCode) => ({
   toolName: 'test-show-program',
-  subProgram: slotWithCode(defaultInputCode || ''),
+  subProgram: context.makeSlotWithCode(defaultInputCode || ''),
 });
 
 const collectReferences: CollectReferences<Program> = (program) => program.subProgram;
 
 const run: ToolRun<Program> = memoizeProps(hooks((props) => {
-  const { program, varBindings} = props;
+  const { program, varBindings, context } = props;
 
-  const subResult = hookRunTool({program: program.subProgram, varBindings})
+  const subResult = hookRunTool({program: program.subProgram, varBindings, context})
 
   const outputP = subResult.outputP;
 

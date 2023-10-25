@@ -1,8 +1,8 @@
-import { dispatcher, EngraftPromise, makeVarBindings, newVar, references, runTool, toolFromModule, VarBindings } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, runTool, toolFromModule, VarBindings } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
-import { registerTestingComponents, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-components";
+import { makeTestingContext, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-components";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";
@@ -11,11 +11,9 @@ import * as Notebook from "../lib/index.js";
 
 // @vitest-environment happy-dom
 
+const context = makeTestingContext();
 const notebookTool = toolFromModule(Notebook);
-
-registerTestingComponents();
-
-dispatcher().registerTool(notebookTool);
+context.dispatcher.registerTool(notebookTool);
 
 const prevVarId = 'IDprev000000';
 
@@ -54,6 +52,7 @@ describe('notebook', () => {
         runTool(memory, {
           program,
           varBindings: empty,
+          context,
         }).outputP
       );
     }
@@ -112,6 +111,7 @@ describe('notebook', () => {
         runTool(new RefuncMemory(), {
           program,
           varBindings: empty,
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -124,7 +124,7 @@ describe('notebook', () => {
     );
 
     expect(
-      references(program),
+      context.dispatcher.referencesForProgram(program),
     ).toEqual(
       new Set()
     );
@@ -165,6 +165,7 @@ describe('notebook', () => {
         runTool(memory, {
           program,
           varBindings,
+          context,
         }).outputP
       );
     }
@@ -220,6 +221,7 @@ describe('notebook', () => {
           varBindings={empty}
           updateProgram={noOp}
           reportOutputState={noOp}
+          context={context}
         />
       );
     }
@@ -297,6 +299,7 @@ describe('notebook', () => {
         notebookTool.run(memory, {
           program,
           varBindings,
+          context,
         }).outputP
       );
     }

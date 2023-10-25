@@ -1,4 +1,4 @@
-import { EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
+import { EngraftContext, EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
 import { ToolOutputBuffer } from "@engraft/core-widgets";
 import { useRefunction } from "@engraft/refunc-react";
 import { ErrorBoundary } from "@engraft/shared/lib/ErrorBoundary.js";
@@ -230,10 +230,11 @@ export type ControlValues = {
 
 export type FormatterNodeViewProps = {
   node: FormatterNode,
+  engraftContext: EngraftContext,
 }
 
 export const FormatterNodeView = memo(function FormatterNodeView(props: FormatterNodeViewProps) {
-  const { node } = props;
+  const { node, engraftContext } = props;
   const context = useContext(FormatterContext);
 
   const { element, ghostInfo } = node;
@@ -249,20 +250,20 @@ export const FormatterNodeView = memo(function FormatterNodeView(props: Formatte
       inner = (
         <Tag className={element.className}>
           {node.children.map((child, i) =>
-            <FormatterNodeView key={i} node={child}/>
+            <FormatterNodeView key={i} node={child} engraftContext={engraftContext} />
           )}
         </Tag>
       );
       break;
     case 'for-each':
       inner = node.children.map((child, i) =>
-        <FormatterNodeView key={i} node={child}/>
+        <FormatterNodeView key={i} node={child} engraftContext={engraftContext} />
       );
       break;
     case 'text':
       if (element.formatProgram) {
         inner = <ErrorBoundary>
-          <ViewFormatProgram formatProgram={element.formatProgram} node={node} />
+          <ViewFormatProgram formatProgram={element.formatProgram} node={node} engraftContext={engraftContext} />
         </ErrorBoundary>;
       } else {
         let text: string;
@@ -354,11 +355,12 @@ export function makeVarBindingsForData(data: any): VarBindings {
 const ViewFormatProgram = memo(function ViewFormatProgram(props: {
   formatProgram: ToolProgram,
   node: FormatterNode,
+  engraftContext: EngraftContext,
 }) {
-  const { formatProgram, node } = props;
+  const { formatProgram, node, engraftContext } = props;
 
   const varBindings = useMemo(() => makeVarBindingsForData(node.innerData), [node.innerData]);
-  const { outputP } = useRefunction(runTool, { program: formatProgram, varBindings })
+  const { outputP } = useRefunction(runTool, { program: formatProgram, varBindings, context: engraftContext })
 
   return <ToolOutputBuffer outputP={outputP} renderValue={identity} />;
 });

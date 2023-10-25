@@ -1,6 +1,6 @@
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -14,14 +14,14 @@ export type Program = {
   perItemProgram: ToolProgram,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (context, defaultCode) => {
   const itemVar = newVar('item');
   return {
     toolName: 'map',
-    inputProgram: slotWithCode(defaultCode || ''),
+    inputProgram: context.makeSlotWithCode(defaultCode || ''),
     itemVar,
     itemKeyVarId: randomId(),
-    perItemProgram: slotWithCode(itemVar.id)
+    perItemProgram: context.makeSlotWithCode(itemVar.id)
   };
 };
 
@@ -29,9 +29,9 @@ const collectReferences: CollectReferences<Program> = (program) =>
   [ program.inputProgram, program.perItemProgram, { '-': [program.itemVar] } ]
 
 const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const inputResult = hookRunTool({program: program.inputProgram, varBindings});
+  const inputResult = hookRunTool({program: program.inputProgram, varBindings, context});
 
   const computedStuffP = hookMemo(() => (
     hookThen(inputResult.outputP, (inputOutput) => {
@@ -66,7 +66,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
               ...newVarBindings,
             }), [varBindings, newVarBindings]);
             const result = hookRunTool(
-              {program: program.perItemProgram, varBindings: itemVarBindings}
+              {program: program.perItemProgram, varBindings: itemVarBindings, context}
             )
             return { result, newScopeVarBindings: newVarBindings };
           })
@@ -80,7 +80,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
         itemKeyVar,
       }
     })
-  ), [inputResult.outputP, program.itemKeyVarId, program.itemVar, program.perItemProgram, varBindings])
+  ), [inputResult.outputP, program.itemKeyVarId, program.itemVar, program.perItemProgram, varBindings, context])
 
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() => (
     computedStuffP.then(({itemResultsWithScope}) =>

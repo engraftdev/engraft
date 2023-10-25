@@ -1,5 +1,5 @@
 import { ToolOutputView, Value, VarDefinition } from "@engraft/core-widgets";
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, runTool, slotWithCode, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, runTool, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -8,12 +8,12 @@ export type Program = {
   def: GadgetDef,
 }
 
-const makeProgram: MakeProgram<Program> = () => ({
+const makeProgram: MakeProgram<Program> = (context) => ({
   toolName: 'gadget-definer',
   def: {
-    initialProgramProgram: slotWithCode(''),
-    outputProgram: slotWithCode(''),
-    viewProgram: slotWithCode(''),
+    initialProgramProgram: context.makeSlotWithCode(''),
+    outputProgram: context.makeSlotWithCode(''),
+    viewProgram: context.makeSlotWithCode(''),
     programVar: newVar('program'),
     programUPVar: newVar('program updater'),
   },
@@ -44,10 +44,10 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 }));
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
-  const { program, updateProgram, varBindings, autoFocus } = props;
+  const { program, updateProgram, varBindings, context, autoFocus } = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const initialProgramResult = useRefunction(runTool, {program: program.def.initialProgramProgram, varBindings});
+  const initialProgramResult = useRefunction(runTool, {program: program.def.initialProgramProgram, varBindings, context});
   const initialProgramOutputState = usePromiseState(initialProgramResult.outputP);
 
   const [gadgetProgram, setGadgetProgram] = useState<unknown | null>(() => {
@@ -66,12 +66,12 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => 
 
   const outputResultWithScope = useRefunction(
     runOutputProgram,
-    program.def, varBindings, gadgetProgram
+    program.def, varBindings, gadgetProgram, context
   );
 
   const viewResultWithScope = useRefunction(
     runViewProgram,
-    program.def, varBindings, gadgetProgram, gadgetProgramUP
+    program.def, varBindings, gadgetProgram, gadgetProgramUP, context
   );
 
   const leftCommonWidth = useCommonWidth();

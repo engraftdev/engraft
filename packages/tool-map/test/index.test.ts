@@ -1,11 +1,11 @@
-import { EngraftPromise, dispatcher, newVar, randomId, runTool, toolFromModule } from "@engraft/core";
+import { EngraftPromise, newVar, randomId, runTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
 import { describe, expect, it } from "vitest";
 import * as Map from "../lib/index.js";
-import { TestingKnownOutput, TestingRefsFunc, registerTestingComponents } from "@engraft/testing-components";
 
-registerTestingComponents();
-dispatcher().registerTool(toolFromModule(Map));
+const context = makeTestingContext();
+context.dispatcher.registerTool(toolFromModule(Map));
 
 describe('checkbox', () => {
   it('basically works for arrays', () => {
@@ -26,7 +26,7 @@ describe('checkbox', () => {
       } satisfies TestingRefsFunc.Program,
     } satisfies Map.Program;
 
-    const {outputP} = runTool(new RefuncMemory(), { program, varBindings: {} });
+    const {outputP} = runTool(new RefuncMemory(), { program, varBindings: {}, context });
     expect(EngraftPromise.state(outputP)).toEqual(
       {status: 'fulfilled', value: {value: [["apple", 0], ["banana", 1], ["cherry", 2]]}}
     );
@@ -50,7 +50,7 @@ describe('checkbox', () => {
       } satisfies TestingRefsFunc.Program,
     } satisfies Map.Program;
 
-    const {outputP} = runTool(new RefuncMemory(), { program, varBindings: {} });
+    const {outputP} = runTool(new RefuncMemory(), { program, varBindings: {}, context });
     expect(EngraftPromise.state(outputP)).toEqual(
       {status: 'fulfilled', value: {value: [["green", "apple"], ["yellow", "banana"], ["red", "cherry"]]}}
     );

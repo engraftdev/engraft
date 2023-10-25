@@ -3,6 +3,7 @@ import { Updater } from "@engraft/shared/lib/Updater.js";
 import { ReactElement, createContext } from "react";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";
+import { EngraftContext } from "./context.js";
 
 // NOTE: The Engraft codebase uses "tool" to refer to what our paper calls
 // "components". This is outdated terminology that will be changed soon.
@@ -27,6 +28,7 @@ export type ToolRun<P extends ToolProgram> =
 export type ToolProps<P extends ToolProgram> = {
   program: P,
   varBindings: VarBindings,
+  context: EngraftContext,
 }
 
 export type VarBindings = {
@@ -76,7 +78,7 @@ export const ToolViewContext = createContext<ToolViewContextValue>({
 });
 
 export type MakeProgram<P extends ToolProgram> =
-  (defaultInputCode?: string) => P;
+  (context: EngraftContext, defaultInputCode?: string) => P;
 
 export type CollectReferences<P extends ToolProgram> =
   (program: P) => ReferenceCollection;

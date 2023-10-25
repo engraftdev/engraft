@@ -1,9 +1,9 @@
 import { getAuth } from "firebase/auth";
 import { Timestamp, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { memo, useCallback, useMemo } from "react";
-import { Patch, patchesRef } from "./db.js";
-import { slotWithCode } from "@engraft/hostkit";
 import { Link, useNavigate } from "react-router-dom";
+import { Patch, patchesRef } from "./db.js";
+import { context } from "./util.js";
 
 type PatchesListProps = {
   patches: (Patch & {id: string})[];
@@ -22,7 +22,7 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
       name: `new page on ${new Date().toLocaleString()}`,
       ownerUid: getAuth().currentUser!.uid,
       createdAt: Timestamp.fromDate(new Date()),
-      toolProgram: slotWithCode(''),
+      toolProgram: context.makeSlotWithCode(''),
     });
     navigate(`/${newDoc.id}/edit`);
   }, [navigate]);

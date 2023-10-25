@@ -1,3 +1,4 @@
+import { makeBasicContext } from "@engraft/basic-setup";
 import { VarBinding } from "@engraft/hostkit";
 import { getPyodide } from  "@engraft/pyodide";
 
@@ -16,14 +17,14 @@ async function reviveIn(obj : any) : Promise<any> {
       for (const key in obj) {
         newValue[key] = await reviveIn(obj[key]);
       }
-      return newValue; 
+      return newValue;
     }
   }
   return obj;
 }
 
 export async function valueFromStdin(input : string) {
-  try { 
+  try {
     const parsed = JSON.parse(input);
     const revived = await reviveIn(parsed);
     return revived;
@@ -72,7 +73,7 @@ async function prepareForStringify(value : any) : Promise<any> {
       return newValue;
     }
   }
-  return value; 
+  return value;
 }
 
 export async function valueToStdout(value: any, jsonOnly=false) {
@@ -100,3 +101,5 @@ export async function valueToStdout(value: any, jsonOnly=false) {
   value = await prepareForStringify(value);
   return JSON.stringify(value, null, 2);
 }
+
+export const makeContext = makeBasicContext;

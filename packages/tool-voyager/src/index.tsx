@@ -1,6 +1,6 @@
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, slotWithCode, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
 import voyagerStyle from "@engraft/vendor-voyager/src/style.css?inline";
 import _ from "lodash";
@@ -16,18 +16,18 @@ type Program = {
   spec: Spec | undefined,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode) => ({
+const makeProgram: MakeProgram<Program> = (context, defaultCode) => ({
   toolName: 'voyager',
-  inputProgram: slotWithCode(defaultCode),
+  inputProgram: context.makeSlotWithCode(defaultCode),
   spec: undefined,
 });
 
 const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
 
 const run: ToolRun<Program> = memoizeProps(hooks((props) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
+  const inputResult = hookRunTool({ program: program.inputProgram, varBindings, context })
 
   const outputP = hookMemo(() => {
     return EngraftPromise.resolve({ value: undefined });

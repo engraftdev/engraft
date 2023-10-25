@@ -1,12 +1,12 @@
 import { EngraftPromise, ToolResultWithScope } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc-react";
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { TestingKnownOutput, TestingRefsFunc, registerTestingComponents } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
 import { updateWithUP } from "@engraft/update-proxy-react";
 import { describe, expect, test } from "vitest";
 import { CellNetworkProps, cellNetwork } from "../lib/cellNetwork.js";
 
-registerTestingComponents();
+const context = makeTestingContext();
 
 function expectCellNetworkValues(
   networkResult: Record<string, ToolResultWithScope>,
@@ -40,6 +40,7 @@ describe('cellNetwork', () => {
         },
       ],
       varBindings: empty,
+      context,
     };
 
     const mem = new RefuncMemory();
@@ -57,6 +58,7 @@ describe('cellNetwork', () => {
       cells: [],
       varBindings: empty,
       prevVarId: "IDprev000000",
+      context,
     };
 
     const mem = new RefuncMemory();
@@ -97,6 +99,7 @@ describe('cellNetwork', () => {
         },
       ],
       varBindings: empty,
+      context,
     };
 
     const mem = new RefuncMemory();
@@ -150,6 +153,7 @@ describe('cellNetwork', () => {
       ],
       varBindings: empty,
       prevVarId,
+      context,
     };
 
     const mem = new RefuncMemory();

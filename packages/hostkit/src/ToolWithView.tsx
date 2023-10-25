@@ -23,9 +23,9 @@ type ToolWithViewProps =
   };
 
 export const ToolWithView = memo(function ToolWithView(props: ToolWithViewProps) {
-  const { program, varBindings, reportOutputState, reportOutputP, ...rest } = props;
+  const { program, varBindings, context, reportOutputState, reportOutputP, ...rest } = props;
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program, varBindings, context });
   useEffect(() => {
     reportOutputP && reportOutputP(outputP);
   }, [outputP, reportOutputP]);

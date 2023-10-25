@@ -1,5 +1,5 @@
 import { CodeMirror, setup } from "@engraft/codemirror-helpers"
-import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookRunTool, randomId, slotWithCode, usePromiseState } from "@engraft/core"
+import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookRunTool, randomId, usePromiseState } from "@engraft/core"
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc"
 import { compileExpressionCached } from "@engraft/shared/lib/compile.js"
 import { UpdateProxyRemovable, updateProxy } from "@engraft/update-proxy"
@@ -23,10 +23,10 @@ type Program = {
   inOutPairs: InOutPair[];
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (context, defaultCode?: string) => {
   return {
     toolName: 'synthesizer',
-    inputProgram: slotWithCode(defaultCode || ''),
+    inputProgram: context.makeSlotWithCode(defaultCode || ''),
     code: 'input',
     inOutPairs: []
   };
@@ -35,9 +35,9 @@ const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
 const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
 
 const run: ToolRun<Program> = memoizeProps(hooks((props) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const inputResult = hookRunTool({program: program.inputProgram, varBindings});
+  const inputResult = hookRunTool({program: program.inputProgram, varBindings, context});
 
   const funcP = hookMemo(() => EngraftPromise.try(() => {
     const compiled = compileExpressionCached(program.code);

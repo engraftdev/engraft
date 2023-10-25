@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, newVar, runTool, slotWithCode } from "@engraft/core";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, newVar, runTool } from "@engraft/core";
 import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
@@ -10,7 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
 
-type Program = {
+export type Program = {
   toolName: 'simulation',
   ticksCount: number,
   stateVar: Var,
@@ -19,15 +19,15 @@ type Program = {
   toDrawProgram: ToolProgram,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (context, defaultCode?: string) => {
   const stateVar = newVar('state');
   return {
     toolName: 'simulation',
     ticksCount: 20,
     stateVar,
-    initProgram: slotWithCode('{}'),
-    onTickProgram: slotWithCode(stateVar.id),
-    toDrawProgram: slotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
+    initProgram: context.makeSlotWithCode('{}'),
+    onTickProgram: context.makeSlotWithCode(stateVar.id),
+    toDrawProgram: context.makeSlotWithCode(`<pre>{JSON.stringify(${stateVar.id}, null, 2)}</pre>`)
   };
 };
 
@@ -35,12 +35,12 @@ const collectReferences: CollectReferences<Program> = (program) =>
   [ program.initProgram, program.onTickProgram, program.toDrawProgram, {'-': program.stateVar} ];
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const initResult = hookRunTool({ program: program.initProgram, varBindings });
+  const initResult = hookRunTool({ program: program.initProgram, varBindings, context });
 
   const onTickResultsWithScope = hookRefunction(runSimulation, {
-    program, varBindings, initOutputP: initResult.outputP, ticksCount: program.ticksCount
+    program, varBindings, initOutputP: initResult.outputP, ticksCount: program.ticksCount, context
   });
 
   const allTickOutputsP = hookMemo(() => EngraftPromise.all([
@@ -76,12 +76,13 @@ export default defineTool({ name: 'simulation', makeProgram, collectReferences, 
 type RunSimulationProps = {
   program: Program,
   varBindings: VarBindings,
+  context: EngraftContext,
   initOutputP: EngraftPromise<ToolOutput>,
   ticksCount: number,
 }
 
 const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
-  const { program, varBindings, initOutputP, ticksCount } = props;
+  const { program, varBindings, context, initOutputP, ticksCount } = props;
 
   return hookFork((branch) => {
     // Even if the tick function is async, we can synchronously construct the computation graph.
@@ -99,7 +100,7 @@ const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
         ...newVarBindings,
       };
       const onTickResultWithScope = branch(`${i}`, () => {
-        const result = hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState });
+        const result = hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState, context });
         return { result, newScopeVarBindings: newVarBindings };
       });
       onTickResultsWithScope.push(onTickResultWithScope);
@@ -118,9 +119,10 @@ type Draft = {
 const runSimulationOnDraft = memoizeProps(hooks((props: {
   program: Program,
   varBindings: VarBindings,
+  context: EngraftContext,
   draft: Draft | undefined,
 }) => {
-  const { program, varBindings, draft } = props;
+  const { program, varBindings, context, draft } = props;
 
   return hookFork((branch) => {
     if (draft) {
@@ -128,6 +130,7 @@ const runSimulationOnDraft = memoizeProps(hooks((props: {
         return hookRefunction(runSimulation, {
           program,
           varBindings,
+          context,
           initOutputP: draft!.initOutputP,
           ticksCount: program.ticksCount - draft!.initTick,
         });
@@ -146,7 +149,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 }
 
 const View = memo((props: ViewProps) => {
-  const { program, updateProgram, varBindings, initResult, onTickResultsWithScope } = props;
+  const { program, updateProgram, varBindings, context, initResult, onTickResultsWithScope } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [draft, draftUP] = useStateUP<Draft | undefined>(() => undefined);
@@ -166,7 +169,7 @@ const View = memo((props: ViewProps) => {
   });
 
   const onTickResultsDraft = useRefunction(runSimulationOnDraft, {
-    program, varBindings, draft
+    program, varBindings, context, draft
   });
 
   // type Timeline = {
@@ -206,7 +209,7 @@ const View = memo((props: ViewProps) => {
     ...varBindings,
     [program.stateVar.id]: { var_: program.stateVar, outputP: tickOutputP },
   }), [varBindings, program.stateVar, tickOutputP]);
-  const toDrawResult = useRefunction(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings });
+  const toDrawResult = useRefunction(runTool, { program: program.toDrawProgram, updateProgram: programUP.toDrawProgram.$apply, varBindings: toDrawVarBindings, context });
 
   return (
     <div className="xRow xGap10" style={{padding: 10}}>

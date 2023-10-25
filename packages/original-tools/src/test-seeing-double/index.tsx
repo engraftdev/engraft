@@ -1,4 +1,4 @@
-import { hookRunTool, ShowView, slotWithCode, Tool, ToolProgram, ToolView } from "@engraft/core";
+import { hookRunTool, ShowView, Tool, ToolProgram, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
@@ -12,18 +12,18 @@ export type Program = {
 export const tool: Tool<Program> = {
   name: 'test-seeing-double',
 
-  makeProgram: () => ({
+  makeProgram: (context) => ({
     toolName: 'test-seeing-double',
-    subProgram: slotWithCode(''),
+    subProgram: context.makeSlotWithCode(''),
     rerenderOnProgramChange: false,
   }),
 
   collectReferences: (program) => program.subProgram,
 
   run: memoizeProps(hooks((props) => {
-    const { program, varBindings } = props;
+    const { program, varBindings, context } = props;
 
-    const { outputP: subOutputP, view: subView } = hookRunTool({program: program.subProgram, varBindings});
+    const { outputP: subOutputP, view: subView } = hookRunTool({program: program.subProgram, varBindings, context});
 
     const outputP = subOutputP;
 

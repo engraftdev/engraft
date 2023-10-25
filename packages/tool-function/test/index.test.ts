@@ -1,7 +1,6 @@
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
-import Slot from "@engraft/tool-slot";
-import { EngraftPromise, RefuncMemory, ToolOutput, dispatcher, newVar, slotWithCode, toolFromModule } from "@engraft/toolkit";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { EngraftPromise, RefuncMemory, ToolOutput, newVar, toolFromModule } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as functionM from "../lib/index.js";
 
@@ -9,9 +8,7 @@ import * as functionM from "../lib/index.js";
 
 const functionTool = toolFromModule(functionM);
 
-registerTestingComponents();
-dispatcher().registerTool(functionTool);
-dispatcher().registerTool(toolFromModule(Slot));
+const context = makeTestingContext();
 
 describe('function', () => {
   it('output works', () => {
@@ -20,10 +17,16 @@ describe('function', () => {
     const input1 = newVar('input 1');
     const input2 = newVar('input 2');
 
+    const bodyProgram: TestingRefsFunc.Program = {
+      toolName: 'testing-refs-func',
+      refs: [ input1.id, input2.id ],
+      func: ([ input1Output, input2Output ]) => ({ value: 10 * (input1Output.value as any) + (input2Output.value as any) }),
+    };
+
     let program: functionM.Program = {
       toolName: 'function',
       argVars: [ input1, input2 ],
-      bodyProgram: slotWithCode(`10 * ${input1.id} + ${input2.id}`),
+      bodyProgram,
       examples: [],
       activeExampleId: 'hmmmm',
     };
@@ -31,6 +34,7 @@ describe('function', () => {
     const { outputP } = functionTool.run(memory, {
       program,
       varBindings: empty,
+      context,
     });
 
     const outputState = EngraftPromise.state(outputP);
@@ -63,6 +67,7 @@ describe('function', () => {
     const { outputP } = functionTool.run(memory, {
       program,
       varBindings: empty,
+      context,
     });
 
     const outputState = EngraftPromise.state(outputP);

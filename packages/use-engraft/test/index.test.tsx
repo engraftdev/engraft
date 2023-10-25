@@ -1,15 +1,11 @@
-import { dispatcher, EngraftPromise, slotWithCode, toolFromModule, ToolOutput } from "@engraft/core";
-import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
-import Slot from "@engraft/tool-slot";
-import React from "react";
+import { EngraftPromise, ToolOutput } from "@engraft/core";
+import { makeSlotWithCode } from "@engraft/tool-slot";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { useEngraft } from "../lib/index.js";
+import { TestingKnownOutput } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
-
-registerTestingComponents();
-dispatcher().registerTool(toolFromModule(Slot));
 
 describe('useEngraft', () => {
   it('basically works', () => {
@@ -31,7 +27,7 @@ describe('useEngraft', () => {
 
   it('can read an incoming var', () => {
     const MyComponent = (props: {}) => {
-      const program = slotWithCode('IDx000000');
+      const program = makeSlotWithCode('IDx000000');
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         inputs: { x: 10 },

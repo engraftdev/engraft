@@ -1,7 +1,7 @@
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { Use } from "@engraft/shared/lib/Use.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
-import { ToolProgram, VarBindings } from "@engraft/toolkit";
+import { EngraftContext, ToolProgram, VarBindings } from "@engraft/toolkit";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { ToolInspectorWindow } from "./ToolInspectorWindow.js";
 
@@ -13,12 +13,13 @@ export type ToolFrameProps = {
   setFrameBarBackdropElem?: (frameBarBackdropElem: HTMLDivElement) => void,
   onClose?: () => void,
   varBindings: VarBindings,
+  context: EngraftContext,
 }
 
 const SOFT_STYLE = false as boolean;
 
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
-  const {children, expand, program, updateProgram, onClose, varBindings, setFrameBarBackdropElem} = props;
+  const {children, expand, program, updateProgram, onClose, varBindings, context, setFrameBarBackdropElem} = props;
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -101,6 +102,7 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
       program={program}
       updateProgram={updateProgram}
       varBindings={varBindings}
+      context={context}
     />
   </div>;
 });

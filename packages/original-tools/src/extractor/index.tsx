@@ -1,4 +1,4 @@
-import { EngraftPromise, hookRunTool, randomId, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, randomId, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "@engraft/core-widgets";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
@@ -27,9 +27,9 @@ export type Program = {
 export const tool: Tool<Program> = {
   name: 'extractor',
 
-  makeProgram: (defaultInputCode) => ({
+  makeProgram: (context, defaultInputCode) => ({
     toolName: 'extractor',
-    inputProgram: slotWithCode(defaultInputCode || ''),
+    inputProgram: context.makeSlotWithCode(defaultInputCode || ''),
     patternsWithIds: [],
     minimized: false,
   }),
@@ -37,8 +37,8 @@ export const tool: Tool<Program> = {
   collectReferences: (program) => program.inputProgram,
 
   run: memoizeProps(hooks((props) => {
-    const { program, varBindings } = props;
-    const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
+    const { program, varBindings, context } = props;
+    const inputResult = hookRunTool({ program: program.inputProgram, varBindings, context })
     const { patternsWithIds } = program;
 
     const mergedPatterns = hookMemo(() => {

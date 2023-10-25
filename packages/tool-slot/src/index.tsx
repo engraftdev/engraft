@@ -11,7 +11,7 @@ import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEdit
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { compileBodyCached } from "@engraft/shared/lib/compile.js";
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, setSlotWithCode, setSlotWithProgram, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { ToolFrame } from "./ToolFrame.js";
@@ -44,7 +44,7 @@ type ProgramToolMode = ProgramShared & {
   subProgram: ToolProgram,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => ({
+const makeProgram: MakeProgram<Program> = (context: EngraftContext, defaultCode?: string) => ({
   toolName: 'slot',
   modeName: 'code',
   defaultCode,
@@ -52,23 +52,21 @@ const makeProgram: MakeProgram<Program> = (defaultCode?: string) => ({
   subPrograms: {},
 });
 
-function slotWithCode(program: string = ''): Program {
+export function makeSlotWithCode(code?: string): Program {
   return {
     toolName: 'slot',
     modeName: 'code',
-    code: program,
-    defaultCode: program,
+    code: code || '',
+    defaultCode: code,
     subPrograms: {},
   };
 }
-setSlotWithCode(slotWithCode);
 
-function slotWithProgram(program: ToolProgram, defaultCode?: string): Program {
-  // TODO: this condition is a hack, isn't it?
+export function makeSlotWithProgram(program: ToolProgram, defaultCode?: string): Program {
+  // TODO: this shortcut is a hack, isn't it?
   if (program.toolName === 'slot') {
     return program as Program;
   }
-
   return {
     toolName: 'slot',
     modeName: 'tool',
@@ -76,7 +74,6 @@ function slotWithProgram(program: ToolProgram, defaultCode?: string): Program {
     defaultCode,
   };
 }
-setSlotWithProgram(slotWithProgram);
 
 const collectReferences: CollectReferences<Program> = (program: Program) => {
   if (program.modeName === 'code') {
@@ -160,11 +157,11 @@ type CodeModeProps = Replace<ToolProps<Program>, {
 }>
 
 const runCodeMode = (props: CodeModeProps) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
   // hookLogChanges({program, varBindings}, 'slot:runCodeMode');
 
-  const { referenceValuesP, subResults } = hookFancyCodeEditor({ code: program.code, subPrograms: program.subPrograms, varBindings });
+  const { referenceValuesP, subResults } = hookFancyCodeEditor({ code: program.code, subPrograms: program.subPrograms, varBindings, context });
 
   const compiledP = hookMemo(() => EngraftPromise.try(() => {
     if (program.code === '') {
@@ -249,7 +246,7 @@ type CodeModeViewProps = CodeModeProps & ToolViewRenderProps<Program> & {
 };
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, onBlur, subResults, logsP} = props;
+  const {program, varBindings, context, updateProgram, expand, autoFocus, onBlur, subResults, logsP} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const [showInspector, setShowInspector] = useState(false);
@@ -287,8 +284,8 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   }, [logDecorations]);
 
   const replaceWithProgram = useCallback((newProgram: ToolProgram) => {
-    programUP.$as<Program>().$set(slotWithProgram(newProgram, program.defaultCode));
-  }, [program.defaultCode, programUP]);
+    programUP.$as<ToolProgram>().$set(context.makeSlotWithProgram(newProgram, program.defaultCode));
+  }, [program.defaultCode, programUP, context]);
 
   return (
     <div
@@ -304,6 +301,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
       }}
     >
       <FancyCodeEditor
+        context={context}
         defaultCode={program.defaultCode}
         extensions={extensions}
         autoFocus={autoFocus}
@@ -322,6 +320,7 @@ const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
         program={program}
         updateProgram={updateProgram as any}
         varBindings={varBindings}
+        context={context}
       />
     </div>
   );
@@ -373,9 +372,9 @@ type ToolModeProps = Replace<ToolProps<Program>, {
 }>
 
 const runToolMode = (props: ToolModeProps) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const { outputP: subOutputP, view: subView } = hookRunTool({ program: program.subProgram, varBindings });
+  const { outputP: subOutputP, view: subView } = hookRunTool({ program: program.subProgram, varBindings, context });
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (renderProps) => <ToolModeView
@@ -395,7 +394,7 @@ type ToolModeViewProps = ToolModeProps & ToolViewRenderProps<Program> & {
 };
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
-  const {program, varBindings, updateProgram, expand, autoFocus, noFrame, subView, onBlur} = props;
+  const {program, varBindings, updateProgram, context, expand, autoFocus, noFrame, subView, onBlur} = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const updateSubProgram = programUP.subProgram.$;
@@ -417,7 +416,7 @@ const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   } else {
     return <ToolFrame
       expand={expand}
-      program={program.subProgram} updateProgram={updateSubProgram} varBindings={varBindings}
+      program={program.subProgram} updateProgram={updateSubProgram} varBindings={varBindings} context={context}
       setFrameBarBackdropElem={setFrameBarBackdropElem}
       onClose={onCloseFrame}
     >

@@ -6,7 +6,7 @@ import { count } from "@engraft/shared/lib/count.js";
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { isoformat } from "@engraft/shared/lib/isoformat.js";
 import { useHover } from '@engraft/shared/lib/useHover.js';
-import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, slotWithCode, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -28,9 +28,9 @@ type P = {
   cellWidths: Record<string, number>,  // TODO: gotta rename these when cols get renamed
 }
 
-const makeProgram: MakeProgram<P> = (defaultCode) => ({
+const makeProgram: MakeProgram<P> = (context, defaultCode) => ({
   toolName: 'data-table',
-  inputProgram: slotWithCode(defaultCode),
+  inputProgram: context.makeSlotWithCode(defaultCode),
   transforms: {
     sort: [],
     filter: [],
@@ -42,9 +42,9 @@ const makeProgram: MakeProgram<P> = (defaultCode) => ({
 const collectReferences: CollectReferences<P> = (program) => program.inputProgram;
 
 const run = memoizeProps(hooks((props: ToolProps<P>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const inputResult = hookRunTool({program: program.inputProgram, varBindings});
+  const inputResult = hookRunTool({program: program.inputProgram, varBindings, context});
 
   const dataFramesP = hookMemo(() => inputResult.outputP.then((inputOutput) => {
     const input = inferDataFrameFromRows(inputOutput.value);

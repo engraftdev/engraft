@@ -1,24 +1,31 @@
 import { empty } from "@engraft/shared/lib/noOp.js";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
 import Slot from "@engraft/tool-slot";
-import { EngraftPromise, ToolOutput, dispatcher, newVar, registerTool, slotWithCode, toolFromModule } from "@engraft/toolkit";
+import { EngraftPromise, ToolOutput, newVar, toolFromModule } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import { Closure, closureToAsyncFunction, closureToSyncFunction } from "../lib/closure.js";
-import { registerTestingComponents, TestingKnownOutput } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
 
-registerTestingComponents();
-dispatcher().registerTool(toolFromModule(Slot));
+const context = makeTestingContext();
+context.dispatcher.registerTool(toolFromModule(Slot));
 
 describe('closureToSyncFunction', () => {
-  it('basically works', () => {
-    const input1 = newVar('input 1');
-    const input2 = newVar('input 2');
+  const input1 = newVar('input 1');
+  const input2 = newVar('input 2');
 
+  const bodyProgram: TestingRefsFunc.Program = {
+    toolName: 'testing-refs-func',
+    refs: [ input1.id, input2.id ],
+    func: ([ input1Output, input2Output ]) => ({ value: 10 * (input1Output.value as any) + (input2Output.value as any) }),
+  };
+
+  it('basically works', () => {
     const closure: Closure = {
       vars: [ input1, input2 ],
-      bodyProgram: slotWithCode(`10 * ${input1.id} + ${input2.id}`),
+      bodyProgram,
       closureVarBindings: empty,
+      context,
     }
 
     const func = closureToSyncFunction(closure);
@@ -30,18 +37,16 @@ describe('closureToSyncFunction', () => {
   });
 
   it('works with closed-over variables', () => {
-    const input1 = newVar('input 1');
-    const input2 = newVar('input 2');
-
     const closure: Closure = {
       vars: [ input1 ],
-      bodyProgram: slotWithCode(`10 * ${input1.id} + ${input2.id}`),
+      bodyProgram,
       closureVarBindings: {
         [input2.id]: {
           var_: input2,
           outputP: EngraftPromise.resolve({value: 2}),
         },
       },
+      context,
     }
 
     const func = closureToSyncFunction(closure);
@@ -59,6 +64,7 @@ describe('closureToSyncFunction', () => {
         outputP: bodyOutputP,
       } satisfies TestingKnownOutput.Program,
       closureVarBindings: empty,
+      context,
     }
 
     const func = closureToSyncFunction(closure);
@@ -86,6 +92,7 @@ describe('closureToAsyncFunction', () => {
         outputP: bodyOutputP,
       } satisfies TestingKnownOutput.Program,
       closureVarBindings: empty,
+      context,
     }
 
     const func = closureToAsyncFunction(closure);

@@ -4,7 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { IsolateStyles, VarUse } from "@engraft/core-widgets";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, dispatcher, hookDedupe, hookFork, hookMemo, hookRunTool, randomId, slotWithProgram } from "@engraft/toolkit";
+import { EngraftContext, EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, hookDedupe, hookFork, hookMemo, hookRunTool, randomId } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
@@ -27,8 +27,9 @@ export function hookFancyCodeEditor(props: {
   code: string,
   subPrograms: SubPrograms,
   varBindings: VarBindings,
+  context: EngraftContext,
 }) {
-  const { code, subPrograms, varBindings } = props;
+  const { code, subPrograms, varBindings, context } = props;
 
   // TODO: this hookDedupe doesn't feel great
   const subResults = hookDedupe(hookMemo(() =>
@@ -38,6 +39,7 @@ export function hookFancyCodeEditor(props: {
           return hookRunTool({
             program: subProgram,
             varBindings,
+            context,
           });
         }, [subProgram, varBindings])
       }))
@@ -93,6 +95,7 @@ export function collectReferencesForFancyCodeEditor(code: string, subPrograms: S
 
 
 type FancyCodeEditorProps = {
+  context: EngraftContext,
   extensions?: Extension[],
   defaultCode: string | undefined,
   code: string,
@@ -114,14 +117,14 @@ export const FancyCodeEditor = memo(function FancyCodeEditor(props: FancyCodeEdi
 });
 
 export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEditor(props: FancyCodeEditorProps & {scopeVarBindingsRef: React.MutableRefObject<VarBindings>}) {
-  const { extensions, defaultCode, code, codeUP, subPrograms, subProgramsUP, replaceWithProgram, subResults, varBindings, autoFocus, onBlur, scopeVarBindingsRef } = props;
+  const { context, extensions, defaultCode, code, codeUP, subPrograms, subProgramsUP, replaceWithProgram, subResults, varBindings, autoFocus, onBlur, scopeVarBindingsRef } = props;
 
   const [refSet, refs] = usePortalSet<{id: string}>();
 
   const allExtensions = useMemo(() => {
     function insertTool(tool: Tool) {
       const id = randomId();
-      const newProgram = slotWithProgram(tool.makeProgram());
+      const newProgram = context.makeSlotWithProgram(tool.makeProgram(context));
       subProgramsUP[id].$set(newProgram);
       // TODO: we never remove these! lol
       return id;
@@ -129,7 +132,7 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
 
     const completions = [
       refCompletions(() => scopeVarBindingsRef.current),
-      toolCompletions(insertTool, replaceWithProgram && ((tool) => replaceWithProgram(tool.makeProgram(defaultCode)))),
+      toolCompletions(context, insertTool, replaceWithProgram && ((tool) => replaceWithProgram(tool.makeProgram(context, defaultCode)))),
     ];
 
     // TODO: We're storing some state here for inter-extension communication.
@@ -223,10 +226,10 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
                     // Replace the slot with the pasted program
                     // TODO: perhaps we should paste inline and then simplify on blur?
                     // TODO: default code?
-                    replaceWithProgram(slotWithProgram(parsed));
+                    replaceWithProgram(context.makeSlotWithProgram(parsed));
                   } else {
                     const newId = randomId();
-                    subProgramsUP[newId].$set(slotWithProgram(parsed));
+                    subProgramsUP[newId].$set(context.makeSlotWithProgram(parsed));
                     newChanges.push({ from: fromB, to: toB, insert: newId });
                   }
                 }
@@ -243,7 +246,7 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
       }),
       extensions || [],
     ];
-  }, [defaultCode, extensions, refSet, replaceWithProgram, scopeVarBindingsRef, subPrograms, subProgramsUP])
+  }, [context, defaultCode, extensions, refSet, replaceWithProgram, scopeVarBindingsRef, subPrograms, subProgramsUP])
 
   const onChange = useCallback((value: string) => {
     if (value !== code) {
@@ -296,7 +299,7 @@ export function refCompletions(varBindingsGetter?: () => VarBindings | undefined
   };
 }
 
-export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithTool?: (tool: Tool) => void): CompletionSource {
+export function toolCompletions(context: EngraftContext, insertTool: (tool: Tool) => string, replaceWithTool?: (tool: Tool) => void): CompletionSource {
   return (completionContext: CompletionContext) => {
     let word = completionContext.matchBefore(/\/?\w*/)!
     if (word.from === word.to && !completionContext.explicit) {
@@ -305,7 +308,7 @@ export function toolCompletions(insertTool: (tool: Tool) => string, replaceWithT
     return {
       from: word.from,
       options: [
-        ...Object.entries(dispatcher().getFullToolIndex())
+        ...Object.entries(context.dispatcher.getFullToolIndex())
           .filter(([_, tool]) => !tool.isInternal)
           .map(([toolName, tool]) => ({
             label: '/' + toolName,

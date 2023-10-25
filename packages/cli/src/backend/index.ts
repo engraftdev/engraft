@@ -1,13 +1,12 @@
 import './env.js';
 // LINE ABOVE (import './env.js';) MUST BE FIRST
-import { registerAllTheTools } from '@engraft/all-the-tools';
-import { EngraftPromise, RefuncMemory, ToolProgram, dispatcher, runTool, slotWithProgram } from '@engraft/hostkit';
+import { EngraftPromise, RefuncMemory, ToolProgram, runTool } from '@engraft/hostkit';
 import express from 'express';
 import { promises as fsPromises, readFileSync } from 'node:fs';
 import { exit } from 'node:process';
 import { fileURLToPath } from 'node:url';
 import yargs from 'yargs/yargs';
-import { valueFromStdin, valueToStdout, varBindingsObject } from '../shared.js';
+import { makeContext, valueFromStdin, valueToStdout, varBindingsObject } from '../shared.js';
 
 const { writeFile } = fsPromises;
 
@@ -28,8 +27,6 @@ not bad
 
 */
 
-
-registerAllTheTools();
 
 const argv = yargs(process.argv.slice(2))
   .command('* <program>', 'run a program', (yargs) =>
@@ -75,7 +72,8 @@ async function read(stream: NodeJS.ReadStream) {
     global.window = {} as any;
 
     const mem = new RefuncMemory();
-    const { outputP } = runTool(mem, { program, varBindings })
+    const context = makeContext();
+    const { outputP } = runTool(mem, { program, varBindings, context })
 
     try {
       const output = await outputP;
@@ -88,7 +86,9 @@ async function read(stream: NodeJS.ReadStream) {
   } else {
     if (program === null) {
       // TODO: bakes in notebook?
-      program = slotWithProgram(dispatcher().lookUpToolByName('notebook').makeProgram('IDinput000000'));
+      // TODO: does this need to be done on the backend?
+      const context = makeContext();
+      program = context.makeSlotWithProgram(context.dispatcher.lookUpToolByName('notebook').makeProgram(context, 'IDinput000000'));
     }
 
     const app = express();

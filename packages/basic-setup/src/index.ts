@@ -1,4 +1,4 @@
-import { Tool, dispatcher, forgetP, toolFromModule } from "@engraft/core";
+import { Dispatcher, EngraftContext, Tool, forgetP, toolFromModule } from "@engraft/core";
 import { originalTools } from "@engraft/original-tools";
 import Checkbox from "@engraft/tool-checkbox";
 import DataTable from "@engraft/tool-data-table";
@@ -11,7 +11,7 @@ import Markdown from "@engraft/tool-markdown";
 import Notebook from "@engraft/tool-notebook";
 import NotebookCanvas from "@engraft/tool-notebook-canvas";
 import Python from "@engraft/tool-python";
-import Slot from "@engraft/tool-slot";
+import Slot, { makeSlotWithCode, makeSlotWithProgram } from "@engraft/tool-slot";
 import TestCountRuns from "@engraft/tool-test-count-runs";
 import Text from "@engraft/tool-text";
 import ToyAdder from "@engraft/tool-toy-adder";
@@ -19,12 +19,7 @@ import ToyAdderSimple from "@engraft/tool-toy-adder-simple";
 import Value from "@engraft/tool-value";
 import Voyager from "@engraft/tool-voyager";
 
-// This package is named somewhat flippantly. We don't yet have a principled way
-// to manage tool dependencies. So this package just contains all the tools.
-// Once we're in a world where anyone can make a tool, this package will no
-// longer make sense.
-
-export const allTheTools: Tool[] = [
+const tools: Tool[] = [
   forgetP(toolFromModule(Checkbox)),
   forgetP(toolFromModule(DataTable)),
   forgetP(toolFromModule(ExampleDatasets)),
@@ -45,8 +40,19 @@ export const allTheTools: Tool[] = [
   forgetP(toolFromModule(Value)),
   forgetP(toolFromModule(Voyager)),
   ...originalTools,
-]
+];
 
-export function registerAllTheTools() {
-  allTheTools.forEach((tool) => dispatcher().registerTool(tool));
+export function makeBasicContext() {
+  const context: EngraftContext = {
+    dispatcher: new Dispatcher(),
+    makeSlotWithCode,
+    makeSlotWithProgram,
+    debugMode: false,
+  };
+
+  for (const tool of tools) {
+    context.dispatcher.registerTool(tool);
+  }
+
+  return context
 }

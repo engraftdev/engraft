@@ -5,7 +5,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, MakeProgram, randomId, ScrollShadow, ShowViewWithScope, slotWithCode, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, CollectReferences, collectReferencesForCellNetwork } from "@engraft/toolkit";
+import { cellNetwork, CollectReferences, collectReferencesForCellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, MakeProgram, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, randomId, ScrollShadow, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, EngraftContext } from "@engraft/toolkit";
 import _ from "lodash";
 import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
@@ -25,13 +25,13 @@ type Cell = {
     // 'infinity' means 'show entire output' (not Infinity cuz that isn't JSON-serializable)
 }
 
-const makeProgram: MakeProgram<Program> = (defaultInput) => {
+const makeProgram: MakeProgram<Program> = (context, defaultInput) => {
   return {
     toolName: 'notebook',
     cells: [
       {
         var_: newVar(alphaLabels[0]),
-        program: slotWithCode(defaultInput || ''),
+        program: context.makeSlotWithCode(defaultInput || ''),
         outputManualHeight: undefined,
       }
     ],
@@ -43,10 +43,10 @@ const collectReferences: CollectReferences<Program> = (program) =>
   collectReferencesForCellNetwork(program.cells, program.prevVarId);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
   const { cells, prevVarId } = program;
 
-  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings, prevVarId });
+  const cellResultsWithScope = hookRefunction(cellNetwork, { cells, varBindings, context, prevVarId });
 
   const outputP = hookMemo(() => EngraftPromise.try(() => {
     const lastCell = _.last(cells);
@@ -72,7 +72,7 @@ type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
 }
 
 const View = memo((props: ViewProps) => {
-  const { program, updateProgram, cellResultsWithScope, autoFocus } = props;
+  const { program, updateProgram, cellResultsWithScope, autoFocus, context } = props;
   const programUP = useUpdateProxy(updateProgram);
 
   const smallestUnusedLabel = unusedLabel(alphaLabels, program.cells.map(cell => cell.var_.label)) || 'ZZZ';
@@ -123,7 +123,14 @@ const View = memo((props: ViewProps) => {
         }
         {program.cells.map((cell, i) =>
           <Fragment key={cell.var_.id}>
-            <CellDivider i={i} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId} outputBelowInput={program.outputBelowInput} />
+            <CellDivider
+              i={i}
+              updateCells={programUP.cells.$apply}
+              smallestUnusedLabel={smallestUnusedLabel}
+              prevVarId={program.prevVarId}
+              outputBelowInput={program.outputBelowInput}
+              context={context}
+            />
             <CellView cell={cell} cellUP={programUP.cells[i]}
               cellResultWithScope={cellResultsWithScope[cell.var_.id]}
               notebookMenuMaker={notebookMenuMaker}
@@ -132,7 +139,14 @@ const View = memo((props: ViewProps) => {
             />
           </Fragment>
         )}
-        <CellDivider i={program.cells.length} updateCells={programUP.cells.$apply} smallestUnusedLabel={smallestUnusedLabel} prevVarId={program.prevVarId} outputBelowInput={program.outputBelowInput} />
+        <CellDivider
+          i={program.cells.length}
+          updateCells={programUP.cells.$apply}
+          smallestUnusedLabel={smallestUnusedLabel}
+          prevVarId={program.prevVarId}
+          outputBelowInput={program.outputBelowInput}
+          context={context}
+        />
       </div>
     </div>
   );
@@ -144,22 +158,23 @@ const CellDivider = memo((props: {
   smallestUnusedLabel: string,
   prevVarId: string,
   outputBelowInput?: boolean,
+  context: EngraftContext,
 }) => {
-  const { i, updateCells, smallestUnusedLabel, prevVarId, outputBelowInput } = props;
+  const { i, updateCells, smallestUnusedLabel, prevVarId, outputBelowInput, context } = props;
 
   const onClick = useCallback((ev: React.MouseEvent | undefined) => {
     updateCells((oldCells) => {
       let newCells = oldCells.slice();
       newCells.splice(i, 0, {
         var_: newVar(smallestUnusedLabel),
-        program: slotWithCode(i === 0 ? '' : prevVarId),
+        program: context.makeSlotWithCode(i === 0 ? '' : prevVarId),
         outputManualHeight: undefined,
       });
       return newCells;
     });
     // TODO: not working to stop the click from focusing the divider
     ev?.preventDefault();
-  }, [i, prevVarId, smallestUnusedLabel, updateCells]);
+  }, [context, i, prevVarId, smallestUnusedLabel, updateCells]);
 
   const [isFocused, setIsFocused] = useState(false);
 

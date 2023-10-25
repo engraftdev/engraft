@@ -1,4 +1,3 @@
-import { registerAllTheTools } from "@engraft/all-the-tools";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
@@ -8,8 +7,6 @@ import { TinkerPatch } from "./TinkerPatch.js";
 import { ViewPatch } from "./ViewPatch.js";
 
 console.log(`Commit: ${import.meta.env.VITE_GIT_COMMIT_HASH?.slice(0, 8) || 'unknown'}`);
-
-registerAllTheTools();
 
 const root = createRoot(document.getElementById('root')!);
 

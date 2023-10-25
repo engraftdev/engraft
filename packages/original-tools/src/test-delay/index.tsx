@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolProgram, ToolProps, ToolRun, ToolView } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolProps, ToolRun, ToolView } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { UseUpdateProxy } from "@engraft/update-proxy-react";
 
@@ -10,17 +10,17 @@ type Program = {
 
 const collectReferences: CollectReferences<Program> = (program) => [ program.delayProgram, program.actualProgram ];
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => ({
+const makeProgram: MakeProgram<Program> = (context, defaultCode?: string) => ({
   toolName: 'test-delay',
-  delayProgram: slotWithCode('1000'),
-  actualProgram: slotWithCode(defaultCode || ''),
+  delayProgram: context.makeSlotWithCode('1000'),
+  actualProgram: context.makeSlotWithCode(defaultCode || ''),
 });
 
 const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const {outputP: delayOutputP, view: delayView} = hookRunTool({program: program.delayProgram, varBindings});
-  const {outputP: actualOutputP, view: actualView} = hookRunTool({program: program.actualProgram, varBindings});
+  const {outputP: delayOutputP, view: delayView} = hookRunTool({program: program.delayProgram, varBindings, context});
+  const {outputP: actualOutputP, view: actualView} = hookRunTool({program: program.actualProgram, varBindings, context});
 
   const outputP = hookMemo(() => {
     return EngraftPromise.all([actualOutputP, delayOutputP]).then(([actualOutput, delayOutput]) => {

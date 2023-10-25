@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
 import { UpdateProxy } from "@engraft/update-proxy";
@@ -24,10 +24,10 @@ type Program = {
 type Mark = 'bar' | 'line' | 'area' | 'point';
 const marks: Mark[] = ['bar', 'line', 'area', 'point'];
 
-const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => {
+const makeProgram: MakeProgram<Program> = (context, defaultInputCode?: string) => {
   return {
     toolName: 'simple-chart',
-    dataProgram: slotWithCode(defaultInputCode || ''),
+    dataProgram: context.makeSlotWithCode(defaultInputCode || ''),
     mark: 'bar',
     xChannel: undefined,
     yChannel: undefined,
@@ -37,10 +37,10 @@ const makeProgram: MakeProgram<Program> = (defaultInputCode?: string) => {
 const collectReferences: CollectReferences<Program> = (program) => program.dataProgram;
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
   const { mark = 'bar', xChannel, yChannel } = program;
 
-  const dataResult = hookRunTool({program: program.dataProgram, varBindings});
+  const dataResult = hookRunTool({program: program.dataProgram, varBindings, context});
 
   const spec = hookMemo(() => {
     const spec: VisualizationSpec = {

@@ -1,21 +1,21 @@
-import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UseUpdateProxy, defineTool, hookMemo, hookRef, hookRunTool, hooks, memoizeProps, slotWithCode } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UseUpdateProxy, defineTool, hookMemo, hookRef, hookRunTool, hooks, memoizeProps } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'test-count-runs',
   subProgram: ToolProgram,
 }
 
-const makeProgram: MakeProgram<Program> = (defaultInputCode) => ({
+const makeProgram: MakeProgram<Program> = (context, defaultInputCode) => ({
   toolName: 'test-count-runs',
-  subProgram: slotWithCode(defaultInputCode || ''),
+  subProgram: context.makeSlotWithCode(defaultInputCode || ''),
 });
 
 const collectReferences: CollectReferences<Program> = (program) => program.subProgram;
 
 const run: ToolRun<Program> = memoizeProps(hooks((props) => {
-  const { program, varBindings} = props;
+  const { program, varBindings, context } = props;
 
-  const subResult = hookRunTool({program: program.subProgram, varBindings})
+  const subResult = hookRunTool({program: program.subProgram, varBindings, context})
 
   const outputP = subResult.outputP;
 

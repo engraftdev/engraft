@@ -1,14 +1,14 @@
-import { EngraftPromise, dispatcher, makeVarBindings, newVar, references, toolFromModule } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, newVar, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
-import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
 
-registerTestingComponents();
+const context = makeTestingContext();
 const simulationTool = toolFromModule(simulation);
-dispatcher().registerTool(simulationTool);
+context.dispatcher.registerTool(toolFromModule(simulationTool));
 
 describe('simulation', () => {
   it('basically works', () => {
@@ -37,6 +37,7 @@ describe('simulation', () => {
         simulationTool.run(new RefuncMemory(), {
           program,
           varBindings: makeVarBindings({IDone000000: {value: 1}}),
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -49,7 +50,7 @@ describe('simulation', () => {
     );
 
     expect(
-      references(program),
+      context.dispatcher.referencesForProgram(program),
     ).toEqual(
       new Set(['IDone000000'])
     );

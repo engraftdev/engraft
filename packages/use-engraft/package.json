@@ -16,6 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
+    "@engraft/basic-setup": "^0.0.1",
+    "@engraft/testing-components": "^0.0.1",
     "@engraft/hostkit": "^0.0.1",
     "@engraft/shared": "^0.0.1",
     "idb-keyval": "^6.2.0",

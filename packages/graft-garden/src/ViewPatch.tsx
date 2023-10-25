@@ -8,6 +8,7 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
 import { usePatchState } from "./usePatchState.js";
+import { context } from "./util.js";
 
 
 export const ViewPatch = memo(function ViewPatch() {
@@ -40,7 +41,7 @@ type ViewPatchActualViewProps = {
 const ViewPatchActualView = memo(function ViewPatchActualView(props: ViewPatchActualViewProps) {
   const { patch } = props;
   const { varBindings } = usePatchState(patch);
-  const { outputP } = useRefunction(runTool, { program: patch.toolProgram, varBindings });
+  const { outputP } = useRefunction(runTool, { program: patch.toolProgram, varBindings, context });
 
   return <ToolOutputView outputP={outputP} displayReactElementsDirectly={true}/>;
 })

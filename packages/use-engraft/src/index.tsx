@@ -1,6 +1,7 @@
 /// <reference types="@types/wicg-file-system-access" />
 
-import { EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, randomId, runTool, slotWithCode, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
+import { EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, randomId, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
+import { makeBasicContext } from "@engraft/basic-setup";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
@@ -9,6 +10,7 @@ import _ from "lodash";
 import React, { ReactNode, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import css from "./index.css?inline";
+import { TestingKnownOutput } from "@engraft/testing-components";
 
 export type SavedProgram = {
   savedProgramId: string,
@@ -46,6 +48,14 @@ export function useEngraft(props: UseEngraftProps) {
 
   // * Manage the tool *
 
+  // This is only set once
+  const [context] = useState(() => {
+    const context = makeBasicContext();
+    // TODO: we include this tool for testing convenience. really context should be passed in, huh?
+    context.dispatcher.registerTool(TestingKnownOutput.tool);
+    return context;
+  });
+
   const stableInputs = useDedupe(inputs || {}, _.isEqual);
 
   const varBindings = useMemo(() => {
@@ -58,12 +68,12 @@ export function useEngraft(props: UseEngraftProps) {
   }, [stableInputs]);
 
   const [draft, updateDraft] = useState<SavedProgram>(
-    program || { savedProgramId: randomId(), program: slotWithCode(defaultCodeFromInputs(stableInputs)) }
+    program || { savedProgramId: randomId(), program: context.makeSlotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
   const result = useRefunction(
     runTool,
-    { program: draft.program, varBindings },
+    { program: draft.program, varBindings, context },
   );
   const resultWithScope: ToolResultWithScope = useMemo(
     () => ({ result, newScopeVarBindings: varBindings }),

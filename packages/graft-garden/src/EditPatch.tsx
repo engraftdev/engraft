@@ -1,6 +1,6 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, slotWithCode, useUpdateProxy } from "@engraft/hostkit";
+import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, useUpdateProxy } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import 'bootstrap/js/dist/dropdown';
@@ -12,7 +12,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
 import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
-import { useUser } from "./util.js";
+import { context, useUser } from "./util.js";
 import { getAuth } from "firebase/auth";
 
 const myCss = `
@@ -97,7 +97,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
   }, []);
 
   const program = patch.toolProgram;
-  const programIsEmpty = _.isEqual(program, slotWithCode(''));
+  const programIsEmpty = _.isEqual(program, context.makeSlotWithCode(''));
 
   const { stateUP, varBindings } = usePatchState(patch);
 
@@ -173,6 +173,7 @@ const EditPatchLoaded = memo(function EditPatchLoaded(props: {
               varBindings={varBindings}
               autoFocus={!willFocusNameInputRef.current}
               expand={true}
+              context={context}
             />
         }
       </ErrorBoundary>

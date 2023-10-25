@@ -21,9 +21,9 @@ const collectReferences: CollectReferences<Program> = (program) =>
   collectReferencesForFancyCodeEditor(program.code, program.subPrograms);
 
 const run = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
+  const { program, varBindings, context } = props;
 
-  const { referenceValuesP, subResults } = hookFancyCodeEditor({ code: program.code, subPrograms: program.subPrograms, varBindings });
+  const { referenceValuesP, subResults } = hookFancyCodeEditor({ code: program.code, subPrograms: program.subPrograms, varBindings, context });
 
   const mdxCode = hookMemo(() => {
     return program.code.replaceAll(refREDirect, (ref) => `props.${ref}`);
@@ -52,9 +52,10 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           subResults={subResults}
           defaultCode=""
           onBlur={onBlur}
+          context={context}
         />
       } />
-    }), [program.code, program.subPrograms, subResults, varBindings]);
+    }), [context, program.code, program.subPrograms, subResults, varBindings]);
 
   return {outputP, view};
 }));

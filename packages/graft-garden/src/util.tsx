@@ -1,3 +1,4 @@
+import { makeBasicContext } from "@engraft/basic-setup";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { useEffect, useState } from "react";
 
@@ -11,3 +12,6 @@ export function useUser() {
   }, []);
   return user;
 }
+
+// TODO: it's a hack to put this here as a global
+export const context = makeBasicContext();

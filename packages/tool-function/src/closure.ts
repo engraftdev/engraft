@@ -1,9 +1,10 @@
-import { EngraftPromise, RefuncMemory, runTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/toolkit";
+import { EngraftContext, EngraftPromise, RefuncMemory, runTool, ToolOutput, ToolProgram, Var, VarBindings } from "@engraft/toolkit";
 
 export type Closure = {
   vars: Var[],
   bodyProgram: ToolProgram,
   closureVarBindings: VarBindings,
+  context: EngraftContext,
 }
 
 export function argValueOutputPsToVarBindings(argValueOutputPs: EngraftPromise<ToolOutput>[], vars: Var[]): VarBindings {
@@ -22,7 +23,7 @@ export function argValuesToVarBindings(values: unknown[], vars: Var[]): VarBindi
 }
 
 export function closureToAsyncFunction(closure: Closure) {
-  const {vars, bodyProgram, closureVarBindings} = closure;
+  const {vars, bodyProgram, closureVarBindings, context} = closure;
   return (...args: unknown[]) => {
     if (args.length < vars.length) {
       throw new Error(`Expected ${vars.length} arguments, got ${args.length}`);
@@ -38,6 +39,7 @@ export function closureToAsyncFunction(closure: Closure) {
           ...closureVarBindings,
           ...varBindings,
         },
+        context,
       }
     );
 

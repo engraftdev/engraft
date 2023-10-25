@@ -1,4 +1,5 @@
-import { EngraftPromise, ReferenceCollection, ToolOutput, ToolProgram, ToolResult, ToolResultWithScope, Var, VarBindings, hookRunTool, references } from "@engraft/core";
+import { EngraftPromise, ReferenceCollection, ToolOutput, ToolProgram, ToolResult, ToolResultWithScope, Var, VarBindings, hookRunTool } from "@engraft/core";
+import { EngraftContext } from "@engraft/core/lib/context.js";
 import { hookCache, hookDedupe, hookFork, hookMemo, hooks } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWith, objEqWithRefEq, recordEqWith, setEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { intersection, union } from "@engraft/shared/lib/sets.js";
@@ -11,6 +12,7 @@ import { toposort } from "./toposort.js";
 export type CellNetworkProps = {
   cells: Cell[],
   varBindings: VarBindings,
+  context: EngraftContext,
   prevVarId?: string,
 }
 
@@ -20,7 +22,7 @@ export type Cell = {
 }
 
 export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolResultWithScope> => {
-  const { cells, varBindings, prevVarId } = props;
+  const { cells, varBindings, context, prevVarId } = props;
 
   // TODO: Now that we have hookCache, we might want to get rid of the explicit
   // topological sorting. Just evaluate references as needed!
@@ -38,13 +40,13 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
         cell.var_.id,
         union(
           // direct references
-          intersection(references(cell.program), cellIds),
+          intersection(context.dispatcher.referencesForProgram(cell.program), cellIds),
           // `prev` references
-          prevVarId && references(cell.program).has(prevVarId) ? [cellToPrev[cell.var_.id]] : [],
+          prevVarId && context.dispatcher.referencesForProgram(cell.program).has(prevVarId) ? [cellToPrev[cell.var_.id]] : [],
         )
       ] as const
     ))
-  , [cellIds, cellToPrev, cells, prevVarId]), objEqWith(setEqWithRefEq));
+  , [cellIds, cellToPrev, cells, context.dispatcher, prevVarId]), objEqWith(setEqWithRefEq));
   const { sorted, cyclic } = hookDedupe(hookMemo(() => {
     return toposort([...cellIds], interCellReferencesByCell);
   }, [interCellReferencesByCell, cellIds]), recordEqWith({sorted: arrEqWithRefEq<string>, cyclic: setEqWithRefEq<string>}));
@@ -89,7 +91,7 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
         const cell = cellById[cellId];
 
         let cellVarBindings = {...varBindings};
-        for (const varId of references(cell.program)) {
+        for (const varId of context.dispatcher.referencesForProgram(cell.program)) {
           if (cellIds.has(varId)) {
             cellVarBindings[varId] = cellVarBindingCache.get(varId);
           } else if (varId === prevVarId) {
@@ -101,6 +103,7 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
         cellResults[cellId] = hookRunTool({
           program: cell.program,
           varBindings: cellVarBindings,
+          context,
         });
       }));
     });
@@ -134,7 +137,7 @@ export const cellNetwork = hooks((props: CellNetworkProps): Record<string, ToolR
     prevVarBindingCache.done();
 
     return cellResultsWithScope;
-  }, [cellById, cellIds, cellToPrev, cells, cyclic, prevVarId, sorted, varBindings]);
+  }, [cellById, cellIds, cellToPrev, cells, context, cyclic, prevVarId, sorted, varBindings]);
 });
 
 export const collectReferencesForCellNetwork = (cells: Cell[], prevVarId?: string): ReferenceCollection => [

@@ -1,15 +1,16 @@
-import { dispatcher, EngraftPromise, makeVarBindings, references, runTool, toolFromModule, ToolOutput } from "@engraft/core";
+import { EngraftPromise, makeVarBindings, runTool, toolFromModule, ToolOutput } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { updateWithUP } from "@engraft/update-proxy";
 import _ from "lodash";
 import { describe, expect, it } from "vitest";
 import * as slot from "../lib/index.js";
+import { makeTestingContext } from "@engraft/testing-components";
 
 // @vitest-environment happy-dom
 
-const slotTool = toolFromModule(slot);
-dispatcher().registerTool(slotTool);  // we test it embedded in itself
+const context = makeTestingContext();
+context.dispatcher.registerTool(toolFromModule(slot));
 
 describe('slot', () => {
   it('basic code works', () => {
@@ -24,6 +25,7 @@ describe('slot', () => {
             defaultCode: undefined,
           },
           varBindings: empty,
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -43,6 +45,7 @@ describe('slot', () => {
             defaultCode: undefined,
           },
           varBindings: empty,
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -62,6 +65,7 @@ describe('slot', () => {
             defaultCode: undefined,
           },
           varBindings: empty,
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -79,6 +83,7 @@ describe('slot', () => {
         defaultCode: undefined,
       },
       varBindings: empty,
+      context,
     });
     expect(EngraftPromise.state(outputP)).toEqual({status: 'pending'});
     const value = await outputP;
@@ -87,7 +92,7 @@ describe('slot', () => {
 
   it('computes references correctly in code-mode', () => {
     expect(
-      references({
+      context.dispatcher.referencesForProgram({
         toolName: 'slot',
         modeName: 'code',
         code: '1 + 1',
@@ -99,7 +104,7 @@ describe('slot', () => {
     );
 
     expect(
-      references({
+      context.dispatcher.referencesForProgram({
         toolName: 'slot',
         modeName: 'code',
         code: 'IDfox000000 + 1',
@@ -113,7 +118,7 @@ describe('slot', () => {
 
   it('computes references correctly in code-mode with subprograms', () => {
     expect(
-      references({
+      context.dispatcher.referencesForProgram({
         toolName: 'slot',
         modeName: 'code',
         code: '1 + IDsubtool000000',
@@ -135,7 +140,7 @@ describe('slot', () => {
 
   it('computes references correctly in tool-mode', () => {
     expect(
-      references({
+      context.dispatcher.referencesForProgram({
         toolName: 'slot',
         modeName: 'tool',
         subProgram: {
@@ -164,6 +169,7 @@ describe('slot', () => {
             defaultCode: undefined,
           } satisfies slot.Program,
           varBindings: makeVarBindings({IDfox000000: {value: 100}}),
+          context,
         }).outputP
       ),
     ).toEqual(
@@ -184,6 +190,7 @@ describe('slot', () => {
         defaultCode: undefined,
       } satisfies slot.Program,
       varBindings: makeVarBindings({IDfox000000: foxOutputP}),
+      context,
     });
     expect(EngraftPromise.state(outputP)).toEqual({status: 'pending'});
     const value = await outputP;
@@ -218,6 +225,7 @@ describe('slot', () => {
         runTool(memory, {
           program,
           varBindings: empty,
+          context,
         }).outputP
       );
     }
@@ -261,6 +269,7 @@ describe('slot', () => {
             defaultCode: undefined,
           } satisfies slot.Program,
           varBindings: makeVarBindings({IDmoose000000: {value: 100}}),
+          context,
         }).outputP
       ),
     ).toEqual({status: 'fulfilled', value: {value: 105}});
@@ -285,6 +294,7 @@ describe('slot', () => {
       return runTool(memory, {
         program,
         varBindings,
+        context,
       }).outputP
     }
 

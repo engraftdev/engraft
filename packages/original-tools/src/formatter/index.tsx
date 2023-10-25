@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, slotWithCode, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
+import { CollectReferences, defineTool, EngraftContext, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
 import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
@@ -22,10 +22,10 @@ type Program = {
   rootElement: FormatterElement;
 }
 
-const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
+const makeProgram: MakeProgram<Program> = (context, defaultCode?: string) => {
   return {
     toolName: 'formatter',
-    inputProgram: slotWithCode(defaultCode || ''),
+    inputProgram: context.makeSlotWithCode(defaultCode || ''),
     rootElement: {
       id: 'root',
       type: 'element',
@@ -40,22 +40,22 @@ const makeProgram: MakeProgram<Program> = (defaultCode?: string) => {
 const collectReferences: CollectReferences<Program> = (program) => program.inputProgram;
 
 const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => {
-  const { program, varBindings } = props;
-  const inputResult = hookRunTool({ program: program.inputProgram, varBindings })
+  const { program, varBindings, context } = props;
+  const inputResult = hookRunTool({ program: program.inputProgram, varBindings, context })
 
   const outputP: EngraftPromise<ToolOutput> = hookMemo(() => inputResult.outputP.then((inputOutput) => {
     const renderedNode = renderElementToNode(program.rootElement, inputOutput.value, '', false);
     const view = (
       <FormatterContext.Provider value={{ editMode: false }} >
         <style>{builtinStyles}</style>
-        <FormatterNodeView node={renderedNode}/>
+        <FormatterNodeView node={renderedNode} engraftContext={context} />
       </FormatterContext.Provider>
     );
 
     return {
       value: view,
     };
-  }), [inputResult.outputP, program.rootElement]);
+  }), [context, inputResult.outputP, program.rootElement]);
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: (viewProps) =>
@@ -75,7 +75,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 }
 
 const View = memo(function FormatterToolView(props: ViewProps) {
-  const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult } = props;
+  const { program, updateProgram, context, autoFocus, frameBarBackdropElem, inputResult } = props;
   const programUP = useUpdateProxy(updateProgram);
   const { rootElement } = program;
 
@@ -110,6 +110,7 @@ const View = memo(function FormatterToolView(props: ViewProps) {
             selectedNodeId={selection.nodeId}
             rootElementUP={programUP.rootElement}
             rootNode={rootNodeWithGhostsState.value}
+            context={context}
           />
         </div>
       }
@@ -126,7 +127,7 @@ const View = memo(function FormatterToolView(props: ViewProps) {
               setSelection,
             }}
           >
-            <FormatterNodeView node={rootNodeWithGhostsState.value}/>
+            <FormatterNodeView node={rootNodeWithGhostsState.value} engraftContext={context} />
           </FormatterContext.Provider>
         </div>
       }
@@ -139,6 +140,7 @@ type SelectionInspectorProps = {
   selectedNodeId: string,
   rootElementUP: UpdateProxy<FormatterElement>,
   rootNode: FormatterNode,
+  context: EngraftContext,
 }
 
 const SelectionInspector = memo(function SelectionInspector(props: SelectionInspectorProps) {
@@ -222,7 +224,7 @@ const SelectionInspectorForElement = memo(function SelectionInspectorForElement(
 
 
 const SelectionInspectorForText = memo(function SelectionInspectorForText(props: SelectionInspectorProps & { node: FormatterNode }) {
-  const { rootElementUP, node } = props;
+  const { rootElementUP, node, context } = props;
 
   const element = node.element as FormatterElement & { type: 'text' };
 
@@ -241,7 +243,7 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
             if (old.formatProgram) {
               return old;
             } else {
-              return {...old, rawHtml: false, formatProgram: slotWithCode('IDdata000000')};
+              return {...old, rawHtml: false, formatProgram: context.makeSlotWithCode('IDdata000000')};
             }
           } else {
             throw new Error('unreachable');
@@ -249,7 +251,7 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
         }
       )
     )
-  }, [element.id, rootElementUP]);
+  }, [context, element.id, rootElementUP]);
 
   return <>
     <div className="xCol xGap10">
@@ -270,6 +272,7 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
           <ToolWithView
             program={element.formatProgram}
             varBindings={varBindings}
+            context={context}
             updateProgram={(newProgram) => {
               rootElementUP.$apply((rootElement) =>
                 updateById<FormatterElementOf<'text'>>(rootElement, element.id,

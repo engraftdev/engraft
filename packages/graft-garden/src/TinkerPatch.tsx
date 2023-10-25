@@ -1,6 +1,6 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { IsolateStyles, ToolWithView, Value, slotWithCode, useStateUP } from "@engraft/hostkit";
+import { IsolateStyles, ToolWithView, Value, useStateUP } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
@@ -11,6 +11,7 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { Link, useParams } from "react-router-dom";
 import { Patch, patchesRef } from "./db.js";
 import { usePatchState } from "./usePatchState.js";
+import { context } from "./util.js";
 
 const myCss = `
 @media (min-width: 992px) {
@@ -68,7 +69,7 @@ const TinkerPatchLoaded = memo(function TinkerPatchLoaded(props: {
 
   const [ program, programUP ] = useStateUP(() => patch.toolProgram);
 
-  const programIsEmpty = _.isEqual(program, slotWithCode(''));
+  const programIsEmpty = _.isEqual(program, context.makeSlotWithCode(''));
 
   const { varBindings } = usePatchState(patch);
 
@@ -106,6 +107,7 @@ const TinkerPatchLoaded = memo(function TinkerPatchLoaded(props: {
           varBindings={varBindings}
           autoFocus={true}
           expand={true}
+          context={context}
         />
       </ErrorBoundary>
       { programIsEmpty &&

@@ -1,4 +1,4 @@
-import { EngraftPromise, hookRunTool, ShowView, slotWithCode, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
 import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
@@ -45,26 +45,26 @@ export function defineSimpleTool<Name extends string, Fields extends object, Sub
 ): Tool<SimpleToolProgram<Name, Fields, SubToolKey>> {
   return {
     name: simpleToolSpec.name,
-    makeProgram: (defaultInputCode) => (
+    makeProgram: (context, defaultInputCode) => (
       {
         toolName: simpleToolSpec.name,
         fields: simpleToolSpec.fields,
         subTools: Object.fromEntries(
           simpleToolSpec.subTools.map((key, i) =>
-            [key, slotWithCode(i === 0 ? defaultInputCode : undefined)]
+            [key, context.makeSlotWithCode(i === 0 ? defaultInputCode : undefined)]
           )
         ) as Record<SubToolKey, ToolProgram>,
       }
     ),
     collectReferences: (program) => Object.values(program.subTools),
     run: memoizeProps(hooks((props) => {
-      const { program, varBindings } = props;
+      const { program, varBindings, context } = props;
 
       const subToolResults: ToolResult[] = hookDedupe(
         // This loop doesn't need a fork because simpleToolSpec.subTools is constant.
         simpleToolSpec.subTools.map((key) => {
           const subToolProgram = program.subTools[key];
-          return hookRunTool({program: subToolProgram, varBindings});
+          return hookRunTool({program: subToolProgram, varBindings, context});
         }),
         arrEqWithRefEq
       );

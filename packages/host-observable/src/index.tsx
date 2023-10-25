@@ -1,19 +1,17 @@
-import { registerAllTheTools } from '@engraft/all-the-tools';
+import { makeBasicContext } from "@engraft/basic-setup";
+import { EngraftPromise, IsolateStyles, PromiseState, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, VarBinding } from '@engraft/hostkit';
 import { ErrorBoundary } from '@engraft/shared/lib/ErrorBoundary.js';
-import {IsolateStyles, ToolWithView, ToolOutputBuffer, EngraftPromise, PromiseState, slotWithCode, ToolOutput, ToolProgram, VarBinding} from '@engraft/hostkit';
 import { isObject } from '@engraft/shared/lib/isObject.js';
-import { ObservableInspector } from './ObservableInspector.js'
+import { ObservableInspector } from './ObservableInspector.js';
 
 import css from "./index.css?inline";
 
-import React, {isValidElement, memo, useCallback, useEffect, useMemo, useState} from 'react';
+import React, { isValidElement, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import ExtensionBanner from "./ExtensionBanner.js";
 
 // React exports for Observable to use
 export * as ReactDOM from 'react-dom';
 export { React };
-
-registerAllTheTools();
 
 export const RootStyles = memo(function RootStyles(){
   return <style>
@@ -48,8 +46,10 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     return varBindings;
   }, [parameters?.inputs]);
 
+  const [context] = useState(() => makeBasicContext());
+
   const [program, updateProgram] = useState<ToolProgram>(
-      parameters?.program || slotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
+      parameters?.program || context.makeSlotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))
   );
 
   const [editorHidden, setEditorHidden] = useState<boolean>(false)
@@ -83,40 +83,40 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
   }, [reportOutputP]);
 
   return (
-
-      <div>
-        <RootStyles/>
-        <ToolOutputBuffer
-            outputP={outputP}
-            renderValue={(value) => {
-              // TODO: copied from elsewhere
-              let maybeElement = value as object | null | undefined;
-              if (isObject(maybeElement) && isValidElement(maybeElement)) {
-                return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
-              }
-              return <ObservableInspector value={value}/>;
-            }}
-        />
-        { !editorHidden &&
-            <div style={{marginTop: 10}}>
-              <IsolateStyles>
-                <ToolWithView
-                    program={program}
-                    varBindings={varBindings}
-                    updateProgram={updateProgram}
-                    reportOutputP={myReportOutputP}
-                    reportOutputState={reportOutputState}
-                />
-              </IsolateStyles>
-            </div>
-        }
-        <ExtensionBanner
-            extensionDetected={extensionDetected}
-            program={program}
-            version={version}
-            editorHidden={editorHidden} setEditorHidden={setEditorHidden}
-        />
-      </div>
+    <div>
+      <RootStyles/>
+      <ToolOutputBuffer
+          outputP={outputP}
+          renderValue={(value) => {
+            // TODO: copied from elsewhere
+            let maybeElement = value as object | null | undefined;
+            if (isObject(maybeElement) && isValidElement(maybeElement)) {
+              return <ErrorBoundary>{maybeElement}</ErrorBoundary>;
+            }
+            return <ObservableInspector value={value}/>;
+          }}
+      />
+      { !editorHidden &&
+          <div style={{marginTop: 10}}>
+            <IsolateStyles>
+              <ToolWithView
+                  program={program}
+                  varBindings={varBindings}
+                  updateProgram={updateProgram}
+                  reportOutputP={myReportOutputP}
+                  reportOutputState={reportOutputState}
+                  context={context}
+              />
+            </IsolateStyles>
+          </div>
+      }
+      <ExtensionBanner
+          extensionDetected={extensionDetected}
+          program={program}
+          version={version}
+          editorHidden={editorHidden} setEditorHidden={setEditorHidden}
+      />
+    </div>
   );
 });
 

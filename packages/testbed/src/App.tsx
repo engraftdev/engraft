@@ -1,14 +1,14 @@
-import { registerAllTheTools } from "@engraft/all-the-tools";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import appCss from "./App.css?inline";
 import { examples } from "./examples/index.js";
-import { EngraftPromise, IsolateStyles, ShowView, ToolOutputView, ToolProgram, ValueEditable, VarBinding, getFullToolIndex, lookUpToolByName, runTool, slotWithProgram, useRefunction } from "@engraft/hostkit";
+import { EngraftPromise, IsolateStyles, ShowView, ToolOutputView, ToolProgram, ValueEditable, VarBinding, runTool, useRefunction } from "@engraft/hostkit";
+import { makeBasicContext } from "@engraft/basic-setup";
 
-registerAllTheTools();
+const context = makeBasicContext();
 
-const defaultProgram = lookUpToolByName('slot').makeProgram();
+const defaultProgram = context.dispatcher.lookUpToolByName('slot').makeProgram(context);
 
 function varBindingsObject(varBindings: VarBinding[]) {
   return Object.fromEntries(varBindings.map((varBinding) => [varBinding.var_.id, varBinding]));
@@ -87,10 +87,10 @@ const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
       {' '}
       <select value='none' onChange={(ev) => {
           incrementVersion();
-          setProgram(slotWithProgram(lookUpToolByName(ev.target.value).makeProgram()));
+          setProgram(context.makeSlotWithProgram(context.dispatcher.lookUpToolByName(ev.target.value).makeProgram(context)));
         }}>
         <option value='none' disabled={true}>Load tool...</option>
-        {Object.keys(getFullToolIndex()).map((name) =>
+        {Object.keys(context.dispatcher.getFullToolIndex()).map((name) =>
           <option key={name} value={name}>{name}</option>
         )}
       </select>
@@ -124,7 +124,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
   ]), []);
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings });
+  const {outputP, view} = useRefunction(runTool, { program, varBindings, context });
 
   const [showTool, setShowTool] = useState(true);
   const [showOutput, setShowOutput] = useState(false);

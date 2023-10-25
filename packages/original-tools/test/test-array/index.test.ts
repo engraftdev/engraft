@@ -1,15 +1,16 @@
 import { EngraftPromise, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { TestingKnownOutput, registerTestingComponents } from "@engraft/testing-components";
+import { TestingKnownOutput, makeTestingContext } from "@engraft/testing-components";
 import { updateWithUP } from "@engraft/update-proxy";
 import { describe, expect, it } from "vitest";
 import * as TestArray from "../../lib/test-array/index.js";
 
 // @vitest-environment happy-dom
 
+const context = makeTestingContext();
 const testArrayTool = toolFromModule(TestArray);
-registerTestingComponents();
+context.dispatcher.registerTool(testArrayTool);
 
 describe('test-array', () => {
   it('output basically works; no unnecessary runs of subtools', () => {
@@ -37,6 +38,7 @@ describe('test-array', () => {
         testArrayTool.run(memory, {
           program,
           varBindings: empty,
+          context,
         }).outputP
       );
     }

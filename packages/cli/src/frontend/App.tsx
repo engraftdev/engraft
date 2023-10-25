@@ -1,13 +1,10 @@
-import { registerAllTheTools } from "@engraft/all-the-tools";
-import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState} from "@engraft/hostkit";
+import { EngraftPromise, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, usePromiseState } from "@engraft/hostkit";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
+import { makeContext, valueFromStdin, valueToStdout, varBindingsObject } from "../shared.js";
 import appCss from "./App.css?inline";
-
-registerAllTheTools();
 
 const App = memo(function App({safeMode = false}: {safeMode?: boolean}) {
   useEffect(() => {
@@ -119,6 +116,8 @@ type AppWithRunningProgramProps = {
 const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWithRunningProgramProps) {
   const {program, updateProgram, stdin, jsonOnly} = props;
 
+  const [context] = useState(() => makeContext());
+
   const inputP = useMemo(() => valueFromStdin(stdin), [stdin]);
 
   const varBindings = useMemo(() => varBindingsObject([
@@ -146,7 +145,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
       throw new Error(`Error saving program: ${resp.status} ${resp.statusText}`);
     }
   };
-  
+
   const saveStdout = stdoutState.status === 'fulfilled' && (async () => {
     console.log('saving stdout', stdoutState.value.value)
     const resp = await fetch('/api/stdout', {
@@ -179,6 +178,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
           varBindings={varBindings}
           autoFocus={true}
           expand={true}
+          context={context}
         />
       </ErrorBoundary>
     </div>
