@@ -1,11 +1,13 @@
 import { EngraftPromise, ToolOutput } from "@engraft/core";
-import { makeSlotWithCode } from "@engraft/tool-slot";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { useEngraft } from "../lib/index.js";
-import { TestingKnownOutput } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { makeSlotWithCode } from "@engraft/tool-slot";
 
 // @vitest-environment happy-dom
+
+const context = makeTestingContext();
 
 describe('useEngraft', () => {
   it('basically works', () => {
@@ -14,6 +16,21 @@ describe('useEngraft', () => {
         toolName: 'testing-known-output',
         outputP: EngraftPromise.resolve({value: 10}),
       } satisfies TestingKnownOutput.Program;
+      const value = useEngraft({
+        program: { savedProgramId: 'IDx000000', program },
+        defaultValue: 20,
+        context,
+      });
+      return <div>{value}</div>;
+    };
+
+    const testRenderer = TestRenderer.create(<MyComponent />);
+    expect(testRenderer.toJSON()).toEqual({type: 'div', props: {}, children: ['10']});
+  });
+
+  it('provides default context with basic tools if no context is provided', () => {
+    const MyComponent = (props: {}) => {
+      const program = makeSlotWithCode('10');
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,
@@ -27,11 +44,16 @@ describe('useEngraft', () => {
 
   it('can read an incoming var', () => {
     const MyComponent = (props: {}) => {
-      const program = makeSlotWithCode('IDx000000');
+      const program = {
+        toolName: 'testing-refs-func',
+        refs: ['IDx000000'],
+        func: ([xOutput]) => xOutput,
+      } satisfies TestingRefsFunc.Program;
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         inputs: { x: 10 },
         defaultValue: 20,
+        context,
       });
       return <div>{value}</div>;
     };
@@ -49,6 +71,7 @@ describe('useEngraft', () => {
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,
+        context,
       });
       return <div>{value}</div>;
     };
@@ -67,6 +90,7 @@ describe('useEngraft', () => {
       const value = useEngraft({
         program: { savedProgramId: 'IDx000000', program },
         defaultValue: 20,
+        context,
       });
       return <div>{value}</div>;
     };
