@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 env:
   # avoid "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"
