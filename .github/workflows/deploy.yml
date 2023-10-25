@@ -12,6 +12,7 @@ permissions:
 env:
   # avoid "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"
   NODE_OPTIONS: "--max_old_space_size=8192"
+  NX_REJECT_UNKNOWN_LOCAL_CACHE: "0"
 
 jobs:
   build-and-deploy:
