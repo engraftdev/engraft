@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 env:
   # avoid "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"
   NODE_OPTIONS: "--max_old_space_size=8192"
@@ -44,7 +47,7 @@ jobs:
       - name: Build use-engraft-demo-js
         run: npx lerna run build-app --scope @engraft/use-engraft-demo-js
 
-      - name: Assemble output
+      - name: Assemble built output into website
         run: |
           mv packages/testbed/dist website/testbed
           mv packages/graft-garden/dist website/graft-garden
