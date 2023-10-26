@@ -1497,6 +1497,11 @@
   resolved "https://registry.npmjs.org/@emotion/weak-memoize/-/weak-memoize-0.3.0.tgz"
   integrity sha512-AHPmaAx+RYfZz0eYu6Gviiagpmiyw98ySSlQvCUhVGDRtDFe4DBS0x1bSjdF3gqUDYOczB+yYvBTtEylYSdRhg==
 
+"@engraft/eslint-plugin-refunc-hooks@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@engraft/eslint-plugin-refunc-hooks/-/eslint-plugin-refunc-hooks-0.0.1.tgz#aa234319e2ec416d3891a250c51a2b54603f7b93"
+  integrity sha512-rGOlc2ifGkt2f4kGtgs8hOmnq1eNY0VfUkvs1lJ9/ayS3nQG60R9STbDJPU33txSCL4V19I50hzEETKq8H/kSg==
+
 "@esbuild/android-arm64@0.17.18":
   version "0.17.18"
   resolved "https://registry.yarnpkg.com/@esbuild/android-arm64/-/android-arm64-0.17.18.tgz#4aa8d8afcffb4458736ca9b32baa97d7cb5861ea"
