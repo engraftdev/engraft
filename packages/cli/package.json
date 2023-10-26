@@ -1,6 +1,6 @@
 {
   "name": "@engraft/cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Command-line tool to run Engraft tools",
   "bin": {
     "engraft": "./lib/run.js"
@@ -21,10 +21,10 @@
     "dev": "vite --config ../../vite.config.ts"
   },
   "dependencies": {
-    "@engraft/basic-setup": "^0.0.1",
-    "@engraft/hostkit": "^0.0.1",
-    "@engraft/pyodide": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
+    "@engraft/basic-setup": "^0.0.2",
+    "@engraft/hostkit": "^0.0.2",
+    "@engraft/pyodide": "^0.0.2",
+    "@engraft/shared": "^0.0.2",
     "@happy-dom/global-registrator": "^8.9.0",
     "express": "^4.18.2",
     "react": "^18.0.0",

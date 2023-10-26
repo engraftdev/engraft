@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-text",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "Engraft tool for plain text",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/codemirror-helpers": "^0.0.1",
-    "@engraft/toolkit": "^0.0.1"
+    "@engraft/codemirror-helpers": "^0.0.2",
+    "@engraft/toolkit": "^0.0.2"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

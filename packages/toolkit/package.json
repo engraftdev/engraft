@@ -1,6 +1,6 @@
 {
   "name": "@engraft/toolkit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "A bundle of libraries needful or helpful for defining Engraft tools",
   "publishConfig": {
@@ -16,11 +16,11 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.1",
-    "@engraft/core-widgets": "^0.0.1",
-    "@engraft/refunc-react": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
-    "@engraft/update-proxy-react": "^0.0.1",
+    "@engraft/core": "^0.0.2",
+    "@engraft/core-widgets": "^0.0.2",
+    "@engraft/refunc-react": "^0.0.2",
+    "@engraft/shared": "^0.0.2",
+    "@engraft/update-proxy-react": "^0.0.2",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {

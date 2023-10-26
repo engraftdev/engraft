@@ -1,6 +1,6 @@
 {
   "name": "@engraft/use-engraft",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "A React hook for embedding Engraft tools",
   "publishConfig": {
@@ -16,15 +16,15 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/basic-setup": "^0.0.1",
-    "@engraft/hostkit": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
+    "@engraft/basic-setup": "^0.0.2",
+    "@engraft/hostkit": "^0.0.2",
+    "@engraft/shared": "^0.0.2",
     "idb-keyval": "^6.2.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@types/wicg-file-system-access": "^2020.9.5",
-    "@engraft/testing-components": "^0.0.1"
+    "@engraft/testing-components": "^0.0.2",
+    "@types/wicg-file-system-access": "^2020.9.5"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

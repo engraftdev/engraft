@@ -1,6 +1,6 @@
 {
   "name": "@engraft/pyodide",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "Pyodide integration for Engraft",
   "publishConfig": {

@@ -1,6 +1,6 @@
 {
   "name": "@engraft/host-observable",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "A library for embedding Engraft in Observable",
   "type": "module",
@@ -14,10 +14,10 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@engraft/basic-setup": "^0.0.1",
-    "@engraft/core": "^0.0.1",
-    "@engraft/hostkit": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
+    "@engraft/basic-setup": "^0.0.2",
+    "@engraft/core": "^0.0.2",
+    "@engraft/hostkit": "^0.0.2",
+    "@engraft/shared": "^0.0.2",
     "@observablehq/inspector": "^5.0.0",
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
     "react-dom": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

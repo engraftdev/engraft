@@ -1,6 +1,6 @@
 {
   "name": "@engraft/core-widgets",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "Some common React components. TODO: is this a real thing?",
   "publishConfig": {
@@ -16,9 +16,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.1",
-    "@engraft/shared": "^0.0.1",
-    "@engraft/update-proxy-react": "^0.0.1",
+    "@engraft/core": "^0.0.2",
+    "@engraft/shared": "^0.0.2",
+    "@engraft/update-proxy-react": "^0.0.2",
     "react-inspector": "^6.0.1",
     "react-merge-refs": "^2.0.1"
   },

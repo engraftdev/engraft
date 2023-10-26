@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-map",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "Engraft tool for mapping an array or object",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.1",
-    "@engraft/toolkit": "^0.0.1",
+    "@engraft/shared": "^0.0.2",
+    "@engraft/toolkit": "^0.0.2",
     "lodash": "^4.17.21",
     "react-dom": "^18.2.0"
   },
