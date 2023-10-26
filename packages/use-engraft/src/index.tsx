@@ -9,7 +9,7 @@ import * as IDBKV from 'idb-keyval';
 import _ from "lodash";
 import React, { ReactNode, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import css from "./index.css?inline";
+import css from "./index.css.js";
 
 export type SavedProgram = {
   savedProgramId: string,

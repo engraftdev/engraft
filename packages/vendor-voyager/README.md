@@ -12,3 +12,5 @@ Note: For this package to compile with Vite, we need to add it to the `optimizeD
       ]
     }
 ```
+
+Also note that Voyager's styles have been moved to `@engraft/tool-voyager` because it was too much trouble to keep them here (ES vs CJS issues).

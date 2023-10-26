@@ -21,9 +21,6 @@
     "noEmit": true,
     "declaration": true,
     "declarationMap": true,
-    "types": [
-      "vite/client"
-    ],
     "incremental": true
   }
 }

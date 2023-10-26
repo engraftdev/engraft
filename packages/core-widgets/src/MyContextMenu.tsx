@@ -1,5 +1,5 @@
 import { memo } from "react";
-import myContextMenuCss from "./MyContextMenu.css?inline";
+import myContextMenuCss from "./MyContextMenu.css.js";
 
 export const MyContextMenu = memo(function MyContextMenu(props: { children: React.ReactNode }) {
   const { children } = props;

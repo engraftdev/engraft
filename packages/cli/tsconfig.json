@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [ "src" ],
+  "include": [ "src", "../../types/lib.d.ts" ],
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "lib"
+    "outDir": "lib",
+    "types": [
+      "vite/client"
+    ]
   }
 }

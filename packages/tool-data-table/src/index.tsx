@@ -11,7 +11,7 @@ import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Column, DataFrame, ValueType, inferDataFrameFromRows } from "./data-frame.js";
-import style from './style.css?inline';
+import style from './style.css.js';
 import { Filter, FilterType, Transforms, applyTransformsExceptSelect, applyTransformsJustSelect, filterTypes, filterTypesByValueType } from "./transforms.js";
 
 /*

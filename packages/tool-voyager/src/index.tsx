@@ -2,7 +2,7 @@ import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
 import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
-import voyagerStyle from "@engraft/vendor-voyager/src/style.css?inline";
+import voyagerStyle from "./voyager-style.css.js";
 import _ from "lodash";
 import { memo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";

@@ -7,7 +7,7 @@ import { UpdateProxy } from '@engraft/update-proxy';
 import { useUpdateProxy } from '@engraft/update-proxy-react';
 import { memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import builtinStyles from './builtin.css?inline';
+import builtinStyles from './builtin.css.js';
 import { FormatterContext, FormatterElement, FormatterElementOf, FormatterNode, FormatterNodeView, FormatterSelection, makeVarBindingsForData, renderElementToNode } from "./elements-and-nodes.js";
 import { getById, updateById } from "./id.js";
 
