@@ -11,10 +11,21 @@
   <link rel="stylesheet" href="tufte.css"/>
 
   <style>
+    h1 {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
     .logo {
       width: 100px;
-      vertical-align: bottom;
     }
+
+    /* @media (min-width: 1000px) {
+      h1 {
+        margin-left: -110px;
+      }
+    } */
 
     @media (prefers-color-scheme: dark) {
       .logo {
@@ -22,28 +33,8 @@
       }
     }
 
-    ul {
-      margin-block-start: 0;
-      margin-block-end: 0;
-    }
-
-    section {
-      padding-left: 100px;
-    }
-
-    section > dl,
-    section > ol,
-    section > ul {
-      -webkit-padding-start: 45px;
-      width: calc(55% - 45px);
-    }
-
-    @media (max-width: 760px) {
-      section > dl,
-      section > ol,
-      section > ul {
-          width: 90%;
-      }
+    .indent {
+      margin-left: 1em;
     }
   </style>
 </head>
@@ -52,15 +43,32 @@
   <article>
     <h1>
       <img src="logo.png" class="logo"/>
-      Engraft
+      <span>Engraft</span>
     </h1>
     <section>
+      <p>
+        Engraft is an API that makes live & rich programming interfaces powerful and practical through composition.
+      </p>
+      <p>
+        <img src="engraft-architecture.png"/>
+      </p>
+    </section>
+    <section>
+      <h2>Source code</h2>
+      <p>
+        Engraft is being developed on <a href="https://github.com/engraftdev/engraft">GitHub</a>.
+        Documentation is currently limited.
+        If you are interested in integrating Engraft into your project, please <a href="mailto:joho@uw.edu">get in touch</a>.
+      </p>
+    </section>
+    <section>
+      <h2>Web applications</h2>
       <ul>
         <li>
-          <a href="./testbed">Testbed</a>
+          <a href="./graft-garden">Graft Garden</a> - a simple host for web applications made with Engraft
         </li>
         <li>
-          <a href="./graft-garden">Graft Garden</a>
+          <a href="./testbed">Testbed</a> - our development testbed
         </li>
         <li>
           Demos of useEngraft:
@@ -70,11 +78,25 @@
           <li><a href="./use-engraft-demo-js">Synonymizer (in JavaScript)</a></li>
         </ul>
       </ul>
-      <p>
-        <small>
-          This work is currently in submission. Please do not share publicly. Thanks!
-        </small>
-      </p>
+    </section>
+    <section>
+      <h2>Publications</h2>
+      <ul>
+        <li>
+          <i>Engraft: An API for Live, Rich, and Composable Programming</i>
+          <div class="indent">Joshua Horowitz & Jeffrey Heer, UIST 2023</div>
+          <div class="indent">
+            <a href="./engraft-uist-2023.pdf">Paper</a>, <a href="https://www.youtube.com/watch?v=cOTbOsHKgJc">Video (30 sec)</a>, <a href="https://www.youtube.com/watch?v=Xbza8XULDMw">Video (5 min)</a>
+          </div>
+        </li>
+        <li>
+          <i>Live, Rich, and Composable: Qualities for Programming Beyond Static Text</i>
+          <div class="indent">Joshua Horowitz & Jeffrey Heer, PLATEAU 2023</div>
+          <div class="indent">
+            <a href="https://arxiv.org/pdf/2303.06777.pdf">Paper</a>
+          </div>
+        </li>
+      </ul>
     </section>
   </article>
 </body>
