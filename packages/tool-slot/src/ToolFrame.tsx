@@ -16,8 +16,6 @@ export type ToolFrameProps = {
   context: EngraftContext,
 }
 
-const SOFT_STYLE = false as boolean;
-
 export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
   const {children, expand, program, updateProgram, onClose, varBindings, context, setFrameBarBackdropElem} = props;
 
@@ -26,10 +24,9 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
   return <div
     className={`ToolFrame ${!expand ? 'xWidthFitContent' : ''}`}
     style={{
-      ...!SOFT_STYLE && {border: '1px solid #c4c4ff'},
+      border: '1px solid #c4c4ff',
       position: "relative", display: 'flex', flexDirection: 'column', boxSizing: 'border-box',
       maxWidth: '100%',
-      ...SOFT_STYLE && {borderRadius: 5, boxShadow: '0px 0px 5px 0px #c4c4ff'},
     }}
   >
     <Use hook={useHover} children={([hoverRef, isHovered]) => {
@@ -67,7 +64,6 @@ export const ToolFrame = memo(function ToolFrame(props: ToolFrameProps) {
             position: 'relative',
             // paddingLeft: 5, paddingRight: 2, background: '#e4e4ff', borderBottomLeftRadius: 5
             paddingLeft: 2, paddingRight: 5, background: '#e4e4ff', borderBottomRightRadius: 5,
-            ...SOFT_STYLE && {borderTopLeftRadius: 5},
             userSelect: 'none', lineHeight: '15px',
           }}>
             {program.toolName}
