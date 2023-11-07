@@ -24,6 +24,8 @@ const myCss = `
 }
 `
 
+const LinkMemo = memo(Link);
+
 export const TinkerPatch = memo(function TinkerPatch() {
   const params = useParams();
   const patchId = params.patchId;
@@ -80,6 +82,7 @@ const TinkerPatchLoaded = memo(function TinkerPatchLoaded(props: {
           value={patch!.name}
           placeholder="patch name"
           disabled/>
+        <LinkMemo to='../view' className="btn btn-outline-primary btn-lg">view</LinkMemo>
       </div>
     </div>
     <div className="tool-wrapper mx-auto mt-5">
