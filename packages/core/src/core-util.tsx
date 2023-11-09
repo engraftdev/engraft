@@ -1,6 +1,8 @@
 import { ReactNode, memo, useContext, useMemo } from 'react';
 import { ShowView } from './ShowView.js';
-import { Tool, ToolProgram, ToolResult, ToolViewContext, ToolViewRenderProps, VarBindings } from './core.js';
+import { Tool, ToolProgram, ToolProps, ToolResult, ToolViewContext, ToolViewRenderProps, VarBindings } from './core.js';
+import { hookMemo } from '@engraft/refunc';
+import { hookRunTool } from './runTool.js';
 
 export type ProgramOf<T> = T extends Tool<infer P> ? P : never;
 // alt: Parameters<T['run']>[1]['program'];
@@ -41,3 +43,16 @@ const ShowViewWithScopeNoMemo = function <P extends ToolProgram>(props: ShowView
 };
 
 export const ShowViewWithScope = memo(ShowViewWithScopeNoMemo) as typeof ShowViewWithScopeNoMemo;
+
+export function hookRunToolWithNewVarBindings<P extends ToolProgram>(
+  props: ToolProps<P> & { newVarBindings: VarBindings }
+): ToolResultWithScope<P> {
+  const allVarBindings = hookMemo(() => ({
+    ...props.varBindings,
+    ...props.newVarBindings,
+  }), [props.varBindings, props.newVarBindings]);
+
+  const result = hookRunTool({...props, varBindings: allVarBindings});
+
+  return { result, newScopeVarBindings: props.newVarBindings };
+}

@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, newVar, runTool } from "@engraft/core";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, hookRunToolWithNewVarBindings, newVar, runTool } from "@engraft/core";
 import { ToolOutputView } from "@engraft/core-widgets";
 import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
 import { useRefunction } from "@engraft/refunc-react";
@@ -91,17 +91,12 @@ const runSimulation = memoizeProps(hooks((props: RunSimulationProps) => {
     const onTickResultsWithScope: ToolResultWithScope[] = [];
     let lastOutputP = initOutputP;
     for (let i = 0; i < ticksCount; i++) {
-      // TODO: memoize?
-      const newVarBindings = {
-        [program.stateVar.id]: { var_: program.stateVar, outputP: lastOutputP },
-      };
-      const varBindingsWithState = {
-        ...varBindings,
-        ...newVarBindings,
-      };
+      const currentLastOutputP = lastOutputP;  // TypeScript doesn't like the ref in the function below
       const onTickResultWithScope = branch(`${i}`, () => {
-        const result = hookRunTool({ program: program.onTickProgram, varBindings: varBindingsWithState, context });
-        return { result, newScopeVarBindings: newVarBindings };
+        const newVarBindings = hookMemo(() => ({
+          [program.stateVar.id]: { var_: program.stateVar, outputP: currentLastOutputP },
+        }), [currentLastOutputP, program.stateVar]);
+        return hookRunToolWithNewVarBindings({ program: program.onTickProgram, varBindings, newVarBindings, context });
       });
       onTickResultsWithScope.push(onTickResultWithScope);
       lastOutputP = onTickResultWithScope.result.outputP;

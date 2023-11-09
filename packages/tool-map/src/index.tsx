@@ -1,6 +1,6 @@
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookRunToolWithNewVarBindings, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -61,14 +61,9 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
                 [itemKeyVar.id]: {var_: itemKeyVar, outputP: EngraftPromise.resolve({value: key})},
               }
             }), [program.itemVar, inputElem, itemKeyVar, key]);
-            const itemVarBindings: VarBindings = hookMemo(() => ({
-              ...varBindings,
-              ...newVarBindings,
-            }), [varBindings, newVarBindings]);
-            const result = hookRunTool(
-              {program: program.perItemProgram, varBindings: itemVarBindings, context}
-            )
-            return { result, newScopeVarBindings: newVarBindings };
+            return hookRunToolWithNewVarBindings(
+              {program: program.perItemProgram, varBindings, newVarBindings, context}
+            );
           })
         )
       )

@@ -1,7 +1,7 @@
 /// <reference types="@types/wicg-file-system-access" />
 
-import { EngraftContext, EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, randomId, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
 import { makeBasicContext } from "@engraft/basic-setup";
+import { EngraftContext, EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, hookRunToolWithNewVarBindings, hooks, randomId, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
@@ -25,6 +25,8 @@ export type UseEngraftProps = {
 }
 
 const defaultContext = makeBasicContext();
+
+const empty = {};
 
 export function useEngraft(props: UseEngraftProps) {
   const {program, inputs, defaultValue, edit, context = defaultContext} = props;
@@ -65,15 +67,10 @@ export function useEngraft(props: UseEngraftProps) {
     program || { savedProgramId: randomId(), program: context.makeSlotWithCode(defaultCodeFromInputs(stableInputs)) }
   );
 
-  const result = useRefunction(
-    runTool,
-    { program: draft.program, varBindings, context },
+  const resultWithScope = useRefunction(hooks(hookRunToolWithNewVarBindings),
+    { program: draft.program, varBindings: empty, newVarBindings: varBindings, context },
   );
-  const resultWithScope: ToolResultWithScope = useMemo(
-    () => ({ result, newScopeVarBindings: varBindings }),
-    [result, varBindings],
-  );
-  const outputState = usePromiseState(result.outputP);
+  const outputState = usePromiseState(resultWithScope.result.outputP);
 
   const [useDefault, setUseDefault] = useState(!!edit);
 
