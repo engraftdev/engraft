@@ -1,10 +1,10 @@
 import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks } from "@engraft/refunc/lib/index.js";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { ToolProgram, ToolProps, ToolResult as ToolResults, VarBindings } from "./core.js";
+import { ToolProgram, ToolProps, ToolResult, VarBindings } from "./core.js";
 
 export function hookRunTool<P extends ToolProgram>(
   props: ToolProps<P>
-): ToolResults<P> {
+): ToolResult<P> {
   const toolName = props.program.toolName;
   const tool = props.context.dispatcher.lookUpToolByProgram(props.program);
 
