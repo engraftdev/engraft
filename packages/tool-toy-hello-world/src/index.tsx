@@ -1,14 +1,14 @@
-import { EngraftPromise, Tool, ToolView, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { EngraftPromise, ToolView, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
-export type Program = {
-  toolName: 'hello-world',
+type Program = {
+  toolName: 'toy-hello-world',
 }
 
-export const tool: Tool<Program> = {
-  name: 'hello-world',
+export default defineTool<Program>({
+  name: 'toy-hello-world',
 
-  makeProgram: (_defaultInputCode) => ({
-    toolName: 'hello-world',
+  makeProgram: () => ({
+    toolName: 'toy-hello-world',
   }),
 
   collectReferences: (_program) => [],
@@ -24,4 +24,4 @@ export const tool: Tool<Program> = {
 
     return { outputP, view };
   })),
-};
+});

@@ -1,0 +1,24 @@
+{
+  "name": "@engraft/tool-toy-hello-world",
+  "version": "0.0.2",
+  "license": "MIT",
+  "description": "Toy Engraft tool that says hello",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build-lib": "tsc && node ../../scripts/css-to-js.cjs src lib",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dependencies": {
+    "@engraft/toolkit": "^0.0.2"
+  },
+  "peerDependencies": {
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+  }
+}
