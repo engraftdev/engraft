@@ -35,6 +35,7 @@
     "@engraft/tool-toy-adder": "^0.0.2",
     "@engraft/tool-toy-adder-simple": "^0.0.2",
     "@engraft/tool-toy-hello-world": "^0.0.2",
+    "@engraft/tool-toy-hello-world-vanilla": "^0.0.2",
     "@engraft/tool-value": "^0.0.2",
     "@engraft/tool-voyager": "^0.0.2"
   }

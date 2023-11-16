@@ -17,6 +17,7 @@ import Text from "@engraft/tool-text";
 import ToyAdder from "@engraft/tool-toy-adder";
 import ToyAdderSimple from "@engraft/tool-toy-adder-simple";
 import ToyHelloWorld from "@engraft/tool-toy-hello-world";
+import ToyHelloWorldVanilla from "@engraft/tool-toy-hello-world-vanilla";
 import Value from "@engraft/tool-value";
 import Voyager from "@engraft/tool-voyager";
 
@@ -39,6 +40,7 @@ const tools: Tool[] = [
   forgetP(toolFromModule(ToyAdder)),
   forgetP(toolFromModule(ToyAdderSimple)),
   forgetP(toolFromModule(ToyHelloWorld)),
+  forgetP(toolFromModule(ToyHelloWorldVanilla)),
   forgetP(toolFromModule(Value)),
   forgetP(toolFromModule(Voyager)),
   ...originalTools,
