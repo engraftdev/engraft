@@ -1,7 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolOutput, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { useCommonWidth } from "@engraft/toolkit";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, useCommonWidth, useUpdateProxy } from "@engraft/toolkit";
 import * as d3dsv from "d3-dsv";
 import { memo, useState } from "react";
 import { RowToCol } from "./RowToCol.js";
@@ -100,13 +97,14 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   ), [urlResult.outputP, paramsResult.outputP, program.pauseRequest, program.useCorsProxy, program.forceText]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) =>
-        <View
-          {...props}
-          {...renderProps}
-          urlView={urlResult.view}
-          paramsView={paramsResult.view}
-        />,
+    render: renderWithReact((renderProps) =>
+      <View
+        {...props}
+        {...renderProps}
+        urlView={urlResult.view}
+        paramsView={paramsResult.view}
+      />
+    ),
   }), [props, urlResult.view, paramsResult.view]);
 
   return { view, outputP };

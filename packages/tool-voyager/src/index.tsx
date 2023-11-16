@@ -1,6 +1,6 @@
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, renderWithReact, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { Action, buildSchema, configureStore, renderVoyager, selectMainSpec } from "@engraft/vendor-voyager";
 import voyagerStyle from "./voyager-style.css.js";
 import _ from "lodash";
@@ -34,11 +34,12 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   }, []);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (viewProps) =>
+    render: renderWithReact((viewProps) =>
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
-      />,
+      />
+    ),
     showsOwnOutput: true,
   }), [inputResult, props]);
 

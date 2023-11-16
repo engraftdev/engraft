@@ -18,6 +18,7 @@
   "dependencies": {
     "@engraft/core": "^0.0.2",
     "@engraft/core-widgets": "^0.0.2",
+    "@engraft/react": "^0.0.2",
     "@engraft/refunc-react": "^0.0.2",
     "@engraft/shared": "^0.0.2",
     "@engraft/update-proxy-react": "^0.0.2",

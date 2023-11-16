@@ -1,6 +1,6 @@
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoize, memoizeProps, newVar, randomId, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoize, memoizeProps, newVar, randomId, renderWithReact, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
 import { Closure, argValueOutputPsToVarBindings, closureToAsyncFunction, closureToSyncFunction } from "./closure.js";
 
@@ -58,8 +58,9 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   }, [syncFunction]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) =>
+    render: renderWithReact((renderProps) =>
       <View {...props} {...renderProps} syncFunction={syncFunction}/>
+    )
   }), [props, syncFunction]);
 
   return {outputP, view};

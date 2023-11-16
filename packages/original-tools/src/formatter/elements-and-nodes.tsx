@@ -1,10 +1,8 @@
-import { EngraftContext, EngraftPromise, runTool, ToolProgram, Var, VarBindings } from "@engraft/core";
-import { ToolOutputBuffer } from "@engraft/core-widgets";
-import { useRefunction } from "@engraft/refunc-react";
 import { ErrorBoundary } from "@engraft/shared/lib/ErrorBoundary.js";
 import { identity } from "@engraft/shared/lib/noOp.js";
 import { Use } from "@engraft/shared/lib/Use.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
+import { EngraftContext, EngraftPromise, runTool, ToolOutputBuffer, ToolProgram, useRefunction, Var, VarBindings } from "@engraft/toolkit";
 import { createContext, CSSProperties, memo, ReactNode, useContext, useMemo } from "react";
 import { hashId, updateById } from "./id.js";
 

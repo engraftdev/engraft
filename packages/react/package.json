@@ -1,8 +1,8 @@
 {
-  "name": "@engraft/core-widgets",
+  "name": "@engraft/react",
   "version": "0.0.2",
   "license": "MIT",
-  "description": "Some common React components.",
+  "description": "Basic utilities for working with Engraft in React",
   "publishConfig": {
     "access": "public"
   },
@@ -17,13 +17,10 @@
   "type": "module",
   "dependencies": {
     "@engraft/core": "^0.0.2",
-    "@engraft/react": "^0.0.2",
-    "@engraft/shared": "^0.0.2",
-    "@engraft/update-proxy-react": "^0.0.2",
-    "react-inspector": "^6.0.1",
-    "react-merge-refs": "^2.0.1"
+    "@engraft/refunc": "^0.0.2"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
+    "react-dom": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
   }
 }

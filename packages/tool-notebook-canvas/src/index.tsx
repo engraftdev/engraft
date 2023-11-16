@@ -1,7 +1,7 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, renderWithReact, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -65,7 +65,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [cellResultsWithScope, cells]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...renderProps} {...props} cellResults={cellResultsWithScope} />,
+    render: renderWithReact((renderProps) => <View {...renderProps} {...props} cellResults={cellResultsWithScope} />),
     showsOwnOutput: cells.length > 0,
   }), [cells.length, props, cellResultsWithScope]);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { EngraftPromise, PromiseState } from "./EngraftPromise.js";
+import { EngraftPromise, PromiseState } from "@engraft/core";
 
 export function usePromiseState<T>(promise: EngraftPromise<T>): PromiseState<T> {
   const [state, setState] = useState<PromiseState<T>>(() => EngraftPromise.state(promise));

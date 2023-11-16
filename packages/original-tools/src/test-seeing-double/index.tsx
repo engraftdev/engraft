@@ -1,6 +1,4 @@
-import { hookRunTool, ShowView, Tool, ToolProgram, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, ShowView, Tool, ToolProgram, ToolView, UseUpdateProxy } from "@engraft/toolkit";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 
 export type Program = {
@@ -28,7 +26,7 @@ export const tool: Tool<Program> = {
     const outputP = subOutputP;
 
     const view: ToolView<Program> = hookMemo(() => ({
-      render: ({updateProgram}) =>
+      render: renderWithReact(({updateProgram}) =>
         <UseUpdateProxy updater={updateProgram} children={(programUP) =>
           <div className="xCol xGap10 xPad10">
             <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
@@ -48,6 +46,7 @@ export const tool: Tool<Program> = {
             </div>
           </div>
         } />
+      ),
     }), [program.subProgram, program.rerenderOnProgramChange, subView]);
 
     return { outputP, view };

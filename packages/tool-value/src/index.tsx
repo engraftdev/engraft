@@ -1,4 +1,4 @@
-import { CollectReferences, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, renderWithReact, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -20,7 +20,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const subResult = hookRunTool({program: program.subProgram, varBindings, context});
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...props} {...renderProps} subResult={subResult} />,
+    render: renderWithReact((renderProps) => <View {...props} {...renderProps} subResult={subResult} />),
     showsOwnOutput: true,
   }), [props, subResult]);
 

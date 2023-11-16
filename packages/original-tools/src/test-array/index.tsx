@@ -1,7 +1,5 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView } from "@engraft/core";
-import { hookFork, hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { arrEqWithRefEq } from "@engraft/shared/lib/eq.js";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, defineTool, EngraftPromise, hookFork, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolProgram, ToolProps, ToolView, UseUpdateProxy } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'test-array',
@@ -45,7 +43,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   , subToolOutputPs, arrEqWithRefEq);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram}) =>
+    render: renderWithReact(({updateProgram}) =>
       <UseUpdateProxy updater={updateProgram} children={(programUP) =>
         <div className="ArrayTool">
           {subToolViews.map((view, i) =>
@@ -53,6 +51,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           )}
         </div>
       } />
+    ),
   }), subToolViews, arrEqWithRefEq);
 
   return { outputP, view };

@@ -1,8 +1,9 @@
-import { memo, useEffect } from "react";
+import { EngraftPromise, PromiseState, ToolOutput, ToolProps, ToolViewRenderProps, runToolWithNewVarBindings } from "@engraft/core";
 import { IsolateStyles } from "@engraft/core-widgets";
+import { ShowViewWithScope, usePromiseState } from "@engraft/react";
 import { useRefunction } from "@engraft/refunc-react";
-import { EngraftPromise, PromiseState, runTool, ShowView, ToolOutput, ToolProps, ToolViewContext, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { Setter } from "@engraft/shared/lib/Updater.js";
+import { memo, useEffect } from "react";
 
 /*
   ToolWithView is a quick and simple way to embed a tool somewhere outside
@@ -12,11 +13,9 @@ import { Setter } from "@engraft/shared/lib/Updater.js";
   probably change since references aren't handled correctly.
 */
 
-// TODO: move this to "hostkit"
-
 type ToolWithViewProps =
   ToolProps<any>
-  & ToolViewRenderProps<any>
+  & Omit<ToolViewRenderProps<any>, 'scopeVarBindings'>
   & {
     reportOutputP?: Setter<EngraftPromise<ToolOutput>>
     reportOutputState?: Setter<PromiseState<ToolOutput>>
@@ -25,21 +24,20 @@ type ToolWithViewProps =
 export const ToolWithView = memo(function ToolWithView(props: ToolWithViewProps) {
   const { program, varBindings, context, reportOutputState, reportOutputP, ...rest } = props;
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings, context });
-  useEffect(() => {
-    reportOutputP && reportOutputP(outputP);
-  }, [outputP, reportOutputP]);
+  const resultWithScope = useRefunction(runToolWithNewVarBindings, { program, newVarBindings: varBindings, context })
 
-  const outputState = usePromiseState(outputP);
+  useEffect(() => {
+    reportOutputP && reportOutputP(resultWithScope.result.outputP);
+  }, [reportOutputP, resultWithScope.result.outputP]);
+
+  const outputState = usePromiseState(resultWithScope.result.outputP);
   useEffect(() => {
     reportOutputState && reportOutputState(outputState);
   }, [outputState, reportOutputState]);
 
   return <>
     <IsolateStyles>
-      <ToolViewContext.Provider value={{scopeVarBindings: varBindings}}>
-        <ShowView view={view} {...rest} />
-      </ToolViewContext.Provider>
+      <ShowViewWithScope resultWithScope={resultWithScope} {...rest} />
     </IsolateStyles>
   </>
 });

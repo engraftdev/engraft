@@ -4,7 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { IsolateStyles, VarUse } from "@engraft/core-widgets";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { EngraftContext, EngraftPromise, ReferenceCollection, ShowView, Tool, ToolProgram, ToolResult, ToolViewContext, UpdateProxy, VarBinding, VarBindings, hookDedupe, hookFork, hookMemo, hookRunTool, randomId } from "@engraft/toolkit";
+import { EngraftContext, EngraftPromise, ReferenceCollection, ScopeVarBindingsContext, ShowView, Tool, ToolProgram, ToolResult, UpdateProxy, VarBinding, VarBindings, hookDedupe, hookFork, hookMemo, hookRunTool, randomId } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useContext, useMemo } from "react";
 import ReactDOM from "react-dom";
@@ -110,7 +110,10 @@ type FancyCodeEditorProps = {
 }
 
 export const FancyCodeEditor = memo(function FancyCodeEditor(props: FancyCodeEditorProps) {
-  const { scopeVarBindings } = useContext(ToolViewContext);
+  const scopeVarBindings = useContext(ScopeVarBindingsContext);
+  if (scopeVarBindings === undefined) {
+    throw new Error('FancyCodeEditor is being used outside of renderWithReact');
+  }
   const scopeVarBindingsRef = useRefForCallback(scopeVarBindings);
 
   return <FancyCodeEditorWithScopeVarBindingsRef {...props} scopeVarBindingsRef={scopeVarBindingsRef} />;

@@ -1,6 +1,6 @@
 import { hasProperty } from "@engraft/shared/lib/hasProperty.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookRunToolWithNewVarBindings, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, ErrorView, InputHeading, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, Value, Var, VarBindings, VarDefinition, defineTool, hookFork, hookMemo, hookRunTool, hookRunToolWithNewVarBindings, hookThen, hooks, inputFrameBarBackdrop, memoizeProps, newVar, outputBackgroundStyle, randomId, renderWithReact, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import _ from "lodash";
 import { CSSProperties, ReactNode, memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -88,12 +88,13 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   ), [computedStuffP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (viewProps) =>
+    render: renderWithReact((viewProps) =>
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
         computedStuffP={computedStuffP}
-      />,
+      />
+    ),
   }), [computedStuffP, inputResult, props]);
 
   return {outputP, view};

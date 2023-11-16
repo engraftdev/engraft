@@ -1,11 +1,10 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps, defineTool } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { assertNever } from "@engraft/shared/lib/assert.js";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { useUpdateProxy } from "@engraft/toolkit";
+import * as d3dsv from "d3-dsv";
 import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
-import {FileRejection } from "react-dropzone";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
-import { assertNever } from "@engraft/shared/lib/assert.js";
-import * as d3dsv from "d3-dsv";
+import { FileRejection } from "react-dropzone";
 
 // TODO: what hath ESM wrought?
 const Dropzone = DropzoneModule.default as unknown as typeof import("react-dropzone").default;
@@ -52,7 +51,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   }), [program.file]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...props} {...renderProps} />,
+    render: renderWithReact((renderProps) => <View {...props} {...renderProps} />),
   }), [props]);
 
   return { outputP, view };

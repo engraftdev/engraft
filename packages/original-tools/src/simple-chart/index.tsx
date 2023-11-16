@@ -1,8 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
-import { UpdateProxy } from "@engraft/update-proxy";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import * as SelectModule from "react-select";
@@ -67,10 +63,12 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [dataResult, spec]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View
-      {...props} {...renderProps}
-      dataResult={dataResult}
-    />,
+    render: renderWithReact((renderProps) =>
+      <View
+        {...props} {...renderProps}
+        dataResult={dataResult}
+      />
+    ),
   }), [props, dataResult]);
 
   return { outputP, view };

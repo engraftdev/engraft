@@ -1,4 +1,4 @@
-import { EngraftPromise, Tool, ToolOutput, ToolOutputView, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { EngraftPromise, Tool, ToolOutput, ToolOutputView, ToolView, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'testing-known-output',
@@ -23,13 +23,13 @@ export const tool: Tool<Program> = {
 
     if (onRun) { onRun(); }
 
-    const view = hookMemo(() => ({
-      render: () => {
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: renderWithReact(() => {
         if (onViewRender) { onViewRender(); }
         return <div className="TestingKnownOutput">
           <ToolOutputView outputP={outputP} />
         </div>;
-      }
+      }),
     }), [onViewRender, outputP]);
 
     return { outputP, view };

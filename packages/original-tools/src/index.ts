@@ -1,4 +1,4 @@
-import { forgetP, Tool, toolFromModule } from "@engraft/core";
+import { forgetP, Tool, toolFromModule } from "@engraft/toolkit";
 import * as Color from "./color/index.js";
 import * as Extractor from "./extractor/index.js";
 import * as File from "./file/index.js";

@@ -11,7 +11,7 @@ import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEdit
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { compileBodyCached } from "@engraft/shared/lib/compile.js";
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { ToolFrame } from "./ToolFrame.js";
@@ -228,12 +228,13 @@ const runCodeMode = (props: CodeModeProps) => {
   }, [outputAndLogsP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (viewProps) =>
+    render: renderWithReact((viewProps) =>
       <CodeModeView
         {...props} {...viewProps} updateProgram={viewProps.updateProgram as Updater<Program, ProgramCodeMode>}
         subResults={subResults}
         logsP={logsP}
       />
+    ),
   }), [props]);
 
   return {outputP, view};
@@ -377,10 +378,10 @@ const runToolMode = (props: ToolModeProps) => {
   const { outputP: subOutputP, view: subView } = hookRunTool({ program: program.subProgram, varBindings, context });
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <ToolModeView
+    render: renderWithReact((renderProps) => <ToolModeView
       {...props} {...renderProps} updateProgram={renderProps.updateProgram as Updater<Program, ProgramToolMode>}
       subView={subView}
-    />,
+    />),
     showsOwnOutput: subView.showsOwnOutput,
     // TODO: what happens if we add more properties to ToolView?
   }), [subView]);

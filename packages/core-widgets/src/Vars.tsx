@@ -1,4 +1,5 @@
-import { Var, VarBinding, usePromiseState } from "@engraft/core";
+import { Var, VarBinding } from "@engraft/core";
+import { usePromiseState } from "@engraft/react";
 import { ControlledSpan } from "@engraft/shared/lib/ControlledTextInput.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useUpdateProxy } from "@engraft/update-proxy-react";

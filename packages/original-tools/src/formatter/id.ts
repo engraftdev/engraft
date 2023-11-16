@@ -1,4 +1,4 @@
-import { randomId } from "@engraft/core";
+import { randomId } from "@engraft/toolkit";
 import seedrandom from "seedrandom";
 
 export function hashId(...args: any[]): string {

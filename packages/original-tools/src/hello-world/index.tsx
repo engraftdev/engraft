@@ -1,5 +1,4 @@
-import { EngraftPromise, Tool } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { EngraftPromise, Tool, ToolView, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'hello-world',
@@ -19,8 +18,8 @@ export const tool: Tool<Program> = {
       value: "Output: Hello world!"
     }), []);
 
-    const view = hookMemo(() => ({
-      render: () => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: renderWithReact(() => <h1 style={{fontStyle: 'italic'}}>View: Hello world!</h1>)
     }), []);
 
     return { outputP, view };

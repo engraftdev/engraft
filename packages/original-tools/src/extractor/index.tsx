@@ -1,13 +1,10 @@
-import { EngraftPromise, hookRunTool, randomId, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
-import { SubValueHandleProps, ToolOutputView, ValueCustomizations } from "@engraft/core-widgets";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import { Use } from "@engraft/shared/lib/Use.js";
 import { useWindowEventListener } from "@engraft/shared/lib/useEventListener.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useKeyHeld } from "@engraft/shared/lib/useKeyHeld.js";
-import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, randomId, renderWithReact, ShowView, SubValueHandleProps, Tool, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, ValueCustomizations } from "@engraft/toolkit";
+import { useUpdateProxy } from "@engraft/toolkit";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
@@ -58,7 +55,9 @@ export const tool: Tool<Program> = {
     })), [inputResult.outputP, mergedPatterns]);
 
     const view: ToolView<Program> = hookMemo(() => ({
-      render: (viewProps : any) => <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>,
+      render: renderWithReact((viewProps) =>
+        <ExtractorToolView {...props} {...viewProps} inputResult={inputResult}/>
+      ),
     }), [props, inputResult]);
 
     return { outputP, view };

@@ -1,6 +1,5 @@
 import { Refunction } from "@engraft/refunc/lib/index.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { ReactElement, createContext } from "react";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";
 import { EngraftContext } from "./context.js";
@@ -56,26 +55,22 @@ export type ToolResult<P extends ToolProgram = ToolProgram> = {
 };
 
 export type ToolView<P extends ToolProgram> = {
-  render: (props: ToolViewRenderProps<P>) => ReactElement<any, any> | null,
+  render: ToolViewRender<P>,
   showsOwnOutput?: boolean,
 }
 
+export type ToolViewRender<P extends ToolProgram> =
+  Refunction<[props: ToolViewRenderProps<P>, element: Element], void>;
+
 export type ToolViewRenderProps<P> = {
   updateProgram: Updater<P>,
+  scopeVarBindings: VarBindings,
   autoFocus?: boolean,
   expand?: boolean,
   noFrame?: boolean,
   frameBarBackdropElem?: HTMLDivElement,
   onBlur?: () => void,
 }
-
-export type ToolViewContextValue = {
-  scopeVarBindings: VarBindings,
-}
-
-export const ToolViewContext = createContext<ToolViewContextValue>({
-  scopeVarBindings: {},
-});
 
 export type MakeProgram<P extends ToolProgram> =
   (context: EngraftContext, defaultInputCode?: string) => P;

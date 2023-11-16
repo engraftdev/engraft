@@ -1,6 +1,6 @@
 // adapted from https://github.com/marcelklehr/toposort/blob/master/test.js
 
-import { EngraftPromise, ProgramOf } from "@engraft/core";
+import { EngraftPromise } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { Fragment } from "react";
 import { describe, expect, it } from "vitest";
@@ -8,6 +8,8 @@ import { defineSimpleTool } from "../lib/simple-tool.js";
 import { makeTestingContext } from "@engraft/testing-components";
 
 const context = makeTestingContext();
+
+type ProgramOf<T> = T extends Tool<infer P> ? P : never;
 
 describe('simple-tool', () => {
   const knownValueTool = defineSimpleTool({

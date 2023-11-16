@@ -1,8 +1,8 @@
-import { EngraftPromise, toolFromModule } from "@engraft/core";
-import { RefuncMemory } from "@engraft/refunc";
+import { EngraftPromise, toolFromModule } from "@engraft/toolkit";
+import { RefuncMemory } from "@engraft/toolkit";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { TestingKnownOutput, makeTestingContext } from "@engraft/testing-components";
-import { updateWithUP } from "@engraft/update-proxy";
+import { updateWithUP } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as TestArray from "../../lib/test-array/index.js";
 

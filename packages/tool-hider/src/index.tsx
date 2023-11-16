@@ -1,5 +1,5 @@
 import { Program as CheckboxProgram } from "@engraft/tool-checkbox";
-import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 // TODO: can this tool ensure that CheckboxProgram is registered, as a
 // dependency?
@@ -30,7 +30,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const outputP = actualResults.outputP;
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram, autoFocus}) =>
+    render: renderWithReact(({updateProgram, autoFocus}) =>
       <UseUpdateProxy updater={updateProgram} children={(programUP) =>
         <div className="xCol xGap10 xPad10">
           <div className="xRow xGap10">
@@ -49,6 +49,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
           }}/>
         </div>
       } />
+    ),
   }), [actualResults.view, isShownResults.outputP, isShownResults.view]);
 
   return {outputP, view};

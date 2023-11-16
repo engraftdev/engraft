@@ -20,8 +20,5 @@
     "@engraft/shared": "^0.0.2",
     "friendly-words": "^1.2.0",
     "synchronous-promise": "^2.0.16"
-  },
-  "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
   }
 }

@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'toy-adder',
@@ -30,7 +30,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   , [xResults.outputP, yResults.outputP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram, autoFocus}) =>
+    render: renderWithReact(({updateProgram, autoFocus}) =>
       <UseUpdateProxy updater={updateProgram} children={(programUP) =>
         <div className="xCol xGap10 xPad10">
           <div className="xRow xGap10">
@@ -51,6 +51,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           </div>
         </div>
       } />
+    ),
   }), [xResults.view, yResults.view]);
 
   return {outputP, view};

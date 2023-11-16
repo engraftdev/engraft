@@ -1,6 +1,6 @@
 import { runtimeObjectId } from "@engraft/shared/lib/runtimeObjectId.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { EngraftContext, IsolateStyles, ToolProgram, ToolViewContext, useUpdateProxy, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
+import { EngraftContext, IsolateStyles, ScopeVarBindingsContext, ToolProgram, useUpdateProxy, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
 import { memo, useContext } from "react";
 import { WindowPortal } from "./WindowPortal.js";
 
@@ -18,7 +18,7 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
   const {program, updateProgram, varBindings, context, show, onClose} = props;
   const programUP = useUpdateProxy(updateProgram);
 
-  const { scopeVarBindings } = useContext(ToolViewContext);
+  const scopeVarBindings = useContext(ScopeVarBindingsContext);
 
   if (!show) return null;
 

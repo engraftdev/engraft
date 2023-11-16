@@ -1,4 +1,5 @@
-import { EngraftPromise, hookRunTool, ShowView, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { EngraftPromise, hookRunTool, Tool, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps } from "@engraft/core";
+import { renderWithReact, ShowView } from '@engraft/react';
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
 import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
@@ -18,7 +19,7 @@ export type SimpleToolProgram<Name extends string, Fields extends object, SubToo
 
 export type RenderProps = Omit<
   ToolViewRenderProps<any>,
-  'updateProgram'
+  'updateProgram' | 'scopeVarBindings'
 >
 
 export type SimpleToolSpec<Name extends string, Fields extends object, SubToolKey extends string> = {
@@ -99,12 +100,12 @@ export function defineSimpleTool<Name extends string, Fields extends object, Sub
       ) as Record<SubToolKey, ToolView<ToolProgram>>;
 
       const view: ToolView<SimpleToolProgram<Name, Fields, SubToolKey>> = {
-        render: (renderProps) => <SimpleToolView
+        render: renderWithReact((renderProps) => <SimpleToolView
           {...props}
           {...renderProps}
           simpleToolSpec={simpleToolSpec}
           subToolViews={subToolViews}
-        />,
+        />),
       };
 
       return {outputP, view};

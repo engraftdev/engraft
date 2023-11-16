@@ -1,7 +1,7 @@
 /// <reference path="./jsx-runtime.d.ts" />
 import { markdown } from "@codemirror/lang-markdown";
 import { FancyCodeEditor, hookFancyCodeEditor, refREDirect, collectReferencesForFancyCodeEditor } from "@engraft/codemirror-helpers";
-import { CollectReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 import { evaluate } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 
@@ -39,7 +39,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [mdxCompiledP, referenceValuesP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram, autoFocus, onBlur}) =>
+    render: renderWithReact(({updateProgram, autoFocus, onBlur}) =>
       <UseUpdateProxy updater={updateProgram} children={programUP =>
         <FancyCodeEditor
           extensions={[markdown()]}
@@ -55,7 +55,8 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           context={context}
         />
       } />
-    }), [context, program.code, program.subPrograms, subResults, varBindings]);
+    ),
+  }), [context, program.code, program.subPrograms, subResults, varBindings]);
 
   return {outputP, view};
 }));

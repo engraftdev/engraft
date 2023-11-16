@@ -1,5 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, defineTool } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolView, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'not-found',
@@ -19,8 +18,8 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     new Error(message)
   ), [message]);
 
-  const view = hookMemo(() => ({
-    render: () => <div className="xPad10">{message}</div>
+  const view: ToolView<Program> = hookMemo(() => ({
+    render: renderWithReact(() => <div className="xPad10">{message}</div>),
   }), [message]);
 
   return { outputP, view };

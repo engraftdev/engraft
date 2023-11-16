@@ -1,4 +1,5 @@
-import { EngraftPromise, Tool, ToolOutput, ToolProps, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { EngraftPromise, Tool, ToolOutput, ToolProps, ToolView, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { Fragment } from "react";
 
 // NOTE: program is not serializable
 export type Program = {
@@ -31,11 +32,11 @@ export const tool: Tool<Program> = {
       ? EngraftPromise.all(refs.map(ref => varBindings[ref].outputP)).then(func)
       : EngraftPromise.unresolved<ToolOutput>();
 
-    const view = hookMemo(() => ({
-      render: () => {
+    const view: ToolView<Program> = hookMemo(() => ({
+      render: renderWithReact(() => {
         if (onViewRender) { onViewRender(); }
-        return null;
-      }
+        return <Fragment/>;
+      }),
     }), [onViewRender]);
 
     return { outputP, view };

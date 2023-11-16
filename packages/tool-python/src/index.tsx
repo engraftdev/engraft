@@ -3,7 +3,7 @@
 import { python } from "@codemirror/lang-python";
 import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { getPyodide } from "@engraft/pyodide";
-import { CollectReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'python',
@@ -32,7 +32,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [program.code, referenceValuesP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram, autoFocus}) =>
+    render: renderWithReact(({updateProgram, autoFocus}) =>
       <UseUpdateProxy updater={updateProgram} children={programUP =>
         <FancyCodeEditor
           extensions={[python()]}
@@ -47,7 +47,8 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
           context={context}
         />
       } />
-    }), [context, program.code, program.subPrograms, subResults, varBindings]);
+    ),
+  }), [context, program.code, program.subPrograms, subResults, varBindings]);
 
   return {outputP, view};
 }));

@@ -5,7 +5,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, CollectReferences, collectReferencesForCellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, MakeProgram, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, randomId, ScrollShadow, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, EngraftContext } from "@engraft/toolkit";
+import { cellNetwork, CollectReferences, collectReferencesForCellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, MakeProgram, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, randomId, ScrollShadow, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, EngraftContext, renderWithReact } from "@engraft/toolkit";
 import _ from "lodash";
 import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
@@ -58,7 +58,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [cellResultsWithScope, cells]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...renderProps} {...props} cellResultsWithScope={cellResultsWithScope} />,
+    render: renderWithReact((renderProps) => <View {...renderProps} {...props} cellResultsWithScope={cellResultsWithScope} />),
     showsOwnOutput: cells.length > 0,
   }), [cells.length, props, cellResultsWithScope]);
 

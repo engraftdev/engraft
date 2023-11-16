@@ -1,4 +1,4 @@
-import { defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, ToolView } from "@engraft/toolkit";
+import { defineTool, EngraftPromise, hookMemo, hooks, memoizeProps, renderWithReact, ToolView } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'checkbox',
@@ -23,7 +23,7 @@ export default defineTool<Program>({
     }), [program.checked]);
 
     const view: ToolView<Program> = hookMemo(() => ({
-      render: ({updateProgram}) =>
+      render: renderWithReact(({updateProgram}) =>
         <input
           type="checkbox"
           checked={program.checked}
@@ -31,6 +31,7 @@ export default defineTool<Program>({
             updateProgram((old) => ({...old, checked: e.target.checked}))
           }}
         />
+      ),
     }), [program.checked]);
 
     return { outputP, view };

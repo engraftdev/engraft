@@ -1,5 +1,5 @@
 import { ToolOutputView } from "@engraft/core-widgets";
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, renderWithReact, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -61,7 +61,7 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
     }, [closureResults.outputP, context, gadgetProgramP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...props} {...renderProps} gadgetProgramP={gadgetProgramP} />
+    render: renderWithReact((renderProps) => <View {...props} {...renderProps} gadgetProgramP={gadgetProgramP} />),
   }), [gadgetProgramP, props]);
 
   return {outputP, view};

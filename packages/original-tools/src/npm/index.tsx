@@ -1,7 +1,5 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView, defineTool } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { ControlledTextInput } from "@engraft/shared/lib/ControlledTextInput.js";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'npm',
@@ -31,7 +29,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   }), [program.packageName]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram}) =>
+    render: renderWithReact(({updateProgram}) =>
       <UseUpdateProxy updater={updateProgram} children={(programUP) =>
         <div className="xCol xGap10 xPad10">
           <div className="xRow xGap10">
@@ -39,6 +37,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
           </div>
         </div>
       } />
+    ),
   }), [program.packageName]);
 
   return { outputP, view };

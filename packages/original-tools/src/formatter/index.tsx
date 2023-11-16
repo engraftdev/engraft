@@ -1,10 +1,6 @@
-import { CollectReferences, defineTool, EngraftContext, EngraftPromise, hookRunTool, MakeProgram, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, usePromiseState } from "@engraft/core";
 import { ToolWithView } from "@engraft/hostkit";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
 import { noOp } from "@engraft/shared/lib/noOp.js";
-import { inputFrameBarBackdrop, InputHeading } from "@engraft/toolkit";
-import { UpdateProxy } from '@engraft/update-proxy';
-import { useUpdateProxy } from '@engraft/update-proxy-react';
+import { CollectReferences, defineTool, EngraftContext, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import builtinStyles from './builtin.css.js';
@@ -58,11 +54,12 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
   }), [context, inputResult.outputP, program.rootElement]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (viewProps) =>
+    render: renderWithReact((viewProps) =>
       <View
         {...props} {...viewProps}
         inputResult={inputResult}
-      />,
+      />
+    ),
   }), [props, inputResult]);
 
   return {outputP, view};
@@ -269,6 +266,7 @@ const SelectionInspectorForText = memo(function SelectionInspectorForText(props:
       <div className="xCol xGap10">
         <b>program</b>
         <div>
+          {/* TODO: ToolWithView shouldn't be used inside tools */}
           <ToolWithView
             program={element.formatProgram}
             varBindings={varBindings}

@@ -1,4 +1,5 @@
-import { EngraftPromise, ToolOutput, usePromiseState } from "@engraft/core";
+import { EngraftPromise, ToolOutput } from "@engraft/core";
+import { usePromiseState } from "@engraft/react";
 import { count } from "@engraft/shared/lib/count.js";
 import Diagram from "@engraft/shared/lib/Diagram.js";
 import { DOM } from "@engraft/shared/lib/DOM.js";

@@ -1,7 +1,4 @@
-import { CollectReferences, defineTool, hookRunTool, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView } from "@engraft/core";
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc";
-import { UseUpdateProxy } from "@engraft/update-proxy-react";
-import { ValueEditable } from "@engraft/core-widgets";
+import { CollectReferences, defineTool, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolProgram, ToolRun, ToolView, UseUpdateProxy, ValueEditable } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'test-show-program',
@@ -23,13 +20,14 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   const outputP = subResult.outputP;
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: ({updateProgram}) =>
+    render: renderWithReact(({updateProgram}) =>
       <UseUpdateProxy updater={updateProgram} children={(programUP) =>
         <div className="xCol xPad10 xGap10">
           <ShowView view={subResult.view} updateProgram={programUP.subProgram.$apply} />
           <ValueEditable value={program.subProgram} updater={programUP.subProgram.$apply}/>
         </div>
       } />
+    ),
   }), [program.subProgram, subResult.view]);
 
   return { outputP, view };

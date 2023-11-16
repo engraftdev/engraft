@@ -1,5 +1,5 @@
-import { EngraftPromise, makeVarBindings, newVar, toolFromModule } from "@engraft/core";
-import { RefuncMemory } from "@engraft/refunc";
+import { EngraftPromise, makeVarBindings, newVar, toolFromModule } from "@engraft/toolkit";
+import { RefuncMemory } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
 import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";

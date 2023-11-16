@@ -1,8 +1,6 @@
 import { CodeMirror, setup } from "@engraft/codemirror-helpers"
-import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookRunTool, randomId, usePromiseState } from "@engraft/core"
-import { hookMemo, hooks, memoizeProps } from "@engraft/refunc"
 import { compileExpressionCached } from "@engraft/shared/lib/compile.js"
-import { UpdateProxyRemovable, updateProxy } from "@engraft/update-proxy"
+import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, randomId, renderWithReact, updateProxy, usePromiseState } from "@engraft/toolkit"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
 import { Task } from "./Task.js"
@@ -51,7 +49,9 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
   [inputResult.outputP, funcP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View {...props} {...renderProps} inputResult={inputResult} funcP={funcP}/>
+    render: renderWithReact((renderProps) =>
+      <View {...props} {...renderProps} inputResult={inputResult} funcP={funcP}/>
+    ),
   }), [funcP, inputResult, props]);
 
   return {outputP, view};

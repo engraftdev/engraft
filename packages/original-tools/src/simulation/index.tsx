@@ -1,11 +1,6 @@
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, Var, VarBindings, defineTool, hookRunTool, hookRunToolWithNewVarBindings, newVar, runTool } from "@engraft/core";
-import { ToolOutputView } from "@engraft/core-widgets";
-import { hookFork, hookMemo, hookRefunction, hooks, memoizeProps } from "@engraft/refunc";
-import { useRefunction } from "@engraft/refunc-react";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { outputBackgroundStyle } from "@engraft/toolkit";
-import { UpdateProxy, useStateUP, useUpdateProxy } from "@engraft/update-proxy-react";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, defineTool, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoizeProps, newVar, outputBackgroundStyle, renderWithReact, runTool, useRefunction, useStateUP, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
@@ -60,12 +55,14 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }), [allTickOutputsP]);
 
   const view: ToolView<Program> = hookMemo(() => ({
-    render: (renderProps) => <View
-      {...props}
-      {...renderProps}
-      initResult={initResult}
-      onTickResultsWithScope={onTickResultsWithScope}
-    />
+    render: renderWithReact((renderProps) =>
+      <View
+        {...props}
+        {...renderProps}
+        initResult={initResult}
+        onTickResultsWithScope={onTickResultsWithScope}
+      />
+    ),
   }), [props, initResult, onTickResultsWithScope]);
 
   return { outputP, view };

@@ -1,10 +1,10 @@
+import { makeBasicContext } from "@engraft/basic-setup";
+import { EngraftPromise, IsolateStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ValueEditable, VarBinding, runToolWithNewVarBindings, useRefunction } from "@engraft/hostkit";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import appCss from "./App.css?inline";
 import { examples } from "./examples/index.js";
-import { EngraftPromise, IsolateStyles, ShowView, ToolOutputView, ToolProgram, ValueEditable, VarBinding, runTool, useRefunction } from "@engraft/hostkit";
-import { makeBasicContext } from "@engraft/basic-setup";
 
 const context = makeBasicContext();
 
@@ -124,7 +124,7 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
     {var_: {id: 'IDarray000000', label: 'array'}, outputP: EngraftPromise.resolve({value: [1, 2, 3]})},
   ]), []);
 
-  const {outputP, view} = useRefunction(runTool, { program, varBindings, context });
+  const resultWithScope = useRefunction(runToolWithNewVarBindings, { program, newVarBindings: varBindings, context })
 
   const [showTool, setShowTool] = useState(true);
   const [showOutput, setShowOutput] = useState(false);
@@ -142,13 +142,13 @@ const AppWithRunningProgram = memo(function AppWithRunningProgram(props: AppWith
         resetKeys={[program]}
       >
         <IsolateStyles>
-          <ShowView view={view} updateProgram={setProgram} autoFocus={true} />
+          <ShowViewWithScope resultWithScope={resultWithScope} updateProgram={setProgram} autoFocus={true} />
         </IsolateStyles>
       </ErrorBoundary>
     </div>
     <br/>
     <br/>
-    {showOutput && <ToolOutputView outputP={outputP} />}
+    {showOutput && <ToolOutputView outputP={resultWithScope.result.outputP} />}
     <br/>
     <br/>
     <div>
