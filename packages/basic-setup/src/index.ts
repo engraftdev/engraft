@@ -16,6 +16,7 @@ import TestCountRuns from "@engraft/tool-test-count-runs";
 import Text from "@engraft/tool-text";
 import ToyAdder from "@engraft/tool-toy-adder";
 import ToyAdderSimple from "@engraft/tool-toy-adder-simple";
+import ToyAdderVanilla from "@engraft/tool-toy-adder-vanilla";
 import ToyHelloWorld from "@engraft/tool-toy-hello-world";
 import ToyHelloWorldVanilla from "@engraft/tool-toy-hello-world-vanilla";
 import Value from "@engraft/tool-value";
@@ -39,6 +40,7 @@ const tools: Tool[] = [
   forgetP(toolFromModule(Text)),
   forgetP(toolFromModule(ToyAdder)),
   forgetP(toolFromModule(ToyAdderSimple)),
+  forgetP(toolFromModule(ToyAdderVanilla)),
   forgetP(toolFromModule(ToyHelloWorld)),
   forgetP(toolFromModule(ToyHelloWorldVanilla)),
   forgetP(toolFromModule(Value)),
