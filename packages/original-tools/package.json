@@ -1,6 +1,6 @@
 {
   "name": "@engraft/original-tools",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "Temporary package to port over old tools into the monorepo.",
   "publishConfig": {
@@ -16,10 +16,10 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/codemirror-helpers": "^0.0.3",
-    "@engraft/hostkit": "^0.0.3",
-    "@engraft/shared": "^0.0.3",
-    "@engraft/toolkit": "^0.0.3",
+    "@engraft/codemirror-helpers": "^0.0.4",
+    "@engraft/hostkit": "^0.0.4",
+    "@engraft/shared": "^0.0.4",
+    "@engraft/toolkit": "^0.0.4",
     "d3-dsv": "^3.0.1",
     "lodash": "^4.17.21",
     "react": "^18.0.0",

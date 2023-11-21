@@ -1,6 +1,6 @@
 {
   "name": "@engraft/update-proxy-react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "React extensions for update-proxy",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.3",
-    "@engraft/update-proxy": "^0.0.3"
+    "@engraft/shared": "^0.0.4",
+    "@engraft/update-proxy": "^0.0.4"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

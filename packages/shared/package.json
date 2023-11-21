@@ -1,6 +1,6 @@
 {
   "name": "@engraft/shared",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "Shared utilities",
   "publishConfig": {

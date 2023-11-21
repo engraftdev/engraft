@@ -1,6 +1,6 @@
 {
   "name": "@engraft/update-proxy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "A little gadget to make it easier to perform functional updates",
   "publishConfig": {
@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.3",
+    "@engraft/shared": "^0.0.4",
     "immutability-helper": "^3.1.1"
   }
 }

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@engraft/host-python",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Python embedding of Engraft",
   "type": "module",
   "scripts": {

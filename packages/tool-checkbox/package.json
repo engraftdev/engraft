@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-checkbox",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "Engraft checkbox tool",
   "publishConfig": {
@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.3"
+    "@engraft/toolkit": "^0.0.4"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
