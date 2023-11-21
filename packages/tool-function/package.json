@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-function",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "description": "Engraft tool to define a reusable function, working off of concrete examples",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.2",
-    "@engraft/toolkit": "^0.0.2"
+    "@engraft/shared": "^0.0.3",
+    "@engraft/toolkit": "^0.0.3"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
