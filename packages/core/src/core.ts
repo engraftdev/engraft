@@ -1,4 +1,4 @@
-import { Refunction } from "@engraft/refunc/lib/index.js";
+import { Refunction } from "@engraft/refunc";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";

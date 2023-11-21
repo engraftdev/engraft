@@ -64,10 +64,10 @@ type PathPosition = {
   index: number,
 }
 let GLOBAL_PATH_POSITION: PathPosition | null = null;
+// TODO: an actual global might be more robust to duplicated-module issues
 function getPathPosition(): PathPosition {
-  // TODO: is this the right place to make sure we can still write to the memory?
   if (GLOBAL_PATH_POSITION === null) {
-    throw new Error('Cannot use hook outside of runWithMemory');
+    throw new Error('Cannot use hook outside of runWithPath');
   }
   return GLOBAL_PATH_POSITION;
 }

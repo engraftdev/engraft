@@ -1,4 +1,4 @@
-import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks } from "@engraft/refunc/lib/index.js";
+import { hookDedupe, hookFork, hookMemo, hookRefunction, hooks } from "@engraft/refunc";
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { ToolProgram, ToolProps, ToolResult, VarBindings } from "./core.js";
 
