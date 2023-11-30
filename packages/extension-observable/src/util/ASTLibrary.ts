@@ -48,7 +48,7 @@ export function parseObjectToAST(obj: Object)  : estree.Node {
 
 export function defaultParams() : estree.Expression  {
     const paramObj = {
-        inputs: [],
+        inputs: {},
         program: {}
     }
 
