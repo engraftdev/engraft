@@ -29,6 +29,11 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
 
   return <table className="table">
     <tbody>
+      <tr>
+        <td>
+          <button onClick={onClickAddNew} className="btn btn-primary btn-sm">new page</button>
+        </td>
+      </tr>
       {patchesSorted.map(patch => {
         const onClickDelete = () => {
           deleteDoc(doc(patchesRef, patch.id));
@@ -50,11 +55,6 @@ export const PatchesList = memo(function PatchesList(props: PatchesListProps) {
       { patches.length === 0 && <tr>
         <td><i>no pages yet</i></td>
       </tr> }
-      <tr>
-        <td>
-          <button onClick={onClickAddNew} className="btn btn-primary btn-sm">new page</button>
-        </td>
-      </tr>
     </tbody>
   </table>;
 });
