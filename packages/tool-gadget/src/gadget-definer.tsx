@@ -1,5 +1,4 @@
-import { ToolOutputView, Value, VarDefinition } from "@engraft/core-widgets";
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, renderWithReact, runTool, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutputView, ToolProps, ToolView, ToolViewRenderProps, UpdateProxy, Value, VarDefinition, defineTool, hookMemo, hooks, memoizeProps, newVar, outputBackgroundStyle, renderWithReact, runTool, useCommonWidth, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
 import { memo, useEffect, useState } from "react";
 import { GadgetClosure, GadgetDef, runOutputProgram, runViewProgram } from "./core.js";
 

@@ -16,8 +16,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.4",
-    "@engraft/core-widgets": "^0.0.4",
     "@engraft/toolkit": "^0.0.4"
   },
   "peerDependencies": {

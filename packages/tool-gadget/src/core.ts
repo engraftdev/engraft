@@ -1,5 +1,4 @@
-import { EngraftContext, EngraftPromise, ToolOutput, ToolProgram, ToolResultWithScope, Var, VarBindings, hookRunToolWithNewVarBindings } from "@engraft/core";
-import { UpdateProxy, hookMemo, hooks } from "@engraft/toolkit";
+import { EngraftContext, EngraftPromise, ToolOutput, ToolProgram, ToolResultWithScope, UpdateProxy, Var, VarBindings, hookMemo, hookRunToolWithNewVarBindings, hooks } from "@engraft/toolkit";
 
 export type GadgetDef = {
   initialProgramProgram: ToolProgram,
