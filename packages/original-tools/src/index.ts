@@ -1,6 +1,5 @@
 import { forgetP, Tool, toolFromModule } from "@engraft/toolkit";
 import * as Color from "./color/index.js";
-import * as Extractor from "./extractor/index.js";
 import * as File from "./file/index.js";
 import * as Formatter from "./formatter/index.js";
 import * as NPM from "./npm/index.js";
@@ -18,7 +17,6 @@ import * as TestTextLatency from "./test-text-latency/index.js";
 
 export const originalTools: Tool[] = [
   forgetP(toolFromModule(Color)),
-  forgetP(toolFromModule(Extractor)),
   forgetP(toolFromModule(File)),
   forgetP(toolFromModule(Formatter)),
   forgetP(toolFromModule(NPM)),

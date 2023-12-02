@@ -21,6 +21,7 @@
     "@engraft/tool-checkbox": "^0.0.4",
     "@engraft/tool-data-table": "^0.0.4",
     "@engraft/tool-example-datasets": "^0.0.4",
+    "@engraft/tool-extractor": "^0.0.4",
     "@engraft/tool-function": "^0.0.4",
     "@engraft/tool-gadget": "^0.0.4",
     "@engraft/tool-hider": "^0.0.4",

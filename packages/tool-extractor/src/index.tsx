@@ -3,8 +3,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { useWindowEventListener } from "@engraft/shared/lib/useEventListener.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useKeyHeld } from "@engraft/shared/lib/useKeyHeld.js";
-import { EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, randomId, renderWithReact, ShowView, SubValueHandleProps, Tool, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, ValueCustomizations } from "@engraft/toolkit";
-import { useUpdateProxy } from "@engraft/toolkit";
+import { defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, randomId, renderWithReact, ShowView, SubValueHandleProps, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy, ValueCustomizations } from "@engraft/toolkit";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
@@ -21,7 +20,7 @@ export type Program = {
   minimized: boolean;
 }
 
-export const tool: Tool<Program> = {
+export default defineTool<Program>({
   name: 'extractor',
 
   makeProgram: (context, defaultInputCode) => ({
@@ -62,7 +61,7 @@ export const tool: Tool<Program> = {
 
     return { outputP, view };
   })),
-};
+});
 
 
 interface ExtractorContextValue {
@@ -117,7 +116,7 @@ function generalize(path: Path, pattern: Pattern): Pattern | undefined {
   return generalization;
 }
 
-export const SubValueHandle = memo(function SubValueHandle({path, children}: SubValueHandleProps) {
+const SubValueHandle = memo(function SubValueHandle({path, children}: SubValueHandleProps) {
   const { activePattern, setActivePattern, otherPatterns, multiSelectMode } = useContext(ExtractorContext);
 
   const matchesActivePattern = activePattern && pathMatchesPattern(path, activePattern);
