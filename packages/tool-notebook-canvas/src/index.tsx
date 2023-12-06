@@ -142,6 +142,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
           children: ({onMouseDownDragPane}) =>
             <CellView
               idx={i}
+              isOutputCell={i === cells.length - 1}
               cell={cell}
               cellsUP={programUP.cells}
               cellResultWithScope={cellResults[cell.var_.id]}
@@ -168,9 +169,10 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
 })
 
 type CellViewProps = {
-  idx: number;
+  idx: number,
+  isOutputCell: boolean,
 
-  cell: Cell;
+  cell: Cell,
   cellsUP: UpdateProxy<Cell[]>,
 
   cellResultWithScope: ToolResultWithScope,
@@ -179,7 +181,7 @@ type CellViewProps = {
 }
 
 const CellView = memo(function CellView(props: CellViewProps) {
-  const {idx, cell, cellsUP, cellResultWithScope, onMouseDownDragPane} = props;
+  const {idx, isOutputCell, cell, cellsUP, cellResultWithScope, onMouseDownDragPane} = props;
   const cellUP = cellsUP[idx];
 
   const removeCell = useCallback(() => {
@@ -263,7 +265,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
         </div>
         <div style={{flexGrow: 1}}/>
         <div style={{color: "#aaa"}}>
-          {idx === 0 && "★"}
+          {isOutputCell && "★"}
         </div>
       </div>
     </div>
