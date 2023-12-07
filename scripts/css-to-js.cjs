@@ -34,7 +34,7 @@ async function convertCssToJs(srcDir, dstDir) {
       const cssContent = await readFile(srcFilePath, 'utf8');
       // eslint-disable-next-line no-template-curly-in-string
       const cssContentEscaped = cssContent.replaceAll(/`|\$/g, (c) => `\${'${c}'}`);
-      const jsContent = `export default String.raw\`${cssContentEscaped}\`;`;
+      const jsContent = `export default String.raw\`${cssContentEscaped}\`;\n`;
       const jsFilePath = dstFilePath + '.js';
 
       await writeFile(jsFilePath, jsContent);
