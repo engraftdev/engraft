@@ -181,7 +181,7 @@ const runCodeMode = (props: CodeModeProps) => {
   }), [program.code])
 
   const outputAndLogsP = hookMemo(() => {
-    return EngraftPromise.all(compiledP, referenceValuesP).then(([compiled, codeReferenceScope]) => {
+    return EngraftPromise.all(compiledP, referenceValuesP).then(([compiled, referenceValues]) => {
       // To manage logs, we keep one special global:
       //   __log: A function which logs using the active slot's line numbers and logs array.
 
@@ -207,17 +207,21 @@ const runCodeMode = (props: CodeModeProps) => {
       const rand = makeRand();
       const scope = {
         ...globals,
-        ...codeReferenceScope,
+        ...referenceValues,
         rand,
         __inst_lineNum,
         log,
+        Meta: {
+          context,
+          ShowView,
+        },
       };
 
       return EngraftPromise.resolve(compiled(scope)).then((value) => {
         return [{value}, logs] as const;
       });
     })
-  }, [compiledP, referenceValuesP]);
+  }, [compiledP, referenceValuesP, context]);
 
   const outputP = hookMemo(() => {
     return outputAndLogsP.then(([output, _]) => output);

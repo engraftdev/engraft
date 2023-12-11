@@ -12,10 +12,11 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "Meta.lookUpToolByName(\"slider\")",
+          "code": "Meta.context.dispatcher.lookUpToolByName(\"slider\")",
           "defaultCode": "",
           "subPrograms": {}
-        }
+        },
+        "outputManualHeight": "infinity"
       },
       {
         "var_": {
@@ -39,11 +40,24 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// Run the slider tool, to get an output and a view.\n\nconst mem = new RefuncMemory();\nconst result = IDneptune546180.run(mem, {\n  program: IDwhitefish971440\n})\n\nreturn result",
+          "code": "// Run the slider tool, to get an output and a view.\n\nconst mem = new RefuncMemory();\nconst result = IDneptune546180.run(mem, {\n  program: IDwhitefish971440,\n  context: Meta.context,\n})\n\nreturn result",
           "defaultCode": "",
           "subPrograms": {}
         },
         "outputManualHeight": "infinity"
+      },
+      {
+        "var_": {
+          "id": "IDfriday358969",
+          "label": "C"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "// Call the view's render function in the rawest way.\n// We see the slider, but it's not slidable.\n\nconst viewMem = new RefuncMemory();\nconst element = document.createElement('div');\n\nIDtuba501846.view.render(\n  viewMem,\n  {\n    updateProgram: () => {}\n  },\n  element\n);\n\nreturn element;",
+          "defaultCode": "IDresonance061062",
+          "subPrograms": {}
+        }
       },
       {
         "var_": {
@@ -53,7 +67,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// Call the view's render function.\n// We see the slider, but it's not slidable.\n\nIDtuba501846.view.render({updateProgram: () => {}})",
+          "code": "// Call the view's render function with a helper.\n// We see the slider, but it's not slidable.\n\n<Meta.ShowView\n  view={IDtuba501846.view}\n  updateProgram={() => {}}\n/>",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },
@@ -67,7 +81,7 @@
         "program": {
           "toolName": "slot",
           "modeName": "code",
-          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    IDneptune546180.makeProgram()\n  );\n  const mem = new RefuncMemory();\n  const result = IDneptune546180.run(mem, {\n    program,\n  });\n  return <div>\n    {result.view.render({\n      updateProgram,\n    })}\n  </div>;\n}\n\nreturn <Component/>",
+          "code": "// To make it slidable, we need to store the program\n// somewhere it can be modified, and pass a program\n// updater into the tool alongside the program.\n\nconst Component = () => {\n  const [program, updateProgram] = React.useState(\n    IDneptune546180.makeProgram()\n  );\n  const mem = new RefuncMemory();\n  const result = IDneptune546180.run(mem, {\n    program,\n  });\n  return <Meta.ShowView\n    view={result.view}\n    updateProgram={updateProgram}\n  />;\n}\n\nreturn <Component/>",
           "defaultCode": "IDresonance061062",
           "subPrograms": {}
         },

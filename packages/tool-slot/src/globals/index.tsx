@@ -95,9 +95,6 @@ export const globals = {
     hookRefunction,
   },
   RefuncMemory,
-  Meta: {
-    // TODO – provide access to meta stuff somehow, probably by passing the context from the slot
-  },
   EngraftPromise,
   csvParse,
   Then,
