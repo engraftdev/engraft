@@ -1,5 +1,5 @@
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-setup";
 import { EngraftPromise, RefuncMemory, ToolOutput, newVar, toolFromModule } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as functionM from "../lib/index.js";

@@ -23,7 +23,6 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@engraft/testing-components": "^0.0.4",
     "@types/wicg-file-system-access": "^2020.9.5"
   },
   "peerDependencies": {

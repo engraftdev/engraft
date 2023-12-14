@@ -2,7 +2,7 @@ import { EngraftPromise, makeVarBindings, newVar, toolFromModule } from "@engraf
 import { RefuncMemory } from "@engraft/toolkit";
 import { describe, expect, it } from "vitest";
 import * as simulation from "../../lib/simulation/index.js";
-import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-setup";
 
 // @vitest-environment happy-dom
 

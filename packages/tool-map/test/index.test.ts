@@ -1,6 +1,6 @@
 import { EngraftPromise, newVar, randomId, runTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
-import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-setup";
 import { describe, expect, it } from "vitest";
 import * as Map from "../lib/index.js";
 

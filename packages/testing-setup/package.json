@@ -1,5 +1,5 @@
 {
-  "name": "@engraft/testing-components",
+  "name": "@engraft/testing-setup",
   "version": "0.0.4",
   "license": "MIT",
   "description": "Engraft components for testing purposes",

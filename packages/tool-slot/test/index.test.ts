@@ -5,7 +5,7 @@ import { updateWithUP } from "@engraft/update-proxy";
 import _ from "lodash";
 import { describe, expect, it } from "vitest";
 import * as slot from "../lib/index.js";
-import { makeTestingContext } from "@engraft/testing-components";
+import { makeTestingContext } from "@engraft/testing-setup";
 
 // @vitest-environment happy-dom
 

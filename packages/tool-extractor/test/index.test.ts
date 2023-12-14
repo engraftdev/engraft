@@ -1,6 +1,6 @@
 import { EngraftPromise, runTool, toolFromModule } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
-import { TestingKnownOutput, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, makeTestingContext } from "@engraft/testing-setup";
 import { describe, expect, it } from "vitest";
 import * as Extractor from "../lib/index.js";
 import { Pattern } from "../lib/patterns.js";

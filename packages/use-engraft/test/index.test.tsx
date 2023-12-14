@@ -2,7 +2,7 @@ import { EngraftPromise, ToolOutput } from "@engraft/core";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { useEngraft } from "../lib/index.js";
-import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-setup";
 import { makeSlotWithCode } from "@engraft/tool-slot";
 
 // @vitest-environment happy-dom

@@ -3,7 +3,7 @@ import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
 import { describe, expect, it } from "vitest";
 import * as Python from "../lib/index.js";
-import { makeTestingContext } from "@engraft/testing-components";
+import { makeTestingContext } from "@engraft/testing-setup";
 
 // @vitest-environment happy-dom
 

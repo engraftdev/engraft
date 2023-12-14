@@ -1,7 +1,7 @@
 import { EngraftPromise, ToolResultWithScope } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc-react";
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-components";
+import { TestingKnownOutput, TestingRefsFunc, makeTestingContext } from "@engraft/testing-setup";
 import { updateWithUP } from "@engraft/update-proxy-react";
 import { describe, expect, test } from "vitest";
 import { CellNetworkProps, cellNetwork } from "../lib/cellNetwork.js";

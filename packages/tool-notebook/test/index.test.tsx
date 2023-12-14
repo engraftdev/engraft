@@ -2,7 +2,7 @@ import { EngraftPromise, makeVarBindings, newVar, runTool, toolFromModule, VarBi
 import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
-import { makeTestingContext, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-components";
+import { makeTestingContext, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-setup";
 import { updateWithUP } from "@engraft/update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";

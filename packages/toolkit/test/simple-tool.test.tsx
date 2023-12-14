@@ -5,7 +5,7 @@ import { RefuncMemory } from "@engraft/refunc";
 import { Fragment } from "react";
 import { describe, expect, it } from "vitest";
 import { defineSimpleTool } from "../lib/simple-tool.js";
-import { makeTestingContext } from "@engraft/testing-components";
+import { makeTestingContext } from "@engraft/testing-setup";
 
 const context = makeTestingContext();
 
