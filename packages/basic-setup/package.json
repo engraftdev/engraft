@@ -20,7 +20,6 @@
     "@engraft/original-tools": "^0.0.4",
     "@engraft/tool-checkbox": "^0.0.4",
     "@engraft/tool-data-table": "^0.0.4",
-    "@engraft/tool-example-datasets": "^0.0.4",
     "@engraft/tool-extractor": "^0.0.4",
     "@engraft/tool-function": "^0.0.4",
     "@engraft/tool-gadget": "^0.0.4",
@@ -29,7 +28,6 @@
     "@engraft/tool-markdown": "^0.0.4",
     "@engraft/tool-notebook": "^0.0.4",
     "@engraft/tool-notebook-canvas": "^0.0.4",
-    "@engraft/tool-python": "^0.0.4",
     "@engraft/tool-slot": "^0.0.4",
     "@engraft/tool-test-count-runs": "^0.0.4",
     "@engraft/tool-text": "^0.0.4",
@@ -38,7 +36,6 @@
     "@engraft/tool-toy-adder-vanilla": "^0.0.4",
     "@engraft/tool-toy-hello-world": "^0.0.4",
     "@engraft/tool-toy-hello-world-vanilla": "^0.0.4",
-    "@engraft/tool-value": "^0.0.4",
-    "@engraft/tool-voyager": "^0.0.4"
+    "@engraft/tool-value": "^0.0.4"
   }
 }

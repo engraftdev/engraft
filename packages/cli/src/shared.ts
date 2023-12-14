@@ -1,4 +1,4 @@
-import { makeBasicContext } from "@engraft/basic-setup";
+import { makeFancyContext } from "@engraft/fancy-setup";
 import { VarBinding } from "@engraft/hostkit";
 import { getPyodide } from  "@engraft/pyodide";
 
@@ -102,4 +102,4 @@ export async function valueToStdout(value: any, jsonOnly=false) {
   return JSON.stringify(value, null, 2);
 }
 
-export const makeContext = makeBasicContext;
+export const makeContext = makeFancyContext;

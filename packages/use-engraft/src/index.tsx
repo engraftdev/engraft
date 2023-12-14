@@ -1,6 +1,6 @@
 /// <reference types="@types/wicg-file-system-access" />
 
-import { makeBasicContext } from "@engraft/basic-setup";
+import { makeFancyContext } from "@engraft/fancy-setup";
 import { EngraftContext, EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, hookRunToolWithNewVarBindings, hooks, randomId, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
@@ -24,7 +24,7 @@ export type UseEngraftProps = {
   context?: EngraftContext,
 }
 
-const defaultContext = makeBasicContext();
+const defaultContext = makeFancyContext();
 
 const empty = {};
 

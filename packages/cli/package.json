@@ -21,7 +21,7 @@
     "dev": "vite --config ../../vite.config.ts"
   },
   "dependencies": {
-    "@engraft/basic-setup": "^0.0.4",
+    "@engraft/fancy-setup": "^0.0.4",
     "@engraft/hostkit": "^0.0.4",
     "@engraft/pyodide": "^0.0.4",
     "@engraft/shared": "^0.0.4",

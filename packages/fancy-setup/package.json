@@ -1,0 +1,25 @@
+{
+  "name": "@engraft/fancy-setup",
+  "version": "0.0.4",
+  "license": "MIT",
+  "description": "Maximalist setup for Engraft, including some large / troublesome components",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "build-lib": "tsc && node ../../scripts/css-to-js.cjs src lib",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dependencies": {
+    "@engraft/core": "^0.0.4",
+    "@engraft/basic-setup": "^0.0.4",
+    "@engraft/tool-example-datasets": "^0.0.4",
+    "@engraft/tool-python": "^0.0.4",
+    "@engraft/tool-voyager": "^0.0.4"
+  }
+}

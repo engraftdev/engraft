@@ -1,4 +1,4 @@
-import { makeBasicContext } from "@engraft/basic-setup";
+import { makeFancyContext } from "@engraft/fancy-setup";
 import { EngraftPromise, IsolateStyles, PromiseState, ToolOutput, ToolOutputBuffer, ToolProgram, ToolWithView, VarBinding } from '@engraft/hostkit';
 import { ErrorBoundary } from '@engraft/shared/lib/ErrorBoundary.js';
 import { isObject } from '@engraft/shared/lib/isObject.js';
@@ -46,7 +46,7 @@ export const ObservableEmbed = memo(function ObservableEmbed(props: ObservableEm
     return varBindings;
   }, [parameters?.inputs]);
 
-  const [context] = useState(() => makeBasicContext());
+  const [context] = useState(() => makeFancyContext());
 
   const [program, updateProgram] = useState<ToolProgram>(
       parameters?.program || context.makeSlotWithCode(defaultCodeFromInputs(parameters?.inputs||{}))

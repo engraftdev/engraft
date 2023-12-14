@@ -48,7 +48,8 @@ Code is divided into separate packages located in the `packages` directory. Each
   * [**toolkit**](packages/toolkit/): Your one-stop shop for tool development – should be the only package most tools need to import from `@engraft`.
 * *Host development*
   * [**hostkit**](packages/toolkit/): Your one-stop shop for host development – should be the only package most hosts need to import from `@engraft`.
-  * [**basic-setup**](packages/basic-setup/): Actually, hosts will probably also need to import this package. It contains a basic setup (`EngraftContext`) with all the tools built by the Engraft team. This is probably not the way things will work long-term.
+  * [**fancy-setup**](packages/fancy-setup/): Actually, hosts will probably also need to import this package. It contains a setup (`EngraftContext`) with all the tools built by the Engraft team. This is probably not the way things will work long-term.
+  * [**basic-setup**](packages/basic-setup/): If you run into trouble, you may want to use this smaller package. It excludes a few components which are real big or cause trouble. (Again: probably not a long-term thing.)
 * *Tools*
     * **tool-\***: Each of these packages defines a tool maintained by the Engraft team.
     * [**original-tools**](packages/original/): A bunch of tools that haven't been sorted into packages yet. (Provisional.)

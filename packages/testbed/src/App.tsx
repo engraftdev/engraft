@@ -1,4 +1,4 @@
-import { makeBasicContext } from "@engraft/basic-setup";
+import { makeFancyContext } from "@engraft/fancy-setup";
 import { EngraftPromise, IsolateStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ValueEditable, VarBinding, runToolWithNewVarBindings, useRefunction } from "@engraft/hostkit";
 import { useLocalStorage } from "@engraft/shared/lib/useLocalStorage.js";
 import { Fragment, memo, useEffect, useMemo, useReducer, useState } from "react";
@@ -6,7 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import appCss from "./App.css?inline";
 import { examples } from "./examples/index.js";
 
-const context = makeBasicContext();
+const context = makeFancyContext();
 
 const defaultProgram = context.dispatcher.lookUpToolByName('slot').makeProgram(context);
 
