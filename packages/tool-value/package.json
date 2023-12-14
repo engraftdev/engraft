@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-value",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "description": "Engraft tool which covers a slot with its value",
   "publishConfig": {
@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.4"
+    "@engraft/toolkit": "^0.0.5"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

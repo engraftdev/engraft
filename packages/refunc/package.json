@@ -1,6 +1,6 @@
 {
   "name": "@engraft/refunc",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "description": "Library for incremental computation",
   "publishConfig": {
@@ -16,6 +16,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.4"
+    "@engraft/shared": "^0.0.5"
   }
 }
