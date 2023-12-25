@@ -14,6 +14,7 @@ export function useContextMenu(menuMaker: MenuMaker): UseContextMenu {
 
   const openMenu = useCallback((ev: React.MouseEvent) => {
     ev.preventDefault();
+    ev.stopPropagation();
     setPosition({x: ev.pageX, y: ev.pageY});
   }, []);
 
