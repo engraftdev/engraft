@@ -1,6 +1,6 @@
 {
   "name": "@engraft/hostkit",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "A bundle of libraries needful or helpful for defining Engraft hosts",
   "publishConfig": {
@@ -16,12 +16,12 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.5",
-    "@engraft/core-widgets": "^0.0.5",
-    "@engraft/react": "^0.0.5",
-    "@engraft/refunc-react": "^0.0.5",
-    "@engraft/shared": "^0.0.5",
-    "@engraft/update-proxy-react": "^0.0.5"
+    "@engraft/core": "^0.0.6",
+    "@engraft/core-widgets": "^0.0.6",
+    "@engraft/react": "^0.0.6",
+    "@engraft/refunc-react": "^0.0.6",
+    "@engraft/shared": "^0.0.6",
+    "@engraft/update-proxy-react": "^0.0.6"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

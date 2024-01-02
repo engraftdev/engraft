@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-test-count-runs",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Engraft testing tool that displays how many times it has been run",
   "publishConfig": {
@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.5"
+    "@engraft/toolkit": "^0.0.6"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

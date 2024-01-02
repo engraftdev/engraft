@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-extractor",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Engraft tool for extracting patterns of data from JSON structures",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.5",
-    "@engraft/toolkit": "^0.0.5"
+    "@engraft/shared": "^0.0.6",
+    "@engraft/toolkit": "^0.0.6"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

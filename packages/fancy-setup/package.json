@@ -1,6 +1,6 @@
 {
   "name": "@engraft/fancy-setup",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Maximalist setup for Engraft, including some large / troublesome components",
   "publishConfig": {
@@ -16,10 +16,10 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/basic-setup": "^0.0.5",
-    "@engraft/core": "^0.0.5",
-    "@engraft/tool-example-datasets": "^0.0.5",
-    "@engraft/tool-python": "^0.0.5",
-    "@engraft/tool-voyager": "^0.0.5"
+    "@engraft/basic-setup": "^0.0.6",
+    "@engraft/core": "^0.0.6",
+    "@engraft/tool-example-datasets": "^0.0.6",
+    "@engraft/tool-python": "^0.0.6",
+    "@engraft/tool-voyager": "^0.0.6"
   }
 }

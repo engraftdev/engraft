@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-markdown",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Engraft tool for Markdown (MDX, actually)",
   "publishConfig": {
@@ -17,8 +17,8 @@
   "type": "module",
   "dependencies": {
     "@codemirror/lang-markdown": "^6.1.1",
-    "@engraft/codemirror-helpers": "^0.0.5",
-    "@engraft/toolkit": "^0.0.5",
+    "@engraft/codemirror-helpers": "^0.0.6",
+    "@engraft/toolkit": "^0.0.6",
     "@mdx-js/mdx": "^2.3.0"
   },
   "peerDependencies": {

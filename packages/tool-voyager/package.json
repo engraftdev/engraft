@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-voyager",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Engraft tool for Voyager 2",
   "publishConfig": {
@@ -16,9 +16,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.5",
-    "@engraft/toolkit": "^0.0.5",
-    "@engraft/vendor-voyager": "^0.0.5",
+    "@engraft/shared": "^0.0.6",
+    "@engraft/toolkit": "^0.0.6",
+    "@engraft/vendor-voyager": "^0.0.6",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
