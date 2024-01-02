@@ -1,7 +1,7 @@
 import ImmutabilityHelper, { Spec } from "immutability-helper";
-import { Updater } from "@engraft/shared/lib/Updater.js";
-
 const immutabilityHelper = ImmutabilityHelper.default;
+
+export type Updater<T, U extends T = T> = (f: (oldU: U) => T) => void;
 
 export type KeyofWithoutArrayMethods<T> =
   T extends Array<any> ? keyof T & number : keyof T;

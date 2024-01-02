@@ -16,7 +16,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.5",
     "@engraft/update-proxy": "^0.0.5"
   },
   "peerDependencies": {

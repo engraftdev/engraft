@@ -16,7 +16,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.5",
     "immutability-helper": "^3.1.1"
   }
 }
