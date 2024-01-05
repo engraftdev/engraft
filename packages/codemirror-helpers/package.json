@@ -1,6 +1,6 @@
 {
   "name": "@engraft/codemirror-helpers",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
   "description": "Some shared utilities to manage CodeMirror instances",
   "publishConfig": {
@@ -23,9 +23,9 @@
     "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.0",
-    "@engraft/core-widgets": "^0.0.6",
-    "@engraft/shared": "^0.0.6",
-    "@engraft/toolkit": "^0.0.6",
+    "@engraft/core-widgets": "^0.0.7",
+    "@engraft/shared": "^0.0.7",
+    "@engraft/toolkit": "^0.0.7",
     "lodash": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

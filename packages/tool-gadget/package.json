@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-gadget",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
   "description": "Engraft tool that allows defining a simple tool and then using it",
   "publishConfig": {
@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.6"
+    "@engraft/toolkit": "^0.0.7"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
