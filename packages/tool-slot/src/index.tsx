@@ -1,8 +1,7 @@
 /// <reference path="babel_plugin-proposal-do-expressions.d.ts" />
-import { NodePath, PluginItem, TransformOptions } from "@babel/core";
+import type { NodePath, PluginItem, TransformOptions } from "@babel/core";
 import proposalDoExpressions from "@babel/plugin-proposal-do-expressions";
 import { transform } from "@babel/standalone";
-import TemplateDefault, * as TemplateModule from "@babel/template";
 import babelTypes from "@babel/types";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorState, RangeSet } from "@codemirror/state";
@@ -18,9 +17,6 @@ import { ToolFrame } from "./ToolFrame.js";
 import { ToolInspectorWindow } from "./ToolInspectorWindow.js";
 import { globals } from "./globals/index.js";
 import { makeRand } from "./globals/rand.js";
-
-// TODO: what hath ESM wrought?
-const template = (TemplateDefault.default || TemplateModule.default) as unknown as typeof import("@babel/template").default;
 
 export type Program = ProgramCodeMode | ProgramToolMode;
 
@@ -114,10 +110,6 @@ export default defineTool({ name: 'slot', makeProgram, collectReferences, run })
 // CODE MODE //
 ///////////////
 
-const lineNumTemplate = template(`
-  __inst_lineNum(%%num%%);
-`);
-
 const lineNumPlugin: PluginItem = function({types: t}: {types: typeof babelTypes}) {
   let nodesToSkip = new Set<babelTypes.Node>();
   return {
@@ -126,7 +118,12 @@ const lineNumPlugin: PluginItem = function({types: t}: {types: typeof babelTypes
         exit(path: NodePath<babelTypes.Statement>) {
           if (nodesToSkip.has(path.node)) { return; }
           if (!path.node.loc) { return; }
-          const newNode = lineNumTemplate({num: t.numericLiteral(path.node.loc.end.line)}) as babelTypes.Statement;
+          const newNode = t.expressionStatement(
+            t.callExpression(
+              t.identifier("__inst_lineNum"),
+              [t.numericLiteral(path.node.loc.end.line)],
+            )
+          );
           nodesToSkip.add(newNode);
           path.insertBefore(newNode);
         }
