@@ -38,7 +38,7 @@ function Redirect({ to }: { to: string }) {
     if (!value) {
       throw new Error(`Redirect: missing param ${key}`);
     }
-    to = to.replace(`:${key}`, value);
+    to = to.replace(`:${key}`, () => value);
   }
   console.warn(`Redirecting from deprecated route: ${window.location.hash.slice(1)} -> ${to}`);
   return <Navigate to={to} replace />;
