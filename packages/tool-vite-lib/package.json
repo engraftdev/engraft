@@ -1,0 +1,29 @@
+{
+  "name": "@engraft/tool-vite-lib",
+  "version": "0.0.7",
+  "license": "MIT",
+  "description": "Engraft tool which provides access to live-reloading libraries compiled by Vite",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build-lib": "tsc && node ../../scripts/css-to-js.cjs src lib",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dependencies": {
+    "@engraft/toolkit": "^0.0.7",
+    "humanize-duration": "^3.31.0"
+  },
+  "peerDependencies": {
+    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
+    "react-dom": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+  },
+  "devDependencies": {
+    "@types/humanize-duration": "^3.27.4"
+  }
+}

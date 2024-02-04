@@ -16,6 +16,7 @@
     "@engraft/fancy-setup": "^0.0.7",
     "@engraft/hostkit": "^0.0.7",
     "@engraft/shared": "^0.0.7",
+    "@engraft/tool-vite-lib": "^0.0.7",
     "@popperjs/core": "^2.11.7",
     "bootstrap": "^5.2.0",
     "firebase": "^9.9.1",
