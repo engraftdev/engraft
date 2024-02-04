@@ -233,11 +233,19 @@ const ValueInternal = memo(function ValueInternal(props: ValueInternalProps) {
 
   // OBJECTS & ARRAYS
 
-  if (value instanceof Object && !(value instanceof Function)) {
+  if (isObject(value)) {
     return <ValueComposite value={value} prefix={prefix} path={path} customizations={customizations} expandedLevelsLeft={expandedLevelsLeft}/>
   }
 
   // PRIMITIVE VALUES
+
+  if (value === null || value === undefined) {
+    return wrapInline(
+      <div style={{color: 'rgb(128, 128, 128)', ...valueFont}}>
+        {value === null ? 'null' : 'undefined'}
+      </div>
+    );
+  }
 
   if (typeof value === 'number') {
     return wrapInline(
