@@ -16,8 +16,12 @@ export function normalizeIndent(strings: TemplateStringsArray, ...expressions: u
   let textLines = text.split('\n');
   assert(textLines[0] === '', 'newline right after opening backtick please');
   textLines = textLines.slice(1);
-  assert(textLines[textLines.length - 1].match(/^\s*$/) !== null, 'no non-whitespace on closing backtick line please');
+  assert(textLines[textLines.length - 1].match(/^ *$/) !== null, 'no non-whitespace on closing backtick line please');
   textLines = textLines.slice(0, textLines.length - 1);
-  const leftPadding = Math.min(...textLines.map(line => line.match(/^\s*/)![0].length));
+  const leftPadding = Math.min(...textLines.map(line => {
+    const m = line.match(/^( *)[^ ]/);  // leading spaces and then a non-space
+    if (m === null) { return Infinity; }  // lines without non-spaces don't constrain
+    return m[1].length;
+  }));
   return textLines.map(line => line.slice(leftPadding)).join('\n') + '\n';
 }

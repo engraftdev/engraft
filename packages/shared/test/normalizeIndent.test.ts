@@ -33,4 +33,12 @@ describe('normalizeIndent', () => {
       extra`;
     }).toThrow();
   });
+
+  it('is ok with blank lines', () => {
+    expect(normalizeIndent`
+    a
+
+    b
+  `).toBe('a\n\nb\n');
+  })
 });
