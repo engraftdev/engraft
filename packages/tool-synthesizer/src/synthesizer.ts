@@ -1,5 +1,11 @@
 import _ from "lodash";
 
+
+export function eval2(code: string): any {
+  // eslint-disable-next-line no-new-func
+  return new Function('return (' + code + ')')();
+}
+
 // the ingredients
 // TODO: customize / abstract over these
 
@@ -11,8 +17,7 @@ interface Constant {
 function constantFromCode(code: string): Constant {
   return {
     code,
-    // eslint-disable-next-line no-eval
-    value: eval(code),
+    value: eval2(code),
   }
 }
 
@@ -280,7 +285,6 @@ function initializeState (inOutPairs: [any, any][]): SynthesisState {
   addValueToState(state, {values: inputs, code: 'input', frontier: true});
 
   for (const {value, code} of constants) {
-    // eslint-disable-next-line no-eval
     const values = inOutPairs.map(() => value);
     addValueToState(state, {values, code, frontier: true})
   }

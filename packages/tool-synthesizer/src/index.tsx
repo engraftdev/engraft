@@ -4,7 +4,7 @@ import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, PromiseSt
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
 import { Task } from "./Task.js"
-import { SynthesisState, synthesizeGen } from "./synthesizer.js"
+import { SynthesisState, eval2, synthesizeGen } from "./synthesizer.js"
 import { createPortal } from "react-dom";
 
 
@@ -124,8 +124,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
       <div className="xRow" style={{marginTop: 10}}>
         <button
           onClick={() => {
-            // eslint-disable-next-line no-eval
-            const pairs: [string, string][] = program.inOutPairs.map((pair) => [eval(pair.inCode), eval(pair.outCode)])
+            const pairs: [string, string][] = program.inOutPairs.map((pair) => [eval2(pair.inCode), eval2(pair.outCode)])
             if (synthesisTask) {
               synthesisTask.cancel();
             }
@@ -189,8 +188,7 @@ export const InOutPairView = memo(function InOutPairView(props: {
   const isCorrect = useMemo(() => {
     if (funcState.status === 'fulfilled') {
       try {
-        // eslint-disable-next-line no-eval
-        const inVal = eval(pair.inCode), outVal = eval(pair.outCode);
+        const inVal = eval2(pair.inCode), outVal = eval2(pair.outCode);
         return _.isEqual(outVal, funcState.value(inVal));
       } catch {
       }
