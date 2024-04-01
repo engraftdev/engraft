@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-notebook",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "description": "The famous Engraft notebook component",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/shared": "^0.0.7",
-    "@engraft/toolkit": "^0.0.7",
+    "@engraft/shared": "^0.0.8",
+    "@engraft/toolkit": "^0.0.8",
     "lodash": "^4.17.21",
     "react-merge-refs": "^2.0.1"
   },

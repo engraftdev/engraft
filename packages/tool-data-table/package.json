@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-data-table",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "description": "Engraft tool to edit table in an interactive table",
   "publishConfig": {
@@ -16,9 +16,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core-widgets": "^0.0.7",
-    "@engraft/shared": "^0.0.7",
-    "@engraft/toolkit": "^0.0.7",
+    "@engraft/core-widgets": "^0.0.8",
+    "@engraft/shared": "^0.0.8",
+    "@engraft/toolkit": "^0.0.8",
     "@reach/menu-button": "^0.18.0"
   },
   "peerDependencies": {

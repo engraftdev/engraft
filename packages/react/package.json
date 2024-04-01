@@ -1,6 +1,6 @@
 {
   "name": "@engraft/react",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "description": "Basic utilities for working with Engraft in React",
   "publishConfig": {
@@ -16,8 +16,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.7",
-    "@engraft/refunc": "^0.0.7"
+    "@engraft/core": "^0.0.8",
+    "@engraft/refunc": "^0.0.8"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",
