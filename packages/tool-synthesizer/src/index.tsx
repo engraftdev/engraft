@@ -1,10 +1,11 @@
 import { CodeMirror, setup } from "@engraft/codemirror-helpers"
 import { compileExpressionCached } from "@engraft/shared/lib/compile.js"
-import { CollectReferences, EngraftPromise, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, randomId, renderWithReact, updateProxy, usePromiseState } from "@engraft/toolkit"
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, PromiseState, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, randomId, renderWithReact, updateProxy, usePromiseState } from "@engraft/toolkit"
 import _ from "lodash"
 import { CSSProperties, Fragment, memo, useCallback, useMemo, useState } from "react"
 import { Task } from "./Task.js"
 import { SynthesisState, synthesizeGen } from "./synthesizer.js"
+import { createPortal } from "react-dom";
 
 
 interface InOutPair {
@@ -63,7 +64,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   inputResult: ToolResult<ToolProgram>,
   funcP: EngraftPromise<(input: any) => any>,
 }) => {
-  const { program, updateProgram, autoFocus, inputResult, funcP } = props;
+  const { program, updateProgram, autoFocus, inputResult, funcP, frameBarBackdropElem } = props;
   const programUP = updateProxy(updateProgram)
 
   const [synthesisTask, setSynthesisTask] = useState<Task<SynthesisState, String | undefined> | undefined>(undefined);
@@ -103,66 +104,68 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
 
   const inOutPairsIncExtra = useMemo(() => [...program.inOutPairs, extraInOutPair], [program.inOutPairs, extraInOutPair]);
 
-  return <div style={{padding: 10}}>
-    <div className="SynthesizerTool-input-row xRow" style={{marginBottom: 10, gap: 10}}>
-      <span style={{fontWeight: 'bold'}}>input</span> <ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />
-    </div>
-
-    <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, auto)', alignItems: 'center'}}>
-      {inOutPairsIncExtra.map((pair, i) =>
-        <InOutPairView
-          key={pair.id}
-          pair={pair}
-          pairUP={programUP.inOutPairs[i]}
-          isExtra={!program.inOutPairs.includes(pair)}
-          funcState={funcState}
-        />
-      )}
-    </div>
-    <div className="xRow" style={{marginTop: 10}}>
-      <button
-        onClick={() => {
-          // eslint-disable-next-line no-eval
-          const pairs: [string, string][] = program.inOutPairs.map((pair) => [eval(pair.inCode), eval(pair.outCode)])
-          if (synthesisTask) {
-            synthesisTask.cancel();
-          }
-          const task = new Task(synthesizeGen(pairs), {
-            onComplete(complete) {
-              if (complete) {
-                programUP.code.$set(complete);
-              } else {
-              }
-              setProgress(undefined);
-              setSynthesisTask(undefined);
-            },
-            onProgress(state) {
-              setProgress({...state.progress});
-            },
-          });
-          setSynthesisTask(task);
-          task.start();
-        }}
-      >
-        Run
-      </button>
-      {synthesisTask &&
+  return <div className="xCol">
+    {frameBarBackdropElem && createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
+    <InputHeading
+      slot={<ShowView view={inputResult.view} updateProgram={programUP.inputProgram.$} autoFocus={autoFocus} />}
+    />
+    <div className="xPad10">
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, auto)', alignItems: 'center'}}>
+        {inOutPairsIncExtra.map((pair, i) =>
+          <InOutPairView
+            key={pair.id}
+            pair={pair}
+            pairUP={programUP.inOutPairs[i]}
+            isExtra={!program.inOutPairs.includes(pair)}
+            funcState={funcState}
+          />
+        )}
+      </div>
+      <div className="xRow" style={{marginTop: 10}}>
         <button
           onClick={() => {
-            synthesisTask.cancel();
-            setProgress(undefined);
-            setSynthesisTask(undefined);
+            // eslint-disable-next-line no-eval
+            const pairs: [string, string][] = program.inOutPairs.map((pair) => [eval(pair.inCode), eval(pair.outCode)])
+            if (synthesisTask) {
+              synthesisTask.cancel();
+            }
+            const task = new Task(synthesizeGen(pairs), {
+              onComplete(complete) {
+                if (complete) {
+                  programUP.code.$set(complete);
+                } else {
+                }
+                setProgress(undefined);
+                setSynthesisTask(undefined);
+              },
+              onProgress(state) {
+                setProgress({...state.progress});
+              },
+            });
+            setSynthesisTask(task);
+            task.start();
           }}
         >
-          Cancel
+          Run
         </button>
-      }
-    </div>
-    <div className="SynthesizerTool-output-row xRow" style={{marginTop: 10, gap: 10}}>
-      <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{program.code}</div>
-    </div>
-    <div>
-      {progress && <pre>{JSON.stringify(progress, null, 2)}</pre>}
+        {synthesisTask &&
+          <button
+            onClick={() => {
+              synthesisTask.cancel();
+              setProgress(undefined);
+              setSynthesisTask(undefined);
+            }}
+          >
+            Cancel
+          </button>
+        }
+      </div>
+      <div className="SynthesizerTool-output-row xRow" style={{marginTop: 10, gap: 10}}>
+        <span style={{fontWeight: 'bold'}}>code</span> <div style={{fontFamily: 'monospace'}}>{program.code}</div>
+      </div>
+      <div>
+        {progress && <pre>{JSON.stringify(progress, null, 2)}</pre>}
+      </div>
     </div>
   </div>
 });
