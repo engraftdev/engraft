@@ -8,7 +8,6 @@ import * as Request from "./request/index.js";
 import * as SimpleChart from "./simple-chart/index.js";
 import * as Simulation from "./simulation/index.js";
 import * as Slider from "./slider/index.js";
-import * as Synthesizer from "./synthesizer/index.js";
 import * as TestArray from "./test-array/index.js";
 import * as TestDelay from "./test-delay/index.js";
 import * as TestSeeingDouble from "./test-seeing-double/index.js";
@@ -25,7 +24,6 @@ export const originalTools: Tool[] = [
   forgetP(toolFromModule(SimpleChart)),
   forgetP(toolFromModule(Simulation)),
   forgetP(toolFromModule(Slider)),
-  forgetP(toolFromModule(Synthesizer)),
   forgetP(toolFromModule(TestArray)),
   forgetP(toolFromModule(TestDelay)),
   forgetP(toolFromModule(TestSeeingDouble)),

@@ -16,7 +16,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/codemirror-helpers": "^0.0.7",
     "@engraft/hostkit": "^0.0.7",
     "@engraft/shared": "^0.0.7",
     "@engraft/toolkit": "^0.0.7",

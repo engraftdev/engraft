@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { compileExpression } from "@engraft/shared/lib/compile.js";
-import { runToCompletion } from "../../lib/synthesizer/Task.js";
-import { synthesizeGen } from "../../lib/synthesizer/synthesizer.js";
+import { runToCompletion } from "../lib/Task.js";
+import { synthesizeGen } from "../lib/synthesizer.js";
 
 describe('synthesizeGen', () => {
   it('synthesizes "adding one"', () => {

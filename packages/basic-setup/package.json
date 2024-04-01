@@ -29,6 +29,7 @@
     "@engraft/tool-notebook": "^0.0.7",
     "@engraft/tool-notebook-canvas": "^0.0.7",
     "@engraft/tool-slot": "^0.0.7",
+    "@engraft/tool-synthesizer": "^0.0.7",
     "@engraft/tool-test-count-runs": "^0.0.7",
     "@engraft/tool-text": "^0.0.7",
     "@engraft/tool-toy-adder": "^0.0.7",

@@ -7,7 +7,6 @@ import { Task } from "./Task.js"
 import { SynthesisState, synthesizeGen } from "./synthesizer.js"
 
 
-
 interface InOutPair {
   id: string,
   inCode: string,
