@@ -86,7 +86,6 @@ describe('applyTransforms', () => {
   it('names works', () => {
     const rows = [{x: 1, y: 2}, {x: 3, y: 4}];
     const data = inferDataFrameFromRows(rows);
-    console.log("HIYA", applyTransforms(data, { names: [ { column: 'x', name: 'xNew' } ] }).rows);
     expect(applyTransforms(data, { names: [ { column: 'x', name: 'xNew' } ] }).rows)
       .toEqual([{xNew: 1, y: 2}, {xNew: 3, y: 4}]);
   });

@@ -30,7 +30,6 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   }, [program.code]);
 
   const mdxCompiledP = hookMemo(() => {
-    console.log('mdxCode', mdxCode);
     return evaluate(mdxCode, {...runtime});
   }, [mdxCode]);
 

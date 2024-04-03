@@ -22,8 +22,6 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
   const { referenceValuesP, subResults } = hookFancyCodeEditor({ code: program.code, subPrograms: program.subPrograms, varBindings, context });
 
   const outputP = hookMemo(() => referenceValuesP.then((referenceValues) => {
-    console.log("text says")
-    console.log("program.code", program.code);
     let code = program.code;
     for (const [key, value] of Object.entries(referenceValues)) {
       code = code.replaceAll(key, () => `${value}`);

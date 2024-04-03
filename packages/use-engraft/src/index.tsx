@@ -172,7 +172,7 @@ const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
       const parsed = JSON.parse(text);
       if (parsed !== null && !(typeof parsed === 'object' && parsed.savedProgramId === id)) {
         // TODO: UI
-        console.log(parsed);
+        console.error(parsed);
         throw new Error('File does not match program');
       }
       setFileHandle(pickedFileHandle);
