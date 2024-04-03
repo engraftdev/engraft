@@ -145,6 +145,7 @@ export const FancyCodeEditorWithScopeVarBindingsRef = memo(function FancyCodeEdi
     function copyCutHandler(event: ClipboardEvent, view: EditorView) {
       defaultCopyCutHandler(view, event);
       // Attach the program to the clipboard as json-engraft data
+      // TODO: restrict to sub-programs that occur in the copied/cut text?
       event.clipboardData!.setData('application/json-engraft-subprograms', JSON.stringify(subPrograms));
       return true;
     }
