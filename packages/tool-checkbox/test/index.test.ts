@@ -15,6 +15,7 @@ describe('checkbox', () => {
           checked,
         },
         varBindings: {},
+        context: undefined as any,  // not needed here
       });
       expect(EngraftPromise.state(outputP)).toEqual({status: 'fulfilled', value: {value: checked}});
     });

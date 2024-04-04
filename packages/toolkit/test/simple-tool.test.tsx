@@ -1,6 +1,6 @@
 // adapted from https://github.com/marcelklehr/toposort/blob/master/test.js
 
-import { EngraftPromise } from "@engraft/core";
+import { EngraftPromise, Tool } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { Fragment } from "react";
 import { describe, expect, it } from "vitest";

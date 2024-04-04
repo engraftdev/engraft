@@ -16,6 +16,7 @@ describe('testing-known-output', () => {
           outputP: EngraftPromise.resolve({value}),
         },
         varBindings: {},
+        context: undefined as any,  // not used here
       });
       expect(EngraftPromise.state(outputP)).toEqual({status: 'fulfilled', value: {value}});
     });
@@ -35,6 +36,7 @@ describe('testing-known-output', () => {
         TestingKnownOutput.tool.run(memory, {
           program,
           varBindings: empty,
+          context: undefined as any,  // not used here
         }).outputP
       );
     }

@@ -1,8 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [ "src", "../../types/lib.d.ts" ],
-  "compilerOptions": {
-    "noEmit": false,
-    "outDir": "lib"
-  }
+  "include": [ "src", "test", "../../types/lib.d.ts" ]
 }

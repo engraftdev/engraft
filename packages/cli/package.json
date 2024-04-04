@@ -12,13 +12,14 @@
   "scripts": {
     "test:watch": "vitest",
     "test": "vitest run",
-    "build-lib": "tsc && node ../../scripts/css-to-js.cjs src lib",
+    "build-lib": "tsc --project tsconfig.build.json && node ../../scripts/css-to-js.cjs src lib",
     "postbuild-lib": "chmod +x lib/run.js",
     "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 .",
     "build-app": "vite build --config ../../vite.config.ts",
     "preview": "vite preview --config ../../vite.config.ts",
-    "dev": "vite --config ../../vite.config.ts"
+    "dev": "vite --config ../../vite.config.ts",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@engraft/fancy-setup": "^0.0.8",

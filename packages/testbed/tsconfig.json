@@ -1,8 +1,7 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [ "src" ],
+  "include": [ "src", "../../types/lib.d.ts" ],
   "compilerOptions": {
-    "module": "es2020",
     "types": [
       "vite/client"
     ]

@@ -10,6 +10,7 @@
   "scripts": {
     "depcheck": "node ../../scripts/our-depcheck.cjs",
     "lint": "eslint --max-warnings=0 .",
+    "tsc": "tsc",
     "build-app": "vite build --config ./vite.config.ts"
   },
   "main": "lib/index.js",
