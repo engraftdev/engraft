@@ -4,28 +4,28 @@ import { Refunction, RefuncMemory } from "./refunc.js";
 
 export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): Refunction<Args, Return> {
   return (memory: RefuncMemory, ...args) => {
-    const memoryForHooks = memory as RefuncMemory & { path?: HookPath };
-    if (!memoryForHooks.path) {
-      memoryForHooks.path = new HookPath();
+    const memoryForHooks = memory as RefuncMemory & { trail?: HookTrail };
+    if (!memoryForHooks.trail) {
+      memoryForHooks.trail = new HookTrail();
     }
-    return runWithPath(() => f(...args), memoryForHooks.path);
+    return runWithTrail(() => f(...args), memoryForHooks.trail);
   };
 }
 
 // fundamental hook
 
 export function hookRef<T>(init: () => T, label?: string): HookRef<T> {
-  const position = getPathPosition();
+  const position = getTrailPosition();
 
-  if (position.path.firstRun) {
+  if (position.trail.firstRun) {
     const ref: HookRef = new HookRef(init(), label);
-    position.path.refs[position.index] = ref;
+    position.trail.refs[position.index] = ref;
     position.index++;
     return ref;
   } else {
-    const ref: HookRef | undefined = position.path.refs[position.index];
+    const ref: HookRef | undefined = position.trail.refs[position.index];
     if (!ref) {
-      throw new Error(`Hooks: Ran off end of path with ${position.index + 1} refs`);
+      throw new Error(`Hooks: Ran off end of trail with ${position.index + 1} refs`);
     }
     position.index++;
     return ref;
@@ -49,7 +49,7 @@ export class HookRef<T = any> {
 // INTERNAL TYPES //
 ////////////////////
 
-export class HookPath {
+export class HookTrail {
   firstRun?: true = true;
   refs: HookRef[] = [];
 }
@@ -59,17 +59,17 @@ export class HookPath {
 // GLOBAL POSITION //
 /////////////////////
 
-type PathPosition = {
-  path: HookPath,
+type TrailPosition = {
+  trail: HookTrail,
   index: number,
 }
-let GLOBAL_PATH_POSITION: PathPosition | null = null;
+let GLOBAL_TRAIL_POSITION: TrailPosition | null = null;
 // TODO: an actual global might be more robust to duplicated-module issues
-function getPathPosition(): PathPosition {
-  if (GLOBAL_PATH_POSITION === null) {
-    throw new Error('Cannot use hook outside of runWithPath');
+function getTrailPosition(): TrailPosition {
+  if (GLOBAL_TRAIL_POSITION === null) {
+    throw new Error('Cannot use hook outside of runWithTrail');
   }
-  return GLOBAL_PATH_POSITION;
+  return GLOBAL_TRAIL_POSITION;
 }
 
 
@@ -77,21 +77,21 @@ function getPathPosition(): PathPosition {
 // INTERNAL //
 //////////////
 
-export function runWithPath<Return>(f: () => Return, path: HookPath): Return {
-  const oldPosition = GLOBAL_PATH_POSITION;
-  const newPosition = { path, index: 0 };
-  GLOBAL_PATH_POSITION = newPosition;
+export function runWithTrail<Return>(f: () => Return, trail: HookTrail): Return {
+  const oldPosition = GLOBAL_TRAIL_POSITION;
+  const newPosition = { trail, index: 0 };
+  GLOBAL_TRAIL_POSITION = newPosition;
 
   let result = f();
 
   // TODO: figure out how error-handling should work for hooky functions (refunctions in general?)
 
-  GLOBAL_PATH_POSITION = oldPosition;
+  GLOBAL_TRAIL_POSITION = oldPosition;
 
-  if (!path.firstRun && newPosition.index !== newPosition.path.refs.length) {
-    throw new Error(`Function changed number of steps between runs: ${newPosition.path.refs.length} => ${newPosition.index}`);
+  if (!trail.firstRun && newPosition.index !== newPosition.trail.refs.length) {
+    throw new Error(`Function changed number of steps between runs: ${newPosition.trail.refs.length} => ${newPosition.index}`);
   }
-  delete path.firstRun;
+  delete trail.firstRun;
 
   return result;
 }
@@ -101,7 +101,7 @@ export function runWithPath<Return>(f: () => Return, path: HookPath): Return {
 // UTILITY //
 /////////////
 
-type HookFork = { [key: string]: HookPath };
+type HookFork = { [key: string]: HookTrail };
 
 export type ForkAccess = {
   branch: ForkBranchFunction,
@@ -122,8 +122,8 @@ export function hookForkLater(): ForkAccess {
       }
       keysUsed[key] = true;
 
-      if (!fork[key]) { fork[key] = new HookPath(); }
-      return runWithPath(f, fork[key]);
+      if (!fork[key]) { fork[key] = new HookTrail(); }
+      return runWithTrail(f, fork[key]);
     },
     done(): void {
       // remove unused keys
