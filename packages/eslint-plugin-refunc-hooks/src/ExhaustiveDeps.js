@@ -131,11 +131,20 @@ module.exports = {
           pureScopes.add(currentScope);
           const blockParent = currentScope.block.parent;
           if (blockParent && blockParent.type === 'CallExpression' && blockParent.callee.name === 'hooks') {
+            // body of a hooks() call; done climbing
+            break;
+          }
+          if (currentScope.block.type === 'FunctionDeclaration' && currentScope.block.id.name.match('^hook[A-Z]')) {
+            // declaring a new hook; done climbing
             break;
           }
           currentScope = currentScope.upper;
         }
         if (!currentScope) {
+          reportProblem({
+            node,
+            message: `Refunc Hook ${context.getSource(reactiveHook)} used outside of 'hooks' or hook definition.`,
+          });
           return;
         }
         componentScope = currentScope;

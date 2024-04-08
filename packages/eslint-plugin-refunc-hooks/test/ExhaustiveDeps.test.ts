@@ -37,6 +37,16 @@ ruleTester.run('exhaustive-deps', rule as any, {
       `,
     },
     {
+      name: 'correct single dep, defining a new hook',
+      code: normalizeIndent`
+        function hookBrandNew(a: number) {
+          return hookMemo(() => {
+            return a * a;
+          }, [a]);
+        }
+      `,
+    },
+    {
       name: 'correct nested dep',
       code: normalizeIndent`
         const f = hooks((a: number) => {
@@ -70,8 +80,19 @@ ruleTester.run('exhaustive-deps', rule as any, {
         const f = hooks((a: number) => {
           return hookMemo(() => {
             return a * a;
-          }, [])
+          }, []);
         });
+      `,
+      errors: [ {} ],
+    },
+    {
+      name: 'missing dep (defining hook)',
+      code: normalizeIndent`
+        function hookBrandNew(a: number) {
+          return hookMemo(() => {
+            return a * a;
+          }, []);
+        }
       `,
       errors: [ {} ],
     },
@@ -104,14 +125,36 @@ ruleTester.run('exhaustive-deps', rule as any, {
     {
       name: 'missing nested dep twice',
       code: normalizeIndent`
-      const f = hooks((a: number) => {
-        return doThing(() => {
-          const b = a * a;
-          return hookMemo(() => {
-            return a * b;
-          }, [a]);
+        const f = hooks((a: number) => {
+          return doThing(() => {
+            const b = a * a;
+            return hookMemo(() => {
+              return a * b;
+            }, [a]);
+          });
         });
-      });
+      `,
+      errors: [ {} ],
+    },
+    {
+      name: 'using hook outside of acceptable context',
+      code: normalizeIndent`
+        const f = (a: number) => {
+          return hookMemo(() => {
+            return a * a;
+          }, []);
+        };
+      `,
+      errors: [ {} ],
+    },
+    {
+      name: 'using hook outside of acceptable context (defining non-hook function)',
+      code: normalizeIndent`
+        function notAHook(a: number) {
+          return hookMemo(() => {
+            return a * a;
+          }, [a]);
+        }
       `,
       errors: [ {} ],
     },
