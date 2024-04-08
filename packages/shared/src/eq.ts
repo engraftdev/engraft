@@ -16,6 +16,9 @@ export function objEqWith<T>(eq: Eq<T>): Eq<Record<string, T>> {
       return false;
     }
     for (let key of keys1) {
+      if (!(key in o2)) {
+        return false;
+      }
       const val1: T | undefined = o1[key];
       const val2: T | undefined = o2[key];
       if (!eq(val1, val2)) {
@@ -46,6 +49,9 @@ export function arrEqWith<T>(eq: Eq<T>): Eq<T[]> {
 export const arrEqWithRefEq = arrEqWith(refEq);
 
 export function setEqWithRefEq<T>(s1: Set<T>, s2: Set<T>): boolean {
+  if (!(s1 instanceof Set) || !(s2 instanceof Set)) {
+    throw new Error('setEqWithRefEq: arguments must be Sets');
+  }
   if (s1.size !== s2.size) { return false; }
   for (let elem of s1) {
     if (!s2.has(elem)) {
