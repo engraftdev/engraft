@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, useCommonWidth, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolRun, ToolView, ToolViewRenderProps, up, useCommonWidth } from "@engraft/toolkit";
 import * as d3dsv from "d3-dsv";
 import { memo, useState } from "react";
 import { RowToCol } from "./RowToCol.js";
@@ -117,7 +117,7 @@ const View = memo(function View(props: ToolProps<Program> & ToolViewRenderProps<
   paramsView: ToolView<ToolProgram>,
 }) {
   const { program, updateProgram, autoFocus, urlView, paramsView } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const leftCommonWidth = useCommonWidth();
 

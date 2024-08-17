@@ -10,7 +10,7 @@ import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEdit
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { cache } from "@engraft/shared/lib/cache.js";
 import { compileBodyCached } from "@engraft/shared/lib/compile.js";
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookFork, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, up, usePromiseState } from "@engraft/toolkit";
 import objectInspect from "object-inspect";
 import { memo, useCallback, useMemo, useState } from "react";
 import { ToolFrame } from "./ToolFrame.js";
@@ -249,7 +249,7 @@ type CodeModeViewProps = CodeModeProps & ToolViewRenderProps<Program> & {
 
 const CodeModeView = memo(function CodeModeView(props: CodeModeViewProps) {
   const {program, varBindings, context, updateProgram, expand, autoFocus, onBlur, subResults, logsP} = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const [showInspector, setShowInspector] = useState(false);
 
@@ -397,7 +397,7 @@ type ToolModeViewProps = ToolModeProps & ToolViewRenderProps<Program> & {
 
 const ToolModeView = memo(function ToolModeView(props: ToolModeViewProps) {
   const {program, varBindings, updateProgram, context, expand, autoFocus, noFrame, subView, onBlur} = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const updateSubProgram = programUP.subProgram.$;
 

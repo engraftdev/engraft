@@ -1,4 +1,4 @@
-import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, useCommonWidth, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, up, useCommonWidth, usePromiseState } from "@engraft/toolkit";
 import humanizeDuration from "humanize-duration";
 import { Fragment, memo, useEffect, useState } from "react";
 
@@ -42,7 +42,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   urlResult: ToolResult<ToolProgram>,
 }) => {
   const { autoFocus, urlResult, program, updateProgram } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const urlOutputState = usePromiseState(urlResult.outputP);
 

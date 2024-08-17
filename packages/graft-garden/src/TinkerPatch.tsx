@@ -1,11 +1,11 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { IsolateStyles, ToolWithView, Value, useStateUP } from "@engraft/hostkit";
+import { IsolateStyles, ToolWithView, Value, up } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import { doc } from "firebase/firestore";
 import _ from "lodash";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { Link, useParams } from "react-router-dom";
@@ -69,7 +69,8 @@ const TinkerPatchLoaded = memo(function TinkerPatchLoaded(props: {
     document.title = `graft garden: editing ${patch?.name || 'unnamed patch'}`;
   }, [patch?.name]);
 
-  const [ program, programUP ] = useStateUP(() => patch.toolProgram);
+  const [ program, setProgram ] = useState(patch.toolProgram);
+  const programUP = up(setProgram);
 
   const programIsEmpty = _.isEqual(program, context.makeSlotWithCode(''));
 

@@ -1,8 +1,8 @@
-import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
-import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
-import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
+import { up, UpdateProxy } from "@engraft/update-proxy";
+import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
+import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value.js";
 
 
 const ValueEditableContext = createContext<Updater<any> | undefined>(undefined);
@@ -16,12 +16,11 @@ function atPath(up: UpdateProxy<any>, path: (string | number)[]): UpdateProxy<an
 
 export const SubValueHandle = memo(function SubValueHandle({value, path, children}: SubValueHandleProps) {
   const updater = useContext(ValueEditableContext);
-  const valueUP = useUpdateProxy(updater);
 
   const [hoverRef, isHovered, elem] = useHover();
 
   const onClick = useCallback((ev: MouseEvent) => {
-    if (!valueUP || !path) { return false; }
+    if (!updater || !path) { return false; }
     ev.preventDefault();
     let defaultStr: string | undefined = undefined;
     try {
@@ -33,11 +32,11 @@ export const SubValueHandle = memo(function SubValueHandle({value, path, childre
     if (newValueStr !== null) {
       try {
         const newValue = JSON.parse(newValueStr);
-        atPath(valueUP, path).$set(newValue);
+        atPath(up(updater), path).$set(newValue);
       } catch { }
     }
     return false;
-  }, [elem, path, valueUP, value])
+  }, [updater, path, elem?.ownerDocument.defaultView, value])
 
   if (!path) {
     return <>{children}</>;

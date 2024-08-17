@@ -6,7 +6,7 @@ import { count } from "@engraft/shared/lib/count.js";
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { isoformat } from "@engraft/shared/lib/isoformat.js";
 import { useHover } from '@engraft/shared/lib/useHover.js';
-import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, renderWithReact, usePromiseState, useUpdateProxy } from '@engraft/toolkit';
+import { CollectReferences, EngraftPromise, InputHeading, MakeProgram, ShowView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, UpdateProxyRemovable, defineTool, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, memoizeProps, renderWithReact, up, usePromiseState } from '@engraft/toolkit';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { CSSProperties, ReactNode, memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -79,7 +79,7 @@ const View = memo((props: ToolProps<P> & ToolViewRenderProps<P> & {
   dataFramesP: EngraftPromise<{input: DataFrame, outputExceptSelect: DataFrame, output: DataFrame}>,
 }) => {
   const { program, updateProgram, autoFocus, frameBarBackdropElem, inputResult, dataFramesP } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const dataFramesState = usePromiseState(dataFramesP);
 
@@ -108,7 +108,7 @@ const Table = memo((props: {
   updateProgram: Updater<P>,
 }) => {
   const { dataFrames, program, updateProgram } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const [maxRows, setMaxRows] = useState(50);
 

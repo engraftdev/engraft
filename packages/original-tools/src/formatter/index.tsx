@@ -1,6 +1,6 @@
 import { ToolWithView } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
-import { CollectReferences, defineTool, EngraftContext, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, defineTool, EngraftContext, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolRun, ToolView, ToolViewRenderProps, up, UpdateProxy, usePromiseState } from "@engraft/toolkit";
 import { memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import builtinStyles from './builtin.css.js';
@@ -73,7 +73,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 
 const View = memo(function FormatterToolView(props: ViewProps) {
   const { program, updateProgram, context, autoFocus, frameBarBackdropElem, inputResult } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
   const { rootElement } = program;
 
   const [ selection, setSelection ] = useState<FormatterSelection | null>(null);

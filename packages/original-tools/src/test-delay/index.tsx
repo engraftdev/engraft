@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolProgram, ToolProps, ToolRun, ToolView, UseUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolProgram, ToolProps, ToolRun, ToolView, up } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'test-delay',
@@ -31,16 +31,14 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact(({updateProgram, autoFocus}) =>
-      <UseUpdateProxy updater={updateProgram} children={(programUP) =>
-        <div className="xCol xGap10 xPad10">
-          <div className="xRow xGap10">
-            <b>delay</b>
-            <ShowView view={delayView} updateProgram={programUP.delayProgram.$apply} autoFocus={autoFocus} />
-            ms
-          </div>
-          <ShowView view={actualView} updateProgram={programUP.actualProgram.$apply} />
+      <div className="xCol xGap10 xPad10">
+        <div className="xRow xGap10">
+          <b>delay</b>
+          <ShowView view={delayView} updateProgram={up(updateProgram).delayProgram.$apply} autoFocus={autoFocus} />
+          ms
         </div>
-      } />
+        <ShowView view={actualView} updateProgram={up(updateProgram).actualProgram.$apply} />
+      </div>
     ),
   }), [delayView, actualView]);
 

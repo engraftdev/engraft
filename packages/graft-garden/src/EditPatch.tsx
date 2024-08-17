@@ -1,9 +1,10 @@
 /// <reference path="./react-firebase-hooks.d.ts" />
 
-import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, useUpdateProxy } from "@engraft/hostkit";
+import { IsolateStyles, ToolWithView, UpdateProxy, ValueEditable, up } from "@engraft/hostkit";
 import { noOp } from "@engraft/shared/lib/noOp.js";
 import bootstrapCss from "bootstrap/dist/css/bootstrap.min.css?inline";
 import 'bootstrap/js/dist/dropdown';
+import { getAuth } from "firebase/auth";
 import { Timestamp, addDoc, deleteDoc, doc } from "firebase/firestore";
 import _ from "lodash";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
@@ -13,7 +14,6 @@ import { Patch, patchesRef } from "./db.js";
 import { useDocumentDataAndUpdater } from "./useDocumentDataAndUpdater.js";
 import { usePatchState } from "./usePatchState.js";
 import { context, useUser } from "./util.js";
-import { getAuth } from "firebase/auth";
 
 const myCss = `
 @media (min-width: 992px) {
@@ -37,7 +37,6 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
   const docRefer = doc(patchesRef, patchId);
   const [patch, updatePatch] = useDocumentDataAndUpdater(docRefer);
   const error = undefined as Error | undefined;  // TODO: handle errors
-  const patchUP = useUpdateProxy(updatePatch);
 
   const user = useUser();
   useEffect(() => {
@@ -60,7 +59,7 @@ export const EditPatch = memo(function EditPatch(props: {safeMode?: boolean}) {
         </div>
       </div>
       { patch
-        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={patchUP} safeMode={safeMode} />
+        ? <EditPatchLoaded patchId={patchId} patch={patch} patchUP={up(updatePatch)} safeMode={safeMode} />
         : error
         ? <div className="col-lg-6 mx-auto">error: {error.message}</div>
         : <div className="col-lg-6 mx-auto">loading...</div>

@@ -1,6 +1,5 @@
 import { assertNever } from "@engraft/shared/lib/assert.js";
-import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
-import { useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolOutput, ToolProps, ToolRun, ToolView, ToolViewRenderProps, defineTool, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 import * as d3dsv from "d3-dsv";
 import { memo, useCallback, useMemo } from "react";
 import * as DropzoneModule from "react-dropzone";
@@ -59,7 +58,7 @@ const run: ToolRun<Program> = memoizeProps(hooks((props: ToolProps<Program>) => 
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const { program, updateProgram } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const mimeType = useMemo(() => {
     if (!program.file) { return null; }

@@ -1,6 +1,6 @@
 import { runtimeObjectId } from "@engraft/shared/lib/runtimeObjectId.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { EngraftContext, IsolateStyles, ScopeVarBindingsContext, ToolProgram, useUpdateProxy, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
+import { EngraftContext, IsolateStyles, ScopeVarBindingsContext, ToolProgram, up, Value, ValueEditable, VarBindings } from "@engraft/toolkit";
 import { memo, useContext } from "react";
 import { WindowPortal } from "./WindowPortal.js";
 
@@ -16,7 +16,6 @@ export type ToolInspectorWindowProps = {
 
 export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspectorWindowProps) {
   const {program, updateProgram, varBindings, context, show, onClose} = props;
-  const programUP = useUpdateProxy(updateProgram);
 
   const scopeVarBindings = useContext(ScopeVarBindingsContext);
 
@@ -29,10 +28,10 @@ export const ToolInspectorWindow = memo(function ToolInspector(props: ToolInspec
     <IsolateStyles>
       <div className="xRow xGap10">
         Debug ID
-        { programUP ?
+        { updateProgram ?
           <input
             value={program.debugId || ""}
-            onChange={(e) => programUP.debugId.$set(e.target.value.length > 0 ? e.target.value : undefined)}
+            onChange={(e) => up(updateProgram).debugId.$set(e.target.value.length > 0 ? e.target.value : undefined)}
           /> :
           <span>{(program as any).debugId}</span>
         }

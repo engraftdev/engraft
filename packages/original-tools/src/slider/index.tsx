@@ -1,5 +1,5 @@
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { EngraftPromise, MyContextMenu, MyContextMenuHeading, Tool, ToolProps, ToolView, ToolViewRenderProps, hookMemo, hooks, memoizeProps, renderWithReact, useUpdateProxy } from "@engraft/toolkit";
+import { EngraftPromise, MyContextMenu, MyContextMenuHeading, Tool, ToolProps, ToolView, ToolViewRenderProps, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 import { memo, useCallback } from "react";
 
 
@@ -41,7 +41,7 @@ export const tool: Tool<Program> = {
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const { program, updateProgram } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>
     <MyContextMenu>

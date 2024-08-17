@@ -2,7 +2,7 @@ import { EngraftPromise, hookRunTool, Tool, ToolProgram, ToolProps, ToolResult, 
 import { renderWithReact, ShowView } from '@engraft/react';
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
-import { UpdateProxy, useUpdateProxy } from "@engraft/update-proxy-react";
+import { up, UpdateProxy } from "@engraft/update-proxy";
 import { useCallback } from "react";
 
 // "defineSimpleTool" provides a simple way to define a tool that has a fixed
@@ -121,7 +121,7 @@ export function SimpleToolView<Name extends string, Fields extends object, SubTo
     }
 ) {
   const {program, updateProgram, simpleToolSpec, subToolViews, ...renderProps} = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const renderSlot = useCallback((slotName: SubToolKey, slotRenderProps?: RenderProps) => {
     return <ShowView

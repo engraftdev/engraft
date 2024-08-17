@@ -1,7 +1,7 @@
 /// <reference path="./jsx-runtime.d.ts" />
 import { markdown } from "@codemirror/lang-markdown";
-import { FancyCodeEditor, hookFancyCodeEditor, refREDirect, collectReferencesForFancyCodeEditor } from "@engraft/codemirror-helpers";
-import { CollectReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEditor, refREDirect } from "@engraft/codemirror-helpers";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolProgram, ToolProps, ToolView, defineTool, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 import { evaluate } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 
@@ -39,21 +39,19 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact(({updateProgram, autoFocus, onBlur}) =>
-      <UseUpdateProxy updater={updateProgram} children={programUP =>
-        <FancyCodeEditor
-          extensions={[markdown()]}
-          code={program.code}
-          codeUP={programUP.code}
-          subPrograms={program.subPrograms}
-          subProgramsUP={programUP.subPrograms}
-          varBindings={varBindings}
-          autoFocus={autoFocus}
-          subResults={subResults}
-          defaultCode=""
-          onBlur={onBlur}
-          context={context}
-        />
-      } />
+      <FancyCodeEditor
+        extensions={[markdown()]}
+        code={program.code}
+        codeUP={up(updateProgram).code}
+        subPrograms={program.subPrograms}
+        subProgramsUP={up(updateProgram).subPrograms}
+        varBindings={varBindings}
+        autoFocus={autoFocus}
+        subResults={subResults}
+        defaultCode=""
+        onBlur={onBlur}
+        context={context}
+      />
     ),
   }), [context, program.code, program.subPrograms, subResults, varBindings]);
 

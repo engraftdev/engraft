@@ -2,7 +2,7 @@ import { Var, VarBinding } from "@engraft/core";
 import { usePromiseState } from "@engraft/react";
 import { ControlledSpan } from "@engraft/shared/lib/ControlledTextInput.js";
 import { Updater } from "@engraft/shared/lib/Updater.js";
-import { useUpdateProxy } from "@engraft/update-proxy-react";
+import { up } from "@engraft/update-proxy";
 import { CSSProperties, memo, useRef, useState } from "react";
 import { ObjectInspector } from "react-inspector";
 
@@ -27,7 +27,6 @@ interface VarDefinitionProps {
 
 export const VarDefinition = memo(function VarDefinition(props: VarDefinitionProps) {
   const { var_, updateVar, autoFocus, attach, style } = props;
-  const varUP = useUpdateProxy(updateVar);
 
   const radii: CSSProperties =
     attach === 'right'
@@ -50,7 +49,7 @@ export const VarDefinition = memo(function VarDefinition(props: VarDefinitionPro
       ...style,
     }}
   >
-    <ControlledSpan value={var_.label} onValue={(label) => varUP && varUP.label.$set(label)}
+    <ControlledSpan value={var_.label} onValue={(label) => updateVar && up(updateVar).label.$set(label)}
           style={{border: 'none', background: 'none'}} autoFocus={autoFocus}/>
     {var_.label.length === 0 && <span style={{fontStyle: 'italic'}}></span>}
   </div>

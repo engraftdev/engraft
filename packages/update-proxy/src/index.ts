@@ -83,6 +83,20 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
   return up;
 }
 
+
+const UPDATE_PROXY_CACHE = new WeakMap<Function, UpdateProxy<unknown>>();
+
+export function up<T>(updater: Updater<T>): UpdateProxy<T> {
+  const cached = UPDATE_PROXY_CACHE.get(updater);
+  if (cached) {
+    return cached as UpdateProxy<T>;
+  } else {
+    const up = updateProxy(updater);
+    UPDATE_PROXY_CACHE.set(updater, up as UpdateProxy<unknown>);
+    return up;
+  }
+}
+
 function atObjOrArray<T, K extends keyof T>(update: Updater<T>, key: K): Updater<T[K]> {
   return (f: (oldTK: T[K]) => T[K]) => {
     update((oldT: T) => {

@@ -1,4 +1,4 @@
-import { hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, ShowView, Tool, ToolProgram, ToolView, UseUpdateProxy } from "@engraft/toolkit";
+import { hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, ShowView, Tool, ToolProgram, ToolView, up } from "@engraft/toolkit";
 import { Fragment, memo, ReactNode, useEffect, useReducer } from "react";
 
 export type Program = {
@@ -26,27 +26,26 @@ export const tool: Tool<Program> = {
     const outputP = subOutputP;
 
     const view: ToolView<Program> = hookMemo(() => ({
-      render: renderWithReact(({updateProgram}) =>
-        <UseUpdateProxy updater={updateProgram} children={(programUP) =>
-          <div className="xCol xGap10 xPad10">
-            <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
-            { program.rerenderOnProgramChange
-            ? <RerenderOn value={program.subProgram}>
-                <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
-              </RerenderOn>
-            : <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
-            }
-            <div className="xRow xGap10">
-              <input
-                type="checkbox"
-                checked={program.rerenderOnProgramChange}
-                onChange={(e) => programUP.rerenderOnProgramChange.$set(e.target.checked)}
-              />
-              <span>rerender view 2 on program change</span>
-            </div>
+      render: renderWithReact(({updateProgram}) => {
+        const programUP = up(updateProgram);
+        return <div className="xCol xGap10 xPad10">
+          <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+          { program.rerenderOnProgramChange
+          ? <RerenderOn value={program.subProgram}>
+              <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+            </RerenderOn>
+          : <ShowView view={subView} updateProgram={programUP.subProgram.$apply} />
+          }
+          <div className="xRow xGap10">
+            <input
+              type="checkbox"
+              checked={program.rerenderOnProgramChange}
+              onChange={(e) => programUP.rerenderOnProgramChange.$set(e.target.checked)}
+            />
+            <span>rerender view 2 on program change</span>
           </div>
-        } />
-      ),
+        </div>;
+      }),
     }), [program.subProgram, program.rerenderOnProgramChange, subView]);
 
     return { outputP, view };

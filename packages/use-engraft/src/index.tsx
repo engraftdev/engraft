@@ -1,7 +1,7 @@
 /// <reference types="@types/wicg-file-system-access" />
 
 import { makeFancyContext } from "@engraft/fancy-setup";
-import { EngraftContext, EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, hookRunToolWithNewVarBindings, hooks, randomId, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/hostkit";
+import { EngraftContext, EngraftPromise, RootStyles, ShowViewWithScope, ToolOutputView, ToolProgram, ToolResultWithScope, VarBinding, VarBindings, VarDefinition, hookRunToolWithNewVarBindings, hooks, randomId, up, usePromiseState, useRefunction } from "@engraft/hostkit";
 import { DOM } from "@engraft/shared/lib/DOM.js";
 import { ShadowDOM } from "@engraft/shared/lib/ShadowDOM.js";
 import { useDedupe } from "@engraft/shared/lib/useDedupe.js";
@@ -118,7 +118,7 @@ type UseEngraftRHSProps = {
 
 const UseEngraftRHS = memo(function UseEngraftRHS(props: UseEngraftRHSProps) {
   const { varBindings, defaultValue, resultWithScope, draft, updateDraft, useDefault, setUseDefault } = props;
-  const draftUP = useUpdateProxy(updateDraft);
+  const draftUP = up(updateDraft);
 
   const id = draft.savedProgramId!;
 

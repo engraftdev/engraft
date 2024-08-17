@@ -62,7 +62,6 @@ Code is divided into separate packages located in the `packages` directory. Each
 * *Utilities*
   * [**shared**](packages/shared/): An assortment of utilities shared across this codebase. It should not be used outside this monorepo.
   * [**update-proxy**](packages/update-proxy/): A helper that makes it easy to perform immutable updates, used often in tools.
-    * [**update-proxy-react**](packages/update-proxy-react/): Helpers connecting update-proxy with React.
   * [**codemirror-helpers**](packages/codemirror-helpers/): Extensions to CodeMirror, including `FancyCodeEditor` (which powers `slot`, `text`, `python`, etc.).
 
 ### Build system overview

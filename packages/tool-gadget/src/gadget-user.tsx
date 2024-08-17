@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, renderWithReact, runTool, usePromiseState, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, renderWithReact, runTool, usePromiseState, useRefunction, up } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -70,7 +70,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   gadgetProgramP: EngraftPromise<unknown>,
 }) => {
   const { program, updateProgram, varBindings, context, gadgetProgramP, autoFocus } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const closureResults = useRefunction(runTool, {program: program.closureProgram, varBindings, context});
   const closureOutputState = usePromiseState(closureResults.outputP);
@@ -99,7 +99,7 @@ const ViewWithClosure = memo((props: ToolProps<Program> & ToolViewRenderProps<Pr
   gadgetProgram: unknown,
 }) => {
   const { program, updateProgram, context, closure, gadgetProgram } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const gadgetProgramUP = programUP.gadgetProgram;
 

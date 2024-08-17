@@ -3,7 +3,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { useWindowEventListener } from "@engraft/shared/lib/useEventListener.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useKeyHeld } from "@engraft/shared/lib/useKeyHeld.js";
-import { defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, randomId, renderWithReact, ShowView, SubValueHandleProps, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, useUpdateProxy, ValueCustomizations } from "@engraft/toolkit";
+import { defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, memoizeProps, randomId, renderWithReact, ShowView, SubValueHandleProps, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, up, ValueCustomizations } from "@engraft/toolkit";
 import React, { createContext, memo, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { isWildcard, mergePatterns, Path, Pattern, wildcard } from "./patterns.js";
@@ -245,7 +245,7 @@ type ExtractorToolViewProps = ToolProps<Program> & ToolViewRenderProps<Program> 
 const ExtractorToolView = memo(function ExtractorToolView(props: ExtractorToolViewProps) {
   const { program, updateProgram, autoFocus, inputResult, frameBarBackdropElem } = props;
   const { patternsWithIds, minimized } = program;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const [activePatternIndex, setActivePatternIndex] = useState(patternsWithIds.length);
 

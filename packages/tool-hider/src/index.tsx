@@ -1,5 +1,5 @@
 import { Program as CheckboxProgram } from "@engraft/tool-checkbox";
-import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UsePromiseState, UseUpdateProxy, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolProgram, ToolRun, ToolView, UsePromiseState, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 
 // TODO: can this tool ensure that CheckboxProgram is registered, as a
 // dependency?
@@ -31,24 +31,22 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact(({updateProgram, autoFocus}) =>
-      <UseUpdateProxy updater={updateProgram} children={(programUP) =>
-        <div className="xCol xGap10 xPad10">
-          <div className="xRow xGap10">
-            <b>shown?</b>
-            <ShowView view={isShownResults.view} updateProgram={programUP.isShownProgram.$} />
-          </div>
-          <UsePromiseState promise={isShownResults.outputP} children={(isShownOutputState) => {
-            if (isShownOutputState.status === 'fulfilled' && isShownOutputState.value.value) {
-              return <div className="xRow xGap10">
-                <b>y</b>
-                <ShowView view={actualResults.view} updateProgram={programUP.actualProgram.$} autoFocus={autoFocus} />
-              </div>
-            } else {
-              return null;
-            }
-          }}/>
+      <div className="xCol xGap10 xPad10">
+        <div className="xRow xGap10">
+          <b>shown?</b>
+          <ShowView view={isShownResults.view} updateProgram={up(updateProgram).isShownProgram.$} />
         </div>
-      } />
+        <UsePromiseState promise={isShownResults.outputP} children={(isShownOutputState) => {
+          if (isShownOutputState.status === 'fulfilled' && isShownOutputState.value.value) {
+            return <div className="xRow xGap10">
+              <b>y</b>
+              <ShowView view={actualResults.view} updateProgram={up(updateProgram).actualProgram.$} autoFocus={autoFocus} />
+            </div>
+          } else {
+            return null;
+          }
+        }}/>
+      </div>
     ),
   }), [actualResults.view, isShownResults.outputP, isShownResults.view]);
 

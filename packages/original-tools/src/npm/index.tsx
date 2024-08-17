@@ -1,5 +1,5 @@
 import { ControlledTextInput } from "@engraft/shared/lib/ControlledTextInput.js";
-import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, ToolRun, ToolView, defineTool, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 
 type Program = {
   toolName: 'npm',
@@ -30,13 +30,11 @@ const run: ToolRun<Program> = memoizeProps(hooks((props) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact(({updateProgram}) =>
-      <UseUpdateProxy updater={updateProgram} children={(programUP) =>
-        <div className="xCol xGap10 xPad10">
-          <div className="xRow xGap10">
-            <b>name</b> <ControlledTextInput value={program.packageName} onChange={(ev) => programUP.packageName.$set(ev.target.value)} />
-          </div>
+      <div className="xCol xGap10 xPad10">
+        <div className="xRow xGap10">
+          <b>name</b> <ControlledTextInput value={program.packageName} onChange={(ev) => up(updateProgram).packageName.$set(ev.target.value)} />
         </div>
-      } />
+      </div>
     ),
   }), [program.packageName]);
 

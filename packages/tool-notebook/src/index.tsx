@@ -5,7 +5,7 @@ import { Use } from "@engraft/shared/lib/Use.js";
 import { MenuMaker, useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
 import { useSize } from "@engraft/shared/lib/useSize.js";
-import { cellNetwork, CollectReferences, collectReferencesForCellNetwork, defineTool, EngraftPromise, hookMemo, hookRefunction, hooks, MakeProgram, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, randomId, ScrollShadow, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxyRemovable, useUpdateProxy, Var, VarDefinition, EngraftContext, renderWithReact } from "@engraft/toolkit";
+import { cellNetwork, CollectReferences, collectReferencesForCellNetwork, defineTool, EngraftContext, EngraftPromise, hookMemo, hookRefunction, hooks, MakeProgram, memoizeProps, MyContextMenu, MyContextMenuHeading, newVar, outputBackgroundStyle, randomId, renderWithReact, ScrollShadow, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, up, UpdateProxyRemovable, Var, VarDefinition } from "@engraft/toolkit";
 import _ from "lodash";
 import { Fragment, memo, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
@@ -73,7 +73,7 @@ type ViewProps = ToolViewRenderProps<Program> & ToolProps<Program> & {
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, cellResultsWithScope, autoFocus, context } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const smallestUnusedLabel = unusedLabel(alphaLabels, program.cells.map(cell => cell.var_.label)) || 'ZZZ';
 

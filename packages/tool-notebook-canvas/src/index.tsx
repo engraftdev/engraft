@@ -1,7 +1,7 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { unusedLabel } from "@engraft/shared/lib/unusedLabel.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, renderWithReact, updateWithUP, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarDefinition, cellNetwork, collectReferencesForCellNetwork, defineTool, hookMemo, hookRefunction, hooks, memoizeProps, newVar, renderWithReact, updateWithUP, up } from "@engraft/toolkit";
 import _ from "lodash";
 import { memo, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -78,7 +78,7 @@ const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & {
   cellResults: {[id: string]: ToolResultWithScope},
 }) => {
   const { program, updateProgram, context, cellResults, frameBarBackdropElem } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
   const { cells } = program;
 
   const smallestUnusedLabel = unusedLabel(defaultCellLabels, cells.map(cell => cell.var_.label));

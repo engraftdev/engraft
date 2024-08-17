@@ -1,4 +1,4 @@
-import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, UpdateProxy, usePromiseState, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRunTool, hooks, inputFrameBarBackdrop, InputHeading, MakeProgram, memoizeProps, renderWithReact, ShowView, ToolOutput, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, up, UpdateProxy, usePromiseState } from "@engraft/toolkit";
 import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import * as SelectModule from "react-select";
@@ -126,7 +126,7 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 const View = memo(function View(props: ViewProps) {
   const { program, updateProgram, dataResult, frameBarBackdropElem } = props;
   const { mark = 'bar', xChannel, yChannel } = program;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
   const dataOutputState = usePromiseState(dataResult.outputP);
 
   const markOptions: OptionWithIcon<Mark>[] = useMemo(() => {

@@ -1,6 +1,6 @@
 import { startDrag } from "@engraft/shared/lib/drag.js";
 import { useRefForCallback } from "@engraft/shared/lib/useRefForCallback.js";
-import { useUpdateProxy } from "@engraft/toolkit";
+import { up } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
 
 import { Pane, PaneGeo, roundTo } from "./model.js";
@@ -21,7 +21,7 @@ export const PaneView = memo(function Pane(props: PaneViewProps) {
   const updateGeo = useCallback((f: (old: PaneGeo) => PaneGeo) => {
     updatePaneGeoById(pane.id, f);
   }, [updatePaneGeoById, pane.id]);
-  const geoUP = useUpdateProxy(updateGeo);
+  const geoUP = up(updateGeo);
 
   const onMouseDownDragPane = useMemo(() => startDrag({
     init() {

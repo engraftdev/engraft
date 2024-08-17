@@ -3,7 +3,7 @@
 import { python } from "@codemirror/lang-python";
 import { FancyCodeEditor, collectReferencesForFancyCodeEditor, hookFancyCodeEditor } from "@engraft/codemirror-helpers";
 import { getPyodide } from "@engraft/pyodide";
-import { CollectReferences, MakeProgram, ToolProgram, ToolProps, ToolView, UseUpdateProxy, defineTool, hookMemo, hooks, memoizeProps, renderWithReact } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ToolProgram, ToolProps, ToolView, defineTool, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 
 export type Program = {
   toolName: 'python',
@@ -33,20 +33,18 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact(({updateProgram, autoFocus}) =>
-      <UseUpdateProxy updater={updateProgram} children={programUP =>
-        <FancyCodeEditor
-          extensions={[python()]}
-          code={program.code}
-          codeUP={programUP.code}
-          subPrograms={program.subPrograms}
-          subProgramsUP={programUP.subPrograms}
-          varBindings={varBindings}
-          autoFocus={autoFocus}
-          subResults={subResults}
-          defaultCode=""
-          context={context}
-        />
-      } />
+      <FancyCodeEditor
+        extensions={[python()]}
+        code={program.code}
+        codeUP={up(updateProgram).code}
+        subPrograms={program.subPrograms}
+        subProgramsUP={up(updateProgram).subPrograms}
+        varBindings={varBindings}
+        autoFocus={autoFocus}
+        subResults={subResults}
+        defaultCode=""
+        context={context}
+      />
     ),
   }), [context, program.code, program.subPrograms, subResults, varBindings]);
 

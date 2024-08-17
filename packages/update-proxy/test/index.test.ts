@@ -1,6 +1,6 @@
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { describe, expect, it } from "vitest";
-import { updateProxy } from "../lib/index.js";
+import { up, updateProxy } from "../lib/index.js";
 
 describe('updateProxy', () => {
   it('works directly', () => {
@@ -201,3 +201,16 @@ describe('updateProxy', () => {
 });
 
 describe.todo('updateWithUP');
+
+describe('up', () => {
+  it('basically works', () => {
+    const updater1 = () => {};
+    const updateProxy1a = up(updater1);
+    const updateProxy1b = up(updater1);
+    expect(updateProxy1a).toBe(updateProxy1b);
+
+    const updater2 = () => {};
+    const updateProxy2 = up(updater2);
+    expect(updateProxy2).not.toBe(updateProxy1a);
+  });
+});

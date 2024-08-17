@@ -1,4 +1,4 @@
-import { EngraftPromise, Tool, ToolProps, ToolView, ToolViewRenderProps, hookMemo, hooks, memoizeProps, renderWithReact, useUpdateProxy } from "@engraft/toolkit";
+import { EngraftPromise, Tool, ToolProps, ToolView, ToolViewRenderProps, hookMemo, hooks, memoizeProps, renderWithReact, up } from "@engraft/toolkit";
 import { memo, useState } from "react";
 
 // A testbed for debugging the cursor-jumping-to-end-of-text problem.
@@ -38,7 +38,7 @@ export const tool: Tool<Program> = {
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program>) => {
   const {program, updateProgram} = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   console.log("render test-text view");
 

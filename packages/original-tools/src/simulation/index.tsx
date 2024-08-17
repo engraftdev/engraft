@@ -1,6 +1,6 @@
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { isObject } from "@engraft/shared/lib/isObject.js";
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, defineTool, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoizeProps, newVar, outputBackgroundStyle, renderWithReact, runTool, useRefunction, useStateUP, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, ShowView, ShowViewWithScope, ToolOutput, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, defineTool, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoizeProps, newVar, outputBackgroundStyle, renderWithReact, runTool, up, useRefunction } from "@engraft/toolkit";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { SimSlider, SimSliderValue } from "./SimSlider.js";
 
@@ -142,9 +142,10 @@ type ViewProps = ToolProps<Program> & ToolViewRenderProps<Program> & {
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, context, initResult, onTickResultsWithScope } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
-  const [draft, draftUP] = useStateUP<Draft | undefined>(() => undefined);
+  const [draft, setDraft] = useState<Draft | undefined>(() => undefined);
+  const draftUP = up(setDraft);
 
   let [selection, setSelection] = useState<SimSliderValue>(() => ({type: 'init', tick: 0}));
   // deal with out-of-bounds selection

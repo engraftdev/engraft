@@ -1,4 +1,4 @@
-import { CollectReferences, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, renderWithReact, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolView, ToolViewRenderProps, defineTool, hookMemo, hookRunTool, hooks, memoizeProps, outputBackgroundStyle, renderWithReact, up } from "@engraft/toolkit";
 import { memo, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -31,7 +31,7 @@ export default defineTool({ name: 'value', makeProgram, collectReferences, run }
 
 const View = memo((props: ToolProps<Program> & ToolViewRenderProps<Program> & { subResult: ToolResult }) => {
   const { updateProgram, subResult, frameBarBackdropElem } = props;
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   const [showTool, setShowTool] = useState(false);
 

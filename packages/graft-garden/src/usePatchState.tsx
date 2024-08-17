@@ -1,10 +1,10 @@
+import { EngraftPromise, VarBindings, up } from "@engraft/hostkit";
 import { useMemo, useState } from "react";
 import { Patch } from "./db.js";
-import { EngraftPromise, VarBindings, useUpdateProxy } from "@engraft/hostkit";
 
 export function usePatchState(patch: Patch) {
   const [state, setState] = useState(() => patch.initialStateJSON && JSON.parse(patch.initialStateJSON));
-  const stateUP = useUpdateProxy(setState);
+  const stateUP = up(setState);
 
   const varBindings: VarBindings = useMemo(() => {
     if (patch.initialStateJSON === undefined) {

@@ -1,6 +1,6 @@
 import { objEqWithRefEq } from "@engraft/shared/lib/eq.js";
 import { useContextMenu } from "@engraft/shared/lib/useContextMenu.js";
-import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoize, memoizeProps, newVar, randomId, renderWithReact, useRefunction, useUpdateProxy } from "@engraft/toolkit";
+import { CollectReferences, EngraftContext, EngraftPromise, MakeProgram, MyContextMenu, MyContextMenuHeading, ShowView, ShowViewWithScope, ToolOutputView, ToolProgram, ToolProps, ToolResult, ToolResultWithScope, ToolRun, ToolView, ToolViewRenderProps, UpdateProxy, Var, VarBindings, VarDefinition, defineTool, hookDedupe, hookFork, hookMemo, hookRefunction, hookRunTool, hookRunToolWithNewVarBindings, hooks, memoize, memoizeProps, newVar, randomId, renderWithReact, up, useRefunction } from "@engraft/toolkit";
 import { memo, useCallback, useMemo } from "react";
 import { Closure, argValueOutputPsToVarBindings, closureToAsyncFunction, closureToSyncFunction } from "./closure.js";
 
@@ -103,8 +103,7 @@ const runBodyOnExamples = memoize(hooks((bodyProgram: ToolProgram, examples: Exa
 
 const View = memo((props: ViewProps) => {
   const { program, updateProgram, varBindings, context, syncFunction } = props;
-
-  const programUP = useUpdateProxy(updateProgram);
+  const programUP = up(updateProgram);
 
   // run all the programs for all the example arg values
   const examplesArgValueResults = useRefunction(runExamplesArgValuePrograms, program.examples, program.argVars, varBindings, context);

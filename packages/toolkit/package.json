@@ -22,7 +22,7 @@
     "@engraft/react": "^0.0.8",
     "@engraft/refunc-react": "^0.0.8",
     "@engraft/shared": "^0.0.8",
-    "@engraft/update-proxy-react": "^0.0.8",
+    "@engraft/update-proxy": "^0.0.8",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
