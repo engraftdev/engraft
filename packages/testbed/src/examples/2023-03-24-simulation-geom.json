@@ -1,0 +1,280 @@
+{
+  "toolName": "slot",
+  "modeName": "tool",
+  "subProgram": {
+    "toolName": "notebook",
+    "cells": [
+      {
+        "var_": {
+          "id": "IDamber024430",
+          "label": "width"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "100",
+          "defaultCode": "",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDfather374141",
+          "label": "height"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "code",
+          "code": "200",
+          "defaultCode": "IDviscose669675",
+          "subPrograms": {}
+        }
+      },
+      {
+        "var_": {
+          "id": "IDhawthorn036564",
+          "label": "sim"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simulation",
+            "ticksCount": 200,
+            "stateVar": {
+              "id": "IDmallow385799",
+              "label": "state"
+            },
+            "initProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "{\n  pos: {x: 1, y: 1},\n  vel: {x: 1.5, y: 1.1}\n}",
+              "defaultCode": "{}",
+              "subPrograms": {
+                "IDcollarbone833802": {
+                  "toolName": "slot",
+                  "modeName": "tool",
+                  "subProgram": {
+                    "toolName": "slider",
+                    "value": 61,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1
+                  }
+                }
+              }
+            },
+            "onTickProgram": {
+              "toolName": "slot",
+              "modeName": "tool",
+              "subProgram": {
+                "toolName": "geom",
+                "inputProgram": {
+                  "toolName": "slot",
+                  "modeName": "code",
+                  "code": "IDmallow385799",
+                  "defaultCode": "IDmallow385799",
+                  "subPrograms": {}
+                },
+                "statePreparation": {
+                  "pos": "point",
+                  "vel": "vector"
+                },
+                "commands": [
+                  {
+                    "id": "IDdentist052568",
+                    "type": "translate-vector",
+                    "name": "vel",
+                    "move": {
+                      "type": "magnet",
+                      "magnet": {
+                        "type": "point",
+                        "name": "pos"
+                      },
+                      "end": "tail"
+                    }
+                  },
+                  {
+                    "id": "IDmagnosaurus519689",
+                    "type": "translate-point",
+                    "name": "pos",
+                    "move": {
+                      "type": "magnet",
+                      "magnet": {
+                        "type": "vector",
+                        "name": "vel",
+                        "end": "head"
+                      }
+                    }
+                  },
+                  {
+                    "id": "IDswoop573726",
+                    "type": "if",
+                    "condition": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDpos000000.y > 10 || IDpos000000.y < 0",
+                      "defaultCode": "true",
+                      "subPrograms": {}
+                    },
+                    "then": [
+                      {
+                        "id": "IDcurio405540",
+                        "type": "scale-vector",
+                        "name": "vel",
+                        "factor": {
+                          "toolName": "slot",
+                          "modeName": "code",
+                          "code": "[1.00, -1]",
+                          "defaultCode": "[1.00, 0.44]",
+                          "subPrograms": {}
+                        }
+                      },
+                      {
+                        "id": "IDtexture529610",
+                        "type": "translate-vector",
+                        "name": "vel",
+                        "move": {
+                          "type": "magnet",
+                          "magnet": {
+                            "type": "point",
+                            "name": "pos"
+                          },
+                          "end": "tail"
+                        }
+                      },
+                      {
+                        "id": "IDreaper610767",
+                        "type": "if",
+                        "condition": {
+                          "toolName": "slot",
+                          "modeName": "code",
+                          "code": "true",
+                          "defaultCode": "true",
+                          "subPrograms": {}
+                        },
+                        "then": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "IDresponsibility788270",
+                    "type": "if",
+                    "condition": {
+                      "toolName": "slot",
+                      "modeName": "code",
+                      "code": "IDpos000000.x > 10 || IDpos000000.x < 0",
+                      "defaultCode": "true",
+                      "subPrograms": {}
+                    },
+                    "then": [
+                      {
+                        "id": "IDmallow325659",
+                        "type": "scale-vector",
+                        "name": "vel",
+                        "factor": {
+                          "toolName": "slot",
+                          "modeName": "code",
+                          "code": "[-1, 1]",
+                          "defaultCode": "[-0.50, 0.98]",
+                          "subPrograms": {}
+                        }
+                      },
+                      {
+                        "id": "IDpower551162",
+                        "type": "translate-vector",
+                        "name": "vel",
+                        "move": {
+                          "type": "magnet",
+                          "magnet": {
+                            "type": "point",
+                            "name": "pos"
+                          },
+                          "end": "tail"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "defaultCode": "IDmallow385799"
+            },
+            "toDrawProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "null",
+              "defaultCode": "<pre>{JSON.stringify(IDmallow385799, null, 2)}</pre>",
+              "subPrograms": {}
+            }
+          },
+          "defaultCode": "IDviscose669675"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDtrollius702481",
+          "label": "B"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "extractor",
+            "inputProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDviscose669675",
+              "defaultCode": "IDviscose669675",
+              "subPrograms": {}
+            },
+            "patternsWithIds": [
+              {
+                "id": "IDequipment819547",
+                "pattern": [
+                  {
+                    "wildcard": true
+                  },
+                  "pos"
+                ]
+              }
+            ],
+            "minimized": false
+          },
+          "defaultCode": "IDviscose669675"
+        }
+      },
+      {
+        "var_": {
+          "id": "IDsweater235937",
+          "label": "A"
+        },
+        "program": {
+          "toolName": "slot",
+          "modeName": "tool",
+          "subProgram": {
+            "toolName": "simple-chart",
+            "dataProgram": {
+              "toolName": "slot",
+              "modeName": "code",
+              "code": "IDviscose669675",
+              "defaultCode": "IDviscose669675",
+              "subPrograms": {}
+            },
+            "mark": "point",
+            "xChannel": {
+              "field": "x",
+              "type": "quantitative"
+            },
+            "yChannel": {
+              "field": "y",
+              "type": "quantitative"
+            }
+          },
+          "defaultCode": "IDviscose669675"
+        },
+        "outputManualHeight": "infinity"
+      }
+    ],
+    "prevVarId": "IDviscose669675"
+  }
+}

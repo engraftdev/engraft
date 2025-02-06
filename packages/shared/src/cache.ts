@@ -1,24 +1,4 @@
-import { hasProperty } from "./hasProperty.js";
-
-type OrError<T> = {value: T} | {error: unknown};
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-const OrError = {
-  try<T>(f: () => T): OrError<T> {
-    try {
-      return {value: f()};
-    } catch (e) {
-      return {error: e};
-    }
-  },
-  orThrow<T>(f: OrError<T>): T {
-    if (hasProperty(f, 'error')) {
-      throw f.error;
-    } else {
-      return f.value;
-    }
-  },
-};
+import { OrError } from "./OrError.js";
 
 // TODO: this will just fill up... someday we should be Principled
 export function cache<Return>(f: (arg: string) => Return): (arg: string) => Return {

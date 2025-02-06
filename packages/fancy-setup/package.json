@@ -20,6 +20,7 @@
     "@engraft/basic-setup": "^0.0.8",
     "@engraft/core": "^0.0.8",
     "@engraft/tool-example-datasets": "^0.0.8",
+    "@engraft/tool-geom": "^0.0.8",
     "@engraft/tool-python": "^0.0.8",
     "@engraft/tool-voyager": "^0.0.8"
   }
