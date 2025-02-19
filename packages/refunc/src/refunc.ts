@@ -6,10 +6,16 @@ export class RefuncMemory {
 
 }
 
+// For convenience...
+
+export type AnyFunction = (...args: any[]) => any;
+
+export type RefunctionLike<F extends (...args: any) => any> = Refunction<Parameters<F>, ReturnType<F>>;
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const Refunction = {
-  fromFunction<Args extends any[], Return>(f: (...args: Args) => Return): Refunction<Args, Return> {
-    return (_memory: RefuncMemory, ...args: Args) => {
+  fromFunction<F extends AnyFunction>(f: F): RefunctionLike<F> {
+    return (_memory: RefuncMemory, ...args: Parameters<F>) => {
       return f(...args);
     };
   },

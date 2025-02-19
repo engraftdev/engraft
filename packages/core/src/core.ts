@@ -1,4 +1,4 @@
-import { Refunction } from "@engraft/refunc";
+import { RefunctionLike } from "@engraft/refunc";
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { EngraftPromise } from "./EngraftPromise.js";
 import { randomId } from "./randomId.js";
@@ -22,7 +22,7 @@ export type ToolProgram = {
 }
 
 export type ToolRun<P extends ToolProgram> =
-  Refunction<[props: ToolProps<P>], ToolResult<P>>;
+  RefunctionLike<(props: ToolProps<P>) => ToolResult<P>>;
 
 export type ToolProps<P extends ToolProgram> = {
   program: P,
@@ -60,7 +60,7 @@ export type ToolView<P extends ToolProgram> = {
 }
 
 export type ToolViewRender<P extends ToolProgram> =
-  Refunction<[props: ToolViewRenderProps<P>, element: Element], void>;
+  RefunctionLike<(props: ToolViewRenderProps<P>, element: Element) => void>;
 
 export type ToolViewRenderProps<P> = {
   updateProgram: Updater<P>,
