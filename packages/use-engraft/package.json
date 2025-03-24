@@ -1,6 +1,6 @@
 {
   "name": "@engraft/use-engraft",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "A React hook for embedding Engraft tools",
   "publishConfig": {
@@ -17,9 +17,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/fancy-setup": "^0.0.8",
-    "@engraft/hostkit": "^0.0.8",
-    "@engraft/shared": "^0.0.8",
+    "@engraft/fancy-setup": "^0.0.9",
+    "@engraft/hostkit": "^0.0.9",
+    "@engraft/shared": "^0.0.9",
     "idb-keyval": "^6.2.0",
     "lodash": "^4.17.21"
   },

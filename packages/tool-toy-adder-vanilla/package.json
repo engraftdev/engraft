@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-toy-adder-vanilla",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "Toy Engraft tool for adding two numbers (written without React)",
   "publishConfig": {
@@ -17,6 +17,6 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/toolkit": "^0.0.8"
+    "@engraft/toolkit": "^0.0.9"
   }
 }

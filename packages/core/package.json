@@ -1,6 +1,6 @@
 {
   "name": "@engraft/core",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "Engraft core protocol",
   "publishConfig": {
@@ -17,8 +17,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/refunc": "^0.0.8",
-    "@engraft/shared": "^0.0.8",
+    "@engraft/refunc": "^0.0.9",
+    "@engraft/shared": "^0.0.9",
     "friendly-words": "^1.2.0",
     "synchronous-promise": "^2.0.16"
   }

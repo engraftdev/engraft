@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-geom",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "A simple geometric scripter for Engraft",
   "scripts": {
@@ -14,9 +14,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/hostkit": "^0.0.8",
-    "@engraft/shared": "^0.0.8",
-    "@engraft/toolkit": "^0.0.8"
+    "@engraft/hostkit": "^0.0.9",
+    "@engraft/shared": "^0.0.9",
+    "@engraft/toolkit": "^0.0.9"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc",

@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-synthesizer",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "Toy programming-by-example synthesizer for Engraft",
   "publishConfig": {
@@ -17,9 +17,9 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/codemirror-helpers": "^0.0.8",
-    "@engraft/shared": "^0.0.8",
-    "@engraft/toolkit": "^0.0.8",
+    "@engraft/codemirror-helpers": "^0.0.9",
+    "@engraft/shared": "^0.0.9",
+    "@engraft/toolkit": "^0.0.9",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {

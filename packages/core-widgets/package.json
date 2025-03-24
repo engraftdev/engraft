@@ -1,6 +1,6 @@
 {
   "name": "@engraft/core-widgets",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "description": "Some common React components.",
   "publishConfig": {
@@ -17,10 +17,10 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/core": "^0.0.8",
-    "@engraft/react": "^0.0.8",
-    "@engraft/shared": "^0.0.8",
-    "@engraft/update-proxy": "^0.0.8",
+    "@engraft/core": "^0.0.9",
+    "@engraft/react": "^0.0.9",
+    "@engraft/shared": "^0.0.9",
+    "@engraft/update-proxy": "^0.0.9",
     "react-inspector": "^6.0.1",
     "react-merge-refs": "^2.0.1"
   },
