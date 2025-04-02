@@ -10,6 +10,7 @@ import Map from "@engraft/tool-map";
 import Markdown from "@engraft/tool-markdown";
 import Notebook from "@engraft/tool-notebook";
 import NotebookCanvas from "@engraft/tool-notebook-canvas";
+import Sculpin from "@engraft/tool-sculpin";
 import Slot, { makeSlotWithCode, makeSlotWithProgram } from "@engraft/tool-slot";
 import Synthesizer from "@engraft/tool-synthesizer";
 import TestCountRuns from "@engraft/tool-test-count-runs";
@@ -33,6 +34,7 @@ const tools: Tool[] = [
   forgetP(toolFromModule(Markdown)),
   forgetP(toolFromModule(Notebook)),
   forgetP(toolFromModule(NotebookCanvas)),
+  forgetP(toolFromModule(Sculpin)),
   forgetP(toolFromModule(Slot)),
   forgetP(toolFromModule(Synthesizer)),
   forgetP(toolFromModule(TestCountRuns)),

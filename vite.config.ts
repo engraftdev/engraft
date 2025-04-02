@@ -39,6 +39,9 @@ export default defineConfig(() => {
     optimizeDeps: {
       include: [
         "@engraft/vendor-voyager",
+      ],
+      exclude: [
+        "moldable-json",
       ]
     },
     build: {
