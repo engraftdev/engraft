@@ -38,6 +38,7 @@ export type Program = {
   inputProgram: ToolProgram;
   setInputProgram: ToolProgram;
   sculpinScript: SculpinScript;
+  returnAsView: boolean;
 };
 
 const makeProgram: MakeProgram<Program> = (context, defaultCode) => ({
@@ -45,6 +46,7 @@ const makeProgram: MakeProgram<Program> = (context, defaultCode) => ({
   inputProgram: context.makeSlotWithCode(defaultCode),
   setInputProgram: context.makeSlotWithCode(""),
   sculpinScript: { steps: [] },
+  returnAsView: false,
 });
 
 const collectReferences: CollectReferences<Program> = (program) => [
@@ -80,22 +82,46 @@ const run = memoizeProps(
           inputResult.outputP,
           setInputProgramIsEmpty ? undefined : setInputResult.outputP,
         ]).then(async ([inputOutput, setInputOutput]) => {
-          const world: World = {
-            data: tag_data(inputOutput!.value),
-            selection: empty_selection(),
-            active_tag: "primary",
-          };
+          const tagged = tag_data(inputOutput!.value);
 
-          const trace = await run_program(
-            world,
-            program.sculpinScript,
-            trace_ref.current,
-          );
-          trace_ref.current = trace;
-          return { value: untag_data(trace.worlds.at(-1)!.data) };
+          if (program.returnAsView) {
+            return {
+              value: (
+                <ProgramEditor
+                  force_run_mode={true}
+                  input={tagged}
+                  program_and_redo_stack={{
+                    program: program.sculpinScript,
+                    redo_stack: [],
+                  }}
+                  set_input={(tagged_data) => {
+                    if (!setInputOutput) return;
+                    const data = untag_data(tagged_data);
+                    (setInputOutput.value as any)(data);
+                  }}
+                  set_program_and_redo_stack={() => {}}
+                />
+              ),
+            };
+          } else {
+            const world: World = {
+              data: tagged,
+              selection: empty_selection(),
+              active_tag: "primary",
+            };
+
+            const trace = await run_program(
+              world,
+              program.sculpinScript,
+              trace_ref.current,
+            );
+            trace_ref.current = trace;
+            return { value: untag_data(trace.worlds.at(-1)!.data) };
+          }
         }),
       [
         inputResult.outputP,
+        program.returnAsView,
         program.sculpinScript,
         setInputProgramIsEmpty,
         setInputResult.outputP,
@@ -149,7 +175,7 @@ const View = memo((props: ViewProps) => {
   const setInputState = usePromiseState(setInputResult.outputP);
 
   return (
-    <div className="xCol" style={{ minWidth: 1000, minHeight: 800 }}>
+    <div className="xCol" style={{ minWidth: 500, minHeight: 800 }}>
       {frameBarBackdropElem &&
         createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
@@ -164,6 +190,11 @@ const View = memo((props: ViewProps) => {
               view={setInputResult.view}
               updateProgram={programUP.setInputProgram.$}
               autoFocus={autoFocus}
+            />
+            <input
+              type="checkbox"
+              checked={program.returnAsView}
+              onChange={(ev) => programUP.returnAsView.$set(ev.target.checked)}
             />
           </div>
         }
