@@ -20,6 +20,7 @@ import {
   up,
   usePromiseState,
 } from "@engraft/toolkit";
+import _ from "lodash";
 import { ProgramEditor } from "moldable-json";
 import { tag_data, untag_data } from "moldable-json/lib/data.js";
 import {
@@ -68,28 +69,35 @@ const run = memoizeProps(
 
     const trace_ref = hookRef<Trace | undefined>(() => undefined);
 
+    const setInputProgramIsEmpty = _.isEqual(
+      program.setInputProgram,
+      context.makeSlotWithCode(""),
+    );
+
     const outputP = hookMemo(
       () =>
-        EngraftPromise.all([inputResult.outputP]).then(
-          async ([inputOutput]) => {
-            const world: World = {
-              data: tag_data(inputOutput.value),
-              selection: empty_selection(),
-              active_tag: "primary",
-            };
+        EngraftPromise.all([
+          inputResult.outputP,
+          setInputProgramIsEmpty ? undefined : setInputResult.outputP,
+        ]).then(async ([inputOutput, setInputOutput]) => {
+          const world: World = {
+            data: tag_data(inputOutput!.value),
+            selection: empty_selection(),
+            active_tag: "primary",
+          };
 
-            const trace = await run_program(
-              world,
-              program.sculpinScript,
-              trace_ref.current,
-            );
-            trace_ref.current = trace;
-            return { value: untag_data(trace.worlds.at(-1)!.data) };
-          },
-        ),
+          const trace = await run_program(
+            world,
+            program.sculpinScript,
+            trace_ref.current,
+          );
+          trace_ref.current = trace;
+          return { value: untag_data(trace.worlds.at(-1)!.data) };
+        }),
       [
         inputResult.outputP,
         program.sculpinScript,
+        setInputProgramIsEmpty,
         setInputResult.outputP,
         trace_ref,
       ],
@@ -138,6 +146,7 @@ const View = memo((props: ViewProps) => {
   const programUP = up(updateProgram);
 
   const inputState = usePromiseState(inputResult.outputP);
+  const setInputState = usePromiseState(setInputResult.outputP);
 
   return (
     <div className="xCol" style={{ minWidth: 1000, minHeight: 800 }}>
@@ -145,11 +154,18 @@ const View = memo((props: ViewProps) => {
         createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
         slot={
-          <ShowView
-            view={inputResult.view}
-            updateProgram={programUP.inputProgram.$}
-            autoFocus={autoFocus}
-          />
+          <div className="xRow xGap10">
+            <ShowView
+              view={inputResult.view}
+              updateProgram={programUP.inputProgram.$}
+              autoFocus={autoFocus}
+            />
+            <ShowView
+              view={setInputResult.view}
+              updateProgram={programUP.setInputProgram.$}
+              autoFocus={autoFocus}
+            />
+          </div>
         }
       />
       <div className="xRow" style={{ flexGrow: 1 }}>
@@ -164,7 +180,15 @@ const View = memo((props: ViewProps) => {
               program: program.sculpinScript,
               redo_stack: [],
             }}
-            set_input={() => {}}
+            set_input={
+              setInputState.status === "fulfilled"
+                ? (tagged_data) => {
+                    const data = untag_data(tagged_data);
+                    console.log("set_input", tagged_data, data);
+                    (setInputState.value.value as any)(data);
+                  }
+                : () => {}
+            }
             set_program_and_redo_stack={(setter) => {
               programUP.sculpinScript.$((oldSculpinScript) => {
                 const newProgramAndRedoStack =
