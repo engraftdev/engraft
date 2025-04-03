@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "moldable-json": {
+      "signature": "597a57ac5a066479fb76102791ddbd2f",
+      "file": true
+    }
+  }
+}

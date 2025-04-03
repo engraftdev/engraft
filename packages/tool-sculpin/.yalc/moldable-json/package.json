@@ -1,0 +1,34 @@
+{
+  "name": "moldable-json",
+  "version": "1.0.1",
+  "type": "module",
+  "bin": "./bin/noticeable.js",
+  "main": "lib/lib.js",
+  "files": [
+    "lib",
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "build-lib": "rm -rf lib && tsc --project tsconfig.lib.json && copyfiles -u 1 \"src/**/*.{js,css}\" lib"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@automerge/automerge-repo": "^1.2.1",
+    "@automerge/automerge-repo-network-websocket": "^1.2.1",
+    "@engraft/update-proxy": "^0.0.9",
+    "eslint-plugin-import": "^2.31.0",
+    "object-inspect": "^1.13.4",
+    "prettier-plugin-organize-imports": "^4.1.0"
+  },
+  "peerDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "yalcSig": "597a57ac5a066479fb76102791ddbd2f"
+}

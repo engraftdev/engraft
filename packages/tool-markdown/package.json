@@ -23,6 +23,6 @@
     "@mdx-js/mdx": "^2.3.0"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "react": "^18.0.0"
   }
 }

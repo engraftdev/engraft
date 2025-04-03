@@ -15,6 +15,5 @@
   },
   "main": "lib/index.js",
   "type": "module",
-  "dependencies": {
-  }
+  "dependencies": {}
 }

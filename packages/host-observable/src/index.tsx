@@ -11,6 +11,7 @@ import ExtensionBanner from "./ExtensionBanner.js";
 
 // React exports for Observable to use
 export * as ReactDOM from 'react-dom';
+export * as ReactDOMClient from 'react-dom/client';
 export { React };
 
 export const RootStyles = memo(function RootStyles(){

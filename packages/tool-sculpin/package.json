@@ -18,10 +18,12 @@
   "type": "module",
   "dependencies": {
     "@engraft/toolkit": "^0.0.9",
-    "moldable-json": "file:/Users/joshuah/Documents/research/dev-2025/moldable-json"
+    "lodash": "^4.17.21",
+    "moldable-json": "file:.yalc/moldable-json"
   },
   "peerDependencies": {
-    "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
