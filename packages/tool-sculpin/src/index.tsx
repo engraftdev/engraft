@@ -175,7 +175,11 @@ const View = memo((props: ViewProps) => {
   const setInputState = usePromiseState(setInputResult.outputP);
 
   return (
-    <div className="xCol" style={{ minWidth: 500, minHeight: 800 }}>
+    <div
+      className="xCol"
+      // style={{ minWidth: 500, minHeight: 800, maxHeight: 400 }}
+      style={{ width: 1200, height: 800 }}
+    >
       {frameBarBackdropElem &&
         createPortal(inputFrameBarBackdrop, frameBarBackdropElem)}
       <InputHeading
@@ -199,7 +203,7 @@ const View = memo((props: ViewProps) => {
           </div>
         }
       />
-      <div className="xRow" style={{ flexGrow: 1 }}>
+      <div className="xRow" style={{ flexGrow: 1, minHeight: 0 }}>
         {inputState.status === "pending" && <div>loading...</div>}
         {inputState.status === "rejected" && (
           <ErrorView error={inputState.reason} />
