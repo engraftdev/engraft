@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "depcheck": "node ../../scripts/our-depcheck.cjs"
+    "depcheck": "node ../../scripts/our-depcheck.cjs",
+    "package": "yarn build && cp -r dist engraft-observable-writer && zip -r engraft-observable-writer.zip engraft-observable-writer && rm -rf engraft-observable-writer"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.7",
