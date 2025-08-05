@@ -9,7 +9,7 @@ export function hookPrevious <T>(value: T, init: () => T): T {
   return current;
 };
 
-// Utility for debugging what might be causing a memoized mento to re-run.
+// Utility for debugging what might be causing a memoized refunc to re-run.
 // Just call:
 //   hookLogChanges({someVar, someOtherVar, ...})
 export function hookLogChanges(values: any, label?: string) {

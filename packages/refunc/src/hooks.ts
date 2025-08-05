@@ -1,6 +1,6 @@
 import { Refunction, RefuncMemory } from "./refunc.js";
 
-// a way to make mentos using React-hook-like sugar
+// a way to make refuncs using React-hook-like sugar
 
 export function hooks<Args extends unknown[], Return>(f: (...args: Args) => Return): Refunction<Args, Return> {
   return (memory: RefuncMemory, ...args) => {
