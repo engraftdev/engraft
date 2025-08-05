@@ -1,4 +1,4 @@
-import { CollectReferences, EngraftPromise, MakeProgram, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, defineTool, hookLater, hookMemo, hookRefunction, hookRunTool, hooks, memoizeProps, renderWithReact, runTool, usePromiseState, useRefunction, up } from "@engraft/toolkit";
+import { CollectReferences, defineTool, EngraftPromise, hookMemo, hookRefunction, hookRunTool, hooks, hookThen, MakeProgram, memoizeProps, renderWithReact, runTool, ShowView, ToolOutputView, ToolProgram, ToolProps, ToolView, ToolViewRenderProps, up, usePromiseState, useRefunction } from "@engraft/toolkit";
 import { memo, useEffect } from "react";
 import { GadgetClosure, runOutputProgram, runViewProgram } from "./core.js";
 
@@ -26,38 +26,36 @@ const run = memoizeProps(hooks((props: ToolProps<Program>) => {
 
   const closureResults = hookRunTool({program: program.closureProgram, varBindings, context});
 
-  const gadgetProgramP =
-    hookMemo(() => {
-      const later = hookLater();
-      return closureResults.outputP.then((closureOutput) => later(() => {
-        const closure = closureOutput.value as GadgetClosure;
-        const { def, closureVarBindings } = closure;
-        const { initialProgramProgram } = def;
+  const gadgetProgramP = hookMemo(() =>
+    hookThen(closureResults.outputP, (closureOutput) => {
+      const closure = closureOutput.value as GadgetClosure;
+      const { def, closureVarBindings } = closure;
+      const { initialProgramProgram } = def;
 
-        // too lazy to conditionally run initialProgramProgram
-        const initialProgramResults = hookRunTool({program: initialProgramProgram, varBindings: closureVarBindings, context});
-        const gadgetProgramP = program.gadgetProgram !== null ?
-          EngraftPromise.resolve(program.gadgetProgram) :
-          initialProgramResults.outputP.then((initialProgramOutput) => initialProgramOutput.value);
+      // too lazy to conditionally run initialProgramProgram
+      const initialProgramResults = hookRunTool({program: initialProgramProgram, varBindings: closureVarBindings, context});
+      const gadgetProgramP = program.gadgetProgram !== null ?
+        EngraftPromise.resolve(program.gadgetProgram) :
+        initialProgramResults.outputP.then((initialProgramOutput) => initialProgramOutput.value);
 
-        return gadgetProgramP;
-      }));
-    }, [closureResults.outputP, context, program.gadgetProgram]);
+      return gadgetProgramP;
+    }),
+    [closureResults.outputP, context, program.gadgetProgram]
+  );
 
-  const outputP =
-    hookMemo(() => {
-      const later = hookLater();
-      return EngraftPromise.all(closureResults.outputP, gadgetProgramP).then(([closureOutput, gadgetProgram]) => later(() => {
-        const closure = closureOutput.value as GadgetClosure;
-        const { def, closureVarBindings } = closure;
+  const outputP = hookMemo(() =>
+    hookThen(EngraftPromise.all(closureResults.outputP, gadgetProgramP), ([closureOutput, gadgetProgram]) => {
+      const closure = closureOutput.value as GadgetClosure;
+      const { def, closureVarBindings } = closure;
 
-        const outputResultEtc = hookRefunction(
-          runOutputProgram,
-          def, closureVarBindings, gadgetProgram, context
-        );
-        return outputResultEtc.result.outputP;
-      }));
-    }, [closureResults.outputP, context, gadgetProgramP]);
+      const outputResultEtc = hookRefunction(
+        runOutputProgram,
+        def, closureVarBindings, gadgetProgram, context
+      );
+      return outputResultEtc.result.outputP;
+    }),
+    [closureResults.outputP, context, gadgetProgramP]
+  );
 
   const view: ToolView<Program> = hookMemo(() => ({
     render: renderWithReact((renderProps) => <View {...props} {...renderProps} gadgetProgramP={gadgetProgramP} />),
