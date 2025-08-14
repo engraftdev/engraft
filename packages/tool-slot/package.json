@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-slot",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "MIT",
   "description": "The famous Engraft slot component",
   "publishConfig": {
@@ -23,9 +23,9 @@
     "@codemirror/lang-javascript": "^6.1.2",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.0",
-    "@engraft/codemirror-helpers": "^0.0.9",
-    "@engraft/shared": "^0.0.9",
-    "@engraft/toolkit": "^0.0.9",
+    "@engraft/codemirror-helpers": "^0.0.10",
+    "@engraft/shared": "^0.0.10",
+    "@engraft/toolkit": "^0.0.10",
     "@googlemaps/react-wrapper": "^1.1.35",
     "d3-dsv": "^3.0.1",
     "immutability-helper": "^3.1.1",

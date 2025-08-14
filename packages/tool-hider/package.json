@@ -1,6 +1,6 @@
 {
   "name": "@engraft/tool-hider",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "MIT",
   "description": "Engraft tool that can hide its child",
   "publishConfig": {
@@ -17,8 +17,8 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/tool-checkbox": "^0.0.9",
-    "@engraft/toolkit": "^0.0.9"
+    "@engraft/tool-checkbox": "^0.0.10",
+    "@engraft/toolkit": "^0.0.10"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

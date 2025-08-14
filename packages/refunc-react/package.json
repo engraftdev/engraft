@@ -1,6 +1,6 @@
 {
   "name": "@engraft/refunc-react",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "MIT",
   "description": "React features for Refunc",
   "publishConfig": {
@@ -17,7 +17,7 @@
   "main": "lib/index.js",
   "type": "module",
   "dependencies": {
-    "@engraft/refunc": "^0.0.9"
+    "@engraft/refunc": "^0.0.10"
   },
   "devDependencies": {
     "react-test-renderer": "18.2.0"

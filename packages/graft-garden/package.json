@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@engraft/graft-garden",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "license": "MIT",
   "description": "DESCRIPTION TODO",
   "scripts": {
@@ -14,10 +14,10 @@
   },
   "type": "module",
   "dependencies": {
-    "@engraft/fancy-setup": "^0.0.9",
-    "@engraft/hostkit": "^0.0.9",
-    "@engraft/shared": "^0.0.9",
-    "@engraft/tool-vite-lib": "^0.0.9",
+    "@engraft/fancy-setup": "^0.0.10",
+    "@engraft/hostkit": "^0.0.10",
+    "@engraft/shared": "^0.0.10",
+    "@engraft/tool-vite-lib": "^0.0.10",
     "@popperjs/core": "^2.11.7",
     "bootstrap": "^5.2.0",
     "firebase": "^9.9.1",
