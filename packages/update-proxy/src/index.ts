@@ -19,6 +19,7 @@ export type UpdateProxy<T> =
       $default: (newT: T) => void,
       $helper: (spec: Spec<T>) => void,
       $as: <U>(u?: U) => UpdateProxy<U>,
+      $if: (pred: (t: T) => boolean) => UpdateProxy<T>,
     }
   // $all for arrays
   & (
@@ -51,6 +52,9 @@ export function updateProxy<T>(updater: Updater<T>, remover?: () => void): Updat
     $default: (newT) => updater((oldT) => oldT ?? newT),
     $helper: (spec) => updater((oldT) => immutabilityHelper(oldT, spec)),
     $as: <U extends T>(u?: U) => up as unknown as UpdateProxy<U>,
+    $if: (pred) => {
+      return updateProxy((f) => updater((oldT) => pred(oldT) ? f(oldT) : oldT));
+    },
     ...remover && {$remove: remover},
   } as UpdateProxy<T>, {
     get(target, key) {

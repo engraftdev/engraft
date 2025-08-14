@@ -183,6 +183,17 @@ describe('updateProxy', () => {
     expect(x).toEqual({a: 1, b: 2, c: 3});
   });
 
+  it('works with $if', () => {
+    let x = [{a: 0, b: true}, {a: 1, b: false}, {a: 2, b: true}];
+    let updateX: Updater<typeof x> = (f) => x = f(x);
+    let xUP = updateProxy(updateX);
+
+    expect(x).toEqual([{a: 0, b: true}, {a: 1, b: false}, {a: 2, b: true}]);
+    xUP.$all.$if(({b}) => b).a.$apply(a => a + 1);
+    expect(x).toEqual([{a: 1, b: true}, {a: 1, b: false}, {a: 3, b: true}]);
+  });
+
+
   it('works with optional properties', () => {
     let x: {a: number, b?: number} = {a: 0};
     let updateX: Updater<typeof x> = (f) => x = f(x);
