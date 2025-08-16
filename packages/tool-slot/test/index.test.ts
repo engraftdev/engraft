@@ -1,7 +1,7 @@
 import { EngraftPromise, makeVarBindings, runTool, toolFromModule, ToolOutput } from "@engraft/core";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty } from "@engraft/shared/lib/noOp.js";
-import { updateWithUP } from "@engraft/update-proxy";
+import { updateWithUP } from "update-proxy";
 import _ from "lodash";
 import { describe, expect, it } from "vitest";
 import * as slot from "../lib/index.js";

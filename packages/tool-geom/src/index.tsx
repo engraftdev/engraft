@@ -104,7 +104,7 @@ type Pos = {
 )
 
 function insertAtPos(pos: Pos & { type: 'between-commands' }, command: Command) {
-  pos.commandsUP.$helper({$splice: [[pos.indexBetween, 0, command]]});
+  pos.commandsUP.$splice(pos.indexBetween, 0, command);
 }
 
 function posCommandUP(pos: Pos & { type: 'during-command' }) {

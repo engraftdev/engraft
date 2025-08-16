@@ -170,8 +170,8 @@ const VarHeading = memo((props: VarHeadingProps) => {
   const varUP = programUP.argVars[index];
 
   const insertVarAfter = useCallback(() => {
-    programUP.argVars.$helper({$splice: [[index + 1, 0, newVar(`input ${index + 2}`)]]});
-    programUP.examples.$all.argValuePrograms.$helper({$splice: [[index + 1, 0, context.makeSlotWithCode('')]]});
+    programUP.argVars.$splice(index + 1, 0, newVar(`input ${index + 2}`));
+    programUP.examples.$all.argValuePrograms.$splice(index + 1, 0, context.makeSlotWithCode(''));
   }, [index, programUP, context]);
 
   const removeVar = useCallback(() => {
@@ -247,7 +247,7 @@ const ExampleRow = memo((props: ExampleRowProps) => {
       id: randomId(),
       argValuePrograms: Array.from({length: numVars}, () => context.makeSlotWithCode('')),
     };
-    programUP.examples.$helper({$splice: [[index + 1, 0, newExample]]});
+    programUP.examples.$splice(index + 1, 0, newExample);
     programUP.activeExampleId.$set(newExample.id);
   }, [index, numVars, programUP.activeExampleId, programUP.examples, context]);
 

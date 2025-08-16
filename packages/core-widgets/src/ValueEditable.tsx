@@ -1,6 +1,6 @@
 import { Updater } from "@engraft/shared/lib/Updater.js";
 import { useHover } from "@engraft/shared/lib/useHover.js";
-import { up, UpdateProxy } from "@engraft/update-proxy";
+import { up, UpdateProxy } from "update-proxy";
 import { createContext, memo, MouseEvent, useCallback, useContext } from "react";
 import { SubValueHandleProps, Value, ValueCustomizations, ValueProps } from "./Value.js";
 

@@ -260,11 +260,11 @@ const Table = memo((props: {
                   className="pointer mr2 mt1"
                   checked={!program.transforms.select || program.transforms.select.includes(column.name)}
                   onChange={(e) => {
-                    programUP.transforms.select.$default(dataFrames.input.columns.map((c) => c.name))
+                    const selectUP = programUP.transforms.select.$default(dataFrames.input.columns.map((c) => c.name))
                     if (e.target.checked) {
-                      programUP.transforms.select.$helper({$push: [column.name]})
+                      selectUP.$push(column.name)
                     } else {
-                      programUP.transforms.select.$apply((cols) => cols!.filter((c) => c !== column.name))
+                      selectUP.$apply((cols) => cols!.filter((c) => c !== column.name))
                     }
                   }}
                 />

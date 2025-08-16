@@ -20,7 +20,7 @@
     "@engraft/core": "^0.0.10",
     "@engraft/react": "^0.0.10",
     "@engraft/shared": "^0.0.10",
-    "@engraft/update-proxy": "^0.0.10",
+    "update-proxy": "^0.0.4",
     "react-inspector": "^6.0.1",
     "react-merge-refs": "^2.0.1"
   },

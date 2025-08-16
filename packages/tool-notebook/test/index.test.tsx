@@ -3,7 +3,7 @@ import { ToolWithView } from "@engraft/hostkit";
 import { RefuncMemory } from "@engraft/refunc";
 import { empty, noOp } from "@engraft/shared/lib/noOp.js";
 import { makeTestingContext, TestingKnownOutput, TestingRefsFunc } from "@engraft/testing-setup";
-import { updateWithUP } from "@engraft/update-proxy";
+import { updateWithUP } from "update-proxy";
 import React from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";

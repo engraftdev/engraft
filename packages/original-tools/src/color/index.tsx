@@ -14,7 +14,7 @@ export default defineSimpleTool({
   },
   render: ({ fields, fieldsUP }) => {
     const onChange = (color: RgbColor) => {
-      fieldsUP.$helper({$merge: color});
+      fieldsUP.$set(color);
     };
     return <RgbColorPicker
       color={fields}

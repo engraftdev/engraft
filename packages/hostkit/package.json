@@ -22,7 +22,7 @@
     "@engraft/react": "^0.0.10",
     "@engraft/refunc-react": "^0.0.10",
     "@engraft/shared": "^0.0.10",
-    "@engraft/update-proxy": "^0.0.10"
+    "update-proxy": "^0.0.4"
   },
   "peerDependencies": {
     "react": "^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc"

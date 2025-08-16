@@ -10990,6 +10990,11 @@ update-browserslist-db@^1.0.13:
     escalade "^3.1.1"
     picocolors "^1.0.0"
 
+update-proxy@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/update-proxy/-/update-proxy-0.0.4.tgz#460f2ea653d4153c7be644fc973060b1960c3e99"
+  integrity sha512-OHckLTdaY6K3Z6tYMvk3v3t/VHq01+l3LKFBjWyyrXwnHp7JsSt81qlsEctYQjAGmxCKZnp/zwTHX1fQktcq6g==
+
 uri-js@^4.2.2:
   version "4.4.1"
   resolved "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz"

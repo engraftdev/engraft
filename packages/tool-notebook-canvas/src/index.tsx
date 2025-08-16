@@ -190,7 +190,7 @@ const CellView = memo(function CellView(props: CellViewProps) {
 
   const makeCellOutput = useCallback(() => {
     cellUP.$remove();
-    cellsUP.$helper({$push: [cell]});
+    cellsUP.$push(cell);
   } , [cellUP, cellsUP, cell]);
 
   const { openMenu, menuNode } = useContextMenu(useCallback((closeMenu) =>

@@ -2,7 +2,7 @@ import { EngraftPromise, hookRunTool, Tool, ToolProgram, ToolProps, ToolResult, 
 import { renderWithReact, ShowView } from '@engraft/react';
 import { hookDedupe, hookMemo, hooks, memoizeProps } from "@engraft/refunc-react";
 import { arrEqWithRefEq, objEqWithRefEq, recordEqWith, refEq } from "@engraft/shared/lib/eq.js";
-import { up, UpdateProxy } from "@engraft/update-proxy";
+import { up, UpdateProxy } from "update-proxy";
 import { useCallback } from "react";
 
 // "defineSimpleTool" provides a simple way to define a tool that has a fixed
