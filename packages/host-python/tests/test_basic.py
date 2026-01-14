@@ -1,10 +1,9 @@
 import sys
-sys.path.append("..")
+sys.path.append("../engraft")
 import engraft
 import unittest
 import numpy as np
 import json
-
 
 def wikipedia_extractor(response):
     return engraft.run_engraft(response, "wikipedia.json", edit=False)
